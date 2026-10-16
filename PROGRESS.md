@@ -1,6 +1,6 @@
 # QQ 人设聊天 Bot：项目入口
 
-更新时间：2026-10-16 23:42（Asia/Shanghai）。
+更新时间：2026-10-16 23:41（Asia/Shanghai）。
 
 ## 当前阶段与授权
 
@@ -11,6 +11,8 @@
 **当前结论：笔记本文字核心闭环已有历史证据，完整文本交付未完成。** LAP-09实现/离线通过，真实重启/群验收待补；LAP-10独立预算/参数实现及high本机真实有证据，原生窗口未证实、CLI强制压缩/内部恢复缺口需回规划，整体部分完成/未部署，见[LAP-10报告](reports/lap-10-2026-10-16.md)。LAP-11独立实现/离线已交付；LAP-12未启动，原文本验收差额保留。当前只推进笔记本，PC不启动。
 
 历史实现提交4560ab6、LAP-09的fc20133、LAP-10的b19b050均已推送origin/main。历史G0/G1/G2/G3及G4单条/无@/两轮口令有证据；真人多人/三轮/长稳尚有差额。用户说明旧报错当时未登录NapCat，LAP-01并入LAP-12，不为旧trace重复真实推理；日志不足以证明跨层因果。详细历史检查点保留于工作线及任务交接。
+
+LAP-11实现交付提交`d00d11f`已成功推送origin/main；本次随后仅同步交付检查点。工作区开始时干净，未纳入本机备份/配置/群消息；提交不等于部署。
 
 ## 已确认的全局需求
 
@@ -39,7 +41,7 @@
 
 | 工作线 | 状态 | 最近更新 | 下一步 | 交接入口 |
 | --- | --- | --- | --- | --- |
-| 笔记本 WorkBuddy | active，LAP-11实现/离线通过、真实待验 | 2026-10-16 23:42 | LAP-10能力缺口回规划；后续按指令推进LAP-12及真人验收 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [任务台账](tracks/laptop-workbuddy/TASKS.md) / [UX_PLAN](tracks/laptop-workbuddy/UX_PLAN.md) |
+| 笔记本 WorkBuddy | active，LAP-11实现/离线通过、真实待验 | 2026-10-16 23:41 | LAP-10能力缺口回规划；后续按指令推进LAP-12及真人验收 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [任务台账](tracks/laptop-workbuddy/TASKS.md) / [UX_PLAN](tracks/laptop-workbuddy/UX_PLAN.md) |
 | 5070 PC 本地模型 | planned，本轮不推进 | 2026-10-15（计划）；2026-10-16确认范围 | 待用户后续启动再确认PC参数 | [HANDOFF](tracks/local-5070/HANDOFF.md) |
 
 已登记的任务级交接：[LAP-08 体验改进规划](tracks/laptop-workbuddy/tasks/LAP-08/HANDOFF.md)、[LAP-09 配置准入实施](tracks/laptop-workbuddy/tasks/LAP-09/HANDOFF.md)、[LAP-10 参数与预算](tracks/laptop-workbuddy/tasks/LAP-10/HANDOFF.md)（部分完成/能力缺口待规划）、[LAP-11 纯文本与人设v2](tracks/laptop-workbuddy/tasks/LAP-11/HANDOFF.md)（本次任务，实现/离线通过，真实待验）。其余实施任务领取时再建立独立HANDOFF，不批量创建空文件。

@@ -12,10 +12,12 @@
 
 兼容/回滚：旧人设正文与hash备份至本机state/persona-backups；新版本使下次请求新建当前会话，旧历史保留，已提前告知用户。不改原Obsidian参考。回滚仅还原本任务文件并停止后重新部署，不删除数据库或覆盖其他变更。
 
-最后安全检查点（2026-10-16 23:42 Asia/Shanghai）：实现及验证完成，结果见[报告](../../../../reports/lap-11-2026-10-16.md)与[结构化离线证据](../../../../reports/lap-11-offline-2026-10-16.json)。82项单元测试通过；5组实际AstrBot回环provider/runner/保存/装饰/OneBot发送一致，各一次模拟ACK；无@喊名、引用内At、冷场、黑名单入口及版本迁移回归通过。修复CommonMark星号跨位置误配，以及框架provider对代码空白/think/JSON原文的改写；固定政策与角色正文统一版本hash。未运行部署脚本或改本机配置、未登录/启停/真实推理/群发；运行实例尚未加载，当前运行状态未重新探测。
+最后安全检查点（2026-10-16 23:41 Asia/Shanghai）：实现及验证完成，结果见[报告](../../../../reports/lap-11-2026-10-16.md)与[结构化离线证据](../../../../reports/lap-11-offline-2026-10-16.json)。82项单元测试通过；5组实际AstrBot回环provider/runner/保存/装饰/OneBot发送一致，各一次模拟ACK；无@喊名、引用内At、冷场、黑名单入口及版本迁移回归通过。修复CommonMark星号跨位置误配，以及框架provider对代码空白/think/JSON原文的改写；固定政策与角色正文统一版本hash。未运行部署脚本或改本机配置、未登录/启停/真实推理/群发；运行实例尚未加载，当前运行状态未重新探测。
 
 修改文件：src/qqbot_gateway/{chat_text,persona,model_gateway,config,errors}.py，plugins/qq_router/main.py，scripts/{configure_astrbot,verify_lap11,verify_g4_routing}.py，config/persona.md、pyproject.toml，tests/{test_chat_text,test_config,test_model_gateway}.py，README、reports/lap-11*、UX_PLAN、ACCEPTANCE、PROGRESS/TASKS/工作线及本交接。新增依赖只在项目.venv安装，框架已同版；原persona v1以hash备份到忽略目录。首次根CWD框架测试产生的默认data已保存到忽略state/lap11-framework-scratch，未丢其他改动。
 
 验证命令：项目Python执行`-m unittest discover -s tests -q`（82通过）；框架Python执行scripts/verify_lap11.py（5例通过）；从runtime/astrbot执行绝对路径scripts/verify_g4_routing.py（入口/隔离/预算/版本迁移通过）。99个本地文档链接及git diff --check通过；提交/推送按本轮用户明确授权执行，提交不代表部署或完整验收。
 
 剩余/下一步：当前不需要用户登录。后续真实QQ ACK与U14群回归、人设3组各2次/P01最终接受需用户在NapCat按需登录并参与；报告仅有人为拟定风格预期，不冒充真实模型输出。LAP-10强制压缩/内部恢复及原生窗口缺口先回规划，LAP-12及旧LAP-02/03/04/05差额保留，不自动扩大本session任务。原Obsidian参考、账号/额度来源、实际settings.local和日常QQ/WorkBuddy配置未改。
+
+交付：实现提交`d00d11f`已成功推送origin/main；99个本地文档链接、工作区/暂存差异格式检查通过。本记录随后仅文档提交同步。真实模型/QQ消息次数均为0，运行实例未部署，不改变未验结论。
