@@ -17,7 +17,7 @@ sys.path[:0]=[str(ROOT),str(ROOT/'src')]
 
 async def verify():
     from astrbot.core.db.po import Conversation
-    from astrbot.api.message_components import At,Plain
+    from astrbot.api.message_components import At,Plain,Reply
     from astrbot.api.platform import AstrBotMessage,MessageMember,MessageType,PlatformMetadata
     from astrbot.core.platform.sources.aiocqhttp.aiocqhttp_message_event import AiocqhttpMessageEvent
     from astrbot.core.pipeline.waking_check.stage import build_unique_session_id
@@ -82,6 +82,14 @@ async def verify():
             try:await anext(no_at)
             except StopAsyncIteration:pass
             else:raise AssertionError('Non-At reached the model')
+            for text in ('大肥鱼', '鱼鱼在吗', '冷场了，出来说话'):
+                silent=event('333','111',50,text,mention=False)
+                assert [item async for item in router.on_group(silent)]==[]
+                assert not silent.get_extra('qq_router_trace')
+            quoted=event('333','111',51,'引用旧消息',mention=False)
+            quoted.message_obj.message.insert(0,Reply(id='old',chain=[At(qq='222')]))
+            assert [item async for item in router.on_group(quoted)]==[]
+            assert not quoted.get_extra('qq_router_trace')
             # Direct plugin delivery must stop before trace/task/coordinator/history, including admins.
             router.blocked={'333','555'}
             before_conversations=len(manager.items)
@@ -112,9 +120,19 @@ async def verify():
             router.budget=InputBudget(limit=100000,overhead=32,history_turns=64)
             large=await request(event('333','111',11,'x'*25000))
             assert len(large.prompt)==25000
+            from qqbot_gateway.persona import compose_persona,persona_version
+            old_cid=manager.current[first.unified_msg_origin]
+            old_count=len(manager.items)
+            router.persona=compose_persona('new offline character')
+            router.persona_id=persona_version(router.persona)
+            migrated=await request(event('333','111',12,'new persona'))
+            assert migrated.conversation.cid!=old_cid and migrated.conversation.history=='[]'
+            assert len(manager.items)==old_count+1
+            assert (first.unified_msg_origin,old_cid) in manager.items
             print('PASS: actual AstrBot session keys + router retain same-user history, isolate other user/group, reject no-At; no network/model calls.')
             print('PASS: direct blocked admin/user, no-At and unauthorized admin stop before trace/tasks/cooldown/history; unblocking retains history.')
             print('PASS: configured history=1, over-budget emoji rejection before provider, and >24k input under a larger budget.')
+            print('PASS: name/cold-chat/quoted-At stay silent; persona version creates a new conversation without deleting old history.')
         finally:router.tasks.close()
 
 

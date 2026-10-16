@@ -1,6 +1,5 @@
 """Configure only the isolated project instance, using upstream APIs for preferences."""
 import asyncio
-import hashlib
 import json
 from pathlib import Path
 import shutil
@@ -9,6 +8,7 @@ import sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'src'))
 from qqbot_gateway.config import load_settings
+from qqbot_gateway.persona import compose_persona, persona_version
 
 
 async def configure():
@@ -26,8 +26,8 @@ async def configure():
         'computer_use_runtime':'none'})
     config['provider_settings']['proactive_capability']['add_cron_tools']=False
     config['provider_settings']['file_extract']['enable']=False
-    persona=(ROOT/'config/persona.md').read_text(encoding='utf-8')
-    persona_id='fatfish-test-'+hashlib.sha256(persona.encode()).hexdigest()[:8]
+    persona=compose_persona((ROOT/'config/persona.md').read_text(encoding='utf-8'))
+    persona_id=persona_version(persona)
     from astrbot.core.config.agent_runner import get_agent_runner_config_default
     runner=get_agent_runner_config_default('local')
     runner['model'].update(provider_id='workbuddy-local',request_max_retries=1,fallback_provider_ids=[])
@@ -42,12 +42,14 @@ async def configure():
     config['provider_ltm_settings']['active_reply']['enable']=False
     config['kb_ids']=[]
     config['t2i']=False
+    config['provider_tts_settings']['enable']=False
     config['disable_metrics']=True
     config['trace_enable']=False;config['trace_log_enable']=False;config['log_file_enable']=False
     config['log_level']='ERROR'
     config['platform_settings']['segmented_reply']['enable']=False
     config['platform_settings']['reply_with_quote']=True
     config['platform_settings']['reply_with_mention']=False
+    config['platform_settings']['reply_prefix']=''
     config['platform_settings']['forward_threshold']=100000
     path.write_text(json.dumps(config,ensure_ascii=False,indent=2),encoding='utf-8-sig')
     target=ROOT/'runtime/astrbot/data/plugins'

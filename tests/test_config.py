@@ -62,6 +62,14 @@ class ConfigTests(unittest.TestCase):
             data = fixture(); data['access'][field] = []
             with self.assertRaises(ValueError): normalize_settings(data)
 
+    def test_plain_chat_output_limits(self):
+        for value in (200,1200,8000):
+            data=fixture();data['output']={'max_reply_chars':value}
+            self.assertEqual(normalize_settings(data)['output']['max_reply_chars'],value)
+        for value in (True,199,8001):
+            data=fixture();data['output']={'max_reply_chars':value}
+            with self.assertRaises(ValueError):normalize_settings(data)
+
     def test_invalid_complete_config_and_unimplemented_controls(self):
         for section, key, value in [('access', 'private_enabled', True), ('onebot', 'port', True),
                                     ('llm', 'model', '--model injected'), ('llm', 'reasoning_effort', 'medium'),

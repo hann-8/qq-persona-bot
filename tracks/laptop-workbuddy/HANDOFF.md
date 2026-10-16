@@ -2,11 +2,15 @@
 
 返回[全局入口](../../PROGRESS.md)。继承[AGENTS](../../AGENTS.md)；原规格见[实施计划](IMPLEMENTATION_PLAN.md)，本轮体验改进执行[UX_PLAN](UX_PLAN.md)，验收见[ACCEPTANCE](ACCEPTANCE.md)，领取/交接见[任务台账](TASKS.md)。本轮任务记录：[LAP-08](tasks/LAP-08/HANDOFF.md)。
 
-更新时间：2026-10-16 23:22（Asia/Shanghai）。目标：先交付个人QQ授权群真实@的人设文字聊天；当前只推进笔记本。用户后续授权转入[LAP-10](tasks/LAP-10/HANDOFF.md)，独立预算/参数实现、70项离线及所选high本机真实通过；原生窗口及强制压缩/内部恢复缺口需回规划，整体部分完成/未部署。LAP-09真实差额保留，LAP-11/12未领取。
+更新时间：2026-10-16 23:42（Asia/Shanghai）。本次任务[LAP-11](tasks/LAP-11/HANDOFF.md)已实现/离线通过，未部署，真实验收待补。用户授权提交/推送，开始工作区干净。
 
 ## 当前状态与第一步
 
-**文字核心已有证据，文本交付未完成；LAP-10部分完成，下一步先处理规划能力缺口。** CLI常规autoCompactEnabled=false能被force压缩/内部恢复绕过，不能保证大上下文严格单次推理；原生窗口仅ACK未证实。独立实现和证据见[LAP-10报告](../../reports/lap-10-2026-10-16.md)。本轮真实CLI3次（含零推理1次）、4控制、2user消息，无群消息/启停/实际配置变更。用户说明旧报错时未登录NapCat，LAP-01仍并入LAP-12，不为旧trace重复探测。
+文字核心已有历史证据，完整文本交付未完成。LAP-11网关单次纯文本转换、固定政策/人设v2、实际框架原文保留与版本迁移已落地；82项单元、5组provider/runner/保存/装饰/OneBot模拟ACK及入口反例回归通过。见[LAP-11报告](../../reports/lap-11-2026-10-16.md)。本轮未启停、改实际配置、登录、真实推理或群发，实例未加载新代码，当前状态未重新探测。
+
+当前无需用户登录。后续实际部署/QQ ACK、人设P01需用户在NapCat按需登录并参与；下次请求会因组合人设hash变化新建当前上下文，旧会话不删。本轮只交付LAP-11，不自动领取LAP-12。
+
+LAP-10独立预算/参数实现和high真实证据保留；原生窗口仅ACK未证实，force压缩/内部恢复可绕过普通关闭开关，不能保证严格单次上游推理。见[LAP-10报告](../../reports/lap-10-2026-10-16.md)，需符合AGENTS要求的规划会话处理，不能因LAP-11离线通过而默认整体可部署。
 
 LAP-09历史检查点：配置菜单及groups/blacklist命令、共享校验/迁移/原子保存、gate/router黑名单静默前置拒绝已落地；当时53项单元测试及实际AstrBot router/At转换器离线回归通过，未真实推理。详情见[LAP-09报告](../../reports/lap-09-2026-10-16.md)。本机存活身份检查拒绝写配置，旧运行实例未更新；提交不代表部署或完整验收。
 
@@ -48,7 +52,7 @@ LAP-09历史检查点：配置菜单及groups/blacklist命令、共享校验/迁
 ## 实现入口与运行方法
 
 - 自有代码：src/qqbot_gateway/{onebot_gate,model_gateway,workbuddy_cli_runner,contracts,session_queue,task_store,text_safety,config,errors}.py；唯一业务插件plugins/qq_router/main.py。AstrBot唯一保存历史，按群+用户隔离、最多8轮，CLI每请求新上下文；同UMO FIFO、5秒冷却、模型全局单并发。
-- 人设config/persona.md运行中仍为旧胖鱼测试版。本轮用户指定人设v2，采鲸鱼娘/鱼片/自然口语，草案与冲突处理见UX_PLAN，尚未落地。默认模型仍deepseek-v4.1-flash；最新需求允许操作者显式设置模型、上下文输入上限和强度，额度不必极限节省，仍不自动换账号/站点/模型或另接收费API。
+- 仓库config/persona.md已采用人设v2草案；persona.py固定政策优先、统一版本hash，运行实例未更新，最终风格接受待LAP-03。默认模型仍deepseek-v4.1-flash；最新需求允许操作者显式设置模型、上下文输入上限和强度，额度不必极限节省，仍不自动换账号/站点/模型或另接收费API。
 - 隔离实例：runtime/astrbot；框架Python为runtime/astrbot-tool/astrbot/Scripts/python.exe，框架验证脚本用它运行，CWD须为runtime/astrbot。项目服务/离线单元测试用.venv/Scripts/python.exe。
 - 本机PowerShell：`scripts/Start-Bot.ps1`完整文本模式；`-ChannelOnly`仅诊断；`scripts/Show-BotStatus.ps1`无推理健康检查；`scripts/Stop-Bot.ps1`按state/managed-processes.json中PID+创建身份停止本项目进程。不要重复启动，不按QQ.exe进程名批量停止。
 - 回环端口：AstrBot管理页6185、OneBot6199、gate6200、模型8765、NapCat6099。state/router-ready.json验证插件PID/创建身份。运行配置cmd_config.json有UTF8 BOM，读utf-8-sig；不要覆盖用户日常应用配置。
@@ -57,10 +61,10 @@ LAP-09历史检查点：配置菜单及groups/blacklist命令、共享校验/迁
 
 ## 剩余工作与任务归属
 
-1. LAP-09共享配置/授权群/黑名单已实现/离线通过，U04/05真实群及U07全组件重启待验；LAP-10参数/预算独立实现、70项离线及high真实通过，原生窗口及force压缩/内部恢复缺口需先回规划。LAP-11纯文本/人设v2、LAP-12启停/状态仍未实施，详见UX_PLAN及LAP-10报告。
+1. LAP-09共享配置/授权群/黑名单已实现/离线通过，U04/05真实群及U07全组件重启待验；LAP-10参数/预算独立实现、70项离线及high真实通过，原生窗口及force压缩/内部恢复缺口需先回规划。LAP-11纯文本/人设v2已实现/离线通过、真实待验；LAP-12启停/状态未实施，详见UX_PLAN及LAP-10报告。
 2. LAP-01合并到LAP-12，不抹掉历史trace限制；只有出现新的独立模型失败再重开。上下文原生控制仅有静态候选证据，实施时先零推理验证，不用autoCompactWindow冒充上限。
 3. 原LAP-02真人交错/隔离/重置和P02三轮差额、LAP-03最终人设接受、LAP-04恢复/文本长稳、LAP-05交付汇总全部保留。旧基线不无故重跑；新代码触及的路径必须重做相应有意义回归。
 4. LAP-06/07视频/ASR仍延期；目前遇链接只说明未支持。已有BV178JX6wEaa样本，进入相关阶段再补其余样本/登录意愿；PC不启动。
-5. 任务归属见台账；LAP-09交付后按用户明确指令转入LAP-10，未领取LAP-11/12。真实@入口、无工具/主动任务/项目自动重试/fallback保持，成功路径不stop_event；CLI内部强制压缩/恢复仍未排除，不冒充上游严格单次推理。
+5. 任务归属见台账；LAP-09交付后按用户明确指令转入LAP-10，LAP-11本轮已独立交付，LAP-12未领取。真实@入口、无工具/主动任务/项目自动重试/fallback保持，成功路径不stop_event；CLI内部强制压缩/恢复仍未排除，不冒充上游严格单次推理。
 
-本次交接可恢复：读取PROGRESS→本文件→TASKS→被领取任务的记录及相关代码/证据，不必重读全部历史报告。代码已增加LAP-09及LAP-10独立实现，实际运行实例尚未重启加载。
+本次交接可恢复：读取PROGRESS→本文件→TASKS→被领取任务的记录及相关代码/证据，不必重读全部历史报告。代码已增加LAP-09、LAP-10独立实现及LAP-11纯文本/人设，实际运行实例尚未重启加载。

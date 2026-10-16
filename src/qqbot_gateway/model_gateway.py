@@ -16,6 +16,7 @@ from .contracts import normalize_request, contract_shape
 from .errors import GatewayError, MESSAGES
 from .workbuddy_cli_runner import CLIRunner
 from .token_budget import InputBudget, validate_model_settings
+from .chat_text import prepare_reply
 
 LOG = logging.getLogger(__name__)
 TRACE = web.RequestKey('qqbot_trace',str)
@@ -110,7 +111,7 @@ class ModelQueue:
                 self.active=False
 
 
-def application(queue,token,ready_file=None,budget=None):
+def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200):
     budget=budget or InputBudget()
     if not isinstance(token,str) or len(token)<32:raise ValueError('Local bearer token required')
     def router_ready():
@@ -161,8 +162,7 @@ def application(queue,token,ready_file=None,budget=None):
         queue.last_shape=contract_shape(payload)
         LOG.info('REQUEST_ACCEPTED request_id=%s',request[TRACE])
         result=await queue.submit(system,prompt,request[TRACE])
-        limited=len(result)>1200
-        if limited:result=result[:1199]+'…'
+        result,limited=prepare_reply(result,max_reply_chars)
         return web.json_response({'id':'chatcmpl-'+request[TRACE],'object':'chat.completion','created':int(time.time()),
             'model':'workbuddy-local','choices':[{'index':0,'message':{'role':'assistant','content':result},
                                                'finish_reason':'length' if limited else 'stop'}]})
@@ -188,7 +188,7 @@ def main():
     runner=CLIRunner(root,llm['model'],llm['run_timeout_seconds'],llm['cleanup_seconds'],llm['reasoning_effort'],budget)
     queue=ModelQueue(runner,llm['queue_limit'],llm['queue_wait_seconds'])
     logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(message)s')
-    web.run_app(application(queue,tokens['model_gateway'],root/'state/router-ready.json',budget),host=llm['host'],port=llm['port'],
+    web.run_app(application(queue,tokens['model_gateway'],root/'state/router-ready.json',budget,settings['output']['max_reply_chars']),host=llm['host'],port=llm['port'],
                 access_log=None,handler_cancellation=True)
 
 

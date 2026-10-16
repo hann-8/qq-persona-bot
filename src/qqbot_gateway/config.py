@@ -117,8 +117,6 @@ def normalize_settings(raw):
         value = section.get(key)
         if type(value) is not int or not lower <= value <= upper:
             raise ValueError(f'Invalid {key}; expected integer {lower}..{upper}')
-    if output['max_reply_chars'] != 1200:
-        raise ValueError('Nondefault output controls require LAP-11 implementation')
     from .token_budget import validate_model_settings
     validate_model_settings(data)
     secret = data.get('secrets_file')

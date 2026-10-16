@@ -5,9 +5,10 @@ class GatewayError(Exception):
 
 
 MESSAGES = {
+    'EMPTY_REPLY': '这次没有生成可显示的文字，请换个问法再试。',
     'INPUT_TOO_LONG': '这条文字和固定设定已超过当前输入预算，请缩短问题或由管理员调整预算。',
     'MODEL_CONFIG_UNSUPPORTED': '当前模型或推理强度不支持此配置，请管理员检查本机模型能力。',
-    'BACKEND_UNAVAILABLE': '胖鱼暂时接不上模型，稍后再试。',
+    'BACKEND_UNAVAILABLE': '暂时接不上模型，稍后再试。',
     'AUTH_REQUIRED': '模型账号需要在本机重新登录，管理员处理后再试。',
     'QUOTA_EXHAUSTED': '当前模型额度不足，请管理员检查额度或明确调整模型配置。',
     'RATE_LIMITED': '模型服务暂时限流，稍后再试。',

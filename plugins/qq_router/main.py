@@ -1,4 +1,3 @@
-import hashlib
 import json
 import logging
 import os
@@ -11,12 +10,15 @@ import psutil
 from astrbot.api.event import filter, AstrMessageEvent
 from astrbot.api.star import Context, Star, register
 from astrbot.api.message_components import At, AtAll, Plain, Reply
+from astrbot.core.agent.message import TextPart
+from astrbot.core.message.message_event_result import MessageChain
 
 from qqbot_gateway.session_queue import SessionCoordinator, SessionError
 from qqbot_gateway.task_store import TaskStore
 from qqbot_gateway.config import load_settings
 from qqbot_gateway.token_budget import InputBudget, validate_model_settings
 from qqbot_gateway.errors import GatewayError, MESSAGES
+from qqbot_gateway.persona import compose_persona, persona_version
 
 LOG=logging.getLogger(__name__)
 
@@ -29,8 +31,8 @@ class QQRouter(Star):
         settings=load_settings(self.root/'config/settings.local.yaml')
         self.bot=settings['bot']['qq'];self.groups=set(settings['access']['allowed_groups']);self.admins=set(settings['access']['admin_users'])
         self.blocked=set(settings['access']['blocked_users'])
-        self.persona=(self.root/'config/persona.md').read_text(encoding='utf-8')
-        self.persona_id='fatfish-test-'+hashlib.sha256(self.persona.encode()).hexdigest()[:8]
+        self.persona=compose_persona((self.root/'config/persona.md').read_text(encoding='utf-8'))
+        self.persona_id=persona_version(self.persona)
         chat=settings.get('chat',{})
         self.budget=InputBudget.from_settings(settings,validate_model_settings(settings))
         self.coordinator=SessionCoordinator(chat.get('user_cooldown_seconds',5),chat.get('session_queue_limit',2),chat.get('session_queue_timeout_seconds',600))
@@ -51,6 +53,26 @@ class QQRouter(Star):
         if event.get_extra('qq_router_trace'):
             event.set_extra('qq_router_success',bool(response.completion_text))
 
+    @filter.on_agent_done()
+    async def preserve_gateway_text(self,event:AstrMessageEvent,run_context,response):
+        # The OpenAI adapter strips whitespace, <think> tags and JSON wrappers.
+        # Our gateway has already returned final plain text; restore that exact
+        # value in both the outgoing chain and runner history, without parsing.
+        if not event.get_extra('qq_router_trace') or response is None:
+            return
+        raw=response.raw_completion
+        if (raw is None or raw.model!='workbuddy-local' or
+                not raw.id.startswith('chatcmpl-') or len(raw.choices)!=1):
+            return
+        text=raw.choices[0].message.content
+        if not isinstance(text,str) or not text.strip() or response.role!='assistant':
+            return
+        response.result_chain=MessageChain().message(text)
+        response.reasoning_content=None
+        if run_context.messages and run_context.messages[-1].role=='assistant':
+            run_context.messages[-1].content=[TextPart(text=text)]
+        event.set_extra('qq_router_success',True)
+
     @filter.event_message_type(filter.EventMessageType.GROUP_MESSAGE)
     async def on_group(self,event:AstrMessageEvent):
         if (str(event.get_self_id())!=self.bot or str(event.get_group_id()) not in self.groups or
@@ -67,7 +89,7 @@ class QQRouter(Star):
         except SessionError as error:
             self.tasks.set(key,'failed')
             if error.notify:
-                texts={'COOLDOWN':'本鱼还在嚼上一口饭，等几秒再叫我。','SESSION_QUEUE_FULL':'你这边还有问题排着队，稍后再试。','SESSION_QUEUE_TIMEOUT':'这条问题排队超时了，请重新提问。'}
+                texts={'COOLDOWN':'上一条还在处理，等几秒再叫我吧。','SESSION_QUEUE_FULL':'你这边还有问题排着队，稍后再试。','SESSION_QUEUE_TIMEOUT':'这条问题排队超时了，请重新提问。'}
                 yield event.plain_result(texts[error.code])
             return
         try:
@@ -76,9 +98,9 @@ class QQRouter(Star):
                 self.tasks.set(key,'failed');yield event.plain_result('目前只接通文字聊天，图片、音频和视频还没接入。');return
             prompt=''.join(c.text for c in components if isinstance(c,Plain)).strip()
             if not prompt:
-                self.tasks.set(key,'failed');yield event.plain_result('本鱼在。带上想问的文字再叫我吧。');return
+                self.tasks.set(key,'failed');yield event.plain_result('我在~ 带上想问的文字再叫我吧。');return
             if re.search(r'https?://\S+',prompt,re.I):
-                self.tasks.set(key,'failed');yield event.plain_result('本鱼目前只接通文字聊天，B站和网页正文还没接入。贴段文字，我先帮你捋捋。');return
+                self.tasks.set(key,'failed');yield event.plain_result('我目前只接通文字聊天，B站和网页正文还没接入。贴段文字，我先帮你捋捋。');return
             try:self.budget.select_history(self.persona,prompt,[])
             except GatewayError:
                 self.tasks.set(key,'failed');yield event.plain_result(MESSAGES['INPUT_TOO_LONG']);return
@@ -90,7 +112,7 @@ class QQRouter(Star):
                 if str(event.get_sender_id()) not in self.admins:
                     self.tasks.set(key,'failed');yield event.plain_result('当前只允许管理员重置本人会话。');return
                 await manager.new_conversation(umo,persona_id=self.persona_id)
-                self.tasks.set(key,'completed');yield event.plain_result('本鱼已清空你在这个群里的当前会话。');return
+                self.tasks.set(key,'completed');yield event.plain_result('你在这个群里的当前会话已重置，重新聊吧。');return
             if conv is None or conv.persona_id!=self.persona_id:
                 cid=await manager.new_conversation(umo,persona_id=self.persona_id)
                 conv=await manager.get_conversation(umo,cid)
@@ -110,7 +132,7 @@ class QQRouter(Star):
         except Exception:
             self.tasks.set(key,'failed')
             LOG.error('QQ_ROUTER_ERROR trace=%s',trace)
-            if not getattr(event,'_has_send_oper',False):yield event.plain_result('本鱼这条没处理好，请稍后再试。（追踪'+trace+'）')
+            if not getattr(event,'_has_send_oper',False):yield event.plain_result('这条没处理好，请稍后再试。（追踪'+trace+'）')
         finally:lease.release()
 
     async def terminate(self):

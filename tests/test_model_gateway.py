@@ -84,13 +84,13 @@ class ParserTests(unittest.TestCase):
 
 class FakeRunner:
     def __init__(self):
-        self.attempts=0;self.calls=[];self.started=asyncio.Event();self.release=asyncio.Event();self.cancelled=asyncio.Event();self.error=None
+        self.attempts=0;self.calls=[];self.started=asyncio.Event();self.release=asyncio.Event();self.cancelled=asyncio.Event();self.error=None;self.result='answer'
 
     async def run(self,system,prompt,request_id):
         self.attempts+=1;self.calls.append(request_id);self.started.set()
         try:
             if self.error:raise GatewayError(self.error)
-            await self.release.wait();return 'answer'
+            await self.release.wait();return self.result
         except asyncio.CancelledError:self.cancelled.set();raise
 
 
@@ -157,6 +157,21 @@ class HttpTests(unittest.IsolatedAsyncioTestCase):
         async with self.client.post(self.url+'/v1/chat/completions',json={'model':'workbuddy-local','messages':[{'role':'user','content':'x'}]},headers=self.headers) as response:
             self.assertEqual(response.status,429);data=await response.json()
         self.assertIn('追踪',data['error']['message']);self.assertEqual(self.runner.attempts,1)
+
+    async def test_one_conversion_and_one_attempt(self):
+        self.runner.result='**重点**\n\n```\n**literal**\n```'
+        async with self.client.post(self.url+'/v1/chat/completions',json={'model':'workbuddy-local','messages':[{'role':'user','content':'x'}]},headers=self.headers) as response:
+            data=await response.json()
+        self.assertEqual(data['choices'][0]['message']['content'],'重点\n**literal**')
+        self.assertEqual(self.runner.attempts,1)
+
+    async def test_empty_or_tool_contaminated_final_is_failure_without_retry(self):
+        for text,code in [('---','EMPTY_REPLY'),('`<tool_call>x</tool_call>`','TOOL_ISOLATION_FAILED')]:
+            self.runner.result=text
+            async with self.client.post(self.url+'/v1/chat/completions',json={'model':'workbuddy-local','messages':[{'role':'user','content':'x'}]},headers=self.headers) as response:
+                self.assertGreaterEqual(response.status,400)
+                data=await response.json();self.assertEqual(data['error']['code'],code)
+        self.assertEqual(self.runner.attempts,2)
 
 
 if __name__=='__main__':unittest.main()
