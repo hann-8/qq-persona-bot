@@ -1,0 +1,6 @@
+name: qq_router
+display_name: 胖鱼文本路由
+desc: 指定群真实@后的单一文本业务入口
+version: v0.1.0
+author: local
+astrbot_version: '==4.29.0'

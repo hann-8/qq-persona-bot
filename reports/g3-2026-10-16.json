@@ -1,0 +1,156 @@
+{
+  "real_request": true,
+  "failure_attempts": {
+    "RATE_LIMITED": {
+      "failed": true,
+      "attempts": 1
+    },
+    "MODEL_TIMEOUT": {
+      "failed": true,
+      "attempts": 1
+    },
+    "PROTOCOL_ERROR": {
+      "failed": true,
+      "attempts": 1
+    }
+  },
+  "answer_exact": true,
+  "cli_attempts": 1,
+  "contract": {
+    "fields": {
+      "model": "str",
+      "stream": "bool",
+      "messages": "list"
+    },
+    "message_fields": [
+      [
+        "content",
+        "role"
+      ],
+      [
+        "content",
+        "role"
+      ],
+      [
+        "content",
+        "role"
+      ],
+      [
+        "content",
+        "role"
+      ]
+    ],
+    "roles": [
+      "system",
+      "user",
+      "assistant",
+      "user"
+    ]
+  },
+  "protocol": [
+    {
+      "type": "system",
+      "subtype": "init",
+      "keys": [
+        "__timestamp",
+        "apiKeySource",
+        "cwd",
+        "mcp_servers",
+        "model",
+        "output_style",
+        "permissionMode",
+        "session_id",
+        "slash_commands",
+        "subtype",
+        "tools",
+        "type",
+        "uuid"
+      ]
+    },
+    {
+      "type": "system",
+      "subtype": "status",
+      "keys": [
+        "__timestamp",
+        "_meta",
+        "_requestId",
+        "session_id",
+        "status",
+        "subtype",
+        "type",
+        "uuid"
+      ]
+    },
+    {
+      "type": "assistant",
+      "subtype": null,
+      "keys": [
+        "__timestamp",
+        "_messageId",
+        "_meta",
+        "_requestId",
+        "message",
+        "parent_tool_use_id",
+        "session_id",
+        "type",
+        "uuid"
+      ]
+    },
+    {
+      "type": "assistant",
+      "subtype": null,
+      "keys": [
+        "__timestamp",
+        "_messageId",
+        "_meta",
+        "_requestId",
+        "message",
+        "parent_tool_use_id",
+        "session_id",
+        "type",
+        "uuid"
+      ]
+    },
+    {
+      "type": "result",
+      "subtype": "success",
+      "keys": [
+        "__timestamp",
+        "_meta",
+        "_requestId",
+        "duration_api_ms",
+        "duration_ms",
+        "is_error",
+        "modelUsage",
+        "num_turns",
+        "permission_denials",
+        "result",
+        "session_id",
+        "subtype",
+        "total_cost_usd",
+        "type",
+        "usage",
+        "uuid"
+      ]
+    },
+    {
+      "type": "system",
+      "subtype": "init",
+      "keys": [
+        "__timestamp",
+        "apiKeySource",
+        "cwd",
+        "mcp_servers",
+        "model",
+        "output_style",
+        "permissionMode",
+        "session_id",
+        "slash_commands",
+        "subtype",
+        "tools",
+        "type",
+        "uuid"
+      ]
+    }
+  ]
+}

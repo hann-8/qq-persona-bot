@@ -1,0 +1,9 @@
+info.txt
+secrets/
+state/
+cache/
+logs/
+runtime/
+.venv/
+config/settings.local.yaml
+__pycache__/

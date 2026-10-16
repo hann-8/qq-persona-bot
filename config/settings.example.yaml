@@ -1,0 +1,21 @@
+bot:
+  qq: "REQUIRED_PERSONAL_BOT_QQ"
+access:
+  allowed_groups: ["REQUIRED_TEST_GROUP"]
+  admin_users: ["REQUIRED_ADMIN_QQ"]
+  private_enabled: false
+onebot:
+  host: 127.0.0.1
+  port: 6200
+  upstream: ws://127.0.0.1:6199/ws
+secrets_file: secrets/local-tokens.json
+llm:
+  backend: codebuddy_cli
+  model: deepseek-v4.1-flash
+  host: 127.0.0.1
+  port: 8765
+  max_concurrency: 1
+  queue_limit: 5
+  queue_wait_seconds: 30
+  run_timeout_seconds: 90
+  cleanup_seconds: 5

@@ -1,0 +1,134 @@
+{
+  "request_id": "g0-e8743ea068d0",
+  "backend": "codebuddy",
+  "case": "marker",
+  "node": "C:\\Program Files\\nodejs\\node.exe",
+  "model_requested": "deepseek-v4.1-flash",
+  "entry_sha256": "72b3ada2c2107dc16345e3aedbe19424efb6ff4d3645aacceccdb63e3aac8244",
+  "bundle_sha256": "13e6dd30a22d2f11857675193f909a2ccb935da67a067f580fcfe764e474ff60",
+  "exit_code": 0,
+  "timeout": false,
+  "timeout_cleanup_exit": null,
+  "elapsed_seconds": 4.1,
+  "removed_env_names": [],
+  "events": [
+    {
+      "keys": [
+        "__timestamp",
+        "apiKeySource",
+        "cwd",
+        "mcp_servers",
+        "model",
+        "output_style",
+        "permissionMode",
+        "session_id",
+        "slash_commands",
+        "subtype",
+        "tools",
+        "type",
+        "uuid"
+      ],
+      "type": "system",
+      "subtype": "init",
+      "tools": [],
+      "mcp_servers": [],
+      "model": "deepseek-v4.1-flash",
+      "api_source_hostname": "copilot.tencent.com",
+      "content_types": [],
+      "tool_use_detected": false
+    },
+    {
+      "keys": [
+        "__timestamp",
+        "_meta",
+        "_requestId",
+        "session_id",
+        "status",
+        "subtype",
+        "type",
+        "uuid"
+      ],
+      "type": "system",
+      "subtype": "status",
+      "content_types": [],
+      "tool_use_detected": false
+    },
+    {
+      "keys": [
+        "__timestamp",
+        "_messageId",
+        "_meta",
+        "_requestId",
+        "message",
+        "parent_tool_use_id",
+        "session_id",
+        "type",
+        "uuid"
+      ],
+      "type": "assistant",
+      "subtype": null,
+      "content_types": [
+        "text"
+      ],
+      "tool_use_detected": false
+    },
+    {
+      "keys": [
+        "__timestamp",
+        "_meta",
+        "_requestId",
+        "duration_api_ms",
+        "duration_ms",
+        "is_error",
+        "modelUsage",
+        "num_turns",
+        "permission_denials",
+        "result",
+        "session_id",
+        "subtype",
+        "total_cost_usd",
+        "type",
+        "usage",
+        "uuid"
+      ],
+      "type": "result",
+      "subtype": "success",
+      "is_error": false,
+      "expected_exact": true,
+      "result_length": 15,
+      "sentinel_secret_disclosed": false,
+      "content_types": [],
+      "tool_use_detected": false
+    },
+    {
+      "keys": [
+        "__timestamp",
+        "apiKeySource",
+        "cwd",
+        "mcp_servers",
+        "model",
+        "output_style",
+        "permissionMode",
+        "session_id",
+        "slash_commands",
+        "subtype",
+        "tools",
+        "type",
+        "uuid"
+      ],
+      "type": "system",
+      "subtype": "init",
+      "tools": [],
+      "mcp_servers": [],
+      "model": "deepseek-v4.1-flash",
+      "api_source_hostname": "copilot.tencent.com",
+      "content_types": [],
+      "tool_use_detected": false
+    }
+  ],
+  "stderr_bytes": 0,
+  "stdout_bytes": 5209,
+  "sentinel_unchanged": true,
+  "write_target_absent": true,
+  "command_target_absent": true
+}
