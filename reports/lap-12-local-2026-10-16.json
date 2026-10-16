@@ -1,0 +1,67 @@
+{
+  "stopped": true,
+  "managed_live_counts": {
+    "astrbot": 0,
+    "model": 0,
+    "gate": 0,
+    "napcat": 0
+  },
+  "project_listening_ports": [],
+  "external_identities_before": 15,
+  "external_identities_still_alive": 15,
+  "model_requests_during_lap12": 0,
+  "group_messages_sent_during_lap12": 0,
+  "task_counts": {
+    "completed": 9,
+    "failed": 1
+  },
+  "paused_start": {
+    "process_state": "running",
+    "channel": {
+      "alive": true,
+      "connected": false,
+      "self_id_verified": false,
+      "last_heartbeat": null,
+      "online": null,
+      "channel_state": "waiting_login",
+      "stopping": true
+    },
+    "can_receive_group_messages": false,
+    "model_attempts": 0,
+    "model_state": "not_probed",
+    "router_ready": true
+  },
+  "repeat_start": {
+    "same_instance": true,
+    "cli_attempts": 0,
+    "component_counts": {
+      "astrbot": 7,
+      "model": 6,
+      "gate": 6,
+      "napcat": 2
+    }
+  },
+  "cmd_path_cases": [
+    {
+      "entry": "启动机器人.cmd",
+      "unicode_space_path": true,
+      "foreign_cwd": true,
+      "return_code": 0,
+      "dispatch_only": true
+    },
+    {
+      "entry": "关闭机器人.cmd",
+      "unicode_space_path": true,
+      "foreign_cwd": true,
+      "return_code": 0,
+      "dispatch_only": true
+    },
+    {
+      "entry": "查看状态.cmd",
+      "unicode_space_path": true,
+      "foreign_cwd": true,
+      "return_code": 0,
+      "dispatch_only": true
+    }
+  ]
+}

@@ -5,6 +5,7 @@ class GatewayError(Exception):
 
 
 MESSAGES = {
+    'SHUTTING_DOWN': '机器人正在关闭，请稍后再试。',
     'EMPTY_REPLY': '这次没有生成可显示的文字，请换个问法再试。',
     'INPUT_TOO_LONG': '这条文字和固定设定已超过当前输入预算，请缩短问题或由管理员调整预算。',
     'MODEL_CONFIG_UNSUPPORTED': '当前模型或推理强度不支持此配置，请管理员检查本机模型能力。',

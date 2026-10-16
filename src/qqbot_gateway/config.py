@@ -183,7 +183,7 @@ def configuration_lock(root):
                 import fcntl
                 fcntl.flock(stream, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except OSError:
-            raise ValueError('Configuration/start operation already in progress') from None
+            raise ValueError('Configuration/start/stop operation already in progress') from None
         try:
             yield
         finally:

@@ -129,10 +129,18 @@ async def verify():
             assert migrated.conversation.cid!=old_cid and migrated.conversation.history=='[]'
             assert len(manager.items)==old_count+1
             assert (first.unified_msg_origin,old_cid) in manager.items
+            from qqbot_gateway.lifecycle import atomic_json
+            atomic_json(root/'state/stop-request.json',{'instance_id':'offline-stop'})
+            with patch.dict(os.environ,{'QQBOT_INSTANCE_ID':'offline-stop'}), \
+                 patch.object(router.tasks,'accept',side_effect=AssertionError('Stopping must not accept')):
+                paused=event('333','111',13,'paused')
+                assert [item async for item in router.on_group(paused)]==[]
+                assert not paused.get_extra('qq_router_trace')
             print('PASS: actual AstrBot session keys + router retain same-user history, isolate other user/group, reject no-At; no network/model calls.')
             print('PASS: direct blocked admin/user, no-At and unauthorized admin stop before trace/tasks/cooldown/history; unblocking retains history.')
             print('PASS: configured history=1, over-budget emoji rejection before provider, and >24k input under a larger budget.')
             print('PASS: name/cold-chat/quoted-At stay silent; persona version creates a new conversation without deleting old history.')
+            print('PASS: current instance stop marker rejects before trace/task/history, no reply or provider request.')
         finally:router.tasks.close()
 
 

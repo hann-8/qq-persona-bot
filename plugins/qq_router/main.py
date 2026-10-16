@@ -19,6 +19,7 @@ from qqbot_gateway.config import load_settings
 from qqbot_gateway.token_budget import InputBudget, validate_model_settings
 from qqbot_gateway.errors import GatewayError, MESSAGES
 from qqbot_gateway.persona import compose_persona, persona_version
+from qqbot_gateway.lifecycle import stopping
 
 LOG=logging.getLogger(__name__)
 
@@ -45,7 +46,7 @@ class QQRouter(Star):
             await manager.create_persona(self.persona_id,self.persona,tools=[],skills=[])
         else:
             await manager.update_persona(self.persona_id,system_prompt=self.persona,tools=[],skills=[])
-        (self.root/'state/router-ready.json').write_text(json.dumps({'pid':os.getpid(),'created':psutil.Process().create_time(),'time':time.time(),'persona_id':self.persona_id}),encoding='utf-8')
+        (self.root/'state/router-ready.json').write_text(json.dumps({'pid':os.getpid(),'created':psutil.Process().create_time(),'time':time.time(),'persona_id':self.persona_id,'instance_id':os.environ.get('QQBOT_INSTANCE_ID')}),encoding='utf-8')
         LOG.warning('QQ_ROUTER_READY persona_version=%s',self.persona_id)
 
     @filter.on_llm_response()
@@ -75,6 +76,8 @@ class QQRouter(Star):
 
     @filter.event_message_type(filter.EventMessageType.GROUP_MESSAGE)
     async def on_group(self,event:AstrMessageEvent):
+        if stopping(self.root):
+            event.should_call_llm(False);event.stop_event();return
         if (str(event.get_self_id())!=self.bot or str(event.get_group_id()) not in self.groups or
                 str(event.get_sender_id())==self.bot or str(event.get_sender_id()) in self.blocked):
             event.should_call_llm(False);event.stop_event();return
@@ -93,6 +96,8 @@ class QQRouter(Star):
                 yield event.plain_result(texts[error.code])
             return
         try:
+            if stopping(self.root):
+                self.tasks.set(key,'failed');return
             self.tasks.set(key,'running')
             if any(not isinstance(c,(At,AtAll,Plain,Reply)) for c in components):
                 self.tasks.set(key,'failed');yield event.plain_result('目前只接通文字聊天，图片、音频和视频还没接入。');return

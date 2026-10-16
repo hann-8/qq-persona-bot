@@ -142,6 +142,21 @@ class HttpTests(unittest.IsolatedAsyncioTestCase):
         async with self.client.get(self.url+'/v1/models') as response:self.assertEqual(response.status,401)
         self.assertEqual(self.runner.attempts,0)
 
+    async def test_health_current_and_historical_errors(self):
+        self.runner.error='RATE_LIMITED'
+        payload={'model':'workbuddy-local','messages':[{'role':'user','content':'x'}]}
+        async with self.client.post(self.url+'/v1/chat/completions',json=payload,headers=self.headers) as response:
+            self.assertEqual(response.status,429)
+        async with self.client.get(self.url+'/health') as response:data=await response.json()
+        self.assertEqual(data['current_error']['code'],'RATE_LIMITED')
+        self.assertFalse(data['last_error']['historical']);self.assertIsInstance(data['last_error']['time'],float)
+        self.runner.error=None
+        async with self.client.post(self.url+'/v1/chat/completions',json=payload,headers=self.headers) as response:
+            self.assertEqual(response.status,200)
+        async with self.client.get(self.url+'/health') as response:data=await response.json()
+        self.assertIsNone(data['current_error']);self.assertTrue(data['last_error']['historical'])
+        self.assertEqual(self.runner.attempts,2)
+
     async def test_minimum_contract(self):
         payload={'model':'workbuddy-local','messages':[{'role':'user','content':'hello'}],'stream':False}
         async with self.client.post(self.url+'/v1/chat/completions',json=payload,headers=self.headers) as response:

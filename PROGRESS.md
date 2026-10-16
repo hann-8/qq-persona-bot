@@ -1,18 +1,18 @@
 # QQ 人设聊天 Bot：项目入口
 
-更新时间：2026-10-16 23:41（Asia/Shanghai）。
+更新时间：2026-10-16 23:56（Asia/Shanghai）。
 
 ## 当前阶段与授权
 
-本次用户授权实施[LAP-11](tracks/laptop-workbuddy/tasks/LAP-11/HANDOFF.md)，23:30登记领取；当前已实现/离线通过，未部署、未完整真实验收。开始时main工作区干净；用户明确授权本次自动提交与推送。结果见[LAP-11报告](reports/lap-11-2026-10-16.md)：82项单元测试、5组实际AstrBot回环保存/发送一致性及入口/会话迁移回归通过。新纯文本转换只在网关一次执行；人设v2与固定政策已落地，版本变化下次请求新建当前上下文，旧历史保留。
+本轮按用户指令实施[LAP-12](tracks/laptop-workbuddy/tasks/LAP-12/HANDOFF.md)，23:43登记领取；**已实现/离线及本机无推理启停通过，后台已按要求关闭，留给用户自行试用。** 开始时main工作区干净，沿用本会话提交/推送授权。结果见[LAP-12报告](reports/lap-12-2026-10-16.md)：97项单元测试、实际框架路由/保存发送回归、中文空格路径cmd调度及本机启动/重复启动/两入口停止通过。
 
-本次未启停bot、改settings.local.yaml、登录、调用真实模型或发群消息；现有实例未加载新代码，运行状态未重新探测。当前无需用户登录；真实QQ ACK及P01人设最终接受待部署后用户参与。LAP-11不冒充已真实/完整验收。
+新启动/关闭/状态cmd、共用OS锁、幂等生命周期、实例停止准入、动态后代清理/失败身份保留、QQ/模型分层状态已落地。新组件曾保持暂停准入加载LAP-09—12，模型not_probed且0CLI；QQ为waiting_login，未要求用户登录。最终所有受管进程退出，6185/6199/6200/6099/8765无监听，15个外部QQ/WorkBuddy创建身份全部存活，任务库仍completed=9/failed=1。真实模型/群消息均为0；没有修改settings.local.yaml、日常QQ或WorkBuddy全局配置。
 
-**当前结论：笔记本文字核心闭环已有历史证据，完整文本交付未完成。** LAP-09实现/离线通过，真实重启/群验收待补；LAP-10独立预算/参数实现及high本机真实有证据，原生窗口未证实、CLI强制压缩/内部恢复缺口需回规划，整体部分完成/未部署，见[LAP-10报告](reports/lap-10-2026-10-16.md)。LAP-11独立实现/离线已交付；LAP-12未启动，原文本验收差额保留。当前只推进笔记本，PC不启动。
+用户自行试用：双击根目录“启动机器人.cmd”，按提示在本机NapCat登录，再用“查看状态.cmd”确认QQ已连接后真实@；用完“关闭机器人.cmd”。新组合人设版本下次请求开启新上下文，旧历史保留。实际扫码恢复、QQ基本操作、真实模型/ACK中停机、群回归和P01最终人设接受仍待用户参与，不写完整验收通过。
 
-历史实现提交4560ab6、LAP-09的fc20133、LAP-10的b19b050均已推送origin/main。历史G0/G1/G2/G3及G4单条/无@/两轮口令有证据；真人多人/三轮/长稳尚有差额。用户说明旧报错当时未登录NapCat，LAP-01并入LAP-12，不为旧trace重复真实推理；日志不足以证明跨层因果。详细历史检查点保留于工作线及任务交接。
+**文字核心已有历史证据，完整文本交付未完成。** LAP-09/11实现和离线证据保留；LAP-12只完成有证据的离线/本机部分。LAP-10原生窗口未证实、CLI强制压缩/内部恢复缺口仍需回规划，不将一次CLI当严格一次上游API，见[LAP-10报告](reports/lap-10-2026-10-16.md)。未扩大实际预算或换模型/账号/额度来源；当前只推进笔记本，PC不启动。
 
-LAP-11实现交付提交`d00d11f`已成功推送origin/main；本次随后仅同步交付检查点。工作区开始时干净，未纳入本机备份/配置/群消息；提交不等于部署。
+历史实现4560ab6、LAP-09的fc20133、LAP-10的b19b050、LAP-11的d00d11f均已推送origin/main。历史G0/G1/G2/G3及G4单条/无@/两轮口令有证据；真人多人/三轮/恢复长稳尚有差额。LAP-01旧trace与未登录的跨层因果仍缺技术证据，保留并入LAP-12，不为旧错误重复推理。完整历史从各任务交接恢复。
 
 ## 已确认的全局需求
 
@@ -41,10 +41,10 @@ LAP-11实现交付提交`d00d11f`已成功推送origin/main；本次随后仅同
 
 | 工作线 | 状态 | 最近更新 | 下一步 | 交接入口 |
 | --- | --- | --- | --- | --- |
-| 笔记本 WorkBuddy | active，LAP-11实现/离线通过、真实待验 | 2026-10-16 23:41 | LAP-10能力缺口回规划；后续按指令推进LAP-12及真人验收 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [任务台账](tracks/laptop-workbuddy/TASKS.md) / [UX_PLAN](tracks/laptop-workbuddy/UX_PLAN.md) |
+| 笔记本 WorkBuddy | active，LAP-12实现/本机启停通过，当前已停机 | 2026-10-16 23:56 | 用户自行试用；LAP-10缺口回规划及原人工验收待补 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [任务台账](tracks/laptop-workbuddy/TASKS.md) / [UX_PLAN](tracks/laptop-workbuddy/UX_PLAN.md) |
 | 5070 PC 本地模型 | planned，本轮不推进 | 2026-10-15（计划）；2026-10-16确认范围 | 待用户后续启动再确认PC参数 | [HANDOFF](tracks/local-5070/HANDOFF.md) |
 
-已登记的任务级交接：[LAP-08 体验改进规划](tracks/laptop-workbuddy/tasks/LAP-08/HANDOFF.md)、[LAP-09 配置准入实施](tracks/laptop-workbuddy/tasks/LAP-09/HANDOFF.md)、[LAP-10 参数与预算](tracks/laptop-workbuddy/tasks/LAP-10/HANDOFF.md)（部分完成/能力缺口待规划）、[LAP-11 纯文本与人设v2](tracks/laptop-workbuddy/tasks/LAP-11/HANDOFF.md)（本次任务，实现/离线通过，真实待验）。其余实施任务领取时再建立独立HANDOFF，不批量创建空文件。
+已登记的任务级交接：[LAP-08 体验改进规划](tracks/laptop-workbuddy/tasks/LAP-08/HANDOFF.md)、[LAP-09 配置准入实施](tracks/laptop-workbuddy/tasks/LAP-09/HANDOFF.md)、[LAP-10 参数与预算](tracks/laptop-workbuddy/tasks/LAP-10/HANDOFF.md)（部分完成/能力缺口待规划）、[LAP-11 纯文本与人设v2](tracks/laptop-workbuddy/tasks/LAP-11/HANDOFF.md)（实现/离线通过，真实待验）、[LAP-12 启停与分层状态](tracks/laptop-workbuddy/tasks/LAP-12/HANDOFF.md)（本次任务，已实现/本机启停通过，当前已关闭）。其余实施任务领取时再建立独立HANDOFF，不批量创建空文件。
 
 ## 多session任务管理
 
@@ -54,6 +54,8 @@ LAP-11实现交付提交`d00d11f`已成功推送origin/main；本次随后仅同
 - “已实现”“离线通过”“真人实测通过”“完整验收通过”分开记录。新想法先记需求，再分配新任务或明确调整旧任务，不把原有未完成项抹掉。
 
 ## 最近里程碑
+
+- LAP-12一键入口/生命周期/分层状态落地；97项单元及框架回归通过，暂停准入本机启动0CLI、重复启动同实例、最终关闭/五端口无监听，外部15身份保留。真人登录/QQ操作/群验收仍待补。
 
 - LAP-11网关纯文本、固定政策/人设v2、框架原文保留和版本迁移落地；82项单元、5组实际框架回环和入口反例通过，真实群ACK/P01未验，未部署。
 
@@ -68,4 +70,4 @@ LAP-11实现交付提交`d00d11f`已成功推送origin/main；本次随后仅同
 
 ## 恢复工作时的第一步
 
-先读AGENTS→本入口→笔记本HANDOFF/TASKS→UX_PLAN及LAP-11交接。LAP-11已实现/离线通过，真实群ACK及LAP-03人设接受待验；不要重复领取。LAP-10原生窗口及强制压缩/内部恢复缺口需符合AGENTS要求的规划会话处理；不得把一次CLI当严格一次上游推理。后续按用户指令领取LAP-12或补原验收；不自动部署或开始新任务。部署需用户按需在NapCat登录，旧LAP-09/10、LAP-02/03/04/05差额及视频/ASR延期保留，PC不启动。
+先读AGENTS→本入口→笔记本HANDOFF/TASKS→UX_PLAN及LAP-12交接。当前后台已关闭，用户自行启动试用，不自动重启。LAP-12代码与本机无推理启停已有证据，真实登录恢复/QQ操作和真实请求/ACK中停机仍未验；LAP-10原生窗口与内部强制压缩缺口需符合AGENTS要求的规划会话处理。后续仅按用户反馈/指令补原LAP-02/03/04及LAP-09/11/12差额，再到LAP-05；视频/ASR延期，PC不启动。

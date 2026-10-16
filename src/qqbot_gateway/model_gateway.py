@@ -17,6 +17,7 @@ from .errors import GatewayError, MESSAGES
 from .workbuddy_cli_runner import CLIRunner
 from .token_budget import InputBudget, validate_model_settings
 from .chat_text import prepare_reply
+from .lifecycle import stopping
 
 LOG = logging.getLogger(__name__)
 TRACE = web.RequestKey('qqbot_trace',str)
@@ -111,7 +112,7 @@ class ModelQueue:
                 self.active=False
 
 
-def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200):
+def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,root=None):
     budget=budget or InputBudget()
     if not isinstance(token,str) or len(token)<32:raise ValueError('Local bearer token required')
     def router_ready():
@@ -128,7 +129,7 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200):
         try:return await handler(request)
         except GatewayError as error:
             trace=request.get(TRACE,'unknown')
-            queue.last_error={'trace':trace,'code':error.code}
+            queue.last_error={'trace':trace,'code':error.code,'time':time.time()}
             LOG.warning('REQUEST_FAILED request_id=%s code=%s',trace,error.code)
             status={'UNSUPPORTED_REQUEST':422,'QUOTA_EXHAUSTED':429,'RATE_LIMITED':429,'QUEUE_FULL':429,
                     'INPUT_TOO_LONG':422,'MODEL_CONFIG_UNSUPPORTED':422,
@@ -138,7 +139,13 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200):
     app=web.Application(middlewares=[guard],client_max_size=budget.payload_limit)
 
     async def health(request):
+        last_error=dict(queue.last_error) if queue.last_error else None
+        if last_error:
+            last_error['historical']=bool(queue.last_success and queue.last_success>last_error.get('time',0))
+        current_error=last_error if last_error and not last_error['historical'] else None
         return web.json_response({'alive':True,'backend_state':queue.state,'queue':queue.queue.qsize(),
+                                  'stopping':bool(root and stopping(root)),
+                                  'current_error':current_error,
                                   'input_budget':budget.limit,'budget_counting':'utf8_visible_bytes_with_envelope',
                                   'overhead_reserve':budget.overhead,'output_reserve':budget.output,
                                   'native_window':'unverified','parameters':getattr(queue.runner,'last_parameters',{}),
@@ -148,13 +155,14 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200):
                                   'user_messages_sent':getattr(queue.runner,'user_messages_sent',0),
                                   'active':queue.active,'cli_attempts':queue.runner.attempts,
                                   'last_success':queue.last_success,'real_inference_verified':queue.last_success is not None,
-                                  'router_ready':router_ready(),'last_contract':queue.last_shape,'last_error':queue.last_error})
+                                  'router_ready':router_ready(),'last_contract':queue.last_shape,'last_error':last_error})
 
     async def models(request):
         return web.json_response({'object':'list','data':[{'id':'workbuddy-local','object':'model','owned_by':'local'}]})
 
     async def chat(request):
         request[TRACE]=uuid.uuid4().hex[:10]
+        if root and stopping(root):raise GatewayError('SHUTTING_DOWN')
         try:payload=await request.json()
         except (ValueError,UnicodeError):raise GatewayError('UNSUPPORTED_REQUEST') from None
         system,prompt=normalize_request(payload,budget=budget)
@@ -188,7 +196,7 @@ def main():
     runner=CLIRunner(root,llm['model'],llm['run_timeout_seconds'],llm['cleanup_seconds'],llm['reasoning_effort'],budget)
     queue=ModelQueue(runner,llm['queue_limit'],llm['queue_wait_seconds'])
     logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(message)s')
-    web.run_app(application(queue,tokens['model_gateway'],root/'state/router-ready.json',budget,settings['output']['max_reply_chars']),host=llm['host'],port=llm['port'],
+    web.run_app(application(queue,tokens['model_gateway'],root/'state/router-ready.json',budget,settings['output']['max_reply_chars'],root),host=llm['host'],port=llm['port'],
                 access_log=None,handler_cancellation=True)
 
 

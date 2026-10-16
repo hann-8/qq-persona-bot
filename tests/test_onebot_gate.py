@@ -126,7 +126,52 @@ class TransportTests(unittest.IsolatedAsyncioTestCase):
     async def connect(self):
         ws=await self.client.ws_connect(self.url,headers=self.auth)
         upstream=await asyncio.wait_for(self.connections.get(),2)
+        probe=await ws.receive_json(timeout=2)
+        self.assertEqual(probe['action'],'get_status')
+        await ws.send_json({'status':'ok','retcode':0,'data':{'online':True},'echo':probe['echo']})
         return ws,upstream
+
+    async def test_health_online_unknown_stale_disconnect_and_probe_echo_is_private(self):
+        import time
+        self.assertEqual(self.gate.status()['channel_state'],'waiting_login')
+        ws,up=await self.connect()
+        await asyncio.sleep(.02)
+        self.assertTrue(self.gate.status()['online'])
+        self.assertTrue(self.received.empty())
+        heartbeat={'post_type':'meta_event','meta_event_type':'heartbeat','self_id':222,'status':{'online':False}}
+        await ws.send_json(heartbeat)
+        await asyncio.wait_for(self.received.get(),2)
+        self.assertEqual(self.gate.status()['channel_state'],'disconnected')
+        self.gate.observe_online({'online':'true'})
+        self.assertIsNone(self.gate.status()['online'])
+        self.gate.observe_online({'online':True});self.gate.online_at=time.time()-46
+        self.assertEqual(self.gate.status()['channel_state'],'unknown')
+        async with self.client.get(self.url.replace('/ws','/health')) as response:
+            data=await response.json()
+        self.assertNotIn('self_id',data);self.assertNotIn('token',str(data))
+        await ws.close()
+        for _ in range(20):
+            if not self.gate.connected:break
+            await asyncio.sleep(.01)
+        self.assertFalse(self.gate.status()['connected'])
+
+    async def test_stop_marker_rejects_new_message_but_keeps_accepted_outbound(self):
+        from unittest.mock import patch
+        from qqbot_gateway.lifecycle import atomic_json
+        self.gate.root=Path(self.temp.name)
+        ws,up=await self.connect()
+        atomic_json(self.gate.root/'state/stop-request.json',{'instance_id':'current'})
+        with patch.dict('os.environ',{'QQBOT_INSTANCE_ID':'current'}), \
+             patch.object(self.gate.store,'reserve',side_effect=AssertionError('draining must not reserve')):
+            await ws.send_json(message())
+            action={'action':'send_group_msg','params':{'group_id':111,'message':'already accepted'},'echo':'final'}
+            await up.send_json(action)
+            self.assertEqual(await ws.receive_json(timeout=2),action)
+            await ws.send_json({'status':'ok','retcode':0,'data':{'message_id':2},'echo':'final'})
+            answer=await asyncio.wait_for(self.received.get(),2)
+            self.assertEqual(answer['echo'],'final')
+            self.assertTrue(self.received.empty())
+        await ws.close()
 
     async def test_drops_and_heartbeat_and_dedup(self):
         ws,up=await self.connect()
