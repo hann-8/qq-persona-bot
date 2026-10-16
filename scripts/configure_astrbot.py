@@ -4,11 +4,15 @@ import hashlib
 import json
 from pathlib import Path
 import shutil
+import sys
 
 ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT/'src'))
+from qqbot_gateway.config import load_settings
 
 
 async def configure():
+    settings=load_settings(ROOT/'config/settings.local.yaml')
     path=ROOT/'runtime/astrbot/data/cmd_config.json'
     config=json.loads(path.read_text(encoding='utf-8-sig'))
     tokens=json.loads((ROOT/'secrets/local-tokens.json').read_text(encoding='utf-8'))
@@ -28,7 +32,9 @@ async def configure():
     runner=get_agent_runner_config_default('local')
     runner['model'].update(provider_id='workbuddy-local',request_max_retries=1,fallback_provider_ids=[])
     runner['persona']['persona_id']=persona_id
-    runner['compression'].update(max_turns=8,trim_turns=1,overflow_strategy='truncate_by_turns')
+    runner['compression'].update(max_turns=settings['chat']['history_turns'],trim_turns=1,
+        fallback_max_tokens=settings['chat']['context_input_limit_tokens']+settings['chat']['output_reserve_tokens'],
+        overflow_strategy='truncate_by_turns')
     runner['misc'].update(max_steps=1)
     config['agent_runner']={'runner_type':'local','config':runner}
     config['provider_ltm_settings']['group_icl_enable']=False

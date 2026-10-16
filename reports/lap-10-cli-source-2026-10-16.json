@@ -1,0 +1,15 @@
+{
+  "bundle_sha256": "13e6dd30a22d2f11857675193f909a2ccb935da67a067f580fcfe764e474ff60",
+  "cli_version": "2.168.0",
+  "scope": "static locked bundle evidence; not an upstream execution trace",
+  "character_offsets": {
+    "process_local_settings": 9241717,
+    "effort_cli_read": 9242256,
+    "effort_model_read": 4754205,
+    "regular_compact_guard": 14600105,
+    "forced_emergency": 14140265,
+    "forced_ptl": 14435240,
+    "native_override_write": 6655511
+  },
+  "forced_compact_exclusion_verified": false
+}

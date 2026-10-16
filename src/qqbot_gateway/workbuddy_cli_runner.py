@@ -12,6 +12,8 @@ import psutil
 
 from .errors import GatewayError, classify_error
 from .text_safety import has_tool_markup
+from .cli_control import ControlExchange, model_metadata
+from .token_budget import InputBudget, known_models, user_message
 
 LOG = logging.getLogger(__name__)
 
@@ -56,6 +58,8 @@ class ResultParser:
         if len(self.events) >= 128:
             raise GatewayError('PROTOCOL_ERROR')
         self.events.append({'type': kind, 'subtype': event.get('subtype'), 'keys': sorted(event)})
+        if kind in ('control_response','control_request'):
+            raise GatewayError('PROTOCOL_ERROR')
         if kind == 'error' or event.get('is_error') or event.get('errors'):
             raise GatewayError(classify_error({k:event.get(k) for k in ('error','errors','message','result')}))
         if kind == 'system' and event.get('subtype') == 'init':
@@ -68,7 +72,7 @@ class ResultParser:
         if isinstance(content, list) and any(isinstance(b, dict) and b.get('type') in ('tool_use', 'tool_call') for b in content):
             raise GatewayError('TOOL_ISOLATION_FAILED')
         if kind == 'result':
-            if self.result is not None:
+            if self.result is not None or not self.initialized:
                 raise GatewayError('PROTOCOL_ERROR')
             if (event.get('subtype') != 'success' or event.get('is_error') is not False or
                     event.get('terminal_reason') not in (None, 'end_turn', 'stop', 'completed', 'success') or
@@ -88,7 +92,7 @@ class ResultParser:
 
 
 class CLIRunner:
-    def __init__(self, root, model, timeout=90, cleanup_seconds=5):
+    def __init__(self, root, model, timeout=90, cleanup_seconds=5, reasoning_effort='auto', budget=None):
         self.root = Path(root)
         lock = json.loads((self.root/'config/versions.lock.json').read_text(encoding='utf-8'))
         self.node = Path(lock['node']['path'])
@@ -98,12 +102,21 @@ class CLIRunner:
         self.cleanup_seconds = cleanup_seconds
         self.attempts = 0
         self.last_protocol = []
+        self.reasoning_effort = reasoning_effort
+        self.budget = budget or InputBudget()
+        self.control_attempts = 0
+        self.user_messages_sent = 0
+        self.last_parameters = {}
+        self.control_timeout = 10
+        if reasoning_effort != 'auto' and reasoning_effort not in known_models().get(model, {}).get('reasoning', {}).get('supportedEfforts', []):
+            raise GatewayError('MODEL_CONFIG_UNSUPPORTED')
         self.denied = json.loads((self.root/'config/cli-tools-denied.json').read_text(encoding='utf-8'))
         bundle = self.entry.parent.parent/'dist/codebuddy-headless.js'
         if not self.node.is_file() or hashlib.sha256(bundle.read_bytes()).hexdigest() != lock['cli']['headless_sha256']:
             raise GatewayError('BACKEND_UNAVAILABLE')
 
     async def run(self, system, prompt, request_id):
+        self.budget.check(system, prompt)
         parent = self.root/'runtime/requests'
         parent.mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory(prefix=request_id+'-', dir=parent) as directory:
@@ -117,7 +130,13 @@ class CLIRunner:
                     '--permission-mode','dontAsk','--no-session-persistence','--max-turns','2',
                     '--model',self.model,'--system-prompt-file',str(system_file),
                     '--setting-sources','none','--disallowedTools',*self.denied]
+            local_settings={'autoCompactEnabled':False}
+            if self.reasoning_effort != 'auto':local_settings['alwaysThinkingEnabled']=True
+            args += ['--settings',json.dumps(local_settings)]
+            if self.reasoning_effort != 'auto':
+                args += ['--effort',self.reasoning_effort,'--input-format','stream-json']
             env = os.environ.copy()
+            env.pop('MAX_THINKING_TOKENS',None)
             for key in list(env):
                 if any(term in key.upper() for term in ('API_KEY','AUTH_TOKEN','ACCESS_TOKEN','BASE_URL')):
                     env.pop(key)
@@ -137,10 +156,17 @@ class CLIRunner:
             try:
                 process = await asyncio.create_subprocess_exec(*args,cwd=work,env=env,
                     stdin=asyncio.subprocess.PIPE,stdout=asyncio.subprocess.PIPE,stderr=asyncio.subprocess.PIPE,
+                    limit=512*1024,
                     creationflags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0)
             except OSError:
                 raise GatewayError('BACKEND_UNAVAILABLE') from None
             parser = ResultParser(self.model)
+            self.last_parameters = {'model':self.model,'effort_requested':self.reasoning_effort,
+                                    'effort_effective':None,'auto_compact_setting':False,
+                                    'forced_compact_exclusion_verified':False,'native_window':'unverified'}
+            self.last_parameters['effort_evidence']='auto_default' if self.reasoning_effort=='auto' else 'awaiting_current_capabilities'
+            exchange = ControlExchange('get_available_models') if self.reasoning_effort != 'auto' else None
+            acknowledged = asyncio.Event()
             tracked = {}
             try:
                 owned_root = psutil.Process(process.pid)
@@ -162,6 +188,30 @@ class CLIRunner:
                     await asyncio.sleep(.05)
 
             async def read_stdout():
+                if exchange is not None:
+                    while line := await process.stdout.readline():
+                        try:event = json.loads(line)
+                        except (ValueError,UnicodeError):raise GatewayError('PROTOCOL_ERROR') from None
+                        if not isinstance(event,dict):raise GatewayError('PROTOCOL_ERROR')
+                        if event.get('type') == 'control_response':
+                            response = exchange.accept(event)
+                            models = {m['id']:m for m in model_metadata(response)}
+                            model = models.get(self.model, {})
+                            if self.reasoning_effort not in model.get('reasoning',{}).get('supportedEfforts',[]):
+                                raise GatewayError('MODEL_CONFIG_UNSUPPORTED')
+                            maximum = model.get('maxInputTokens')
+                            if isinstance(maximum,int) and self.budget.limit > maximum:
+                                raise GatewayError('MODEL_CONFIG_UNSUPPORTED')
+                            self.last_parameters['effort_effective'] = self.reasoning_effort
+                            self.last_parameters['effort_evidence']='current_supportedEfforts_and_cli_flag'
+                            acknowledged.set()
+                            break
+                        # No model response may precede the only user message.
+                        if event.get('type') in ('result','assistant','user'):
+                            raise GatewayError('PROTOCOL_ERROR')
+                        parser.line(line.decode('utf-8'))
+                    else:
+                        raise GatewayError('PROTOCOL_ERROR')
                 while chunk := await process.stdout.read(8192):
                     parser.feed(chunk)
 
@@ -173,7 +223,19 @@ class CLIRunner:
                         raise GatewayError('PROTOCOL_ERROR')
 
             async def write_stdin():
-                process.stdin.write(prompt.encode('utf-8'))
+                if exchange is not None:
+                    self.control_attempts += 1
+                    process.stdin.write((json.dumps(exchange.request())+'\n').encode('utf-8'))
+                    await process.stdin.drain()
+                    try:
+                        await asyncio.wait_for(acknowledged.wait(), min(self.control_timeout,self.timeout))
+                    except TimeoutError:
+                        raise GatewayError('PROTOCOL_ERROR') from None
+                    payload = (json.dumps(user_message(prompt),ensure_ascii=False,separators=(',',':'))+'\n').encode('utf-8')
+                else:
+                    payload = prompt.encode('utf-8')
+                self.user_messages_sent += 1
+                process.stdin.write(payload)
                 await process.stdin.drain()
                 process.stdin.close()
 
@@ -185,6 +247,8 @@ class CLIRunner:
                 return parser.finish(process.returncode)
             except TimeoutError:
                 raise GatewayError('MODEL_TIMEOUT') from None
+            except (ValueError,UnicodeError,BrokenPipeError,ConnectionResetError):
+                raise GatewayError('PROTOCOL_ERROR') from None
             finally:
                 capture()
                 watcher.cancel()

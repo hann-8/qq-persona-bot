@@ -1,15 +1,16 @@
-import json
 from .errors import GatewayError
 
 
-def normalize_request(payload, char_limit=24000):
+def normalize_request(payload, char_limit=None, budget=None):
+    from .token_budget import InputBudget, dialog_text
+    budget = budget or InputBudget()
     fail = lambda: GatewayError('UNSUPPORTED_REQUEST')
     if not isinstance(payload, dict) or set(payload) - {'model', 'messages', 'stream'}:
         raise fail()
     if payload.get('model') != 'workbuddy-local' or payload.get('stream', False) is not False:
         raise fail()
     messages = payload.get('messages')
-    if not isinstance(messages, list) or not 1 <= len(messages) <= 40:
+    if not isinstance(messages, list) or not 1 <= len(messages) <= 2*budget.history_turns:
         raise fail()
     normalized = []
     for message in messages:
@@ -42,9 +43,12 @@ def normalize_request(payload, char_limit=24000):
     if not dialog or dialog[-1]['role'] != 'user' or not dialog[-1]['content'].strip():
         raise fail()
     system = '\n\n'.join(systems)
-    prompt = json.dumps(dialog, ensure_ascii=False, separators=(',', ':'))
-    if len(system) + len(prompt) > char_limit:
+    if any(m['role'] != ('user' if index%2 == 0 else 'assistant') for index,m in enumerate(dialog)):
         raise fail()
+    prompt = dialog_text(dialog)
+    if char_limit is not None and len(system) + len(prompt) > char_limit:
+        raise fail()
+    budget.check(system, prompt)
     return system, prompt
 
 

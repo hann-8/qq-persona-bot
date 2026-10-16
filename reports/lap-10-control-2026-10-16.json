@@ -1,0 +1,234 @@
+{
+  "cli_version": "2.168.0",
+  "bundle_sha256": "13e6dd30a22d2f11857675193f909a2ccb935da67a067f580fcfe764e474ff60",
+  "user_messages": 0,
+  "inference_requests": 0,
+  "controls": [
+    "get_available_models",
+    "set_config"
+  ],
+  "models": [
+    {
+      "id": "hy4-preview",
+      "maxInputTokens": 960000,
+      "maxOutputTokens": 64000,
+      "supportsReasoning": true,
+      "onlyReasoning": true,
+      "reasoning": {
+        "supportedEfforts": [
+          "high"
+        ],
+        "defaultEffort": "high"
+      }
+    },
+    {
+      "id": "hy3",
+      "maxInputTokens": 192000,
+      "maxOutputTokens": 64000,
+      "supportsReasoning": true,
+      "onlyReasoning": true,
+      "reasoning": {
+        "effort": "high"
+      }
+    },
+    {
+      "id": "hy3-x",
+      "maxInputTokens": 192000,
+      "maxOutputTokens": 64000,
+      "supportsReasoning": true,
+      "onlyReasoning": true,
+      "reasoning": {
+        "effort": "high"
+      }
+    },
+    {
+      "id": "step-5-preview",
+      "maxInputTokens": 1000000,
+      "maxOutputTokens": 64000,
+      "supportsReasoning": true,
+      "onlyReasoning": true,
+      "reasoning": {
+        "supportedEfforts": [
+          "low",
+          "medium",
+          "high"
+        ],
+        "defaultEffort": "high"
+      }
+    },
+    {
+      "id": "space-bunny",
+      "maxInputTokens": 1000000,
+      "maxOutputTokens": 128000,
+      "supportsReasoning": true,
+      "onlyReasoning": true,
+      "reasoning": {
+        "supportedEfforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ],
+        "defaultEffort": "max"
+      }
+    },
+    {
+      "id": "deepseek-v4.1-flash",
+      "maxInputTokens": 1000000,
+      "maxOutputTokens": 128000,
+      "supportsReasoning": true,
+      "onlyReasoning": true,
+      "reasoning": {
+        "supportedEfforts": [
+          "low",
+          "high",
+          "max"
+        ],
+        "defaultEffort": "high"
+      }
+    },
+    {
+      "id": "glm-5.3",
+      "maxInputTokens": 1000000,
+      "maxOutputTokens": 64000,
+      "supportsReasoning": true,
+      "onlyReasoning": true,
+      "reasoning": {
+        "supportedEfforts": [
+          "low",
+          "high",
+          "max"
+        ],
+        "defaultEffort": "max"
+      }
+    },
+    {
+      "id": "glm-5.3-flash",
+      "maxInputTokens": 1000000,
+      "maxOutputTokens": 131072,
+      "supportsReasoning": true,
+      "onlyReasoning": true,
+      "reasoning": {
+        "supportedEfforts": [
+          "low",
+          "high",
+          "max"
+        ],
+        "defaultEffort": "high"
+      }
+    },
+    {
+      "id": "glm-5.2",
+      "maxInputTokens": 1000000,
+      "maxOutputTokens": 64000,
+      "supportsReasoning": true,
+      "onlyReasoning": true,
+      "reasoning": {
+        "effort": "medium"
+      }
+    },
+    {
+      "id": "glm-5.1",
+      "maxInputTokens": 200000,
+      "maxOutputTokens": 48000,
+      "supportsReasoning": true,
+      "onlyReasoning": true,
+      "reasoning": {
+        "effort": "medium"
+      }
+    },
+    {
+      "id": "glm-5v-turbo",
+      "maxInputTokens": 200000,
+      "maxOutputTokens": 64000,
+      "supportsReasoning": true,
+      "onlyReasoning": true,
+      "reasoning": {
+        "effort": "medium"
+      }
+    },
+    {
+      "id": "minimax-m3",
+      "maxInputTokens": 512000,
+      "maxOutputTokens": 64000,
+      "supportsReasoning": true,
+      "onlyReasoning": true,
+      "reasoning": {
+        "effort": "medium"
+      }
+    },
+    {
+      "id": "minimax-m2.7",
+      "maxInputTokens": 200000,
+      "maxOutputTokens": 48000,
+      "supportsReasoning": true,
+      "onlyReasoning": true,
+      "reasoning": {
+        "effort": "medium"
+      }
+    },
+    {
+      "id": "kimi-k3-1",
+      "maxInputTokens": 1000000,
+      "maxOutputTokens": 32000,
+      "supportsReasoning": true,
+      "onlyReasoning": true,
+      "reasoning": {
+        "effort": "medium"
+      }
+    },
+    {
+      "id": "kimi-k2.8-preview",
+      "maxInputTokens": 1000000,
+      "maxOutputTokens": 64000,
+      "supportsReasoning": true,
+      "onlyReasoning": true,
+      "reasoning": {
+        "supportedEfforts": [
+          "low",
+          "high",
+          "max"
+        ],
+        "defaultEffort": "high"
+      }
+    },
+    {
+      "id": "kimi-k2.7",
+      "maxInputTokens": 256000,
+      "maxOutputTokens": 32000,
+      "supportsReasoning": true,
+      "onlyReasoning": true,
+      "reasoning": {
+        "effort": "medium"
+      }
+    },
+    {
+      "id": "kimi-k2.6",
+      "maxInputTokens": 256000,
+      "maxOutputTokens": 32000,
+      "supportsReasoning": true,
+      "onlyReasoning": true,
+      "reasoning": {
+        "effort": "medium"
+      }
+    },
+    {
+      "id": "deepseek-v4-pro",
+      "maxInputTokens": 1000000,
+      "maxOutputTokens": 128000,
+      "supportsReasoning": true,
+      "onlyReasoning": true,
+      "reasoning": {
+        "effort": "high"
+      }
+    }
+  ],
+  "acknowledged": {
+    "autoCompactEnabled": false,
+    "contextWindow": 200000
+  },
+  "control_probe": "passed",
+  "cleanup_confirmed": true,
+  "native_window_effective_verified": false
+}

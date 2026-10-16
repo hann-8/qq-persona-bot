@@ -96,9 +96,6 @@ def normalize_settings(raw):
     llm.setdefault('context_window_tokens', None)
     if llm['reasoning_effort'] not in ('auto', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max'):
         raise ValueError('Invalid reasoning_effort')
-    # LAP-10 has not connected these controls. Never silently ignore explicit requests.
-    if llm['reasoning_effort'] != 'auto' or llm['context_window_tokens'] is not None:
-        raise ValueError('Explicit effort/native window requires LAP-10 implementation')
     chat, output = data['chat'], data['output']
     for key, value in {'history_turns': 8, 'context_input_limit_tokens': 16384,
                        'context_overhead_reserve_tokens': 2048, 'output_reserve_tokens': 2048,
@@ -120,10 +117,10 @@ def normalize_settings(raw):
         value = section.get(key)
         if type(value) is not int or not lower <= value <= upper:
             raise ValueError(f'Invalid {key}; expected integer {lower}..{upper}')
-    # Do not expose controls belonging to subsequent tasks before their runtime paths exist.
-    if any(chat[k] != v for k, v in {'history_turns': 8, 'context_input_limit_tokens': 16384,
-                                    'context_overhead_reserve_tokens': 2048, 'output_reserve_tokens': 2048}.items()) or output['max_reply_chars'] != 1200:
-        raise ValueError('Nondefault chat/output controls require LAP-10/11 implementation')
+    if output['max_reply_chars'] != 1200:
+        raise ValueError('Nondefault output controls require LAP-11 implementation')
+    from .token_budget import validate_model_settings
+    validate_model_settings(data)
     secret = data.get('secrets_file')
     if not isinstance(secret, str) or not secret:
         raise ValueError('Missing secrets_file')

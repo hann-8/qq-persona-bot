@@ -101,8 +101,20 @@ async def verify():
             router.blocked=set()
             restored=await request(event('333','111',8,'recall after unblock'))
             assert 'A-secret' in restored.conversation.history
+            from qqbot_gateway.token_budget import InputBudget
+            router.budget=InputBudget(limit=1024,overhead=32,history_turns=1)
+            single=await request(event('333','111',9,'only current'))
+            assert single.conversation.history=='[]'
+            too_long=event('333','111',10,'🙂'*1000)
+            rejected=[item async for item in router.on_group(too_long)]
+            assert len(rejected)==1 and not isinstance(rejected[0],ProviderRequest)
+            # A larger configured budget must not retain the old 24k/8k character ceiling.
+            router.budget=InputBudget(limit=100000,overhead=32,history_turns=64)
+            large=await request(event('333','111',11,'x'*25000))
+            assert len(large.prompt)==25000
             print('PASS: actual AstrBot session keys + router retain same-user history, isolate other user/group, reject no-At; no network/model calls.')
             print('PASS: direct blocked admin/user, no-At and unauthorized admin stop before trace/tasks/cooldown/history; unblocking retains history.')
+            print('PASS: configured history=1, over-budget emoji rejection before provider, and >24k input under a larger budget.')
         finally:router.tasks.close()
 
 

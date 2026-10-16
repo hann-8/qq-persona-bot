@@ -12,9 +12,11 @@ from astrbot.api.event import filter, AstrMessageEvent
 from astrbot.api.star import Context, Star, register
 from astrbot.api.message_components import At, AtAll, Plain, Reply
 
-from qqbot_gateway.session_queue import SessionCoordinator, SessionError, trim_history
+from qqbot_gateway.session_queue import SessionCoordinator, SessionError
 from qqbot_gateway.task_store import TaskStore
 from qqbot_gateway.config import load_settings
+from qqbot_gateway.token_budget import InputBudget, validate_model_settings
+from qqbot_gateway.errors import GatewayError, MESSAGES
 
 LOG=logging.getLogger(__name__)
 
@@ -30,6 +32,7 @@ class QQRouter(Star):
         self.persona=(self.root/'config/persona.md').read_text(encoding='utf-8')
         self.persona_id='fatfish-test-'+hashlib.sha256(self.persona.encode()).hexdigest()[:8]
         chat=settings.get('chat',{})
+        self.budget=InputBudget.from_settings(settings,validate_model_settings(settings))
         self.coordinator=SessionCoordinator(chat.get('user_cooldown_seconds',5),chat.get('session_queue_limit',2),chat.get('session_queue_timeout_seconds',600))
         self.tasks=TaskStore(self.root/'state/tasks.sqlite')
 
@@ -76,8 +79,9 @@ class QQRouter(Star):
                 self.tasks.set(key,'failed');yield event.plain_result('本鱼在。带上想问的文字再叫我吧。');return
             if re.search(r'https?://\S+',prompt,re.I):
                 self.tasks.set(key,'failed');yield event.plain_result('本鱼目前只接通文字聊天，B站和网页正文还没接入。贴段文字，我先帮你捋捋。');return
-            if len(prompt)+len(self.persona)+512>24000:
-                self.tasks.set(key,'failed');yield event.plain_result('这条文字太长了，请缩短后再发。');return
+            try:self.budget.select_history(self.persona,prompt,[])
+            except GatewayError:
+                self.tasks.set(key,'failed');yield event.plain_result(MESSAGES['INPUT_TOO_LONG']);return
             manager=self.context.conversation_manager
             umo=event.unified_msg_origin
             cid=await manager.get_curr_conversation_id(umo)
@@ -91,7 +95,7 @@ class QQRouter(Star):
                 cid=await manager.new_conversation(umo,persona_id=self.persona_id)
                 conv=await manager.get_conversation(umo,cid)
             history=json.loads(conv.history or '[]')
-            history=trim_history(history,turns=7,char_limit=max(0,min(8000,24000-len(prompt)-len(self.persona)-1500)))
+            history=self.budget.select_history(self.persona,prompt,history)
             await manager.update_conversation(umo,cid,history=history)
             conv.history=json.dumps(history,ensure_ascii=False)
             LOG.warning('QQ_TASK_RUNNING trace=%s',trace)

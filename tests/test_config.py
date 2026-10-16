@@ -64,7 +64,7 @@ class ConfigTests(unittest.TestCase):
 
     def test_invalid_complete_config_and_unimplemented_controls(self):
         for section, key, value in [('access', 'private_enabled', True), ('onebot', 'port', True),
-                                    ('llm', 'model', '--model injected'), ('llm', 'reasoning_effort', 'high'),
+                                    ('llm', 'model', '--model injected'), ('llm', 'reasoning_effort', 'medium'),
                                     ('llm', 'context_window_tokens', 32768), ('chat', 'history_turns', 65),
                                     ('output', 'mode', 'markdown')]:
             data = fixture(); data.setdefault(section, {})[key] = value
@@ -144,6 +144,22 @@ class ConfigTests(unittest.TestCase):
         self.assertEqual(new_gate.blocked_users, frozenset(model_snapshot['access']['blocked_users']))
         self.assertNotIn('777', old_gate.allowed_groups)
         self.assertNotIn('333', old_gate.blocked_users)
+
+    def test_parameter_commands_validate_and_preserve_existing_identity(self):
+        before=load_settings(self.path)
+        execute(self.path,'context','set','32768')
+        execute(self.path,'history','set','12')
+        execute(self.path,'effort','set','high')
+        snapshot=self.path.read_bytes()
+        for section,value in [('effort','medium'),('context-window','200000'),('context','1048577'),('context','1e5')]:
+            with self.subTest(section=section), self.assertRaises(ValueError):execute(self.path,section,'set',value)
+            self.assertEqual(self.path.read_bytes(),snapshot)
+        execute(self.path,'effort','set','auto')
+        execute(self.path,'model','set','unknown-model')
+        with self.assertRaises(ValueError):execute(self.path,'effort','set','high')
+        after=load_settings(self.path)
+        self.assertEqual(before['bot'],after['bot']);self.assertEqual(before['access'],after['access'])
+        self.assertEqual(after['chat']['context_input_limit_tokens'],32768)
 
     def test_os_lock_blocks_other_process_and_releases(self):
         code = ('import sys; from pathlib import Path; '

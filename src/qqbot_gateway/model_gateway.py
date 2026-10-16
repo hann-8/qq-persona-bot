@@ -15,6 +15,7 @@ from .config import load_settings
 from .contracts import normalize_request, contract_shape
 from .errors import GatewayError, MESSAGES
 from .workbuddy_cli_runner import CLIRunner
+from .token_budget import InputBudget, validate_model_settings
 
 LOG = logging.getLogger(__name__)
 TRACE = web.RequestKey('qqbot_trace',str)
@@ -109,7 +110,8 @@ class ModelQueue:
                 self.active=False
 
 
-def application(queue,token,ready_file=None):
+def application(queue,token,ready_file=None,budget=None):
+    budget=budget or InputBudget()
     if not isinstance(token,str) or len(token)<32:raise ValueError('Local bearer token required')
     def router_ready():
         if ready_file is None:return True
@@ -128,13 +130,21 @@ def application(queue,token,ready_file=None):
             queue.last_error={'trace':trace,'code':error.code}
             LOG.warning('REQUEST_FAILED request_id=%s code=%s',trace,error.code)
             status={'UNSUPPORTED_REQUEST':422,'QUOTA_EXHAUSTED':429,'RATE_LIMITED':429,'QUEUE_FULL':429,
+                    'INPUT_TOO_LONG':422,'MODEL_CONFIG_UNSUPPORTED':422,
                     'QUEUE_TIMEOUT':504,'MODEL_TIMEOUT':504,'PROTOCOL_ERROR':502}.get(error.code,503)
             return web.json_response({'error':{'message':MESSAGES[error.code]+'（追踪'+trace+'）','type':'gateway_error','code':error.code}},status=status)
 
-    app=web.Application(middlewares=[guard],client_max_size=512*1024)
+    app=web.Application(middlewares=[guard],client_max_size=budget.payload_limit)
 
     async def health(request):
         return web.json_response({'alive':True,'backend_state':queue.state,'queue':queue.queue.qsize(),
+                                  'input_budget':budget.limit,'budget_counting':'utf8_visible_bytes_with_envelope',
+                                  'overhead_reserve':budget.overhead,'output_reserve':budget.output,
+                                  'native_window':'unverified','parameters':getattr(queue.runner,'last_parameters',{}),
+                                  'forced_compact_exclusion_verified':False,
+                                  'upstream_inference_attempts':'unverified_cli_internal_recovery',
+                                  'control_attempts':getattr(queue.runner,'control_attempts',0),
+                                  'user_messages_sent':getattr(queue.runner,'user_messages_sent',0),
                                   'active':queue.active,'cli_attempts':queue.runner.attempts,
                                   'last_success':queue.last_success,'real_inference_verified':queue.last_success is not None,
                                   'router_ready':router_ready(),'last_contract':queue.last_shape,'last_error':queue.last_error})
@@ -146,7 +156,7 @@ def application(queue,token,ready_file=None):
         request[TRACE]=uuid.uuid4().hex[:10]
         try:payload=await request.json()
         except (ValueError,UnicodeError):raise GatewayError('UNSUPPORTED_REQUEST') from None
-        system,prompt=normalize_request(payload)
+        system,prompt=normalize_request(payload,budget=budget)
         if not router_ready():raise GatewayError('BACKEND_UNAVAILABLE')
         queue.last_shape=contract_shape(payload)
         LOG.info('REQUEST_ACCEPTED request_id=%s',request[TRACE])
@@ -174,10 +184,11 @@ def main():
     if llm['host']!='127.0.0.1' or llm['backend']!='codebuddy_cli' or llm['max_concurrency']!=1:
         raise ValueError('Restricted local CLI configuration required')
     tokens=json.loads((root/settings['secrets_file']).read_text(encoding='utf-8'))
-    runner=CLIRunner(root,llm['model'],llm['run_timeout_seconds'],llm['cleanup_seconds'])
+    budget=InputBudget.from_settings(settings,validate_model_settings(settings))
+    runner=CLIRunner(root,llm['model'],llm['run_timeout_seconds'],llm['cleanup_seconds'],llm['reasoning_effort'],budget)
     queue=ModelQueue(runner,llm['queue_limit'],llm['queue_wait_seconds'])
     logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(message)s')
-    web.run_app(application(queue,tokens['model_gateway'],root/'state/router-ready.json'),host=llm['host'],port=llm['port'],
+    web.run_app(application(queue,tokens['model_gateway'],root/'state/router-ready.json',budget),host=llm['host'],port=llm['port'],
                 access_log=None,handler_cancellation=True)
 
 

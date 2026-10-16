@@ -14,6 +14,8 @@ secrets_file: secrets/local-tokens.json
 llm:
   backend: codebuddy_cli
   model: deepseek-v4.1-flash
+  reasoning_effort: auto
+  context_window_tokens: null  # Native window unverified: only null/auto is accepted.
   host: 127.0.0.1
   port: 8765
   max_concurrency: 1
@@ -21,12 +23,13 @@ llm:
   queue_wait_seconds: 30
   run_timeout_seconds: 90
   cleanup_seconds: 5
-# Model/context/output controls are implemented by LAP-10/11; keep their defaults until then.
+# Input budget counts visible UTF-8 bytes + serialized envelope + overhead, not exact model tokens.
 chat:
   history_turns: 8
   context_input_limit_tokens: 16384
   context_overhead_reserve_tokens: 2048
   output_reserve_tokens: 2048
 output:
+  # Plain-text conversion is LAP-11; output controls must keep defaults until then.
   mode: plain_chat
   max_reply_chars: 1200

@@ -1,0 +1,129 @@
+{
+  "model": "deepseek-v4.1-flash",
+  "requested_effort": "high",
+  "native_window_effective_verified": false,
+  "passed": false,
+  "over_budget_status": 422,
+  "cli_attempts": 1,
+  "inference_requests": 1,
+  "control_attempts": 1,
+  "parameters": {
+    "model": "deepseek-v4.1-flash",
+    "effort_requested": "high",
+    "effort_effective": "high",
+    "auto_compact": false,
+    "native_window": "unverified"
+  },
+  "protocol": [
+    {
+      "type": "system",
+      "subtype": "init",
+      "keys": [
+        "__timestamp",
+        "apiKeySource",
+        "cwd",
+        "mcp_servers",
+        "model",
+        "output_style",
+        "permissionMode",
+        "session_id",
+        "slash_commands",
+        "subtype",
+        "tools",
+        "type",
+        "uuid"
+      ]
+    },
+    {
+      "type": "system",
+      "subtype": "status",
+      "keys": [
+        "__timestamp",
+        "_meta",
+        "_requestId",
+        "session_id",
+        "status",
+        "subtype",
+        "type",
+        "uuid"
+      ]
+    },
+    {
+      "type": "assistant",
+      "subtype": null,
+      "keys": [
+        "__timestamp",
+        "_messageId",
+        "_meta",
+        "_requestId",
+        "message",
+        "parent_tool_use_id",
+        "session_id",
+        "type",
+        "uuid"
+      ]
+    },
+    {
+      "type": "assistant",
+      "subtype": null,
+      "keys": [
+        "__timestamp",
+        "_messageId",
+        "_meta",
+        "_requestId",
+        "message",
+        "parent_tool_use_id",
+        "session_id",
+        "type",
+        "uuid"
+      ]
+    },
+    {
+      "type": "result",
+      "subtype": "success",
+      "keys": [
+        "__timestamp",
+        "_meta",
+        "_requestId",
+        "duration_api_ms",
+        "duration_ms",
+        "is_error",
+        "modelUsage",
+        "num_turns",
+        "permission_denials",
+        "result",
+        "session_id",
+        "subtype",
+        "total_cost_usd",
+        "type",
+        "usage",
+        "uuid"
+      ]
+    },
+    {
+      "type": "system",
+      "subtype": "init",
+      "keys": [
+        "__timestamp",
+        "apiKeySource",
+        "cwd",
+        "mcp_servers",
+        "model",
+        "output_style",
+        "permissionMode",
+        "session_id",
+        "slash_commands",
+        "subtype",
+        "tools",
+        "type",
+        "uuid"
+      ]
+    }
+  ],
+  "last_error": {
+    "trace": "67df844ec1",
+    "code": "PROTOCOL_ERROR"
+  },
+  "counter_scope": "inference_requests in this captured report counts CLI user messages; not a verified upstream API-attempt count",
+  "forced_compact_exclusion_verified": false
+}

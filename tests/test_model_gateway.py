@@ -52,6 +52,13 @@ class ParserTests(unittest.TestCase):
         for byte in wire(init(),final()):parser.feed(bytes([byte]))
         self.assertEqual(parser.finish(0),'中文🙂\n"ok"')
 
+    def test_cli_stream_lifecycle_init_after_final_is_not_another_result(self):
+        parser=ResultParser('expected')
+        parser.feed(wire(init(),final(),init()))
+        self.assertEqual(parser.finish(0),'中文🙂\n"ok"')
+        with self.assertRaises(GatewayError):
+            parser=ResultParser('expected');parser.feed(wire(init(),final(),dict(init(),model='wrong')))
+
     def test_final_protocol_failures(self):
         for event in (final(result=''),final(terminal_reason='cancelled'),final(subtype='cancelled'),final(is_error=True)):
             with self.subTest(event=event),self.assertRaises(GatewayError):
