@@ -22,6 +22,7 @@ def admitted_message(event, config):
     if (event.get('post_type') != 'message' or event.get('message_type') != 'group' or
             qq_id(event.get('self_id')) != config.bot_qq or
             not qq_id(event.get('user_id')) or qq_id(event.get('user_id')) == config.bot_qq or
+            qq_id(event.get('user_id')) in config.blocked_users or
             qq_id(event.get('group_id')) not in config.allowed_groups):
         return False
     message = event.get('message')

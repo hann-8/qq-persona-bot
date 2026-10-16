@@ -10,7 +10,7 @@ import uuid
 import psutil
 
 from aiohttp import web
-import yaml
+from .config import load_settings
 
 from .contracts import normalize_request, contract_shape
 from .errors import GatewayError, MESSAGES
@@ -169,7 +169,7 @@ def application(queue,token,ready_file=None):
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--config',required=True);args=parser.parse_args()
     path=Path(args.config).resolve();root=path.parent.parent
-    settings=yaml.safe_load(path.read_text(encoding='utf-8-sig'))
+    settings=load_settings(path)
     llm=settings['llm']
     if llm['host']!='127.0.0.1' or llm['backend']!='codebuddy_cli' or llm['max_concurrency']!=1:
         raise ValueError('Restricted local CLI configuration required')

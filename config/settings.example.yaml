@@ -1,7 +1,9 @@
+schema_version: 2
 bot:
   qq: "REQUIRED_PERSONAL_BOT_QQ"
 access:
   allowed_groups: ["REQUIRED_TEST_GROUP"]
+  blocked_users: []
   admin_users: ["REQUIRED_ADMIN_QQ"]
   private_enabled: false
 onebot:
@@ -19,3 +21,12 @@ llm:
   queue_wait_seconds: 30
   run_timeout_seconds: 90
   cleanup_seconds: 5
+# Model/context/output controls are implemented by LAP-10/11; keep their defaults until then.
+chat:
+  history_turns: 8
+  context_input_limit_tokens: 16384
+  context_overhead_reserve_tokens: 2048
+  output_reserve_tokens: 2048
+output:
+  mode: plain_chat
+  max_reply_chars: 1200

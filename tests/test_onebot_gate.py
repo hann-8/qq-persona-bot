@@ -55,6 +55,16 @@ class PredicateTests(unittest.TestCase):
             with self.subTest(patch=patch), self.assertRaises(ValueError):
                 replace(self.config, **patch)
 
+    def test_blocklist_admins_and_mentions_do_not_bypass(self):
+        config = replace(self.config, blocked_users=frozenset({'333', '555'}))
+        for user in (333, 555):
+            for segments in (message()['message'], [], [{'type':'text','data':{'text':'222'}}]):
+                event = message(); event.update(user_id=user, message=segments)
+                self.assertFalse(admitted_message(event, config))
+        event = message(); event['user_id'] = 666
+        event['message'].append({'type':'text','data':{'text':'333'}})
+        self.assertTrue(admitted_message(event, config))
+
     def test_persistent_dedup(self):
         store=DedupStore(self.config.database)
         self.assertTrue(store.reserve(message()))
@@ -145,6 +155,22 @@ class TransportTests(unittest.IsolatedAsyncioTestCase):
         response={'status':'ok','retcode':0,'data':{'online':True},'echo':'query'}
         await ws.send_json(response)
         self.assertEqual(await asyncio.wait_for(self.received.get(),2),response)
+        await ws.close()
+
+    async def test_blocked_never_reserves_or_forwards_then_unblock_admits(self):
+        from unittest.mock import patch
+        self.gate.config = replace(self.config, blocked_users=frozenset({'333'}))
+        ws, up = await self.connect()
+        with patch.object(self.gate.store, 'reserve', wraps=self.gate.store.reserve) as reserve:
+            await ws.send_json(message())
+            heartbeat = {'post_type':'meta_event','meta_event_type':'heartbeat','self_id':222}
+            await ws.send_json(heartbeat)
+            self.assertEqual(await asyncio.wait_for(self.received.get(), 2), heartbeat)
+            reserve.assert_not_called()
+            self.assertTrue(self.received.empty())
+        self.gate.config = self.config  # Simulates a new, unblocked startup snapshot.
+        await ws.send_json(message())
+        self.assertEqual(await asyncio.wait_for(self.received.get(), 2), message())
         await ws.close()
 
     async def test_bad_auth_and_identity(self):

@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 STATE = ROOT / 'state/managed-processes.json'
 NAPCAT = ROOT / 'runtime/napcat/installer/NapCat.52230.Shell'
 sys.path.insert(0, str(ROOT / 'src'))
-from qqbot_gateway.config import load_gate_config
+from qqbot_gateway.config import load_gate_config, configuration_lock
 
 
 def alive(entry):
@@ -101,6 +101,11 @@ def check_port(port):
 
 
 def start_channel(full=False):
+    with configuration_lock(ROOT):
+        _start_channel(full)
+
+
+def _start_channel(full=False):
     if any(alive(e) is not None for e in read_state()):
         raise RuntimeError('Project processes already running; inspect status first')
     gate=load_gate_config(ROOT/'config/settings.local.yaml')

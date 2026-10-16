@@ -7,7 +7,6 @@ import re
 import time
 import uuid
 
-import yaml
 import psutil
 from astrbot.api.event import filter, AstrMessageEvent
 from astrbot.api.star import Context, Star, register
@@ -15,6 +14,7 @@ from astrbot.api.message_components import At, AtAll, Plain, Reply
 
 from qqbot_gateway.session_queue import SessionCoordinator, SessionError, trim_history
 from qqbot_gateway.task_store import TaskStore
+from qqbot_gateway.config import load_settings
 
 LOG=logging.getLogger(__name__)
 
@@ -24,8 +24,9 @@ class QQRouter(Star):
     def __init__(self,context:Context):
         super().__init__(context)
         self.root=Path(os.environ['QQBOT_ROOT']).resolve()
-        settings=yaml.safe_load((self.root/'config/settings.local.yaml').read_text(encoding='utf-8-sig'))
+        settings=load_settings(self.root/'config/settings.local.yaml')
         self.bot=settings['bot']['qq'];self.groups=set(settings['access']['allowed_groups']);self.admins=set(settings['access']['admin_users'])
+        self.blocked=set(settings['access']['blocked_users'])
         self.persona=(self.root/'config/persona.md').read_text(encoding='utf-8')
         self.persona_id='fatfish-test-'+hashlib.sha256(self.persona.encode()).hexdigest()[:8]
         chat=settings.get('chat',{})
@@ -49,11 +50,13 @@ class QQRouter(Star):
 
     @filter.event_message_type(filter.EventMessageType.GROUP_MESSAGE)
     async def on_group(self,event:AstrMessageEvent):
-        event.should_call_llm(True)
         if (str(event.get_self_id())!=self.bot or str(event.get_group_id()) not in self.groups or
-                str(event.get_sender_id())==self.bot):return
+                str(event.get_sender_id())==self.bot or str(event.get_sender_id()) in self.blocked):
+            event.should_call_llm(False);event.stop_event();return
         components=event.get_messages()
-        if not any(isinstance(c,At) and str(c.qq)==self.bot for c in components):return
+        if not any(isinstance(c,At) and str(c.qq)==self.bot for c in components):
+            event.should_call_llm(False);event.stop_event();return
+        event.should_call_llm(True)
         trace=uuid.uuid4().hex[:10];event.set_extra('qq_router_trace',trace)
         key=self.bot+':'+str(event.get_group_id())+':'+str(event.message_obj.message_id)
         if not self.tasks.accept(key,trace):return

@@ -1,42 +1,66 @@
-# 笔记本 WorkBuddy 工作线
+# 笔记本 WorkBuddy 工作线交接
 
-返回[全局入口](../../PROGRESS.md)。继承全局要求；细节以[实施计划](IMPLEMENTATION_PLAN.md)、[验收矩阵](ACCEPTANCE.md)为准。
+返回[全局入口](../../PROGRESS.md)。继承[AGENTS](../../AGENTS.md)；原规格见[实施计划](IMPLEMENTATION_PLAN.md)，本轮体验改进执行[UX_PLAN](UX_PLAN.md)，验收见[ACCEPTANCE](ACCEPTANCE.md)，领取/交接见[任务台账](TASKS.md)。本轮任务记录：[LAP-08](tasks/LAP-08/HANDOFF.md)。
 
-状态：G0/G1通过；G2真实握手通过；G3本机真实provider通过；G4单条及修复后的群多轮通过，离线会话隔离通过；完整人工隔离/长稳待验。更新时间：2026-10-16（Asia/Shanghai）。
+更新时间：2026-10-16 23:00（Asia/Shanghai）。目标：先交付个人QQ授权群真实@的人设文字聊天；当前只推进笔记本。本轮按授权仅实施[LAP-09](tasks/LAP-09/HANDOFF.md)，已实现/离线通过，真实验收待用户参与；LAP-10—12仍待后续指令。
 
-## 当前检查点与下一步
+## 当前状态与第一步
 
-1. 初次真实@无回复：gate准入4条、tasks为空、CLI0；本机AstrBot认证日志API确认At昵称解析ActionFailed1403。群名片为空时框架回退get_stranger_info被拒并丢弃At。已限定允许查询bot自身昵称；其他用户仍拒绝，入站规则不变。scripts/verify_g4_adapter.py使用安装的实际转换器复现旧失败、验证修复，无网络调用。
-2. 20:51:01重连后用户介绍测试收到1条正常胖鱼回复；健康页CLI1次、任务completed、发送ACK确认。随后普通文字无@静默，但两轮口令出现原样DSML Write/Read文本，P02失败，立即精确停止服务。没有实际CLI memory文件写入证据，不能将模型文本当真实工具执行。
-3. 固定CLI源码确认默认MemoryContextInterceptor注入自动记忆指导。已加仅子进程生效的自动/团队记忆、抽取/相关性禁用环境开关；parser拒绝DSML/tool-call文本；trim_history排除受污染完整轮次，未手工删除数据库。39项离线测试通过。
-4. scripts/verify_g4_memory.py --real本机实际AstrBot provider两轮通过：同账号/指定模型/相同人设，随机口令第二轮精确回忆，2请求/2次CLI，新增CLI memory文件0。证据reports/g4-memory-2026-10-16.json；不是QQ群验收。
-5. 已恢复文本服务，20:56:01真实QQ握手及router_ready=true。用户确认新口令两轮正常纯文本；健康页CLI2次、错误null，新增2任务completed，历史3完整轮次/DSML0。scripts/verify_g4_routing.py以真实框架事件/unique session构造器+真实router、内存会话管理器替身验证同用户保留、跨用户/跨群为空、无At无请求，通过且无模型/网络调用。不是多人群人工验收。
-6. 当前文本测试版可继续试用。下一步先核对真实跨用户交错/人设接受与运行恢复，再按用户文本优先安排视频；视频缺无字幕/受限样本与登录意愿，不擅自猜参数。README.md已补启停/配置/限制。不请求用户重复已通过的口令测试，不重放旧消息。
+**文字核心已有证据，文本交付未完成；LAP-09已实现/离线通过，真实重启/群验收未做。** 先读UX_PLAN/TASKS及LAP-09交接；后续可按用户指令另领LAP-10。用户说明旧报错时未登录NapCat，LAP-01并入LAP-12的登录/分层状态提示，不再作为所有任务之前的独立阻塞。
 
-运行命令：scripts/Start-Bot.ps1完整文本模式；-ChannelOnly仅诊断；scripts/Show-BotStatus.ps1只读健康无推理；scripts/Stop-Bot.ps1按记录PID+创建身份停止本项目进程。回环端口AstrBot6185/6199、gate6200、model8765、NapCat6099。state/managed-processes.json记录身份，state/router-ready.json验证插件就绪；日志仅结构元数据，不导出原始群内容或凭据。
+最新检查点：配置菜单及groups/blacklist命令、共享校验/迁移/原子保存、gate/router黑名单静默前置拒绝已落地；53项单元测试及实际AstrBot router/At转换器离线回归通过。详情见[LAP-09报告](../../reports/lap-09-2026-10-16.md)。本机存活身份检查拒绝写配置；本轮未修改实际settings/persona、启停、登录或调用真实模型/发消息，旧运行实例未更新。用户补充授权自主commit/push，提交包含保留的旧规划文档；不代表部署或完整验收。
 
-G3/G4实现：严格文本HTTP契约、CLI NDJSON解析、单并发FIFO、总期限和取消清理；唯一qq_router显式request_llm接管，同UMO FIFO、8轮短历史、5秒冷却，测试人设config/persona.md。禁止默认LLM旁路/工具/压缩/fallback。G3真实provider调用1次成功，429/超时/坏协议模拟各尝试1次，见reports/g3-2026-10-16.json。G4报告见[当前验证记录](../../reports/g4-2026-10-16.md)。B站本阶段未接入，不基于URL猜内容。
+以下为22:10规划阶段历史记录（LAP-09最新结果以上段为准）：
 
-## 参数与不变约束
+- 上次21:35前后执行`./scripts/Show-BotStatus.ps1`：进程在、router_ready=true、queue=0、active=false、cli_attempts=7、backend_state=ready，最后模型成功21:21:24。是历史快照，本轮未重新探活，不能当作22点的实时状态。
+- 历史失败模型追踪11aacf9b18：21:02:07接受并启动CLI一次，21:02:23返回BACKEND_UNAVAILABLE；业务追踪a0c16673b2于21:02:24标failed。具体上游原因未保留，不能猜成登录失效、额度耗尽或断网。两种追踪ID不同。
+- 本次以SQLite只读连接复核任务库：累计completed=9、failed=1；该失败后21:12:42、21:16:15、21:17:16、21:21:25各有1条completed，最后业务追踪bc9b6f9210。仅查询trace/status/updated和计数，没有读取聊天正文。任务完成计数不等于功能验收通过率。
+- `last_error`仍指向历史失败；源码`model_gateway.py`成功时更新state/last_success但不清空last_error，因此它与ready同时出现不能直接判定当前持续故障。仅确认之后有请求成功，尚无“已定位/已修复”证据。
+- 用户说明NapCat未登录记为现场事实；旧模型追踪已出现CLI_START，现有日志没有证明跨层因果，不伪报技术根因复现。没有新独立失败时不为旧trace循环真实推理。
+- **下一实施会话第一步：**先读AGENTS、PROGRESS、本文件、TASKS和UX_PLAN，核对git status；LAP-09实现/离线已完成，真实差额见其交接；新实施按用户后续指令领取LAP-10，不自动开始。不要重装或从G0重新开始。
+- 本会话已核对用户六项反馈并读取指定人设v2；上下文重点为模型输入上限，聊天轮数为辅助。仅编辑文档，未改运行人设/配置、代码、原Obsidian笔记或服务状态；未调用模型、发群消息、提交推送。
 
-用户info.txt提供bot/admin/测试群；仅提取标识到被忽略的config/settings.local.yaml，不使用/复制其中密码。用户确认微信登录、独立CodeBuddy CLI与WorkBuddy**同一账号同一站点**；指定deepseek-v4.1-flash，报告1700 credits/每日100，精确扣减不可核验。保留模型入口、节省token，不自动切换、不提供独立API Key。
+## 代码与Git检查点
 
-用户授权自行设计大肥鱼人设，无3组问答，最终人设仍需人工验收。仅1个B站样本，用户明确视频低优先级，样本通过非当前文本交付前提；无字幕/失败样本和B站登录意愿待补，不阻碍文本线。
+以下前三条为22:10规划历史检查点；本轮新增实现/验证以顶部LAP-09报告及任务交接为准。原规划修改全部保留，按用户最新授权与LAP-09一起交付提交；不将历史“未改代码”描述为当前状态。
 
-个人QQ+NapCat独立副本+外置严格WS gate+AstrBot，唯一业务qq_router。AstrBot唯一维护历史，按群+用户隔离；CLI每请求新上下文。modalities必须[text]，禁默认重试/压缩/fallback；成功路径不stop_event。视频后续瞬时system证据不入完整历史，ASR必须可终止子进程。不能擅自改变账号、额度和触发规则。
+- 分支main；实现提交4560ab6，已push至origin/main（https://github.com/hann-8/qq-persona-bot）。本会话开始时代码与该提交一致；已有5份已跟踪文档修改及TASKS.md来自上次盘点，已保留。
+- 本轮新增AGENTS.md、UX_PLAN.md、tasks/LAP-08/HANDOFF.md；同步PROGRESS、TASKS、本文件、ACCEPTANCE、IMPLEMENTATION_PLAN及REQUIREMENTS。共9份文档，未改源代码、脚本、config/persona.md、settings.local.yaml或版本锁，未提交推送。
+- 旧39项离线测试仅是当前旧实现证据，本轮未重跑。新增U01—U20均是待实施合同；文档链接/一致性核对记录在LAP-08交接，不冒充运行验收。
+- info.txt本机文件保留且已停止跟踪，.gitignore排除它及本机参数、secrets、state、runtime、logs等。既有Git历史仍有用户旧参数文件，已提醒更换密码；不自动改写历史，不读取/使用其中密码。当前账号/群标识从config/settings.local.yaml取，凭据只在被忽略路径。
 
-## 已完成与证据
+## 已验证与重要修复
 
-- [G0报告](../../reports/g0-2026-10-16.md)：桌面内置CLI5.8.2首次失败（退出0但error_during_execution；首版漏采errors，具体原因未知），不再重试该路径；ACP只读未发现新鲜Gateway。用户随后自行安装官方独立CLI2.168.0，确认同账号/站点后继续，指定模型多次成功，init tools/MCP均空，system/history/中文emoji/换行/伪system及哨兵隔离通过。采用--tools空参数，并逐项传--disallowedTools（逗号合并无效）。不启用ACP或/gateway。
-- [G1报告](../../reports/g1-2026-10-16.md)、[版本清单](../../config/versions.lock.json)：uv0.13.1、Python3.12.15（项目安装、无注册表/PATH修改）、项目.venv、独立uv tool AstrBot4.29.0。AstrBot管理页HTTP200。普通Node为C:/Program Files/nodejs/node.exe v24.22.0，同等回归通过，不依赖Codex私有Node作为最终路径。
-- 超时证据以g0-4eb446b67c9b为准：taskkill退出128因嵌套Job退出竞争，不单凭退出码判成功；psutil超时前捕获4个后代及创建身份，等待后全部退出，process_tree_cleanup_verified=true。下一请求g0-8ac6e1852519成功。早期只验证根退出，已补足完整树证据。
-- NapCat固定v4.18.38 OneKey/Shell、腾讯官方QQ9.9.33-52230安装包预置后执行官方安装器，独立副本runtime/napcat/installer/NapCat.52230.Shell。未改D:/QQ，未运行包内按QQ.exe名称结束进程的脚本。源码仓库main与二进制版本不一致，不宣称源码复现；本机hash用于追溯，不冒充独立真实性校验。
-- [G2报告](../../reports/g2-2026-10-16.md)：严格准入/双向认证/第二连接拒绝/出站action限制/echo/心跳/SQLite去重/断线重连离线通过。16项unittest通过（G0协议6+G2谓词4+实际本机WS6）。真实QQ握手及Q01单条调用/答复已补验；Q13应用队列离线验证通过，真实压力未测。
+| 范围 | 证据与结论 |
+| --- | --- |
+| G0 | [报告](../../reports/g0-2026-10-16.md)：用户自行安装的官方CodeBuddy CLI2.168.0，同WorkBuddy账号/站点，指定模型调用、system/history、工具隔离、编码和超时树清理/恢复通过。桌面内置CLI早期失败，不回退该路线，ACP不进入主线。精确credits扣减未核验。 |
+| G1 | [报告](../../reports/g1-2026-10-16.md)、[版本锁](../../config/versions.lock.json)：项目Python3.12.15、uv0.13.1、AstrBot4.29.0、普通Node24.22.0；NapCat4.18.38+独立QQ9.9.33-52230，未改日常D:/QQ。 |
+| G2 | [报告](../../reports/g2-2026-10-16.md)：严格准入/认证/去重/出站动作控制与WS传输离线通过；真实登录与self_id握手通过。 |
+| G3 | [证据](../../reports/g3-2026-10-16.json)：实际AstrBot provider本机真实请求1次成功、CLI1次；429/超时/坏协议模拟各仅1次尝试。 |
+| G4 | [记录](../../reports/g4-2026-10-16.md)：用户真实@介绍成功，无@普通文字静默；修复后口令两轮正常纯文本。39项离线测试通过。实际框架事件+router+内存会话替身验证同用户保留历史、跨用户/跨群为空、无At无请求；不是多人群人工验收。 |
 
-## 文件与安全检查点
+必须保留的修复：
 
-自有实现：src/qqbot_gateway/{config.py,onebot_gate.py}；scripts/g0_probe.py、g0_protocol.py、manage.py及Start/Stop/Test/Show-BotStatus.ps1；tests/test_g0_protocol.py、test_onebot_gate.py；pyproject.toml；config/settings.example.yaml、mcp-empty.json、versions.lock.json。运行状态/config本机副本/凭据/缓存/logs在忽略路径，不导出。
+1. AstrBot群名片为空会回退get_stranger_info获取@目标昵称；原gate拒绝后框架丢弃真实At。现仅允许查询配置bot自身昵称，其他用户仍拒绝。`scripts/verify_g4_adapter.py`用实际安装转换器复现旧失败和修复，无网络调用。
+2. `--tools ""`不足以禁用工具；`--disallowedTools`必须将每个名称分别传argv，逗号合并无效。使用config/cli-tools-denied.json并校验init tools/MCP为空，不能删除该检查。
+3. 工具空和`--setting-sources none`仍不关闭CLI MemoryContextInterceptor。它曾导致模型将Write/Read的DSML文本发到群里，口令首次验收失败。现仅在CLI子进程禁用自动/团队记忆及记忆辅助服务；parser拒绝DSML/tool-call结果，trim_history排除污染完整轮次。没有实际文件写入证据，不将生成文本当工具执行。`scripts/verify_g4_memory.py --real`同模型本机两轮精确回忆，2请求/2次CLI、新增CLI memory文件0，见[证据](../../reports/g4-memory-2026-10-16.json)。
 
-旧规划8个Markdown文件保留，PROGRESS是唯一全局入口。仓库已存在；info.txt为用户本机文件，之前已进入Git历史。用户本轮授权commit/push，现保留本机文件并停止跟踪；不改写历史，既有历史密码仍需用户更换。用户本轮提供的独立CLI是外部安装，不由代理安装/修改。其余可见代码/报告/文档变更均为本轮代理工作；用户已授权以中文提交说明提交并推送至origin/main。
+## 实现入口与运行方法
 
-验证限制：精确额度扣减、真实认证失效/配额耗尽未制造；G3已本机实测、G4单条和多轮真实通过、隔离离线通过但真人交错待验，不能声称完整验收通过；视频/ASR/PC未部署；锁屏、睡眠和长稳未测。不靠反复模型请求代替定位错误。
+- 自有代码：src/qqbot_gateway/{onebot_gate,model_gateway,workbuddy_cli_runner,contracts,session_queue,task_store,text_safety,config,errors}.py；唯一业务插件plugins/qq_router/main.py。AstrBot唯一保存历史，按群+用户隔离、最多8轮，CLI每请求新上下文；同UMO FIFO、5秒冷却、模型全局单并发。
+- 人设config/persona.md运行中仍为旧胖鱼测试版。本轮用户指定人设v2，采鲸鱼娘/鱼片/自然口语，草案与冲突处理见UX_PLAN，尚未落地。默认模型仍deepseek-v4.1-flash；最新需求允许操作者显式设置模型、上下文输入上限和强度，额度不必极限节省，仍不自动换账号/站点/模型或另接收费API。
+- 隔离实例：runtime/astrbot；框架Python为runtime/astrbot-tool/astrbot/Scripts/python.exe，框架验证脚本用它运行，CWD须为runtime/astrbot。项目服务/离线单元测试用.venv/Scripts/python.exe。
+- 本机PowerShell：`scripts/Start-Bot.ps1`完整文本模式；`-ChannelOnly`仅诊断；`scripts/Show-BotStatus.ps1`无推理健康检查；`scripts/Stop-Bot.ps1`按state/managed-processes.json中PID+创建身份停止本项目进程。不要重复启动，不按QQ.exe进程名批量停止。
+- 回环端口：AstrBot管理页6185、OneBot6199、gate6200、模型8765、NapCat6099。state/router-ready.json验证插件PID/创建身份。运行配置cmd_config.json有UTF8 BOM，读utf-8-sig；不要覆盖用户日常应用配置。
+- `scripts/Test-Bot.ps1`为39项离线测试；`scripts/verify_g4_adapter.py`及`scripts/verify_g4_routing.py`为额外离线框架集成验证；带--real的verify_g3.py/verify_g4_memory.py会消耗真实额度，不当健康探针循环运行。
+- [使用说明](../../README.md)。日志仅保留结构元数据，原始错误被process_host.py丢弃，这是当前上游诊断信息不足的原因之一。
+
+## 剩余工作与任务归属
+
+1. LAP-09共享配置/授权群/黑名单已实现/离线通过，U04/05真实群及U07全组件重启待验；LAP-10模型三项参数→LAP-11纯文本/人设v2→LAP-12一键启停/登录分层状态/QQ共存尚未实施，合同及能力验证分支详见UX_PLAN。
+2. LAP-01合并到LAP-12，不抹掉历史trace限制；只有出现新的独立模型失败再重开。上下文原生控制仅有静态候选证据，实施时先零推理验证，不用autoCompactWindow冒充上限。
+3. 原LAP-02真人交错/隔离/重置和P02三轮差额、LAP-03最终人设接受、LAP-04恢复/文本长稳、LAP-05交付汇总全部保留。旧基线不无故重跑；新代码触及的路径必须重做相应有意义回归。
+4. LAP-06/07视频/ASR仍延期；目前遇链接只说明未支持。已有BV178JX6wEaa样本，进入相关阶段再补其余样本/登录意愿；PC不启动。
+5. 任务归属见台账；本轮仅领取LAP-09并保留真实差额，不领取其他任务。真实@入口、无工具/主动任务/默认重试/压缩/fallback保持，成功路径不stop_event。
+
+本次交接可恢复：读取PROGRESS→本文件→TASKS→被领取任务的记录及相关代码/证据，不必重读全部历史报告。代码已增加LAP-09实现，实际运行实例尚未重启加载。

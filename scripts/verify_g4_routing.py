@@ -9,6 +9,7 @@ from pathlib import Path
 import sys
 import tempfile
 from types import SimpleNamespace
+import yaml
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path[:0]=[str(ROOT),str(ROOT/'src')]
@@ -35,7 +36,11 @@ async def verify():
 
     with tempfile.TemporaryDirectory() as directory:
         root=Path(directory);(root/'config').mkdir()
-        (root/'config/settings.local.yaml').write_text('bot:\n  qq: "222"\naccess:\n  allowed_groups: ["111", "444"]\n  admin_users: ["333"]\nchat:\n  user_cooldown_seconds: 0\n',encoding='utf-8')
+        settings=yaml.safe_load((ROOT/'config/settings.example.yaml').read_text(encoding='utf-8'))
+        settings['bot']['qq']='222'
+        settings['access'].update(allowed_groups=['111','444'],admin_users=['333'])
+        settings['chat']['user_cooldown_seconds']=0
+        (root/'config/settings.local.yaml').write_text(yaml.safe_dump(settings),encoding='utf-8')
         (root/'config/persona.md').write_text('offline persona',encoding='utf-8')
         previous=os.environ.get('QQBOT_ROOT');os.environ['QQBOT_ROOT']=directory
         manager=Conversations()
@@ -77,7 +82,27 @@ async def verify():
             try:await anext(no_at)
             except StopAsyncIteration:pass
             else:raise AssertionError('Non-At reached the model')
+            # Direct plugin delivery must stop before trace/task/coordinator/history, including admins.
+            router.blocked={'333','555'}
+            before_conversations=len(manager.items)
+            from unittest.mock import patch
+            with patch.object(router.tasks,'accept',side_effect=AssertionError('Blocked task accepted')), \
+                 patch.object(router.coordinator,'acquire',side_effect=AssertionError('Blocked cooldown/queue reached')):
+                for user in ('333','555'):
+                    for mention in (True,False):
+                        rejected=event(user,'111',6,'blocked',mention=mention)
+                        assert [item async for item in router.on_group(rejected)]==[]
+                        assert not rejected.get_extra('qq_router_trace')
+                        assert rejected.is_stopped()
+                cross_group=event('333','999',7,'unauthorized admin')
+                assert [item async for item in router.on_group(cross_group)]==[]
+                assert cross_group.is_stopped()
+            assert len(manager.items)==before_conversations
+            router.blocked=set()
+            restored=await request(event('333','111',8,'recall after unblock'))
+            assert 'A-secret' in restored.conversation.history
             print('PASS: actual AstrBot session keys + router retain same-user history, isolate other user/group, reject no-At; no network/model calls.')
+            print('PASS: direct blocked admin/user, no-At and unauthorized admin stop before trace/tasks/cooldown/history; unblocking retains history.')
         finally:router.tasks.close()
 
 
