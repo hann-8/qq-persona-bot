@@ -21,3 +21,5 @@
 修改文件：上述范围及新增cli_control.py、config/cli-capabilities.json、tests/test_cli_control.py/test_cli_runner.py/test_token_budget.py、原test_config/test_model_gateway和verify_g4_routing回归；reports/lap-10*.json/md、README、UX_PLAN、ACCEPTANCE、PROGRESS/TASKS/工作线交接同步。没有修改settings.local.yaml、persona或运行实例；未读取认证文件/群正文。真实CLI3次启动（含零推理1次）、控制4次、user2条；上游API内部尝试次数未知，已将代码计数改名user_messages_sent。
 
 下一步：先由符合AGENTS模型档位要求的规划会话处理强制压缩/内部恢复边界，不把它与原生窗口ACK混为已通过。LAP-10未完成差额不删除；LAP-09真实验收/原文本收尾任务继续保留。无需用户本轮登录；未自动领取LAP-11/12。提交/推送不等于部署。
+
+交付：独立实现提交b19b050已成功推送origin/main；87个本地文档链接与git diff --check通过。源码类型严格ACK的末次收紧已单独跑3项control测试通过；全套70项基线及其余代码结果保留。当前bot未重启加载本提交，状态仍为部分完成。
