@@ -2,7 +2,11 @@
 
 返回[全局入口](../../PROGRESS.md)。继承[AGENTS](../../AGENTS.md)；原规格见[实施计划](IMPLEMENTATION_PLAN.md)，本轮体验改进执行[UX_PLAN](UX_PLAN.md)，验收见[ACCEPTANCE](ACCEPTANCE.md)，领取/交接见[任务台账](TASKS.md)。本轮任务记录：[LAP-08](tasks/LAP-08/HANDOFF.md)。
 
-更新时间：2026-10-17 10:02（Asia/Shanghai）。当前[LAP-13](tasks/LAP-13/HANDOFF.md)已按计划实现/离线通过，见[报告](../../reports/lap-13-2026-10-17.md)。分组菜单/清屏与结果等待、逐项输入说明/强度映射、启动固定NapCat地址已落地。108项单元、中文空格路径/外部CWD的实际配置入口验证通过；真实窗口视觉接受由用户重新打开cmd体验。
+更新时间：2026-10-17 10:57（Asia/Shanghai）。[LAP-14](tasks/LAP-14/HANDOFF.md)v2仅规划完成，见[PLAN](tasks/LAP-14/PLAN.md)和[medium实施指引](tasks/LAP-14/IMPLEMENTATION_GUIDE.md)。当前磁盘persona重复/冲突材料15984字节，加政策16849字节；运行实例加载版本未知，不当作真实风格根因复现。参考机制及逐任务实现/验收顺序已核对，bot产品代码未改。
+
+下一步用户后续选择gpt-6.1-sol/medium并指定LAP-15（精简角色/场景表达，仍单条），再LAP-16（同次生成、最多3泡/80字、认真单条、ACK/历史/中断）；single兼容、adaptive显式启用。LAP-17近期本地路线已补用户授权SSH硬件/Ollama盘点和Qwen3.5-9B Q4初选，见[PC选型](../local-5070/MODEL_SELECTION.md)；模型安装/推理/接入未开始。LAP-18联网为中优先级，后续独立规划。新实施任务未领取；产品代码/配置/人设和真实bot均不操作，未推理/群发，persona增量hash不变。家庭访问资料仅本机忽略加密记录，不进入工作环境。用户最新授予项目规划/实施长期自行commit/push授权，已同步AGENTS及medium指引，本轮文档按该授权交付。
+
+以下为LAP-13交付检查点：当前[LAP-13](tasks/LAP-13/HANDOFF.md)已按计划实现/离线通过，见[报告](../../reports/lap-13-2026-10-17.md)。分组菜单/清屏与结果等待、逐项输入说明/强度映射、启动固定NapCat地址已落地。108项单元、中文空格路径/外部CWD的实际配置入口验证通过；真实窗口视觉接受由用户重新打开cmd体验。
 
 本轮未启停/探活真实bot、改本机配置、登录、模型/群发；用户persona增加245行和hash不变，不纳入提交。运行状态不能沿用旧停机快照。LAP-10/原真人验收差额不变，不自动推进其他任务；交付按既有授权提交/推送。
 
