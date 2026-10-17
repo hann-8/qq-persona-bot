@@ -15,7 +15,7 @@ sys.path[:0]=[str(ROOT),str(ROOT/'src')]
 os.environ['ASTRBOT_DISABLE_METRICS']='1'
 
 
-async def verify(root,backend,mode,participation,full_lifecycle=False,lap24=False):
+async def verify(root,backend,mode,participation,full_lifecycle=False,lap24=False,lap25=False):
     import yaml
     from PIL import Image
     from aiohttp import web
@@ -84,11 +84,13 @@ async def verify(root,backend,mode,participation,full_lifecycle=False,lap24=Fals
     try:
         cases=['text_image','image_only','invalid_id','answer','missing2','duplicate2','error2','timeout2','stop','hash_changed','cooldown','bad','metadata_missing','metadata_mismatch','image_only_missing','web_answer']
         if lap24:cases+=['text1','text2','text3','text2_image','capacity_image']
+        if lap25:cases+=['fenced','optional','plain','bad_meme_text','final_system_trim']
         if participation=='free':cases+=['ambient_image_only','silent']
         for case in cases:
             if participation=='free':
                 router.group_turns.reset('111')
-                with router.tasks.db:router.tasks.db.execute("UPDATE delivery SET repair='operator_reviewed' WHERE cid='@ram'")
+                if case=='final_system_trim':
+                    for n in range(30):router.group_turns.append('111','old',str(n),'old','x'*350)
             class Bot:
                 def __init__(self):self.sent=[]
                 async def send_group_msg(self,**kwargs):
@@ -116,13 +118,19 @@ async def verify(root,backend,mode,participation,full_lifecycle=False,lap24=Fals
             msg.raw_message={'qqbot_connection':'a'*64}
             e=AiocqhttpMessageEvent(question,msg,PlatformMetadata(name='aiocqhttp',description='offline',id='qqbot'),'111',Bot())
             gen=router.on_group(e);req=await anext(gen)
+            if case=='final_system_trim':req.system_prompt+='S'*7500
             raw=dict(kind='answer' if case in ('answer','web_answer') else 'chat',bubbles=[] if only or case=='silent' else ['合成文字'],meme_id='invalid' if case=='invalid_id' else None if case=='silent' else mid)
             if case in ('text1','text2','text3','text2_image','capacity_image'):
                 n=3 if case in ('text3','capacity_image') else 2 if case in ('text2','text2_image') else 1
                 raw.update(bubbles=['合成文字'+str(i) for i in range(n)],meme_id=mid if case in ('text2_image','capacity_image') else None)
             if participation=='free':raw.update(qqbot_group_reply=1,decision='silent' if case=='silent' else 'speak')
             else:raw.update(qqbot_media_reply=1)
-            harness.text='bad' if case=='bad' else json.dumps(raw,ensure_ascii=False)
+            if case in ('fenced','optional','plain','bad_meme_text','final_system_trim'):raw['meme_id']=None
+            if case=='optional':raw.pop('meme_id');raw['bubbles']='合成文字';raw['reason']='inert'
+            if case=='bad_meme_text':raw['meme_id']={'path':'untrusted'}
+            harness.text='{"broken"' if case=='bad' else json.dumps(raw,ensure_ascii=False)
+            if case=='fenced':harness.text='```json\n'+harness.text+'\n```'
+            if case=='plain':harness.text='合成文字'
             prior=harness.attempts
             path,_=c.resolve(mid);original=path.read_bytes()
             if case in ('hash_changed','image_only_missing'):path.write_bytes(b'changed')
@@ -191,10 +199,13 @@ async def verify(root,backend,mode,participation,full_lifecycle=False,lap24=Fals
             router.delivery.allowed=old_allowed;router.delivery.catalog.cfg['cooldown_seconds']=0;path.write_bytes(original)
             types=[s['message'][0]['type'] for s in e.bot.sent]
             expected=[] if case=='silent' else ['image'] if case in ('image_only','ambient_image_only') else ['text'] if case in ('invalid_id','answer','stop','hash_changed','cooldown','bad','metadata_missing','metadata_mismatch','image_only_missing','web_answer') else ['text','image']
+            if case in ('fenced','optional','plain','bad_meme_text','final_system_trim'):expected=['text']
             if case in ('text1','text2','text3'):expected=['text']*(int(case[-1]) if mode=='adaptive' else 1)
             if case in ('text2_image','capacity_image'):expected=['text']*((3 if case=='capacity_image' else 2) if mode=='adaptive' else 1)+(['image'] if case=='text2_image' or mode=='single' else [])
             if stopped_metadata:expected=[]
             assert types==expected,(case,types,expected)
+            if case in ('fenced','optional','plain','bad_meme_text','final_system_trim'):
+                assert e.bot.sent[0]['message'][0]['data']['text']=='合成文字',case
             if case=='web_answer':
                 assert '来源：Synthetic source https://example.com/page' in e.bot.sent[0]['message'][0]['data']['text']
                 assert 'SYNTHETIC_EVIDENCE' not in e.bot.sent[0]['message'][0]['data']['text']
@@ -212,7 +223,7 @@ async def verify(root,backend,mode,participation,full_lifecycle=False,lap24=Fals
         _,plan=media_plan(json.dumps(dict(qqbot_media_reply=1,kind='chat',bubbles=[],meme_id=mid)),settings['output'],'发个表情',c,c.candidates(''))
         router.tasks.accept('crash','t');router.tasks.prepare_group_delivery('crash','111','epoch','r',plan,'d',[1,2]);router.tasks.begin_part('crash',0)
         router.tasks.close();router.tasks=TaskStore(root/'state/tasks.sqlite');await router.tasks.recover_deliveries(manager)
-        assert router.tasks.parts('crash')[0][1]=='unknown' and router.tasks.group_blocked('111')
+        assert router.tasks.parts('crash')[0][1]=='unknown' and not router.tasks.group_blocked('111')
         assert router.tasks.db.execute("SELECT part_type FROM prepared_part WHERE message_key='crash'").fetchone()[0]=='image'
         return dict(backend=backend,mode=mode,participation=participation,cases=report,recovery=True,real_model_requests=0,real_qq_messages=0,real_favorites_reads=0)
     finally:

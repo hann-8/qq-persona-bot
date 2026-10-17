@@ -1,5 +1,7 @@
 # QQ 人设聊天 Bot：项目入口
 
+2026-10-18 00:55（Asia/Shanghai）：[LAP-25](tracks/laptop-workbuddy/tasks/LAP-25/HANDOFF.md)群聊可靠性修复已实现/离线通过：发送未知不再锁群、部分发送区分、格式恢复/坏表情保文字、最终system及候选预算裁剪、业务错误明确分流。260单元/12组合384实际框架合成通过；不改本机配置人设、不启停/登录/真实模型/群，需用户正常重启加载，真实效果待验。
+
 更新时间：2026-10-18 00:35（Asia/Shanghai）。本文件是唯一项目进度入口，不另建根HANDOFF。
 
 ## 当前阶段与授权
@@ -58,7 +60,7 @@ LAP-17已有SSH原生runner/schema3/切换及统一结果/版本；LAP-18安全�
 
 | 工作线 | 状态 | 最近更新 | 下一步 | 交接入口 |
 | --- | --- | --- | --- | --- |
-| 笔记本 WorkBuddy / 共用网关 | active；24独立实现/离线通过，原生路径/真实验收未完成；21/22/23离线交付，18搜索未完成 | 2026-10-18 00:35 | 24原生目录证据/报告接入回规划；加载/登录/表达接受另授权，不自动开始真实验收 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [24交接](tracks/laptop-workbuddy/tasks/LAP-24/HANDOFF.md) |
+| 笔记本 WorkBuddy / 共用网关 | active；25修复已实现/离线通过，24独立部分已交付、18搜索缺口保留 | 2026-10-18 00:55 | 正常重启加载25后观察真实群效果；24目录/原生报告缺口另补证据 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [25交接](tracks/laptop-workbuddy/tasks/LAP-25/HANDOFF.md) |
 | 家庭5070 PC本地模型 | active；17接入已实现/离线与元数据通过，真实生成未验 | 2026-10-17 15:52 | 17待真实范围；保留0生成/未改本机后端 | [HANDOFF](tracks/local-5070/HANDOFF.md) / [选型历史/最新快照](tracks/local-5070/MODEL_SELECTION.md) |
 
 已建立任务交接：[LAP-08规划](tracks/laptop-workbuddy/tasks/LAP-08/HANDOFF.md)、[09配置/准入](tracks/laptop-workbuddy/tasks/LAP-09/HANDOFF.md)、[10预算/参数](tracks/laptop-workbuddy/tasks/LAP-10/HANDOFF.md)、[11纯文本/人设](tracks/laptop-workbuddy/tasks/LAP-11/HANDOFF.md)、[12启停/状态](tracks/laptop-workbuddy/tasks/LAP-12/HANDOFF.md)、[13配置控制台](tracks/laptop-workbuddy/tasks/LAP-13/HANDOFF.md)、[14人设/分条规划](tracks/laptop-workbuddy/tasks/LAP-14/HANDOFF.md)、[15精简人设](tracks/laptop-workbuddy/tasks/LAP-15/HANDOFF.md)、[16一次生成/分条](tracks/laptop-workbuddy/tasks/LAP-16/HANDOFF.md)、[19双后端/联网规划](tracks/laptop-workbuddy/tasks/LAP-19/HANDOFF.md)、[17本地接入/配置切换](tracks/laptop-workbuddy/tasks/LAP-17/HANDOFF.md)、[18共用联网独立部分/搜索缺口](tracks/laptop-workbuddy/tasks/LAP-18/HANDOFF.md)；[LAP-20已实现/离线通过](tracks/laptop-workbuddy/tasks/LAP-20/HANDOFF.md)，未启用free；[LAP-21受控表情](tracks/laptop-workbuddy/tasks/LAP-21/HANDOFF.md)本轮已领取实施。

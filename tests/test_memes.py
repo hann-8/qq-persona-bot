@@ -95,7 +95,7 @@ class CatalogTests(unittest.TestCase):
             _,p=media_plan(json.dumps(raw),cfg,q,c,c.candidates(q));self.assertEqual(len(p.parts),1)
     def test_bad_protocol(self):
         c,r=registered(self.root)
-        for raw in ('bad','{"qqbot_media_reply":1,"qqbot_media_reply":1}','{"url":"x"}'):
+        for raw in ('{"broken"','{"qqbot_media_reply":1,"qqbot_media_reply":1}','{"url":"x"}'):
             decision,p=media_plan(raw,DEFAULTS,'x',c,[]);self.assertEqual(decision,'error');self.assertNotIn('{',p.canonical_text)
     def test_media_hosts(self):
         self.assertTrue(media_url('https://gchat.qpic.cn/x?rkey=transient'))

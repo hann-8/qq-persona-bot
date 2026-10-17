@@ -90,7 +90,9 @@ class TaskStore:
         return bool(cur.rowcount)
 
     def group_blocked(self,group):
-        return bool(self.db.execute("SELECT 1 FROM delivery WHERE umo=? AND cid='@ram' AND state='unknown' AND repair!='operator_reviewed'",('group:'+group,)).fetchone())
+        # Entertainment chat may lose this turn; old ACK uncertainty is evidence,
+        # never a persistent admission lock for new group messages.
+        return False
 
     def review_group(self,group):
         with self.db:self.db.execute("UPDATE delivery SET repair='operator_reviewed' WHERE umo=? AND cid='@ram' AND state='unknown'",('group:'+group,))
@@ -128,6 +130,9 @@ class TaskStore:
         complete=bool(parts) and all(state=='sent' for _,state,_ in parts)
         state='sent' if complete else ('unknown' if any(s in ('sending','unknown','sent') for _,s,_ in parts) else 'failed')
         if not complete and any(s=='sent' for _,s,_ in parts) and all(s in ('sent','failed') for _,s,_ in parts):state='partial'
+        row=self.delivery(key)
+        if (row and row['cid']=='@ram' and not complete and any(s=='sent' for _,s,_ in parts)
+                and all(s in ('sent','failed','prepared') for _,s,_ in parts)):state='partial'
         with self.db:
             self.db.execute("UPDATE delivery_part SET state='unknown' WHERE message_key=? AND state='sending'",(key,))
             self.db.execute('UPDATE delivery SET state=?,reason=COALESCE(?,reason) WHERE message_key=?',(state,reason,key))

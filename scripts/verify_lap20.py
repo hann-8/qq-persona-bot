@@ -14,7 +14,7 @@ sys.path[:0]=[str(ROOT),str(ROOT/'src')]
 os.environ['ASTRBOT_DISABLE_METRICS']='1'
 
 
-async def verify(root,backend,mode,full_lifecycle=False,lap24=False):
+async def verify(root,backend,mode,full_lifecycle=False,lap24=False,lap25=False):
     import yaml
     from aiohttp import web
     from astrbot.api.platform import AstrBotMessage,MessageMember,MessageType,PlatformMetadata
@@ -142,6 +142,25 @@ async def verify(root,backend,mode,full_lifecycle=False,lap24=False):
 
     report=[]
     try:
+        if lap25:
+            for case,raw in [('fenced','```json\n'+speak+'\n```'),('plain','普通合成答复'),
+                             ('optional',json.dumps(dict(bubbles='普通合成答复',reason='inert'))),
+                             ('gateway_budget',speak),('final_system_trim',speak)]:
+                router.group_turns.reset('111')
+                if case=='final_system_trim':
+                    for n in range(30):router.group_turns.append('111','old',str(n),'old','x'*350)
+                e=event(True);gen=router.on_group(e);req=await anext(gen)
+                if case=='gateway_budget':req.system_prompt+='S'*20000
+                if case=='final_system_trim':req.system_prompt+='S'*7500
+                before=harness.attempts;await complete(e,req,raw);await finish(gen)
+                assert len(e.bot.sent)==1,(case,e.bot.sent)
+                assert harness.attempts==before+int(case!='gateway_budget'),case
+                if case=='gateway_budget':
+                    from qqbot_gateway.errors import MESSAGES
+                    assert MESSAGES['INPUT_TOO_LONG'] in str(e.bot.sent)
+                    assert router.tasks.delivery(e.get_extra('qq_delivery_key'))['reason']=='gateway_input_too_long'
+                else:assert ('合成回复' if case in ('fenced','final_system_trim') else '普通合成答复') in str(e.bot.sent)
+                report.append(dict(case='lap25_'+case,generations=harness.attempts-before,sends=1))
         if full_lifecycle:
             if lap24:
                 for kind,number in [('chat',1),('chat',2),('chat',3),('answer',3)]:
@@ -159,7 +178,7 @@ async def verify(root,backend,mode,full_lifecycle=False,lap24=False):
                     assert harness.attempts==before+1
                     report.append(dict(case='lap24_'+kind+str(number),sends=count,generations=1,ack=True))
             for mention in (False,True):
-                for case,text in (('speak',speak),('silent',silent),('bad','invalid JSON')):
+                for case,text in (('speak',speak),('silent',silent),('bad','{"broken"')):
                     router.group_turns.reset('111')
                     e=event(mention);gen=router.on_group(e);req=await anext(gen)
                     before=harness.attempts
@@ -177,8 +196,7 @@ async def verify(root,backend,mode,full_lifecycle=False,lap24=False):
         for mention in (False,True):
             for case in ('speak','silent','bad','tamper','missing','error','timeout','stop','disconnect','framework_error','late','blocked'):
                 router.group_turns.reset('111')
-                # A fresh synthetic group isolates deliberate unknown-ACK quarantine cases.
-                with router.tasks.db:router.tasks.db.execute("UPDATE delivery SET state='failed' WHERE cid='@ram' AND state='unknown'")
+                # Prior unknown ACK evidence remains; new messages stay admissible.
                 bot_ack=case if case in ('missing','error','timeout') else 'ok'
                 e=event(mention,ack=bot_ack,sender='999' if case=='blocked' else '333')
                 gen=router.on_group(e);attempts=harness.attempts
@@ -195,7 +213,7 @@ async def verify(root,backend,mode,full_lifecycle=False,lap24=False):
                     await finish(gen)
                     assert len(e.bot.sent)==int(mention)
                     report.append(dict(case=case,mention=mention,generations=0,sends=len(e.bot.sent)));continue
-                harness.text=('invalid JSON' if case=='bad' else json.dumps(dict(qqbot_group_reply=1,
+                harness.text=('{"broken"' if case=='bad' else json.dumps(dict(qqbot_group_reply=1,
                     decision='silent' if case=='silent' else 'speak',kind='chat',bubbles=[] if case=='silent' else ['第一条','第二条'],meme_id=None),ensure_ascii=False))
                 response=await provider.text_chat(prompt=req.prompt,system_prompt=req.system_prompt,contexts=req.contexts,
                     session_id=req.session_id,func_tool=None,request_max_retries=1)
@@ -233,11 +251,10 @@ async def verify(root,backend,mode,full_lifecycle=False,lap24=False):
                     bot_rows=[r for r in router.group_turns.snapshot('111') if r['speaker']=='bot']
                     assert len(bot_rows)==confirmed,(case,confirmed,bot_rows)
                     assert req.prompt not in str(row)
-                    if case in ('missing','error','timeout'):assert router.tasks.group_blocked('111')
+                    if case in ('missing','error','timeout'):assert not router.tasks.group_blocked('111')
                 report.append(dict(case=case,mention=mention,generations=harness.attempts-attempts,sends=count))
                 (root/'state/stop-request.json').unlink(missing_ok=True);connect()
         router.group_turns.reset('111')
-        with router.tasks.db:router.tasks.db.execute("UPDATE delivery SET state='failed' WHERE cid='@ram' AND state='unknown'")
         # Two speakers are batched once. Snapshot stays immutable as later events arrive.
         e1=event(text='batch one');g1=router.on_group(e1);first=asyncio.create_task(anext(g1));await asyncio.sleep(.05)
         e2=event(sender='334',text='batch two');g2=router.on_group(e2)
@@ -298,22 +315,23 @@ async def verify(root,backend,mode,full_lifecycle=False,lap24=False):
         assert '引用未解析' in quotedreq.prompt
         await complete(quoted,quotedreq,speak);await finish(quotedgen)
         report.append(dict(case='scope_media_and_embedded_quote',passed=True))
-        # A ticket accepted before a preceding unknown ACK must recheck after its wait.
+        # A waiting new mention continues after a preceding unknown ACK, without replay.
         router.group_turns.reset('111')
         uncertain=event(True,ack='missing');uncertaingen=router.on_group(uncertain);uncertainreq=await anext(uncertaingen)
         queued=event(True,sender='334');queuedgen=router.on_group(queued);queuedtask=asyncio.create_task(anext(queuedgen));await asyncio.sleep(.03)
         await complete(uncertain,uncertainreq,speak);await finish(uncertaingen)
         attempts=harness.attempts
-        try:await queuedtask
-        except StopAsyncIteration:pass
-        assert harness.attempts==attempts and len(queued.bot.sent)==1 and not queued.get_extra('qq_group_request')
-        report.append(dict(case='waiting_mention_rechecks_unknown_ack',passed=True))
+        queuedreq=await queuedtask
+        await complete(queued,queuedreq,speak);await finish(queuedgen)
+        assert harness.attempts==attempts+1 and len(queued.bot.sent)==1 and queued.get_extra('qq_group_request')
+        assert not router.tasks.group_blocked('111')
+        report.append(dict(case='waiting_mention_continues_after_unknown_ack',passed=True))
         # Reopen unknown intent: discard RAM target without touching personal manager or resending.
         from qqbot_gateway.reply_plan import ReplyPlan
         key='crash';router.tasks.accept(key,'t');router.tasks.prepare_group_delivery(key,'444','e','r',ReplyPlan('answer',('bot','bot2'),'bot\nbot2'),'d',[1,2]);router.tasks.begin_part(key,0)
         router.tasks.close();router.tasks=TaskStore(root/'state/tasks.sqlite')
         await router.tasks.recover_deliveries(Manager())
-        assert router.tasks.group_blocked('444') and router.tasks.delivery(key)['repair']=='ram_discarded'
+        assert not router.tasks.group_blocked('444') and router.tasks.delivery(key)['repair']=='ram_discarded'
         return dict(backend=backend,mode=mode,real_model_requests=0,real_qq_messages=0,real_ssh=0,cases=report,
             original_event=True,no_personal_conversation=True,recovery=True,usage=queue.group_usage)
     finally:

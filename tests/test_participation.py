@@ -55,7 +55,7 @@ class ProtocolTests(unittest.TestCase):
         self.assertEqual(decision,'error');self.assertIn('没接住',plan.canonical_text)
 
     def test_invalid_output_never_leaks_envelope(self):
-        for raw in ('', '{}',reply(meme_id='m1'),reply(bubbles=[]),reply(bubbles=['']),reply(kind='tool'),
+        for raw in ('', '{}',reply(bubbles=[]),reply(bubbles=['']),reply(kind='tool'),
                     reply(qqbot_group_reply=True),reply()[:-1]+',"decision":"speak"}',reply(bubbles=['<tool_call>bad</tool_call>'])):
             with self.subTest(raw=raw):
                 self.assertEqual(group_plan(raw,OUTPUT,'',False),('error',None))
@@ -238,7 +238,7 @@ class SchedulingTests(unittest.IsolatedAsyncioTestCase):
             path=Path(directory)/'tasks.sqlite';store=TaskStore(path);store.accept('k','t')
             store.prepare_group_delivery('k','g','epoch','r',ReplyPlan('answer',('bot',),'bot'),'h',[1,2])
             store.begin_part('k',0);store.close();store=TaskStore(path)
-            await store.recover_deliveries(Manager());self.assertTrue(store.group_blocked('g'))
+            await store.recover_deliveries(Manager());self.assertFalse(store.group_blocked('g'))
             store.review_group('g');self.assertFalse(store.group_blocked('g'));self.assertEqual(store.delivery('k')['state'],'unknown')
             self.assertFalse(store.begin_part('k',0));store.close()
 

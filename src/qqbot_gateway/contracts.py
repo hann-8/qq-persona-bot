@@ -1,7 +1,7 @@
 from .errors import GatewayError
 
 
-def normalize_request(payload, char_limit=None, budget=None):
+def normalize_request(payload, char_limit=None, budget=None, group_suffix=''):
     from .token_budget import InputBudget, dialog_text
     budget = budget or InputBudget()
     fail = lambda: GatewayError('UNSUPPORTED_REQUEST')
@@ -56,7 +56,12 @@ def normalize_request(payload, char_limit=None, budget=None):
         from .reply_plan import digest
         if len(dialog)!=1 or payload['qqbot_request']['snapshot_digest']!=digest(dialog[0]['content']):raise fail()
         from .group_protocol import validate_snapshot
-        validate_snapshot(dialog[0]['content'],payload['qqbot_request'])
+        snapshot=validate_snapshot(dialog[0]['content'],payload['qqbot_request'])
+        from .turn_budget import fit_snapshot
+        # Verify original identity first, then budget a subset against the actual
+        # framework system prompt. Response identity remains the original request.
+        dialog[0]=dict(role='user',content=fit_snapshot(snapshot,system,budget,group_suffix))
+        prompt=dialog_text(dialog)
     if char_limit is not None and len(system) + len(prompt) > char_limit:
         raise fail()
     budget.check(system, prompt)

@@ -433,19 +433,15 @@ class QQRouter(Star):
             if mention or self.participation['allow_ambient_web']:
                 anchor=next((r['text'] for r in reversed(eligible) if '[非文本未解析]' not in r['text'] and intent(r['text'],self.web).kind!='none'),None)
             w.evaluated_seq=w.seq
-            # Cut oldest rows against the selected backend's real envelope budget.
-            while snapshot:
-                body=json.dumps(dict(must_reply=mention,target_seq=target_seq if mention else None,web_anchor=anchor,messages=snapshot),ensure_ascii=False,separators=(',',':'))
-                try:self.budget.select_history(self.persona,body,[]);break
-                except GatewayError:
-                    if len(snapshot)==1:
-                        if mention:await self.local_notice(event,MESSAGES['INPUT_TOO_LONG'])
-                        return
-                    remove=next((i for i,r in enumerate(snapshot) if not mention or r['seq']!=target_seq),None)
-                    if remove is None:return
-                    snapshot.pop(remove)
-                    if anchor and not any(r['text']==anchor for r in snapshot):anchor=None
-            if not snapshot:return
+            from qqbot_gateway.turn_budget import fit_snapshot,candidate_instruction
+            suffix=candidate_instruction([]) if self.memes.cfg['enabled'] else ''
+            try:
+                body=fit_snapshot(dict(must_reply=mention,target_seq=target_seq if mention else None,
+                    web_anchor=anchor,messages=snapshot),self.persona,self.budget,suffix)
+            except GatewayError as error:
+                if mention:await self.local_notice(event,MESSAGES[error.code])
+                return
+            snapshot=json.loads(body)['messages']
             request=dict(version=1,kind='group_turn',trigger='mention' if mention else 'ambient',must_reply=mention,
                          epoch=epoch,snapshot_digest=digest(body),request_key=digest(key))
             event.set_extra('qq_group_request',request);event.set_extra('qq_delivery_key',key)

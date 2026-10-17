@@ -1,10 +1,12 @@
 """Strict one-generation media envelope; model chooses only offered IDs."""
 import json
 import re
+import logging
 from .reply_plan import ReplyPlan,PreparedPart,digest,make_reply_plan,_pairs
 from .errors import GatewayError
 
 MEDIA_REQUEST={'version':1,'kind':'media_turn'}
+LOG=logging.getLogger(__name__)
 
 
 def explicit_meme(question):
@@ -13,7 +15,9 @@ def explicit_meme(question):
 
 def media_plan(raw,output,question,catalog,candidates,*,group=False,must_reply=True):
     try:
-        obj=json.loads(raw,object_pairs_hook=_pairs)
+        from .output_envelope import decode_envelope
+        obj=decode_envelope(raw,group=group,must_reply=must_reply)
+        if not group:obj.pop('decision',None)
         fields={'qqbot_group_reply','decision','kind','bubbles','meme_id'} if group else {'qqbot_media_reply','kind','bubbles','meme_id'}
         marker='qqbot_group_reply' if group else 'qqbot_media_reply'
         if not isinstance(obj,dict) or set(obj)!=fields or type(obj[marker]) is not int or obj[marker]!=1 or obj['kind'] not in ('chat','answer') or not isinstance(obj['bubbles'],list):raise ValueError()
@@ -47,6 +51,7 @@ def media_plan(raw,output,question,catalog,candidates,*,group=False,must_reply=T
         return 'speak',ReplyPlan(plan.kind if plan else 'chat',labels,'\n'.join(labels),plan.limited if plan else False,
                                 plan.fallback_reason if plan else None,tuple(parts))
     except (ValueError,TypeError,KeyError,GatewayError):
+        LOG.warning('GROUP_OUTPUT_INVALID category=media_protocol_error')
         if not must_reply:return 'error',None
         text='这条没接住，请再说一次。'
         return 'error',ReplyPlan('answer',(text,),text,fallback_reason='media_protocol_error')

@@ -1,11 +1,13 @@
 """Strict authenticated group-turn envelope and one-generation decision."""
 import json
 import re
+import logging
 from .errors import GatewayError
 from .reply_plan import make_reply_plan,ReplyPlan,_pairs,digest
 
 SILENT='QQBOT_INTERNAL_SILENT'
 FIELDS={'version','kind','trigger','must_reply','epoch','snapshot_digest','request_key'}
+LOG=logging.getLogger(__name__)
 
 
 def validate_request(value):
@@ -41,7 +43,11 @@ def validate_snapshot(text,request):
 
 def group_plan(raw,output,question,must_reply):
     try:
-        obj=json.loads(raw,object_pairs_hook=_pairs)
+        from .output_envelope import decode_envelope
+        obj=decode_envelope(raw,group=True,must_reply=must_reply)
+        # This path has no enabled image catalog. Ignore image suggestions when
+        # usable text exists rather than discarding the whole answer.
+        if obj['bubbles']:obj['meme_id']=None
         if (not isinstance(obj,dict) or set(obj)!={'qqbot_group_reply','decision','kind','bubbles','meme_id'} or
             type(obj['qqbot_group_reply']) is not int or obj['qqbot_group_reply']!=1 or
             obj['decision'] not in ('speak','silent') or obj['kind'] not in ('chat','answer') or
@@ -56,6 +62,7 @@ def group_plan(raw,output,question,must_reply):
         if output['delivery_mode']=='single':plan=ReplyPlan(plan.kind,(plan.canonical_text,),plan.canonical_text,plan.limited,plan.fallback_reason)
         return 'speak',plan
     except (ValueError,TypeError,KeyError,GatewayError):
+        LOG.warning('GROUP_OUTPUT_INVALID category=group_protocol_error')
         if not must_reply:return 'error',None
         text='这条没接住，请再说一次。'
         return 'error',ReplyPlan('answer',(text,),text,fallback_reason='group_protocol_error')
