@@ -24,6 +24,8 @@ NapCat：现有启动器固定bundle/CWD并传配置bot.qq；安装包快速脚�
 
 首版修改5份：PROGRESS.md、tracks/laptop-workbuddy/HANDOFF.md、TASKS.md、本目录HANDOFF.md与PLAN.md；本轮新增IMPLEMENTATION_GUIDE.md，共6份文档。不提交secrets、settings、state或其他session文件。18日续作未发现其他session未提交差异。
 
-首版Git交付：内容`293422a4d75a49f329bab891426f160c8704750c`及记录`cf69570a1a4c129f17c9d13750890ca41a04edb1`均已推送origin/main并核对完整SHA；检查点工作区干净。期间LAP-21由原session独立提交`fd2a35f`，24首版只提交其5份文档，未夹带21内容。18日复审的6份文档沿长期授权独立commit/push，交付后记录内容SHA并再次核对远端。
+首版Git交付：内容`293422a4d75a49f329bab891426f160c8704750c`及记录`cf69570a1a4c129f17c9d13750890ca41a04edb1`均已推送origin/main并核对完整SHA；检查点工作区干净。期间LAP-21由原session独立提交`fd2a35f`，24首版只提交其5份文档，未夹带21内容。
+
+18日Git交付：复审内容`d03f40aed0c5a087f05be4fecfc64d02f1d4b153`已推送origin/main，rev-parse与ls-remote完整SHA一致，内容检查点工作区干净。该提交仅6份归属文档，182本地链接及差异/隐私模式/非代码归属核对通过；0真实运行操作。本段随后独立提交/推送并再次核对远端，最终记录提交以本session回执为准。
 
 下一步：用户已明确由其后续安排6.1-sol/medium实施，复制IMPLEMENTATION_GUIDE第7节即可；实施方先登记续作/文件归属，按指引先B后A，不把本次规划当部署授权。登录目录能力缺口与真实QQ/表达接受分别补证据。需要重启/真人扫码/真实模型/群验收时另按用户范围登记唯一实例执行归属，保留LAP-18搜索及旧真人/上下文控制差额。
