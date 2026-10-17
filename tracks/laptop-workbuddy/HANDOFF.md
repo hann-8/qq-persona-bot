@@ -2,7 +2,9 @@
 
 返回[全局入口](../../PROGRESS.md)。继承[AGENTS](../../AGENTS.md)；原规格见[实施计划](IMPLEMENTATION_PLAN.md)，本轮体验改进执行[UX_PLAN](UX_PLAN.md)，验收见[ACCEPTANCE](ACCEPTANCE.md)，领取/交接见[任务台账](TASKS.md)。本轮任务记录：[LAP-08](tasks/LAP-08/HANDOFF.md)。
 
-更新时间：2026-10-17 09:56（Asia/Shanghai）。当前新任务[LAP-13](tasks/LAP-13/HANDOFF.md)详细计划已落盘，见[PLAN](tasks/LAP-13/PLAN.md)。范围为菜单清屏/分组、逐项输入解释/强度编号、启动固定NapCat地址；未改实现、配置、人设或启停，未探测用户试用后的当前运行状态。用户persona未提交改动保留。后续按AGENTS由medium在用户新实施指令后执行。
+更新时间：2026-10-17 10:02（Asia/Shanghai）。当前[LAP-13](tasks/LAP-13/HANDOFF.md)已按计划实现/离线通过，见[报告](../../reports/lap-13-2026-10-17.md)。分组菜单/清屏与结果等待、逐项输入说明/强度映射、启动固定NapCat地址已落地。108项单元、中文空格路径/外部CWD的实际配置入口验证通过；真实窗口视觉接受由用户重新打开cmd体验。
+
+本轮未启停/探活真实bot、改本机配置、登录、模型/群发；用户persona增加245行和hash不变，不纳入提交。运行状态不能沿用旧停机快照。LAP-10/原真人验收差额不变，不自动推进其他任务；交付按既有授权提交/推送。
 
 以下为上次LAP-12的历史交接检查点，不能据此判断当前仍在停机：
 

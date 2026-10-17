@@ -18,6 +18,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 STATE = ROOT / 'state/managed-processes.json'
 NAPCAT = ROOT / 'runtime/napcat/installer/NapCat.52230.Shell'
+NAPCAT_URL = 'http://127.0.0.1:6099'
 sys.path.insert(0, str(ROOT / 'src'))
 from qqbot_gateway.config import load_gate_config, configuration_lock
 from qqbot_gateway.lifecycle import atomic_json
@@ -185,7 +186,7 @@ def show_status(report=None):
         if old and old.get('historical'):print('历史模型错误：'+old.get('code','UNKNOWN')+'（后来已有成功，不代表当前故障）')
     print('任务状态计数：'+json.dumps(report['task_counts'],ensure_ascii=False))
     if report['process_state']!='stopped' and report['channel_state']!='connected':
-        print('请在本机 http://127.0.0.1:6099 完成登录，再查看状态；不会自动重启或调用模型。')
+        print(f'请在本机 {NAPCAT_URL} 完成登录，再查看状态；不会自动重启或调用模型。')
     return report
 
 
@@ -226,8 +227,14 @@ def check_port(port):
 
 
 def start_channel(full=False, paused=False):
-    with configuration_lock(ROOT):
-        _start_channel(full, paused)
+    completed = False
+    try:
+        with configuration_lock(ROOT):
+            _start_channel(full, paused)
+        completed = True
+    finally:
+        print(f'\nNapCat 登录/管理：{NAPCAT_URL}')
+        if not completed:print('本次启动未完成，页面可能暂不可访问。')
 
 
 def _start_channel(full=False, paused=False):

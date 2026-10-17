@@ -1,5 +1,7 @@
 import asyncio
 from contextlib import ExitStack
+from contextlib import redirect_stdout
+from io import StringIO
 import json
 import os
 from pathlib import Path
@@ -108,6 +110,22 @@ class LifecycleTests(unittest.TestCase):
              patch.object(manage.subprocess,'run') as child:
             with self.assertRaises(RuntimeError):manage.start_channel(full=True)
             child.assert_not_called()
+
+    def test_every_start_attempt_prints_login_url_but_json_status_stays_json(self):
+        for full in (False,True):
+            for failure in (None,RuntimeError('PARTIAL_RUNNING'),ValueError('invalid config')):
+                output=StringIO()
+                with patch.object(manage,'_start_channel',side_effect=failure),redirect_stdout(output):
+                    if failure:
+                        with self.assertRaises(type(failure)):manage.start_channel(full=full)
+                    else:manage.start_channel(full=full)
+                self.assertIn('NapCat 登录/管理：http://127.0.0.1:6099',output.getvalue())
+                self.assertEqual('页面可能暂不可访问' in output.getvalue(),failure is not None)
+        output=StringIO()
+        with patch.object(manage,'status_report',return_value={'metadata':True}), \
+             patch.object(sys,'argv',['manage.py','status','--json']),redirect_stdout(output):
+            self.assertEqual(manage.main(),0)
+        self.assertEqual(json.loads(output.getvalue()),{'metadata':True})
 
     def test_port_conflict_does_not_kill_owner(self):
         with socket.socket() as sock:

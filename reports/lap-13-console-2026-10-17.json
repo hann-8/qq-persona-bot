@@ -1,0 +1,13 @@
+{
+  "real_model_requests": 0,
+  "real_qq_messages": 0,
+  "real_bot_lifecycle_actions": 0,
+  "wrapper_unicode_space_path": true,
+  "foreign_cwd": true,
+  "codex_pythonpath_removed": true,
+  "menu_read_only_flow": true,
+  "non_tty_no_ansi": true,
+  "cli_show_no_menu_or_pause": true,
+  "temporary_config_unchanged": true,
+  "visual_interactive_terminal_acceptance": "pending_user"
+}
