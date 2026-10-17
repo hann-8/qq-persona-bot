@@ -4,6 +4,8 @@
 
 更新时间：2026-10-17 11:35（Asia/Shanghai）。[LAP-16](tasks/LAP-16/HANDOFF.md)已按用户指令独立实现/离线通过，见[报告](../../reports/lap-16-2026-10-17.md)。124项单元、40组实际框架合成回环、5组原aiocqhttp/gate回执及并发/启动恢复/7项adaptive准入通过；原single框架/入口/历史回归通过。缺省single、adaptive仅显式配置；本机settings/人设正文未改，未启停/探活真实bot、登录、推理/群发/SSH/PC，运行状态未知。下一步用户指定adaptive启用/真实范围，LAP-17/18未领取；P01/旧真人及LAP-10/13差额保留。加载模式/生成限额改动会新建当前上下文，旧历史保留；回滚须先处理pending账本，见报告。Git交付沿用长期授权。
 
+LAP-16内容提交`2a2bb93`已推送origin/main，2026-10-17 11:36（Asia/Shanghai）用ls-remote核对完整SHA一致，已跟踪工作区无剩余差异；随后仅同步本交付记录。state中的备份/测试日志及本机settings保持忽略，未实际启用adaptive或部署/真实验收。
+
 以下为LAP-15历史交付检查点：
 
 更新时间：2026-10-17 11:09（Asia/Shanghai）。[LAP-15](tasks/LAP-15/HANDOFF.md)已按用户明确指令独立实施/离线通过，见[报告](../../reports/lap-15-2026-10-17.md)。原persona完整hash备份后整理唯一角色正文，组合3618字节；108项单元、5组实际框架合成保存/发送、入口/本人历史/隔离/版本迁移通过。固定政策/共用compose已有实现保留，单条、真实@、CLI/模型/预算和工具隔离保持。

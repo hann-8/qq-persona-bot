@@ -18,4 +18,8 @@
 
 修改文件：src/qqbot_gateway/{config,persona,model_gateway,task_store,reply_plan,reply_delivery}.py，plugins/qq_router/main.py，scripts/{configure_astrbot,configure_bot,verify_lap16}.py，config/settings.example.yaml，tests/{test_model_gateway,test_configure_menu,test_reply_plan,test_reply_delivery}.py，reports/lap-16-{2026-10-17.md,offline-2026-10-17.json}，README/PROGRESS、活动线HANDOFF/TASKS/UX_PLAN/ACCEPTANCE及本HANDOFF。仅本任务归属；开始工作区干净，未改persona正文或本机配置/其他session内容。离线命令/结果及回滚步骤见报告；源代码差异和新文件已审阅。
 
-剩余：commit/push及最终远端核对；真实范围须用户指定，由唯一实例负责人启用adaptive/协调加载并做真实QQ ACK/多人/停止/风格接受。当前真实bot状态未知，未启停/登录/推理/群发，未SSH或PC操作；真实启用/adaptive设置保存和群ACK/P01/人工接受未验。旧LAP-10及真人差额保留。会话设置由用户选择，未自动核验/切换。
+Git交付：LAP-16内容提交`2a2bb93`已推送origin/main，2026-10-17 11:36（Asia/Shanghai）用ls-remote核对完整SHA一致，已跟踪工作区无剩余差异；随后仅同步本交付记录。state中的备份/测试日志及本机settings保持忽略，未实际启用adaptive或部署/真实验收。
+
+剩余：真实范围须用户指定，由唯一实例负责人启用adaptive/协调加载并做真实QQ ACK/多人/停止/风格接受。当前真实bot状态未知，未启停/登录/推理/群发，未SSH或PC操作；真实启用/adaptive设置保存和群ACK/P01/人工接受未验。旧LAP-10及真人差额保留。会话设置由用户选择，未自动核验/切换。
+
+最终检查：124项全套单元通过；142个本地Markdown链接、差异空白、两compose表达式/尺寸/版本与persona原hash核对通过。内容提交仅24份本任务归属文件，未夹带忽略资料或其他修改；最终交付记录提交后再次核对远端。
