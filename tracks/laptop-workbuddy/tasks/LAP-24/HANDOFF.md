@@ -1,6 +1,6 @@
 # LAP-24：登录持久化与自然分条排查规划
 
-返回[PROGRESS](../../../../PROGRESS.md) / [TASKS](../../TASKS.md) / [工作线](../../HANDOFF.md)。继承[AGENTS](../../../../AGENTS.md)；原分条合同见[LAP-14](../LAP-14/PLAN.md)，free/表情合同见[LAP-19](../LAP-19/GROUP_CHAT_PLAN.md)。
+返回[PROGRESS](../../../../PROGRESS.md) / [TASKS](../../TASKS.md) / [工作线](../../HANDOFF.md) / [medium实施指引](IMPLEMENTATION_GUIDE.md)。继承[AGENTS](../../../../AGENTS.md)；原分条合同见[LAP-14](../LAP-14/PLAN.md)，free/表情合同见[LAP-19](../LAP-19/GROUP_CHAT_PLAN.md)。
 
 2026-10-17 23:42（Asia/Shanghai）领取；session `LAP-24-login-natural-replies-plan`，标题“登录持久化与自然分条排查规划”。开始分支main，HEAD `5024879ad06446ae7f12cf8a2e908d44a0cc5b79`，git status干净。
 
@@ -8,18 +8,22 @@
 
 文件归属：本目录HANDOFF/PLAN、PROGRESS、工作线HANDOFF/TASKS；不写其他任务文档或本机资料。Markdown台账无锁，首次写入前已核对共享文件无未提交修改。
 
-当前检查点：源码发送器按plan.parts遍历，不补齐最大条数；free提示词缺少adaptive分支的“不凑条数”，人设含1—3句/15—60字篇幅目标，为行为偏向的静态线索，未以真实输出复现唯一根因。本机仅白名单读取确认ollama_ssh/free/adaptive/max_bubbles=3/web=true/memes=true；不沿用旧“未启用”快照。
+2026-10-18续领：用户明确本会话承担max详细规划、后由其安排6.1-sol/medium实施。同一session仅续作LAP-24；续作基线`cf69570a1a4c129f17c9d13750890ca41a04edb1`、工作区干净。范围仍仅只读核对/文档；在原5份归属文档基础上增加本目录IMPLEMENTATION_GUIDE.md。补核原生Worker环境继承、固定WebUI认证/密码回退接口与失败分支，收紧计划，准备medium复制指令；不读取秘密值、不启停/登录/认证、不运行真实模型或群验收。
+
+17日排查基线：源码发送器按plan.parts遍历，不补齐最大条数；free提示词缺少adaptive分支的“不凑条数”，人设含1—3句/15—60字篇幅目标，为行为偏向的静态线索，未以真实输出复现唯一根因。当时白名单读取确认ollama_ssh/free/adaptive/max_bubbles=3/web=true/memes=true；不是18日新探测/运行加载证据。
 
 NapCat：现有启动器固定bundle/CWD并传配置bot.qq；安装包快速脚本说明需登录过一次。安装v4.18.38支持快速登录、密码回退和新设备验证；Windows GUID在QQ实际data root下nt_qq/global/nt_data/msf/Registry20，并经CurrentUser DPAPI保护。独立安装目录不证明实际QQ数据目录隔离；本轮未读日常QQ资料、Registry20内容或登录票据，重复验证根因未证实。
 
-状态：2026-10-17 23:50排查/详细[PLAN](PLAN.md)完成，未实施。计划覆盖需求/非目标、当前证据、登录数据归属/快速登录/可选DPAPI密码回退、自然条数/表情合同、配置/文件/顺序、验证接受、兼容回滚、未验证能力及Git分支。后续先自然分条，再推进可证实的登录独立部分；未知原生路径控制先补证据回规划，不碰日常QQ资料。
+状态：2026-10-18 00:15 max详细[PLAN复审](PLAN.md)/[medium复制指引](IMPLEMENTATION_GUIDE.md)完成，未实施。补核Worker重启复制环境、WebUI认证hash/包络/固定登录接口，明确本版采用固定WebUI单次回退，取代首版原生密码环境注入；DPAPI双凭据、稳定未登录判据、20秒/8请求/密码POST一次、按实例保留unknown账本、single/adaptive/表情24组合及真实接受门槛均已细化。先自然分条，再完成登录独立部分；原生数据根路径覆盖仍未验证，不能猜路径迁移或伪标project_only。
 
-验证：`.venv/Scripts/python.exe -m unittest discover -s tests -p test_reply_plan.py`，8项通过；用PYTHONPATH等价sys.path加入src的stdin合成脚本调用group_plan，chat数组1/2/3分别返回1/2/3，无真实模型/QQ。当前free/web/memes组合prompt 5134 UTF-8字节、不含“不凑条数”。首次stdin探测未加src路径，报ModuleNotFoundError，补入后上述3例及尺寸核对通过；未改变环境/安装依赖。5份归属文档首次164本地链接全部存在、未发现独立6—12位账号样式数字、git diff --check通过；最终链接数随完成记录增加，以末次检查为准。
+17日验证：`.venv/Scripts/python.exe -m unittest discover -s tests -p test_reply_plan.py`，8项通过；用PYTHONPATH等价sys.path加入src的stdin合成脚本调用group_plan，chat数组1/2/3分别返回1/2/3，无真实模型/QQ。当时free/web/memes组合prompt 5134 UTF-8字节、不含“不凑条数”。首次stdin探测未加src路径报ModuleNotFoundError，补入后通过；未改变环境/安装依赖。首版最终168本地链接/差异空白/新增行账号样式数字检查通过。
+
+18日验证：只读安装包源码/启动脚本/静态接口与现有验证入口，无单元/框架重跑、真实认证或运行探测。安装napcat.mjs SHA256及关键函数证据见PLAN；6份文档182本地链接/章节去重/差异空白和新增行账号样式数字检查通过，src/scripts/config/tests无差异、无其他session已跟踪差异。旧verify脚本main会覆盖旧报告的限制已写入指引，要求新lap-24入口/报告。全部待实现测试仅是验收合同，不能计入本轮通过数。
 
 并行工作：开始工作区干净，23:48看到LAP-21新增configure_bot.py/test_configure_menu.py/21 HANDOFF差异。21交接明确其session只写自己的代码/测试/README/报告/任务交接，不写或提交24共享索引；24同样不覆盖、不暂存、不提交21文件。本次8项单元不是21新增代码的验证结论。
 
-修改仅5份：PROGRESS.md、tracks/laptop-workbuddy/HANDOFF.md、TASKS.md、本目录HANDOFF.md与PLAN.md。不提交secrets、settings、state或其他session文件。
+首版修改5份：PROGRESS.md、tracks/laptop-workbuddy/HANDOFF.md、TASKS.md、本目录HANDOFF.md与PLAN.md；本轮新增IMPLEMENTATION_GUIDE.md，共6份文档。不提交secrets、settings、state或其他session文件。18日续作未发现其他session未提交差异。
 
-Git交付：内容提交`293422a4d75a49f329bab891426f160c8704750c`已推送origin/main，rev-parse与ls-remote完整SHA一致；内容检查点git status干净。最终168本地链接/差异空白/本任务新增行账号样式数字检查通过。期间LAP-21已由原session独立提交`fd2a35f`，24仅提交上述5份文档；没有保留未提交的21内容。本段交付记录随后单独提交/推送并再次核对远端，最终记录提交号以本session回执为准。
+首版Git交付：内容`293422a4d75a49f329bab891426f160c8704750c`及记录`cf69570a1a4c129f17c9d13750890ca41a04edb1`均已推送origin/main并核对完整SHA；检查点工作区干净。期间LAP-21由原session独立提交`fd2a35f`，24首版只提交其5份文档，未夹带21内容。18日复审的6份文档沿长期授权独立commit/push，交付后记录内容SHA并再次核对远端。
 
-下一步：用户选择AGENTS规定实施设置并明确继续后，从PLAN第5节开始领取实施/更新归属；登录目录能力缺口与真实QQ/表达接受分别补证据。需要重启/真人扫码/真实模型/群验收时先登记唯一实例执行归属，规划与Git不构成部署授权。保留LAP-18搜索及旧真人/上下文控制差额。
+下一步：用户已明确由其后续安排6.1-sol/medium实施，复制IMPLEMENTATION_GUIDE第7节即可；实施方先登记续作/文件归属，按指引先B后A，不把本次规划当部署授权。登录目录能力缺口与真实QQ/表达接受分别补证据。需要重启/真人扫码/真实模型/群验收时另按用户范围登记唯一实例执行归属，保留LAP-18搜索及旧真人/上下文控制差额。
