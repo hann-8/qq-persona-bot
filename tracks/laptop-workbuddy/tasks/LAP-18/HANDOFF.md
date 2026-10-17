@@ -28,4 +28,4 @@
 
 回滚：操作者停机保存web.enabled=false再重启；保留旧历史/配置备份/两profile。回退旧代码先处理pending发送账本并恢复配对配置备份；不在本轮实际启用或回滚。只有独立代码/离线交付，不能标LAP-18完整完成。
 
-Git交付：待完成本任务差异审阅、commit/push并核对完整SHA；不提交本机settings、凭据、测试data或原始网页/群消息。当前只含本任务修改，无用户变更需要夹带或丢弃。
+Git交付：2026-10-17 16:18，内容提交`ebbe5d5d930dde2dce33e1c30a1b685a5ce35ee5`已推送origin/main，git rev-parse HEAD与git ls-remote的完整SHA一致，检查点工作区干净；随后仅同步本交付记录并按长期授权提交/推送。最终交付记录的SHA由main/HEAD恢复，不自引用自身SHA。不提交本机settings、凭据、测试data或原始网页/群消息。保留本机差异：无已跟踪或未跟踪任务文件差异，既有配置/secrets及新增state测试工件继续忽略；没有夹带或丢弃用户修改。Git交付不等于搜索完成、部署或真实验收。
