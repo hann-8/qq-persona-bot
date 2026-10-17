@@ -22,6 +22,7 @@ from .lifecycle import stopping
 
 LOG = logging.getLogger(__name__)
 TRACE = web.RequestKey('qqbot_trace',str)
+GROUP_REQUEST = web.RequestKey('qqbot_group_request',dict)
 
 
 @dataclass
@@ -31,6 +32,7 @@ class Job:
     request_id: str
     deadline: float
     future: asyncio.Future
+    group_request: dict | None = None
     started: asyncio.Event = field(default_factory=asyncio.Event)
     cancelled: asyncio.Event = field(default_factory=asyncio.Event)
 
@@ -49,6 +51,7 @@ class ModelQueue:
         self.last_shape=None
         self.last_error=None
         self.last_usage={}
+        self.group_usage={}
 
     async def start(self):
         self.worker=asyncio.create_task(self._work())
@@ -61,11 +64,12 @@ class ModelQueue:
             job=self.queue.get_nowait()
             if not job.future.done():job.future.set_exception(GatewayError('BACKEND_UNAVAILABLE'))
 
-    async def submit(self,system,prompt,request_id):
+    async def submit(self,system,prompt,request_id,group_request=None):
         if self.state in ('AUTH_REQUIRED','QUOTA_EXHAUSTED','CLEANUP_FAILED','REMOTE_RESULT_UNKNOWN'):
             raise GatewayError(self.state)
         if self.queue.qsize()>=self.limit+(0 if self.active else 1):raise GatewayError('QUEUE_FULL')
         job=Job(system,prompt,request_id,time.monotonic()+self.wait,asyncio.get_running_loop().create_future())
+        job.group_request=group_request
         try:self.queue.put_nowait(job)
         except asyncio.QueueFull:raise GatewayError('QUEUE_FULL') from None
         try:
@@ -88,7 +92,10 @@ class ModelQueue:
             if self.state in ('AUTH_REQUIRED','QUOTA_EXHAUSTED','CLEANUP_FAILED','REMOTE_RESULT_UNKNOWN'):
                 job.future.set_exception(GatewayError(self.state));continue
             self.active=True
-            task=asyncio.create_task(self.runner.run(job.system,job.prompt,job.request_id))
+            if job.group_request and hasattr(self.runner,'run_group'):
+                call=self.runner.run_group(job.system,job.prompt,job.request_id,job.group_request)
+            else:call=self.runner.run(job.system,job.prompt,job.request_id)
+            task=asyncio.create_task(call)
             cancel=asyncio.create_task(job.cancelled.wait())
             try:
                 done,_=await asyncio.wait((task,cancel),return_when=asyncio.FIRST_COMPLETED)
@@ -138,6 +145,9 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
         except GatewayError as error:
             trace=request.get(TRACE,'unknown')
             queue.last_error={'trace':trace,'code':error.code,'time':time.time()}
+            if GROUP_REQUEST in request:
+                usage_key=request[GROUP_REQUEST]['trigger']+':error'
+                queue.group_usage[usage_key]=queue.group_usage.get(usage_key,0)+1
             LOG.warning('REQUEST_FAILED request_id=%s code=%s',trace,error.code)
             status={'UNSUPPORTED_REQUEST':422,'QUOTA_EXHAUSTED':429,'RATE_LIMITED':429,'QUEUE_FULL':429,
                     'INPUT_TOO_LONG':422,'MODEL_CONFIG_UNSUPPORTED':422,
@@ -170,6 +180,7 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
                                   'web_audit':getattr(getattr(queue.runner,'retriever',None),'last_audit',{}),
                                   'web_search_quality_passed':False,
                                   'last_usage':queue.last_usage,'credits':None,'credits_state':'unknown',
+                                  'group_usage':queue.group_usage,
                                   'last_success':queue.last_success,'real_inference_verified':queue.last_success is not None,
                                   'router_ready':router_ready(),'last_contract':queue.last_shape,'last_error':last_error})
 
@@ -182,15 +193,37 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
         try:payload=await request.json()
         except (ValueError,UnicodeError):raise GatewayError('UNSUPPORTED_REQUEST') from None
         system,prompt=normalize_request(payload,budget=budget)
+        if 'qqbot_request' in payload:request[GROUP_REQUEST]=payload['qqbot_request']
         if not router_ready():raise GatewayError('BACKEND_UNAVAILABLE')
         queue.last_shape=contract_shape(payload)
         LOG.info('REQUEST_ACCEPTED request_id=%s',request[TRACE])
-        result=await queue.submit(system,prompt,request[TRACE])
+        group_request=payload.get('qqbot_request')
+        result=await queue.submit(system,prompt,request[TRACE],group_request)
         backend_result=result if isinstance(result,BackendResult) else BackendResult(result)
         result=backend_result.text
         response_id='chatcmpl-'+request[TRACE]
         metadata={}
-        if backend_result.web_expired:
+        if group_request:
+            from .group_protocol import group_plan,metadata as group_metadata,SILENT
+            snapshot=json.loads(json.loads(prompt)[-1]['content'])
+            question=next((row['text'] for row in snapshot['messages'] if row['seq']==snapshot.get('target_seq')),'')
+            if backend_result.prepared_plan is not None:
+                plan=backend_result.prepared_plan
+                decision='speak'
+            elif backend_result.web_expired:
+                decision,plan=group_plan('',output,'',group_request['must_reply'])
+            else:
+                decision,plan=group_plan(result,output,question,group_request['must_reply'])
+            result=plan.canonical_text if plan else SILENT
+            limited=plan.limited if plan else False
+            metadata['qqbot_group_plan']=group_metadata(group_request,response_id,decision,plan)
+            queue.last_usage=dict(queue.last_usage,trigger=group_request['trigger'],decision=decision)
+            usage_key=group_request['trigger']+':'+decision
+            queue.group_usage[usage_key]=queue.group_usage.get(usage_key,0)+1
+            if backend_result.generation_performed:
+                generated_key=group_request['trigger']+':generations'
+                queue.group_usage[generated_key]=queue.group_usage.get(generated_key,0)+1
+        elif backend_result.web_expired:
             metadata['qqbot_web_expired']=True
             limited=False
         elif backend_result.prepared_plan is not None:
@@ -233,6 +266,7 @@ def main():
     from .web_retrieval import WebRunner, Retriever
     ids=[settings['bot']['qq']]+sum((settings['access'][k] for k in ('allowed_groups','admin_users','blocked_users')),[])
     runner=WebRunner(runner,Retriever(settings['web'],ids),budget,settings['output'],root)
+    runner.allow_ambient_web=settings['participation']['allow_ambient_web']
     queue=ModelQueue(runner,llm['queue_limit'],llm['queue_wait_seconds'])
     logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(message)s')
     web.run_app(application(queue,tokens['model_gateway'],root/'state/router-ready.json',budget,settings['output']['max_reply_chars'],root,settings['output']),host=llm['host'],port=llm['port'],

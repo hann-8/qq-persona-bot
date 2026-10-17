@@ -210,7 +210,7 @@ async def verify(synthetic=None, backend='codebuddy_cli', report_path=None):
                         assert row['state']==('sent' if ack_count==len(plan.bubbles) else 'unknown'),(case,row)
                         for i,sent in enumerate(bot.sent):
                             assert not any(p['type']=='at' for p in sent['message'])
-                            assert sum(p['type']=='reply' for p in sent['message'])==(1 if i==0 else 0)
+                            assert not any(p['type'] in ('reply','at') for p in sent['message'])
                         assert event.bot is bot
                         next_req=await asyncio.wait_for(follow_task,1)
                         next_history=json.loads(next_req.conversation.history)

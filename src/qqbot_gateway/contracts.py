@@ -5,8 +5,11 @@ def normalize_request(payload, char_limit=None, budget=None):
     from .token_budget import InputBudget, dialog_text
     budget = budget or InputBudget()
     fail = lambda: GatewayError('UNSUPPORTED_REQUEST')
-    if not isinstance(payload, dict) or set(payload) - {'model', 'messages', 'stream'}:
+    if not isinstance(payload, dict) or set(payload) - {'model', 'messages', 'stream','qqbot_request'}:
         raise fail()
+    if 'qqbot_request' in payload:
+        from .group_protocol import validate_request
+        validate_request(payload['qqbot_request'])
     if payload.get('model') != 'workbuddy-local' or payload.get('stream', False) is not False:
         raise fail()
     messages = payload.get('messages')
@@ -46,6 +49,11 @@ def normalize_request(payload, char_limit=None, budget=None):
     if any(m['role'] != ('user' if index%2 == 0 else 'assistant') for index,m in enumerate(dialog)):
         raise fail()
     prompt = dialog_text(dialog)
+    if 'qqbot_request' in payload:
+        from .reply_plan import digest
+        if len(dialog)!=1 or payload['qqbot_request']['snapshot_digest']!=digest(dialog[0]['content']):raise fail()
+        from .group_protocol import validate_snapshot
+        validate_snapshot(dialog[0]['content'],payload['qqbot_request'])
     if char_limit is not None and len(system) + len(prompt) > char_limit:
         raise fail()
     budget.check(system, prompt)

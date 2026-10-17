@@ -50,6 +50,15 @@ class MenuTests(unittest.TestCase):
         self.original = self.path.read_bytes()
     def tearDown(self):self.temp.cleanup()
 
+    def test_explicit_free_menu_preserves_profiles_and_units(self):
+        before=load_settings(self.path)
+        ui=RecordedConsole(['7','1','free','','0','0'])
+        menu(self.path,ui)
+        after=load_settings(self.path)
+        self.assertEqual(after['participation']['mode'],'free')
+        self.assertEqual(after['llm'],before['llm']);self.assertEqual(after['access'],before['access'])
+        self.assertIn('沉默也可能消耗模型额度',ui.text);self.assertIn('UTF-8字节',ui.text)
+
     def test_page_timing_keeps_list_visible_until_enter_and_main_hides_ids(self):
         ui = RecordedConsole(['1','1','','0','0'])
         menu(self.path, ui)

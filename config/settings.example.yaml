@@ -1,6 +1,21 @@
 # schema1/2 are migrated in memory; saving writes schema3 with a full backup.
 # Budget fields count visible UTF-8 bytes and envelope, not exact model tokens.
 schema_version: 3
+participation:
+  mode: mentions
+  debounce_seconds: 2
+  max_batch_wait_seconds: 5
+  min_evaluation_interval_seconds: 5
+  max_evaluations_per_minute: 12
+  unsolicited_cooldown_seconds: 15
+  max_unsolicited_per_minute: 4
+  context_messages: 60
+  context_ttl_seconds: 900
+  context_max_bytes: 32768
+  message_max_chars: 2000
+  mention_queue_limit: 8
+  max_ambient_age_seconds: 90
+  allow_ambient_web: true
 web:
   enabled: false
   trigger: auto
@@ -65,6 +80,7 @@ llm:
 chat:
   history_turns: 8
 output:
+  quote_reply: false
   mode: plain_chat
   max_reply_chars: 1200
   delivery_mode: single

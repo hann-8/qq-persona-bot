@@ -19,16 +19,17 @@ async def configure():
     config=json.loads(path.read_text(encoding='utf-8-sig'))
     tokens=json.loads((ROOT/'secrets/local-tokens.json').read_text(encoding='utf-8'))
     config['provider_sources']=[]
-    config['provider']=[{'id':'workbuddy-local','type':'openai_chat_completion','provider':'openai',
+    config['provider']=[{'id':'workbuddy-local','type':'qqbot_openai','provider':'openai',
         'provider_type':'chat_completion','enable':True,'key':[tokens['model_gateway']],
         'api_base':'http://127.0.0.1:8765/v1','model':'workbuddy-local','modalities':['text'],
         'custom_extra_body':{},'timeout':180,'proxy':''}]
     config['provider_settings'].update({'enable':True,'streaming_response':False,'web_search':False,
         'web_search_link':False,'display_reasoning_text':False,'show_tool_use_status':False,
-        'computer_use_runtime':'none'})
+        'computer_use_runtime':'none','prompt_prefix':'{{prompt}}',
+        'identifier':False,'group_name_display':False,'datetime_system_prompt':False})
     config['provider_settings']['proactive_capability']['add_cron_tools']=False
     config['provider_settings']['file_extract']['enable']=False
-    persona=compose_persona((ROOT/'config/persona.md').read_text(encoding='utf-8'),settings['output'],settings['web'])
+    persona=compose_persona((ROOT/'config/persona.md').read_text(encoding='utf-8'),settings['output'],settings['web'],settings['participation'])
     persona_id=session_version(persona,settings)
     from astrbot.core.config.agent_runner import get_agent_runner_config_default
     runner=get_agent_runner_config_default('local')
@@ -49,7 +50,7 @@ async def configure():
     config['trace_enable']=False;config['trace_log_enable']=False;config['log_file_enable']=False
     config['log_level']='ERROR'
     config['platform_settings']['segmented_reply']['enable']=False
-    config['platform_settings']['reply_with_quote']=True
+    config['platform_settings']['reply_with_quote']=False
     config['platform_settings']['reply_with_mention']=False
     config['platform_settings']['reply_prefix']=''
     config['platform_settings']['forward_threshold']=100000

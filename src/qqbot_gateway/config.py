@@ -34,8 +34,10 @@ class GateConfig:
     host: str = '127.0.0.1'
     port: int = 6200
     blocked_users: frozenset[str] = frozenset()
+    participation_mode: str = 'mentions'
 
     def __post_init__(self):
+        if self.participation_mode not in ('mentions','free'):raise ValueError('Invalid participation mode')
         if not qq_id(self.bot_qq) or not self.allowed_groups or not self.admin_users:
             raise ValueError('Bot, allowed groups and admins must be nonempty')
         if any(not qq_id(x) for x in self.allowed_groups | self.admin_users | self.blocked_users):
@@ -61,6 +63,8 @@ def normalize_settings(raw):
     data['schema_version'] = 3
     from .web_policy import validate_web
     data['web'] = validate_web(data.get('web', {}))
+    from .participation import validate_participation
+    data['participation']=validate_participation(data.get('participation',{}))
     for section in ('bot', 'access', 'onebot', 'llm', 'chat', 'output'):
         data.setdefault(section, {})
         if not isinstance(data[section], dict):
@@ -138,6 +142,8 @@ def normalize_settings(raw):
     if local['input_budget']['context_input_limit_tokens']+local['input_budget']['output_reserve_tokens'] > local['num_ctx'] or local['input_budget']['output_reserve_tokens'] < local['num_predict']:raise ValueError('Local budget exceeds known model capacity / output reserve')
     for key, value in {'history_turns':8,'user_cooldown_seconds':5,'session_queue_limit':2,'session_queue_timeout_seconds':600}.items():chat.setdefault(key,value)
     output.setdefault('mode', 'plain_chat')
+    output.setdefault('quote_reply',False)
+    if output['quote_reply'] is not False:raise ValueError('Only direct group replies are supported')
     output.setdefault('max_reply_chars', 1200)
     from .reply_plan import DEFAULTS
     for key, value in DEFAULTS.items():
@@ -214,6 +220,7 @@ def load_gate_config(path):
         database=root / 'state/gate.sqlite', upstream=data['onebot']['upstream'],
         host=data['onebot']['host'], port=data['onebot']['port'],
         blocked_users=frozenset(data['access']['blocked_users']),
+        participation_mode=data['participation']['mode'],
     )
 
 

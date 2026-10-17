@@ -95,9 +95,6 @@ class ReplyDelivery:
                     event.bot=proxy
                     try:
                         chain=event.plain_result(text)
-                        if index==0:
-                            from astrbot.api.message_components import Reply
-                            chain.chain.insert(0,Reply(id=str(event.message_obj.message_id)))
                         await cancellable(event.send(chain),lambda:self.allowed(event),self.timeout)
                         state=self.store.part_result(key,index,'sent' if proxy.calls==1 and proxy.message_id else 'unknown',proxy.message_id)
                     except BaseException:

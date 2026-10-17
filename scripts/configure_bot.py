@@ -187,9 +187,11 @@ class ConfigMenu:
             self.ui.write(f"输入预算：{chat['context_input_limit_tokens']:,}（可见内容保守计数）")
             self.ui.write('\n1  群与黑名单\n2  模型与对话\n3  详细设置与能力说明\n4  回复方式\n5  后端与连接\n6  联网搜索\n0  退出')
             self.ui.write('\n修改前请先关闭机器人；保存后，下次启动生效')
-            choice = self.ui.choose({'0','1','2','3','4','5','6'})
+            self.ui.write('7  群聊参与与活跃度')
+            choice = self.ui.choose({'0','1','2','3','4','5','6','7'})
             if choice == '0':return
-            if choice == '6':self.web_group()
+            if choice == '7':self.participation_group()
+            elif choice == '6':self.web_group()
             elif choice == '5':self.backend_group()
             elif choice == '4':self.output_group()
             elif choice == '3':
@@ -199,6 +201,49 @@ class ConfigMenu:
                 self.ui.write(content.getvalue().rstrip())
                 self.ui.pause()
             else:self.group(choice)
+
+    def participation_group(self):
+        from qqbot_gateway.participation import DEFAULTS,RANGES
+        while True:
+            settings,digest=read_settings(self.path)
+            self.ui.page('群聊参与与活跃度')
+            self.ui.write('free会读取授权群启动后的新消息，即使沉默也可能消耗模型额度。真实@优先；无新消息不生成。保存须停机，重启生效；全模式直接群发，无引用/自动@。')
+            self.ui.write('seconds单位为秒，per_minute为每分钟轮次；context_messages为条数，context_max_bytes为UTF-8字节，message_max_chars为字符；mention_queue_limit为每群等待数。')
+            keys=list(DEFAULTS)
+            for index,key in enumerate(keys,1):
+                bounds=f'{RANGES[key][0]}..{RANGES[key][1]}' if key in RANGES else ('mentions/free' if key=='mode' else 'true/false')
+                self.ui.write(f'{index} {key}: {settings["participation"][key]} ({bounds})')
+            self.ui.write('17 核对后解除本群未知发送隔离 / 0 返回')
+            choice=self.ui.choose({'0','17'}|{str(i) for i in range(1,len(keys)+1)})
+            if choice=='0':return
+            if choice=='17':
+                from qqbot_gateway.task_store import TaskStore
+                group=self.ui.read('已在QQ核对发送结果的授权群号：').strip()
+                if group not in settings['access']['allowed_groups']:
+                    self.ui.write('必须选择授权群。');self.ui.pause();continue
+                if self.ui.read('不会重发任何旧内容；输入“已核对”继续：').strip()!='已核对':continue
+                try:
+                    with configuration_lock(self.path.parent.parent):
+                        require_stopped(self.path.parent.parent)
+                        store=TaskStore(self.path.parent.parent/'state/tasks.sqlite')
+                        try:store.review_group(group)
+                        finally:store.close()
+                    self.ui.write('已解除；原未知ACK证据保留，没有重发。')
+                except (ValueError,OSError,RuntimeError) as error:self.ui.write(operation_error(error))
+                self.ui.pause();continue
+            key=keys[int(choice)-1];value=self.ui.read('新值（回车保留）：').strip()
+            if not value:continue
+            try:
+                if key=='allow_ambient_web':
+                    if value not in ('true','false'):raise ValueError('Expected true/false')
+                    value=value=='true'
+                elif key in ('debounce_seconds','max_batch_wait_seconds'):value=float(value)
+                elif key in RANGES:value=int(value)
+                settings['participation'][key]=value
+                save_settings(self.path,settings,digest)
+                self.ui.write('已保存，下次启动生效。没有启停/读取群消息/调用模型。')
+            except (ValueError,OSError) as error:self.ui.write(operation_error(error)+' 请核对页面范围。')
+            self.ui.pause()
 
     def web_group(self):
         from qqbot_gateway.web_policy import DEFAULTS

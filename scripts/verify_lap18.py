@@ -173,11 +173,11 @@ async def verify(root,backend,mode):
         await provider.terminate();await server.cleanup();router.tasks.close()
 
 
-async def main(root):
+async def main(root,report_prefix='lap-18'):
     reports=[]
     for backend in ('codebuddy_cli','ollama_ssh'):
         for mode in ('single','adaptive'):reports.append(await verify(root,backend,mode))
-    (ROOT/'reports/lap-18-framework.json').write_text(json.dumps(reports,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    (ROOT/f'reports/{report_prefix}-framework.json').write_text(json.dumps(reports,ensure_ascii=False,indent=2)+'\n',encoding='utf-8',newline='\n')
     print('PASS: 26 web cases, both actual runners/installed AstrBot, original history/source/ACK/deadline; 0 real model/QQ')
     from scripts import verify_lap11,verify_lap16
     from scripts.verify_lap17 import Harness
@@ -185,7 +185,9 @@ async def main(root):
         for mode in ('single','adaptive'):
             folder=root/('regression-'+backend+'-'+mode);folder.mkdir()
             harness=Harness(folder,backend)
-            await (verify_lap16 if mode=='adaptive' else verify_lap11).verify(harness,backend,ROOT/f'reports/lap-18-regression-{backend}-{mode}.json')
+            report_path=ROOT/f'reports/{report_prefix}-{backend}-{mode}.json'
+            await (verify_lap16 if mode=='adaptive' else verify_lap11).verify(harness,backend,report_path)
+            report_path.write_text(report_path.read_text(encoding='utf-8'),encoding='utf-8',newline='\n')
 
 
 if __name__=='__main__':

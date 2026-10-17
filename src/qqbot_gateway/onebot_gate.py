@@ -7,6 +7,8 @@ import random
 import secrets
 import sqlite3
 import time
+import os
+import psutil
 
 import aiohttp
 from aiohttp import web
@@ -28,12 +30,12 @@ def admitted_message(event, config):
             qq_id(event.get('group_id')) not in config.allowed_groups):
         return False
     message = event.get('message')
-    return isinstance(message, list) and any(
+    return isinstance(message, list) and bool(message) and all(isinstance(s,dict) and isinstance(s.get('type'),str) and isinstance(s.get('data'),dict) for s in message) and (config.participation_mode=='free' or any(
         isinstance(segment, dict) and segment.get('type') == 'at' and
         isinstance(segment.get('data'), dict) and
         qq_id(segment['data'].get('qq')) == config.bot_qq
         for segment in message
-    )
+    ))
 
 
 def allowed_action(event, config):
@@ -92,6 +94,16 @@ class OneBotGate:
         self.online = None
         self.online_at = None
         self.health_pending = {}
+        self.connection_id=secrets.token_hex(32)
+
+    def publish_connection(self):
+        if self.root:
+            path=self.root/'state/gate-connection.json'
+            path.parent.mkdir(parents=True,exist_ok=True)
+            temp=path.with_suffix('.tmp')
+            temp.write_text(json.dumps(dict(id=self.connection_id,connected=self.connected,online=self.online,
+                pid=os.getpid(),created=psutil.Process().create_time(),updated=time.time())),encoding='utf-8')
+            temp.replace(path)
 
     def status(self):
         online = self.online if self.connected and self.online_at and time.time()-self.online_at < 45 else None
@@ -102,8 +114,11 @@ class OneBotGate:
                 'stopping': bool(self.root and stopping(self.root))}
 
     def observe_online(self, data):
+        previous=self.online
         self.online = data.get('online') if isinstance(data, dict) and type(data.get('online')) is bool else None
         self.online_at = time.time()
+        if self.online is not True and previous is True:self.connection_id=secrets.token_hex(32)
+        self.publish_connection()
 
     async def _status_loop(self, downstream):
         # Independent bounded echo space, never mixed with framework pending actions.
@@ -114,7 +129,7 @@ class OneBotGate:
             try:
                 await downstream.send_json({'action':'get_status','params':{},'echo':echo})
                 try:await asyncio.wait_for(future, timeout=3)
-                except TimeoutError:self.online=None;self.online_at=None
+                except TimeoutError:self.observe_online(None)
             finally:
                 self.health_pending.pop(echo_key(echo), None)
             await asyncio.sleep(15)
@@ -145,6 +160,7 @@ class OneBotGate:
                                               receive_timeout=None) as upstream:
                     self.failures = 0
                     self.connected = True
+                    self.connection_id=secrets.token_hex(32);self.publish_connection()
                     self.ever_connected = True
                     LOG.info('CHANNEL_CONNECTED_SELF_ID_VERIFIED')
                     pending = set()
@@ -164,6 +180,7 @@ class OneBotGate:
             LOG.warning('UPSTREAM_OR_PROTOCOL_FAILURE')
         finally:
             self.connected = False
+            self.publish_connection()
             self.online = None
             self.online_at = None
             self.health_pending.clear()
@@ -189,7 +206,21 @@ class OneBotGate:
             if admitted_message(event, self.config):
                 if self.root and stopping(self.root):continue
                 if self.store.reserve(event):
-                    await upstream.send_str(frame.data)
+                    if self.config.participation_mode=='free':
+                        # Never let adapter quote expansion fetch or expose embedded bodies.
+                        safe=[];reference=None;media=False
+                        for segment in event['message']:
+                            if not isinstance(segment,dict):continue
+                            kind=segment.get('type');data=segment.get('data',{})
+                            if not isinstance(data,dict):continue
+                            if kind=='text' and isinstance(data.get('text'),str):safe.append({'type':'text','data':{'text':data['text']}})
+                            elif kind=='at' and qq_id(data.get('qq'))==self.config.bot_qq:safe.append({'type':'at','data':{'qq':self.config.bot_qq}})
+                            elif kind=='reply':reference=str(data.get('id',''))[:128]
+                            elif kind!='at':media=True;safe.append({'type':'text','data':{'text':'[非文本未解析]'}})
+                        event=dict(event,message=safe,raw_message='',qqbot_reference=reference,qqbot_media=media,
+                                   qqbot_connection=self.connection_id)
+                        await upstream.send_json(event)
+                    else:await upstream.send_str(frame.data)
             elif (event.get('post_type') == 'meta_event' and
                   event.get('meta_event_type') in ('heartbeat', 'lifecycle') and
                   qq_id(event.get('self_id')) == self.config.bot_qq):

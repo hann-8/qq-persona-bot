@@ -73,6 +73,26 @@ class TaskStore:
         row=cur.fetchone()
         return dict(zip([c[0] for c in cur.description],row)) if row else None
 
+    def prepare_group_delivery(self,key,group,epoch,response_id,plan,snapshot_digest,seq_range):
+        # cid sentinel separates RAM targets from personal repair. No human body persists.
+        identity=json.dumps(dict(snapshot_digest=snapshot_digest,seq_range=seq_range,epoch=epoch))
+        with self.db:
+            cur=self.db.execute('INSERT OR IGNORE INTO delivery VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
+                (key,'group:'+group,'@ram',response_id,digest(plan.canonical_text),json.dumps(plan.bubbles,ensure_ascii=False),
+                 snapshot_digest,snapshot_digest,identity,'prepared','pending',plan.fallback_reason))
+            if cur.rowcount:self.db.executemany('INSERT INTO delivery_part VALUES (?,?,?,NULL)',[(key,i,'prepared') for i in range(len(plan.bubbles))])
+        return bool(cur.rowcount)
+
+    def group_blocked(self,group):
+        return bool(self.db.execute("SELECT 1 FROM delivery WHERE umo=? AND cid='@ram' AND state='unknown' AND repair!='operator_reviewed'",('group:'+group,)).fetchone())
+
+    def review_group(self,group):
+        with self.db:self.db.execute("UPDATE delivery SET repair='operator_reviewed' WHERE umo=? AND cid='@ram' AND state='unknown'",('group:'+group,))
+
+    def finish_group(self,key):
+        self.finish_delivery(key)
+        with self.db:self.db.execute("UPDATE delivery SET repair='ram_discarded' WHERE message_key=? AND cid='@ram'",(key,))
+
     def parts(self,key):
         return self.db.execute('SELECT part,state,message_id FROM delivery_part WHERE message_key=? ORDER BY part',(key,)).fetchall()
 
@@ -137,6 +157,7 @@ class TaskStore:
 
     async def recover_deliveries(self,manager):
         for key in self.pending_deliveries():
-            await self.repair_delivery(key,manager)
+            if self.delivery(key)['cid']=='@ram':self.finish_group(key)
+            else:await self.repair_delivery(key,manager)
 
     def close(self):self.db.close()

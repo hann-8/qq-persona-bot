@@ -254,7 +254,7 @@ def evidence_prompt(system,prompt,retrieval,budget,cfg):
 
 
 def source_plan(raw,sources,output,question,partial=False):
-    plan=make_reply_plan(raw,output,question)
+    plan=raw if isinstance(raw,ReplyPlan) else make_reply_plan(raw,output,question)
     allowed={x['url'] for x in sources}
     # Refuse a fabricated source/link, including inside Markdown or literal prose.
     for url in re.findall(r'https?://[^\s<>"）]+',plan.canonical_text):
@@ -281,6 +281,34 @@ class WebRunner:
     def __init__(self,runner,retriever,budget,output,root=None):
         self.runner=runner;self.retriever=retriever;self.budget=budget;self.output=output;self.root=root
     def __getattr__(self,name):return getattr(self.runner,name)
+    async def run_group(self,system,prompt,request_id,request):
+        from .backends import BackendResult
+        from .group_protocol import group_plan,SILENT
+        self.check_stopping()
+        # Only one newest concrete row can leave the machine; never the group snapshot.
+        snapshot=json.loads(json.loads(prompt)[-1]['content'])
+        question=snapshot.get('web_anchor') if request['trigger']=='mention' or getattr(self,'allow_ambient_web',True) else None
+        if question and (not isinstance(question,str) or not any(r['text']==question and r['speaker']!='bot' for r in snapshot['messages'])):
+            from .errors import GatewayError
+            raise GatewayError('UNSUPPORTED_REQUEST')
+        if not question:return await self.guarded(self.runner.run(system,prompt,request_id))
+        retrieval=await self.guarded(self.retriever.retrieve(question))
+        if retrieval.expired or retrieval.notice:
+            if not request['must_reply']:return BackendResult(SILENT,generation_performed=False,web_expired=True)
+            notice=retrieval.notice or '本次网页读取超时，请稍后再试。'
+            return BackendResult(notice,prepared_plan=ReplyPlan('answer',(notice,),notice),generation_performed=False)
+        if retrieval.kind=='none':return await self.guarded(self.runner.run(system,prompt,request_id))
+        enriched,sources=evidence_prompt(system,prompt,retrieval,self.budget,self.retriever.cfg)
+        if not sources:return BackendResult(SILENT,generation_performed=False,web_expired=True)
+        result=await self.guarded(self.runner.run(system,enriched,request_id))
+        result=result if isinstance(result,BackendResult) else BackendResult(result)
+        decision,plan=group_plan(result.text,self.output,question,request['must_reply'])
+        if plan and decision=='speak':
+            try:plan=source_plan(plan,sources,self.output,question,retrieval.partial)
+            except WebFailure:
+                return BackendResult(SILENT,result.usage,result.parameters,result.finish_reason,web_expired=True)
+            return BackendResult(plan.canonical_text,result.usage,result.parameters,result.finish_reason,plan)
+        return result
     def check_stopping(self):
         from .lifecycle import stopping
         from .errors import GatewayError
