@@ -14,6 +14,6 @@
 
 未验证：真实账号收藏/实际媒体域名、QQ图片/GIF客户端显示、真实ACK/模型协议质量/额度、多人/长稳及全部旧真人差额。用户说明有2个收藏未查询，不能写可发。默认memes=false、本机settings/persona未改。无SSH/真实生成/群发/登录/启停/探活。LAP-18搜索缺口继续保留。
 
-交付前检查：159个本地Markdown链接、compileall、uv lock --check（24包）、Git diff及忽略规则通过；7份JSON可解析且仅合成内容，新增assets仅2份README，无用户素材。剩余：commit/push及远端SHA核对；完成后仅等待用户指定真实范围，不启用任何新模式或推进其他任务。回滚见报告/README，回退旧文本代码前先隔离pending/unknown并配对备份。开始无用户/其他session差异，所有本轮已跟踪和新增文件归本任务；state测试工件继续忽略。
+交付前检查：159个本地Markdown链接、compileall、uv lock --check（24包）、Git diff及忽略规则通过；7份JSON可解析且仅合成内容，新增assets仅2份README，无用户素材。剩余：仅等待用户指定真实范围，不启用任何新模式或推进其他任务。回滚见报告/README，回退旧文本代码前先隔离pending/unknown并配对备份。开始无用户/其他session差异，所有本轮已跟踪和新增文件归本任务；state测试工件继续忽略。
 
-Git交付：待本次内容提交与远端核对后写入检查点。
+Git交付：2026-10-17，内容提交`5bb29d04c9966aa0e11f9cc6d26b3f6cc2c42eb9`已推送origin/main，git rev-parse HEAD与git ls-remote完整SHA一致，内容检查点工作区干净。42份任务文件已检查，未夹带用户/其他任务修改；本机settings、secrets、原始群消息、用户图片和state测试工件持续忽略。随后仅同步本交付记录/入口，最终记录提交SHA由main/HEAD恢复，不自引用；最终SHA在回复中核对报告。无保留的已跟踪/未跟踪差异。Git交付不等于部署或真实验收。
