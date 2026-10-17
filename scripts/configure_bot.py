@@ -13,6 +13,15 @@ from qqbot_gateway.config import (read_settings, save_settings, qq_id,
 from qqbot_gateway.token_budget import known_models
 from scripts.console_ui import Console
 
+OUTPUT_FIELDS = {
+    'delivery-mode': ('delivery_mode', '回复方式', 'single / adaptive；single兼容单条，adaptive闲聊最多3条/80字、认真问题单条'),
+    'max-bubbles': ('max_bubbles', '最多条数', '整数1—3条，不凑条数，超限合并'),
+    'casual-max-chars': ('casual_max_chars', '闲聊总长', '整数20—120字符，默认80；超限合并，不强切'),
+    'bubble-max-chars': ('bubble_max_chars', '每条上限', '整数10—60字符，且不大于闲聊总长'),
+    'delay-min-ms': ('bubble_delay_min_ms', '间隔下限', '整数0—5000毫秒；不大于间隔上限'),
+    'delay-max-ms': ('bubble_delay_max_ms', '间隔上限', '整数0—5000毫秒；不小于间隔下限'),
+}
+
 
 def show(settings):
     access = settings['access']
@@ -26,10 +35,18 @@ def show(settings):
     print('下次启动将关闭常规自动压缩；CLI强制压缩/内部恢复仍有能力缺口，大上下文的严格单次推理合同未验收。')
     supported=known_models().get(llm['model'],{}).get('reasoning',{}).get('supportedEfforts',[])
     print('当前模型可显式选强度：'+('/'.join(supported) or '未知，仅auto'))
+    print(f"回复方式：{settings['output']['delivery_mode']}；闲聊最多{settings['output']['max_bubbles']}条/{settings['output']['casual_max_chars']}字符，认真问题单条；切换后新上下文，旧历史保留。")
 
 
 def parameter(settings, section, value):
-    if section == 'model': settings['llm']['model'] = value
+    if section in OUTPUT_FIELDS:
+        key = OUTPUT_FIELDS[section][0]
+        if section != 'delivery-mode':
+            if not isinstance(value, str) or len(value)>10 or not re.fullmatch(r'[0-9]+',value):
+                raise ValueError('Output value must be a decimal integer')
+            value = int(value)
+        settings['output'][key] = value
+    elif section == 'model': settings['llm']['model'] = value
     elif section == 'effort': settings['llm']['reasoning_effort'] = value
     elif section == 'context-window':
         if value != 'auto':
@@ -49,7 +66,7 @@ def execute(path, section, action, identifier=None, *, expected_digest=None):
     if section == 'show':
         show(settings)
         return
-    if section in ('model','context','context-window','effort','history','overhead','output-reserve'):
+    if section in OUTPUT_FIELDS or section in ('model','context','context-window','effort','history','overhead','output-reserve'):
         parameter(settings,section,identifier)
         save_settings(path,settings,digest)
         print('参数已校验保存，下次启动生效；账号/站点不变。')
@@ -128,17 +145,43 @@ class ConfigMenu:
             self.ui.write(f"推理强度：{EFFORT_NAMES.get(llm['reasoning_effort'], llm['reasoning_effort'])}（{llm['reasoning_effort']}）")
             self.ui.write(f"授权群：{len(access['allowed_groups'])} 个    黑名单：{len(access['blocked_users'])} 人    记忆：{chat['history_turns']} 轮")
             self.ui.write(f"输入预算：{chat['context_input_limit_tokens']:,}（可见内容保守计数）")
-            self.ui.write('\n1  群与黑名单\n2  模型与对话\n3  详细设置与能力说明\n0  退出')
+            self.ui.write('\n1  群与黑名单\n2  模型与对话\n3  详细设置与能力说明\n4  回复方式\n0  退出')
             self.ui.write('\n修改前请先关闭机器人；保存后，下次启动生效')
-            choice = self.ui.choose({'0','1','2','3'})
+            choice = self.ui.choose({'0','1','2','3','4'})
             if choice == '0':return
-            if choice == '3':
+            if choice == '4':self.output_group()
+            elif choice == '3':
                 self.ui.page('详细设置与能力说明')
                 content = StringIO()
                 with redirect_stdout(content):show(settings)
                 self.ui.write(content.getvalue().rstrip())
                 self.ui.pause()
             else:self.group(choice)
+
+    def output_group(self):
+        fields = list(OUTPUT_FIELDS.items())
+        while True:
+            settings, digest = read_settings(self.path)
+            self.ui.page('回复方式')
+            self.ui.write('single保持单条；adaptive一次生成，闲聊最多3条/80字，认真问题单条。')
+            self.ui.write('改变提示规则会开始新上下文，旧历史保留；保存后须协调关闭/启动，不热生效。')
+            for i, (name,(key,title,help_text)) in enumerate(fields,1):
+                self.ui.write(f'{i}  {title}：{settings["output"][key]}；{help_text}')
+            self.ui.write('0  返回')
+            choice = self.ui.choose({'0'} | {str(i) for i in range(1,len(fields)+1)})
+            if choice == '0':return
+            name,(key,title,help_text) = fields[int(choice)-1]
+            self.ui.page(title)
+            self.ui.write(help_text+'；空回车保留；保存后下次启动生效。')
+            value = self.ui.read('请输入值：').strip()
+            if value:
+                try:
+                    execute(self.path,name,'set',value,expected_digest=digest)
+                    self.ui.write('已保存，下次启动生效。')
+                except (ValueError,OSError) as error:
+                    self.ui.write(operation_error(error)+' 请核对整数范围及上下限关系。')
+            else:self.ui.write('已取消，原值保留。')
+            self.ui.pause()
 
     def group(self, category):
         choices = self.ACCESS if category == '1' else self.PARAMETERS
@@ -249,7 +292,7 @@ def main():
     parser = argparse.ArgumentParser(description='本机授权群/黑名单配置，停止后保存、下次启动生效')
     commands = parser.add_subparsers(dest='section')
     commands.add_parser('show')
-    for section in ('model','context','context-window','effort','history','overhead','output-reserve'):
+    for section in (*OUTPUT_FIELDS,'model','context','context-window','effort','history','overhead','output-reserve'):
         actions=commands.add_parser(section).add_subparsers(dest='action',required=True)
         actions.add_parser('set').add_argument('identifier')
     for section in ('groups', 'blacklist'):

@@ -142,6 +142,28 @@ class HttpTests(unittest.IsolatedAsyncioTestCase):
         async with self.client.get(self.url+'/v1/models') as response:self.assertEqual(response.status,401)
         self.assertEqual(self.runner.attempts,0)
 
+    async def test_adaptive_protocol_error_and_metadata_do_not_retry(self):
+        await self.app_runner.cleanup()
+        self.queue=ModelQueue(self.runner)
+        self.app_runner=web.AppRunner(application(self.queue,'t'*40,output={'delivery_mode':'adaptive'}),access_log=None)
+        await self.app_runner.setup();site=web.TCPSite(self.app_runner,'127.0.0.1',0);await site.start()
+        url=f'http://127.0.0.1:{site._server.sockets[0].getsockname()[1]}/v1/chat/completions'
+        payload={'model':'workbuddy-local','messages':[{'role':'user','content':'hi'}]}
+        for text,code in [('{"qqbot_reply":', 'PROTOCOL_ERROR'),
+                          ('{"qqbot_reply":1,"kind":"chat","bubbles":["\\u003ctool_call\\u003e"]}','TOOL_ISOLATION_FAILED')]:
+            self.runner.result=text
+            before=self.runner.attempts
+            async with self.client.post(url,json=payload,headers=self.headers) as response:
+                data=await response.json();self.assertGreaterEqual(response.status,400)
+            self.assertEqual(data['error']['code'],code)
+            self.assertNotIn('qqbot_reply',data['error']['message'])
+            self.assertEqual(self.runner.attempts,before+1)
+        self.runner.result='{"qqbot_reply":1,"kind":"chat","bubbles":["a","b"]}'
+        async with self.client.post(url,json=payload,headers=self.headers) as response:
+            data=await response.json();self.assertEqual(response.status,200)
+        self.assertEqual(data['choices'][0]['message']['content'],'a\nb')
+        self.assertEqual(data['qqbot_reply_plan']['response_id'],data['id'])
+
     async def test_health_current_and_historical_errors(self):
         self.runner.error='RATE_LIMITED'
         payload={'model':'workbuddy-local','messages':[{'role':'user','content':'x'}]}

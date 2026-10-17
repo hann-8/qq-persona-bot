@@ -30,6 +30,12 @@ chat:
   context_overhead_reserve_tokens: 2048
   output_reserve_tokens: 2048
 output:
-  # Plain-text conversion is LAP-11; output controls must keep defaults until then.
+  # Explicitly choose adaptive for limited bubbles; missing fields keep single.
   mode: plain_chat
   max_reply_chars: 1200
+  delivery_mode: single
+  max_bubbles: 3
+  casual_max_chars: 80
+  bubble_max_chars: 40
+  bubble_delay_min_ms: 800
+  bubble_delay_max_ms: 1600

@@ -17,6 +17,7 @@ from .errors import GatewayError, MESSAGES
 from .workbuddy_cli_runner import CLIRunner
 from .token_budget import InputBudget, validate_model_settings
 from .chat_text import prepare_reply
+from .reply_plan import make_reply_plan, DEFAULTS
 from .lifecycle import stopping
 
 LOG = logging.getLogger(__name__)
@@ -112,8 +113,9 @@ class ModelQueue:
                 self.active=False
 
 
-def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,root=None):
+def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,root=None,output=None):
     budget=budget or InputBudget()
+    output=DEFAULTS | {'max_reply_chars':max_reply_chars} | (output or {})
     if not isinstance(token,str) or len(token)<32:raise ValueError('Local bearer token required')
     def router_ready():
         if ready_file is None:return True
@@ -170,10 +172,18 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
         queue.last_shape=contract_shape(payload)
         LOG.info('REQUEST_ACCEPTED request_id=%s',request[TRACE])
         result=await queue.submit(system,prompt,request[TRACE])
-        result,limited=prepare_reply(result,max_reply_chars)
-        return web.json_response({'id':'chatcmpl-'+request[TRACE],'object':'chat.completion','created':int(time.time()),
+        response_id='chatcmpl-'+request[TRACE]
+        metadata={}
+        if output['delivery_mode']=='adaptive':
+            question=json.loads(prompt)[-1]['content']
+            plan=make_reply_plan(result,output,question)
+            result,limited=plan.canonical_text,plan.limited
+            metadata['qqbot_reply_plan']=plan.metadata(response_id)
+        else:
+            result,limited=prepare_reply(result,max_reply_chars)
+        return web.json_response({'id':response_id,'object':'chat.completion','created':int(time.time()),
             'model':'workbuddy-local','choices':[{'index':0,'message':{'role':'assistant','content':result},
-                                               'finish_reason':'length' if limited else 'stop'}]})
+                                               'finish_reason':'length' if limited else 'stop'}],**metadata})
 
     app.router.add_get('/health',health)
     app.router.add_get('/v1/models',models)
@@ -196,7 +206,7 @@ def main():
     runner=CLIRunner(root,llm['model'],llm['run_timeout_seconds'],llm['cleanup_seconds'],llm['reasoning_effort'],budget)
     queue=ModelQueue(runner,llm['queue_limit'],llm['queue_wait_seconds'])
     logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(message)s')
-    web.run_app(application(queue,tokens['model_gateway'],root/'state/router-ready.json',budget,settings['output']['max_reply_chars'],root),host=llm['host'],port=llm['port'],
+    web.run_app(application(queue,tokens['model_gateway'],root/'state/router-ready.json',budget,settings['output']['max_reply_chars'],root,settings['output']),host=llm['host'],port=llm['port'],
                 access_log=None,handler_cancellation=True)
 
 

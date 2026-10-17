@@ -26,7 +26,7 @@ async def configure():
         'computer_use_runtime':'none'})
     config['provider_settings']['proactive_capability']['add_cron_tools']=False
     config['provider_settings']['file_extract']['enable']=False
-    persona=compose_persona((ROOT/'config/persona.md').read_text(encoding='utf-8'))
+    persona=compose_persona((ROOT/'config/persona.md').read_text(encoding='utf-8'),settings['output'])
     persona_id=persona_version(persona)
     from astrbot.core.config.agent_runner import get_agent_runner_config_default
     runner=get_agent_runner_config_default('local')

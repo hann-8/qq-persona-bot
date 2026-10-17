@@ -2,6 +2,10 @@
 
 返回[全局入口](../../PROGRESS.md)。继承[AGENTS](../../AGENTS.md)；原规格见[实施计划](IMPLEMENTATION_PLAN.md)，本轮体验改进执行[UX_PLAN](UX_PLAN.md)，验收见[ACCEPTANCE](ACCEPTANCE.md)，领取/交接见[任务台账](TASKS.md)。本轮任务记录：[LAP-08](tasks/LAP-08/HANDOFF.md)。
 
+更新时间：2026-10-17 11:35（Asia/Shanghai）。[LAP-16](tasks/LAP-16/HANDOFF.md)已按用户指令独立实现/离线通过，见[报告](../../reports/lap-16-2026-10-17.md)。124项单元、40组实际框架合成回环、5组原aiocqhttp/gate回执及并发/启动恢复/7项adaptive准入通过；原single框架/入口/历史回归通过。缺省single、adaptive仅显式配置；本机settings/人设正文未改，未启停/探活真实bot、登录、推理/群发/SSH/PC，运行状态未知。下一步用户指定adaptive启用/真实范围，LAP-17/18未领取；P01/旧真人及LAP-10/13差额保留。加载模式/生成限额改动会新建当前上下文，旧历史保留；回滚须先处理pending账本，见报告。Git交付沿用长期授权。
+
+以下为LAP-15历史交付检查点：
+
 更新时间：2026-10-17 11:09（Asia/Shanghai）。[LAP-15](tasks/LAP-15/HANDOFF.md)已按用户明确指令独立实施/离线通过，见[报告](../../reports/lap-15-2026-10-17.md)。原persona完整hash备份后整理唯一角色正文，组合3618字节；108项单元、5组实际框架合成保存/发送、入口/本人历史/隔离/版本迁移通过。固定政策/共用compose已有实现保留，单条、真实@、CLI/模型/预算和工具隔离保持。
 
 未启停/探活真实bot、登录、真实模型/群发、SSH/PC操作；当前运行状态未知，真实加载/P01用户风格接受未验。加载后新版本使下次请求新建当前上下文，旧历史保留。原文15984字节及原文→新正文diff均本机忽略保留，未提交原材料或运行配置。下一步由用户指定LAP-16或协调LAP-15真实范围，不自动推进LAP-16/17/18。LAP-14 PLAN/指引保留为合同；PC选型已有证据，不重复探测。LAP-10/13和原真人验收差额不变。Git按AGENTS长期授权交付。

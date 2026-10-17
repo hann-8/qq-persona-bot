@@ -20,6 +20,8 @@ from qqbot_gateway.token_budget import InputBudget, validate_model_settings
 from qqbot_gateway.errors import GatewayError, MESSAGES
 from qqbot_gateway.persona import compose_persona, persona_version
 from qqbot_gateway.lifecycle import stopping
+from qqbot_gateway.reply_plan import trusted_plan, digest
+from qqbot_gateway.reply_delivery import ReplyDelivery, cancellable
 
 LOG=logging.getLogger(__name__)
 
@@ -32,14 +34,17 @@ class QQRouter(Star):
         settings=load_settings(self.root/'config/settings.local.yaml')
         self.bot=settings['bot']['qq'];self.groups=set(settings['access']['allowed_groups']);self.admins=set(settings['access']['admin_users'])
         self.blocked=set(settings['access']['blocked_users'])
-        self.persona=compose_persona((self.root/'config/persona.md').read_text(encoding='utf-8'))
+        self.output=settings['output']
+        self.persona=compose_persona((self.root/'config/persona.md').read_text(encoding='utf-8'),self.output)
         self.persona_id=persona_version(self.persona)
         chat=settings.get('chat',{})
         self.budget=InputBudget.from_settings(settings,validate_model_settings(settings))
         self.coordinator=SessionCoordinator(chat.get('user_cooldown_seconds',5),chat.get('session_queue_limit',2),chat.get('session_queue_timeout_seconds',600))
         self.tasks=TaskStore(self.root/'state/tasks.sqlite')
+        self.delivery=ReplyDelivery(self.tasks,self.output,self.delivery_allowed)
 
     async def initialize(self):
+        await self.tasks.recover_deliveries(self.context.conversation_manager)
         manager=self.context.persona_manager
         try:await manager.get_persona(self.persona_id)
         except ValueError:
@@ -61,18 +66,68 @@ class QQRouter(Star):
         # value in both the outgoing chain and runner history, without parsing.
         if not event.get_extra('qq_router_trace') or response is None:
             return
+        if response.role!='assistant':
+            event.set_extra('qq_router_success',False)
+            return
         raw=response.raw_completion
         if (raw is None or raw.model!='workbuddy-local' or
                 not raw.id.startswith('chatcmpl-') or len(raw.choices)!=1):
+            if getattr(self,'output',{}).get('delivery_mode')=='adaptive' and event.get_extra('qq_delivery_key'):
+                event.clear_result();event.stop_event()
             return
         text=raw.choices[0].message.content
         if not isinstance(text,str) or not text.strip() or response.role!='assistant':
+            if getattr(self,'output',{}).get('delivery_mode')=='adaptive' and event.get_extra('qq_delivery_key'):
+                event.clear_result();event.stop_event()
             return
         response.result_chain=MessageChain().message(text)
         response.reasoning_content=None
         if run_context.messages and run_context.messages[-1].role=='assistant':
             run_context.messages[-1].content=[TextPart(text=text)]
         event.set_extra('qq_router_success',True)
+        if getattr(self,'output',{}).get('delivery_mode')=='adaptive' and event.get_extra('qq_delivery_key'):
+            # Persist before the framework can either save history or dispatch a result.
+            try:
+                key=event.get_extra('qq_delivery_key')
+                plan=trusted_plan(getattr(raw,'qqbot_reply_plan',None),text,raw.id,self.output)
+                expected=[m.model_dump() for m in run_context.messages if m.role!='system' and not m._no_save]
+                self.tasks.prepare_delivery(key,event.unified_msg_origin,event.get_extra('qq_delivery_cid'),
+                    raw.id,plan,event.get_extra('qq_delivery_before'),expected)
+                row=self.tasks.delivery(key)
+                if (row['response_id']!=raw.id or row['content_sha256']!=digest(plan.canonical_text) or
+                        tuple(json.loads(row['bubbles']))!=plan.bubbles):
+                    raise ValueError('Response changed during hook reentry')
+                event.set_extra('qq_delivery_plan',plan)
+            except Exception:
+                # Framework swallows hook exceptions; explicitly stop unsafe save/dispatch.
+                event.set_extra('qq_router_success',False)
+                event.clear_result();event.stop_event()
+                LOG.error('QQ_DELIVERY_PREPARE_FAILED')
+
+    def delivery_allowed(self,event):
+        return (not stopping(self.root) and str(event.get_self_id())==self.bot and
+                str(event.get_group_id()) in self.groups and str(event.get_sender_id()) not in self.blocked and
+                str(event.get_sender_id())!=self.bot and event.get_extra('qq_delivery_version')==self.persona_id and
+                event.get_extra('qq_delivery_identity')==(str(event.get_self_id()),str(event.get_group_id()),str(event.get_sender_id())))
+
+    @filter.on_decorating_result()
+    async def deliver_reply(self,event:AstrMessageEvent):
+        if getattr(self,'output',{}).get('delivery_mode')!='adaptive' or not event.get_extra('qq_delivery_key'):
+            return
+        # Always take over this model event, even if the hook/SDK failed to prepare a plan.
+        event.clear_result()
+        key=event.get_extra('qq_delivery_key')
+        plan=event.get_extra('qq_delivery_plan')
+        if plan is None:
+            if event.get_extra('qq_delivery_handled'):return
+            event.set_extra('qq_delivery_handled',True)
+            self.tasks.set(key,'failed')
+            if self.delivery_allowed(event):
+                # No model result is trusted here. Local error remains one short message.
+                try:await cancellable(event.send(event.plain_result('这条没有生成可发送的回答，请稍后再试。')),lambda:self.delivery_allowed(event),3)
+                except Exception:pass
+            return
+        await self.delivery.send(event,key,plan)
 
     @filter.event_message_type(filter.EventMessageType.GROUP_MESSAGE)
     async def on_group(self,event:AstrMessageEvent):
@@ -121,23 +176,40 @@ class QQRouter(Star):
             if conv is None or conv.persona_id!=self.persona_id:
                 cid=await manager.new_conversation(umo,persona_id=self.persona_id)
                 conv=await manager.get_conversation(umo,cid)
+            if self.tasks.quarantined(umo,cid):
+                self.tasks.set(key,'failed')
+                yield event.plain_result('这个会话的发送历史需要本机核对，暂时不能继续。');return
             history=json.loads(conv.history or '[]')
             history=self.budget.select_history(self.persona,prompt,history)
             await manager.update_conversation(umo,cid,history=history)
             conv.history=json.dumps(history,ensure_ascii=False)
+            if self.output['delivery_mode']=='adaptive':
+                event.set_extra('qq_delivery_key',key)
+                event.set_extra('qq_delivery_cid',cid)
+                event.set_extra('qq_delivery_before',history)
+                event.set_extra('qq_delivery_version',self.persona_id)
+                event.set_extra('qq_delivery_identity',(str(event.get_self_id()),str(event.get_group_id()),str(event.get_sender_id())))
             LOG.warning('QQ_TASK_RUNNING trace=%s',trace)
             try:
                 yield event.request_llm(prompt=prompt,conversation=conv,tool_set=None)
             finally:
-                sent=bool(getattr(event,'_has_send_oper',False))
-                success=event.get_extra('qq_router_success')
-                status='completed' if success and sent else ('failed' if not success and sent else 'send_unknown')
-                self.tasks.set(key,status)
+                if self.output['delivery_mode']=='adaptive':
+                    row=self.tasks.delivery(key)
+                    if row:
+                        await self.tasks.repair_delivery(key,manager)
+                        status=self.tasks.db.execute('SELECT status FROM tasks WHERE message_key=?',(key,)).fetchone()[0]
+                    else:
+                        status='failed';self.tasks.set(key,status)
+                else:
+                    sent=bool(getattr(event,'_has_send_oper',False))
+                    success=event.get_extra('qq_router_success')
+                    status='completed' if success and sent else ('failed' if not success and sent else 'send_unknown')
+                    self.tasks.set(key,status)
                 LOG.warning('QQ_TASK_FINAL trace=%s status=%s',trace,status)
         except Exception:
             self.tasks.set(key,'failed')
             LOG.error('QQ_ROUTER_ERROR trace=%s',trace)
-            if not getattr(event,'_has_send_oper',False):yield event.plain_result('这条没处理好，请稍后再试。（追踪'+trace+'）')
+            if not event.get_extra('qq_delivery_key') and not getattr(event,'_has_send_oper',False):yield event.plain_result('这条没处理好，请稍后再试。（追踪'+trace+'）')
         finally:lease.release()
 
     async def terminate(self):

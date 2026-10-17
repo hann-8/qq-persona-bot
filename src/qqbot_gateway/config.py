@@ -104,6 +104,19 @@ def normalize_settings(raw):
         chat.setdefault(key, value)
     output.setdefault('mode', 'plain_chat')
     output.setdefault('max_reply_chars', 1200)
+    from .reply_plan import DEFAULTS
+    for key, value in DEFAULTS.items():
+        output.setdefault(key, value)
+    if output['delivery_mode'] not in ('single', 'adaptive'):
+        raise ValueError('Invalid delivery_mode')
+    for key, lower, upper in (('max_bubbles',1,3), ('casual_max_chars',20,120),
+                              ('bubble_max_chars',10,60), ('bubble_delay_min_ms',0,5000),
+                              ('bubble_delay_max_ms',0,5000)):
+        if type(output[key]) is not int or not lower <= output[key] <= upper:
+            raise ValueError(f'Invalid {key}; expected integer {lower}..{upper}')
+    if (output['bubble_max_chars'] > output['casual_max_chars'] or
+            output['bubble_delay_max_ms'] < output['bubble_delay_min_ms']):
+        raise ValueError('Invalid bubble limit/delay relationship')
     if output['mode'] != 'plain_chat':
         raise ValueError('Only plain_chat output is planned')
     for section, key, lower, upper in (
