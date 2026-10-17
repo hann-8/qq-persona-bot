@@ -16,4 +16,4 @@
 
 剩余：用户按项目关闭/启动入口重启加载后验证free/@回复；本session不启停/登录/真实模型/群发，不改配置/人设。若仍有409须另核对受管连接身份，不能按进程名批量终止。保留18搜索/旧真人差额。
 
-Git交付：提交/推送核对进行中，完成后同步记录。回滚无schema迁移，沿用pending/unknown保护；回退空链修复会恢复故障。
+Git交付：2026-10-17 18:06（Asia/Shanghai），内容提交`a1c19e248fac6ceaf45f44e454fa88954b1148f7`已推送origin/main，rev-parse与ls-remote完整SHA一致，交付检查点工作区干净。链接/报告合成标记/compileall/提交差异检查通过；本段随后独立同步。保留本机忽略配置、secrets和state日志，无其他任务差异。回滚无schema迁移，沿用pending/unknown保护；回退空链修复会恢复故障。
