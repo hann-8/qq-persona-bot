@@ -18,6 +18,8 @@ NapCat：现有启动器固定bundle/CWD并传配置bot.qq；安装包快速脚�
 
 并行工作：开始工作区干净，23:48看到LAP-21新增configure_bot.py/test_configure_menu.py/21 HANDOFF差异。21交接明确其session只写自己的代码/测试/README/报告/任务交接，不写或提交24共享索引；24同样不覆盖、不暂存、不提交21文件。本次8项单元不是21新增代码的验证结论。
 
-修改仅5份：PROGRESS.md、tracks/laptop-workbuddy/HANDOFF.md、TASKS.md、本目录HANDOFF.md与PLAN.md。按长期授权在审阅差异/文件归属后提交并推送，核对远端SHA；不提交secrets、settings、state或其他session文件。
+修改仅5份：PROGRESS.md、tracks/laptop-workbuddy/HANDOFF.md、TASKS.md、本目录HANDOFF.md与PLAN.md。不提交secrets、settings、state或其他session文件。
+
+Git交付：内容提交`293422a4d75a49f329bab891426f160c8704750c`已推送origin/main，rev-parse与ls-remote完整SHA一致；内容检查点git status干净。最终168本地链接/差异空白/本任务新增行账号样式数字检查通过。期间LAP-21已由原session独立提交`fd2a35f`，24仅提交上述5份文档；没有保留未提交的21内容。本段交付记录随后单独提交/推送并再次核对远端，最终记录提交号以本session回执为准。
 
 下一步：用户选择AGENTS规定实施设置并明确继续后，从PLAN第5节开始领取实施/更新归属；登录目录能力缺口与真实QQ/表达接受分别补证据。需要重启/真人扫码/真实模型/群验收时先登记唯一实例执行归属，规划与Git不构成部署授权。保留LAP-18搜索及旧真人/上下文控制差额。
