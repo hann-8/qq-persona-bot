@@ -1,0 +1,20 @@
+{
+  "original_bytes": 15984,
+  "original_sha256": "c55c51db10a0d9c3d147638763ffa10e16c0be9daffa4ec80bfd4037417120b7",
+  "character_bytes": 2753,
+  "policy_bytes": 865,
+  "composed_bytes": 3618,
+  "character_sha256": "ba9d15792f4d9e025076a7ce3a762ba48443587c3a47d7d0a5e808719ba83360",
+  "persona_version": "fatfish-chat-ead23a5d4d15278e",
+  "caller_outputs_identical": true,
+  "duplicate_template_check": "passed",
+  "actual_prompt_history_budget": "passed",
+  "backup_verified": true,
+  "real_model_requests": 0,
+  "real_qq_messages": 0,
+  "character_file_bytes": 2753,
+  "unit_tests_passed": 108,
+  "framework_loopback_cases_passed": 5,
+  "framework_routing_migration": "passed",
+  "original_to_current_diff": "local ignored state/persona-backups/lap15-original-to-current.diff"
+}

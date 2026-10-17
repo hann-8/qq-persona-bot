@@ -1,16 +1,16 @@
 # QQ 人设聊天 Bot：项目入口
 
-更新时间：2026-10-17 11:01（Asia/Shanghai）。
+更新时间：2026-10-17 11:10（Asia/Shanghai）。
 
 ## 当前阶段与授权
 
-当前[LAP-14](tracks/laptop-workbuddy/tasks/LAP-14/HANDOFF.md)v2详细规划完成：[行为/配置合同](tracks/laptop-workbuddy/tasks/LAP-14/PLAN.md) / [medium实施指引](tracks/laptop-workbuddy/tasks/LAP-14/IMPLEMENTATION_GUIDE.md)。后续由用户自行选择gpt-6.1-sol/medium，按指令先LAP-15精简人设/场景表达，再LAP-16一次生成、闲聊最多3条/80字、认真问答单条和ACK/历史；single兼容、adaptive显式启用。当前CodeBuddy CLI/模型/账号/预算及真实@保持。
+[LAP-15](tracks/laptop-workbuddy/tasks/LAP-15/HANDOFF.md)已按用户指令独立实施、离线通过，见[报告](reports/lap-15-2026-10-17.md)：完整备份原persona后统一40行角色/9个人工场景，组合prompt3618 UTF-8字节；108项单元、5组实际框架合成回环及入口/历史/版本迁移通过。固定政策/共用compose代码保持，仍单条纯文本、当前CLI/模型/账号/预算/真实@和工具隔离。
+
+未启停/探活真实bot、登录、推理或群发，当前运行状态未知；真实加载/P01用户接受与完整文本交付未验。下次协调加载会因persona版本变化新建当前上下文，旧历史保留。LAP-16/17/18未领取；下一任务由用户指定。既有[LAP-14详细计划](tracks/laptop-workbuddy/tasks/LAP-14/PLAN.md)及[实施指引](tracks/laptop-workbuddy/tasks/LAP-14/IMPLEMENTATION_GUIDE.md)保留。
 
 用户正在自行部署家庭5070，并追加明确授权SSH只读查看配置/选型：已确认Windows10、7800X3D、约32GB内存、RTX5070/12227MiB、Ollama0.40.5；10:50快照模型列表为空。首选候选Qwen3.5-9B Q4_K_M，4B为轻量备选，见[PC选型证据](tracks/local-5070/MODEL_SELECTION.md)。家庭入口/账户和加密凭据仅本机忽略记录，与工作环境隔离；未下载/加载/推理或改PC服务。LAP-17后端/群聊参与仍待独立规划，不能把SSH盘点当部署或放开@。
 
-用户新增联网检索/网页读取为**中优先级LAP-18**，排在人设/分条之后，提供方/引用/预算/工具边界另规划；当前工具隔离保持。产品代码/运行配置/人设与真实bot均未操作，用户persona增量hash保留。旧LAP-10/13及真人验收差额保留，新功能未实现/未真实验收。
-
-用户最新长期授权：本项目plan和implement均可在合适检查点自行commit/push，无需每次确认，已写入AGENTS并同步medium指引。本轮10份规划/5070选型及项目准则/状态文档已随`c7d2f27`推送origin/main，11:01用ls-remote核对本地/远端一致；随后只同步交付记录。原persona用户增量hash不变，本机家庭访问资料及原始盘点不纳入提交。Git交付不代表新功能实施/部署或真实验收。
+用户新增联网检索/网页读取为中优先级LAP-18，排在人设/分条之后，提供方/引用/预算/工具边界另规划；当前工具隔离保持。旧LAP-10/13及真人验收差额保留。Git交付沿用AGENTS长期授权；LAP-15提交不含原文备份、本机配置或家庭访问资料，不代表部署/真实验收。
 
 以下为LAP-13交付检查点：
 
@@ -64,10 +64,10 @@ LAP-13实现提交`ee7f2d4`已成功推送origin/main；随后仅同步交付检
 
 | 工作线 | 状态 | 最近更新 | 下一步 | 交接入口 |
 | --- | --- | --- | --- | --- |
-| 笔记本 WorkBuddy | active，LAP-14 v2仅规划完成；旧验收差额保留 | 2026-10-17 10:57 | 用户后续指定LAP-15，再LAP-16；联网LAP-18中优先级 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [任务台账](tracks/laptop-workbuddy/TASKS.md) / [实施指引](tracks/laptop-workbuddy/tasks/LAP-14/IMPLEMENTATION_GUIDE.md) |
+| 笔记本 WorkBuddy | active，LAP-15已实现/离线通过；真实待验 | 2026-10-17 11:10 | 用户指定LAP-16或协调LAP-15真实接受；联网LAP-18中优先级 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [任务台账](tracks/laptop-workbuddy/TASKS.md) / [实施指引](tracks/laptop-workbuddy/tasks/LAP-14/IMPLEMENTATION_GUIDE.md) |
 | 家庭5070 PC本地模型 | planned，用户自部署中；SSH只读盘点/初选完成，项目接入未开始 | 2026-10-17 10:57 | 复用已有Ollama，后续LAP-17独立后端能力/接入规划；未做推理 | [HANDOFF](tracks/local-5070/HANDOFF.md) / [模型选择](tracks/local-5070/MODEL_SELECTION.md) |
 
-已登记的任务级交接：[LAP-08 体验改进规划](tracks/laptop-workbuddy/tasks/LAP-08/HANDOFF.md)、[LAP-09 配置准入实施](tracks/laptop-workbuddy/tasks/LAP-09/HANDOFF.md)、[LAP-10 参数与预算](tracks/laptop-workbuddy/tasks/LAP-10/HANDOFF.md)（部分完成/能力缺口待规划）、[LAP-11 纯文本与人设v2](tracks/laptop-workbuddy/tasks/LAP-11/HANDOFF.md)（实现/离线通过，真实待验）、[LAP-12 启停与分层状态](tracks/laptop-workbuddy/tasks/LAP-12/HANDOFF.md)（已实现/本机启停通过，停机为历史检查点）、[LAP-13 配置控制台交互](tracks/laptop-workbuddy/tasks/LAP-13/HANDOFF.md)（已实现/离线通过，视觉接受待验）、[LAP-14 人设与分条规划](tracks/laptop-workbuddy/tasks/LAP-14/HANDOFF.md)（仅规划完成）。其余实施任务领取时再建立独立HANDOFF，不批量创建空文件。
+已登记的任务级交接：[LAP-08 体验改进规划](tracks/laptop-workbuddy/tasks/LAP-08/HANDOFF.md)、[LAP-09 配置准入实施](tracks/laptop-workbuddy/tasks/LAP-09/HANDOFF.md)、[LAP-10 参数与预算](tracks/laptop-workbuddy/tasks/LAP-10/HANDOFF.md)（部分完成/能力缺口待规划）、[LAP-11 纯文本与人设v2](tracks/laptop-workbuddy/tasks/LAP-11/HANDOFF.md)（实现/离线通过，真实待验）、[LAP-12 启停与分层状态](tracks/laptop-workbuddy/tasks/LAP-12/HANDOFF.md)（已实现/本机启停通过，停机为历史检查点）、[LAP-13 配置控制台交互](tracks/laptop-workbuddy/tasks/LAP-13/HANDOFF.md)（已实现/离线通过，视觉接受待验）、[LAP-14 人设与分条规划](tracks/laptop-workbuddy/tasks/LAP-14/HANDOFF.md)（仅规划完成）、[LAP-15 精简人设与场景表达](tracks/laptop-workbuddy/tasks/LAP-15/HANDOFF.md)（已实现/离线通过，真实待验）。其余实施任务领取时再建立独立HANDOFF，不批量创建空文件。
 
 ## 多session任务管理
 
@@ -77,6 +77,8 @@ LAP-13实现提交`ee7f2d4`已成功推送origin/main；随后仅同步交付检
 - “已实现”“离线通过”“真人实测通过”“完整验收通过”分开记录。新想法先记需求，再分配新任务或明确调整旧任务，不把原有未完成项抹掉。
 
 ## 最近里程碑
+
+- LAP-15人设整理已实现/离线通过：原文完整hash备份，组合3618字节；108项单元及实际框架回环/版本迁移通过，真实加载/P01仍未验。
 
 - LAP-14 v2完成详细行为/配置合同和medium逐步实施指引；用户追加授权的家庭PC SSH只读盘点/候选模型选择有证据，远程修改/模型请求0；联网LAP-18登记中优先级。bot新功能未实施，persona增量保留。
 
@@ -95,4 +97,4 @@ LAP-13实现提交`ee7f2d4`已成功推送origin/main；随后仅同步交付检
 
 ## 恢复工作时的第一步
 
-先读AGENTS→本入口→笔记本HANDOFF/TASKS→LAP-14 HANDOFF/PLAN/IMPLEMENTATION_GUIDE。后续用户要求medium实施时先领取LAP-15，备份用户persona原文、统一精简表达，再独立LAP-16。会话设置由用户选择，不伪称检测/切换。当前bot状态未经本轮探测，不自动启停/推理/群发或放开@。PC硬件/Ollama盘点已有证据，从其HANDOFF/MODEL_SELECTION恢复，不重做登录探测或安装；后端/联网另规划。LAP-10/13及旧真人差额保留，视频/ASR不推进。
+先读AGENTS→本入口→笔记本HANDOFF/TASKS→LAP-14 HANDOFF/PLAN/IMPLEMENTATION_GUIDE。LAP-15已独立实现/离线通过，先读其HANDOFF及报告；后续由用户指定LAP-16或协调真实加载/风格接受，不能重复领取LAP-15。会话设置由用户选择，不伪称检测/切换。当前bot状态未经本轮探测，不自动启停/推理/群发或放开@。PC硬件/Ollama盘点已有证据，从其HANDOFF/MODEL_SELECTION恢复，不重做登录探测或安装；后端/联网另规划。LAP-10/13及旧真人差额保留，视频/ASR不推进。
