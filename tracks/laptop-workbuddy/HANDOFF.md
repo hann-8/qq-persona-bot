@@ -2,7 +2,7 @@
 
 返回[全局入口](../../PROGRESS.md)。继承[AGENTS](../../AGENTS.md)；原规格见[实施计划](IMPLEMENTATION_PLAN.md)，本轮体验改进执行[UX_PLAN](UX_PLAN.md)，验收见[ACCEPTANCE](ACCEPTANCE.md)，领取/交接见[任务台账](TASKS.md)。本轮任务记录：[LAP-08](tasks/LAP-08/HANDOFF.md)。
 
-更新时间：2026-10-17 10:57（Asia/Shanghai）。[LAP-14](tasks/LAP-14/HANDOFF.md)v2仅规划完成，见[PLAN](tasks/LAP-14/PLAN.md)和[medium实施指引](tasks/LAP-14/IMPLEMENTATION_GUIDE.md)。当前磁盘persona重复/冲突材料15984字节，加政策16849字节；运行实例加载版本未知，不当作真实风格根因复现。参考机制及逐任务实现/验收顺序已核对，bot产品代码未改。
+更新时间：2026-10-17 11:01（Asia/Shanghai）。[LAP-14](tasks/LAP-14/HANDOFF.md)v2仅规划完成，见[PLAN](tasks/LAP-14/PLAN.md)和[medium实施指引](tasks/LAP-14/IMPLEMENTATION_GUIDE.md)。10份文档及Git长期授权已随`c7d2f27`推送origin/main，远端/本地一致；本条随后同步交付记录。当前磁盘persona重复/冲突材料15984字节，加政策16849字节；运行实例加载版本未知，不当作真实风格根因复现。参考机制及逐任务实现/验收顺序已核对，bot产品代码未改，用户persona未纳入提交。
 
 下一步用户后续选择gpt-6.1-sol/medium并指定LAP-15（精简角色/场景表达，仍单条），再LAP-16（同次生成、最多3泡/80字、认真单条、ACK/历史/中断）；single兼容、adaptive显式启用。LAP-17近期本地路线已补用户授权SSH硬件/Ollama盘点和Qwen3.5-9B Q4初选，见[PC选型](../local-5070/MODEL_SELECTION.md)；模型安装/推理/接入未开始。LAP-18联网为中优先级，后续独立规划。新实施任务未领取；产品代码/配置/人设和真实bot均不操作，未推理/群发，persona增量hash不变。家庭访问资料仅本机忽略加密记录，不进入工作环境。用户最新授予项目规划/实施长期自行commit/push授权，已同步AGENTS及medium指引，本轮文档按该授权交付。
 

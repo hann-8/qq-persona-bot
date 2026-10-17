@@ -2,7 +2,7 @@
 
 返回[全局入口](../../PROGRESS.md) / [工作线交接](HANDOFF.md)。继承[AGENTS](../../AGENTS.md)；本轮体验增量合同见[UX_PLAN](UX_PLAN.md)，原规格见[实施计划](IMPLEMENTATION_PLAN.md)，通过标准见[验收矩阵](ACCEPTANCE.md)。
 
-更新时间：2026-10-17 10:57（Asia/Shanghai）。[LAP-14](tasks/LAP-14/HANDOFF.md)v2规划完成，新增[medium实施指引](tasks/LAP-14/IMPLEMENTATION_GUIDE.md)。仍优先CodeBuddy CLI，不领取LAP-15/16；用户追加授权的家庭PC SSH只读盘点/模型初选已完成（远程修改/模型请求0），见[PC证据](../local-5070/MODEL_SELECTION.md)。联网LAP-18登记中优先级；均未接入bot。产品代码/人设/运行配置未改，未启停/探活真实bot、推理/群发；persona增量hash不变，旧验收差额保留。用户最新长期授权本项目plan/implement自行commit/push，LAP-14文档按该授权交付，用户/私密本机文件不夹带。
+更新时间：2026-10-17 11:01（Asia/Shanghai）。[LAP-14](tasks/LAP-14/HANDOFF.md)v2规划及medium指引已随`c7d2f27`推送origin/main，远端/本地一致；本条随后同步交付记录。仍优先CodeBuddy CLI，不领取LAP-15/16；用户授权的PC SSH只读盘点/初选有证据，联网LAP-18为中优先级，均未接入bot。产品代码/人设/运行配置未改，未启停/探活真实bot、推理/群发；persona增量hash不变且未提交。用户最新长期授权plan/implement自行commit/push已写入AGENTS，私密本机资料不夹带，旧验收差额保留。
 
 LAP-12的97项离线/本机启停及16c6fd6/0d9d309推送为历史检查点；上次交接时停机，本轮未探测当前运行状态，不假定用户试用后仍停止。旧LAP-10与真人验收差额全部保留。
 
@@ -27,7 +27,7 @@ LAP-13实现提交`ee7f2d4`已成功推送origin/main；随后仅同步交付检
 | LAP-11 | 纯文本输出和人设v2适配 | 已实现/离线通过，真实待验；[任务HANDOFF](tasks/LAP-11/HANDOFF.md) | LAP-09配置合同，LAP-10后集成；能力缺口保留 | LAP-11纯文本与人设v2实施，2026-10-16 23:30领取，23:41交接 | 82项单元、5组实际框架保存/发送及入口/会话迁移通过；U03真实QQ ACK、U13/P01用户接受、U14真实群待验，暂停准入加载后已停机，真实待验 |
 | LAP-12 | 一键启停、登录/状态和QQ共存 | 已实现/离线及本机启停通过，真实差额保留；[任务HANDOFF](tasks/LAP-12/HANDOFF.md) | LAP-09/10配置合同，保留LAP-10缺口 | LAP-12启停状态实施与最终停机，2026-10-16 23:43领取，23:56交接 | 97项测试及本机无推理启停通过，最终受管进程0/五端口关闭/15外部身份保留；真实登录恢复、QQ基本操作与真实请求中停机待验 |
 | LAP-13 | 配置控制台与启动提示交互 | 已实现/离线通过，终端视觉待接受；[任务HANDOFF](tasks/LAP-13/HANDOFF.md) / [详细计划](tasks/LAP-13/PLAN.md) | 复用LAP-09/10配置合同、LAP-12入口；旧验收差额保留 | LAP-13配置控制台交互实施，2026-10-17 09:58领取 | 108项测试、实际入口路径通过，10:02交接；用户重新打开配置cmd体验；persona保留，真实bot不操作 |
-| LAP-14 | 人设落地与分条对话调研规划 | completed，仅v2规划；[HANDOFF](tasks/LAP-14/HANDOFF.md) / [PLAN](tasks/LAP-14/PLAN.md) / [指引](tasks/LAP-14/IMPLEMENTATION_GUIDE.md) | 用户后续明确先规划、CLI优先；另授权SSH只读配置核对 | 同一LAP-14规划会话，10:31首次、10:45续领、10:57交接；本任务文档/AGENTS/全局及两线状态/选型证据归属 | medium可按步骤先15后16；SSH盘点/模型初选有证据，bot新功能未实现 |
+| LAP-14 | 人设落地与分条对话调研规划 | completed，仅v2规划；[HANDOFF](tasks/LAP-14/HANDOFF.md) / [PLAN](tasks/LAP-14/PLAN.md) / [指引](tasks/LAP-14/IMPLEMENTATION_GUIDE.md) | 用户后续明确先规划、CLI优先；另授权SSH只读配置核对 | 同一LAP-14规划会话，10:31首次、10:45续领、10:57规划交接、11:01 Git交付；本任务文档归属 | `c7d2f27`已推送并核对；medium先15后16，bot新功能未实现，persona/私密资料未提交 |
 | LAP-15 | 精简人设与场景表达 | 待领取，已规划；合同见LAP-14 PLAN第4/9/10节 | 用户后续指定实施；优先于多气泡 | 未登记，不预建HANDOFF | 保留用户原文备份，单一角色正文/固定政策/短聊与认真解释；尺寸与离线证据、P01用户接受分开 |
 | LAP-16 | 一次生成与有限分条发送 | 待领取，已规划；合同见LAP-14 PLAN第5—10节 | LAP-15后，用户后续实施指令 | 未登记，不预建HANDOFF | 最多3泡/80字、认真问题单条、回执/历史/去重/中断；single兼容，adaptive显式启用 |
 | LAP-17 | 本地后端与群聊参与能力规划 | 待后续详细规划；[硬件/Ollama/模型初选资料](../local-5070/MODEL_SELECTION.md)已补 | 家庭PC用户自部署中，CLI仍优先；模型API与未@参与分开授权 | 未领取实施，不预建HANDOFF | 明确API/鉴权/原生预算/思考/质量与回滚；当前无模型推理/接入，不旁听/放开@/自动切后端 |

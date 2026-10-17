@@ -4,7 +4,7 @@
 
 状态：completed，**v2详细规划完成**，见[PLAN](PLAN.md) / [medium实施指引](IMPLEMENTATION_GUIDE.md)；bot新功能未实现/未真实验收。2026-10-17 10:31（Asia/Shanghai）首次领取，10:45按用户后续要求继续，10:57规划交接；session标题“LAP-14人设与分条对话规划”。当前主线是CodeBuddy CLI，后续用户自行选择gpt-6.1-sol/medium实施LAP-15，再独立LAP-16。本轮未改bot产品代码/运行配置/人设，未启停/探活真实bot、QQ登录/推理/群发。
 
-Git交付：用户最新明确长期授权本项目所有plan/implement在合适检查点自行commit/push。本次仍归同一LAP-14文档收尾，已同步AGENTS、PLAN和medium实施提示，不再保留“不自动commit/push”的旧限制。仅提交本任务10份文档；原persona用户增量、忽略secrets/state资料保留本机；推送目标为已配置origin/main。实际提交和远端核对结果在交付后记录。
+Git交付（2026-10-17 11:01 Asia/Shanghai）：用户长期授权本项目所有plan/implement在合适检查点自行commit/push，已同步AGENTS、PLAN和medium提示。内容提交`c7d2f27`（规划人设分场景回复与有限分条并补充5070选型）已成功推送origin/main，ls-remote核对远端与本地完整SHA一致。本条随后单独提交/推送交付记录；不改变规划完成/功能未实施的状态。仅10份本任务文档进入内容提交；原persona的245行增量hash不变，secrets/state家庭资料和盘点工件均忽略且未提交。
 
 用户追加说明家庭5070正在自行部署小LLM，并明确要求SSH只读看配置、推荐模型；该追加授权已执行，见[PC选型证据](../../../local-5070/MODEL_SELECTION.md)。已真实连通并核对硬件/Ollama元数据；远程持久修改0、真实模型请求0，未下载/安装/加载模型或启停服务。用户再追加联网工具中优先级，已列LAP-18待规划；本地后端、未@参与和联网均不在LAP-15/16顺手实施。
 
