@@ -22,6 +22,7 @@ NAPCAT_URL = 'http://127.0.0.1:6099'
 sys.path.insert(0, str(ROOT / 'src'))
 from qqbot_gateway.config import load_settings, load_gate_config, configuration_lock
 from qqbot_gateway.lifecycle import atomic_json
+from qqbot_gateway.napcat_login import child_environment
 
 
 def alive(entry):
@@ -154,13 +155,16 @@ def status_report():
     if phase=='stopped':channel='disconnected'
     try:
         from qqbot_gateway.backends import resolve_backend
-        cfg=resolve_backend(load_settings(ROOT/'config/settings.local.yaml'))
+        settings=load_settings(ROOT/'config/settings.local.yaml')
+        cfg=resolve_backend(settings)
         configured={'backend':cfg['backend'],'model':cfg['model']}
-    except (ValueError,OSError):configured={'state':'unavailable'}
+        from qqbot_gateway.napcat_login import credential_status
+        login_status=credential_status(ROOT,settings['bot']['qq'])
+    except (ValueError,OSError):configured={'state':'unavailable'};login_status={'state':'unavailable'}
     return {'process_state':phase,'mode':mode,'processes':counts,'channel':gate,'channel_state':channel,
             'can_receive_group_messages':bool(complete and gate.get('connected') is True and
                  gate.get('self_id_verified') is True and gate.get('online') is True and not gate.get('stopping')),
-            'model':model,'configured_profile':configured,'task_counts':task_counts()}
+            'model':model,'configured_profile':configured,'task_counts':task_counts(),'napcat_login':login_status}
 
 
 def task_counts():
@@ -179,6 +183,8 @@ def show_status(report=None):
               'disconnected':'QQ已断开或尚未连接','unknown':'登录状态未确认'}
     print('项目：'+phases.get(report['process_state'],'启动中'))
     print('QQ通道：'+channels.get(report['channel_state'],'登录状态未确认'))
+    login_status=report.get('napcat_login',{})
+    if login_status:print('密码回退：'+login_status.get('state','unavailable')+'；数据归属：'+login_status.get('data_scope','unverified')+'；本实例尝试：'+login_status.get('attempt_state','unavailable'))
     print('群消息：'+('可接收授权群真实@' if report['can_receive_group_messages'] else '尚未确认可接收'))
     model=report['model']
     configured=report.get('configured_profile',{})
@@ -259,7 +265,7 @@ def _start_channel(full=False, paused=False):
     if config_before.exists():(backup/'astrbot-cmd-config.json').write_bytes(config_before.read_bytes())
     if full:
         result=subprocess.run([str(ROOT/'runtime/astrbot-tool/astrbot/Scripts/python.exe'),str(ROOT/'scripts/configure_astrbot.py')],
-                              cwd=ROOT/'runtime/astrbot',capture_output=True)
+                              cwd=ROOT/'runtime/astrbot',capture_output=True,env=child_environment(os.environ))
         if result.returncode:
             (ROOT/'runtime/astrbot/configure-error.log').write_bytes(result.stdout+result.stderr)
             raise RuntimeError('CONFIG_PREPARE_FAILED; local runtime/astrbot/configure-error.log')
@@ -296,7 +302,7 @@ def _start_channel(full=False, paused=False):
         atomic_json(ROOT/'state/stop-request.json',{'instance_id':instance_id,'time':time.time()})
     else:
         (ROOT/'state/stop-request.json').unlink(missing_ok=True)
-    env=os.environ.copy();env['QQBOT_INSTANCE_ID']=instance_id;env['PYTHONPATH']=str(ROOT/'src');env['PYTHONUTF8']='1';env['QQBOT_ROOT']=str(ROOT)
+    env=child_environment(os.environ);env['QQBOT_INSTANCE_ID']=instance_id;env['PYTHONPATH']=str(ROOT/'src');env['PYTHONUTF8']='1';env['QQBOT_ROOT']=str(ROOT)
     specs=[('astrbot',[str(ROOT/'runtime/astrbot-bin/astrbot.exe'),'run'],ROOT/'runtime/astrbot',(6185,6199),25),
            ('gate',[str(ROOT/'.venv/Scripts/python.exe'),'-m','qqbot_gateway.onebot_gate','--config',str(ROOT/'config/settings.local.yaml')],ROOT,(6200,),10),
            ('napcat',[str(NAPCAT/'NapCatWinBootMain.exe'),gate.bot_qq],NAPCAT,(6099,),30)]
@@ -334,6 +340,14 @@ def _start_channel(full=False, paused=False):
         raise
     mode_record['phase']='running'
     atomic_json(ROOT/'state/service-mode.json',mode_record)
+    if not paused:
+        from qqbot_gateway.napcat_login_client import startup_fallback
+        def ready_channel():
+            value=fetch_health(6200)
+            return (value.get('connected') is True and value.get('self_id_verified') is True and
+                    value.get('online') is True and not value.get('stopping'))
+        reason=startup_fallback(ROOT,NAPCAT,instance_id,gate.bot_qq,entries=read_state,channel_ready=ready_channel)
+        print('NAPCAT_LOGIN_FALLBACK '+reason,flush=True)
     show_status()
     print('关闭此启动窗口不会停止后台bot；请使用关闭机器人.cmd。')
 

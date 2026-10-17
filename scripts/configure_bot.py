@@ -80,6 +80,11 @@ def execute(path, section, action, identifier=None, *, expected_digest=None):
     settings, digest = read_settings(path)
     if expected_digest is not None and digest != expected_digest:
         raise ValueError('Configuration changed; reload before saving')
+    if section == 'napcat-login':
+        import json
+        from qqbot_gateway.napcat_login import configure_credentials
+        print(json.dumps(configure_credentials(path,action),ensure_ascii=False))
+        return
     if section in ('connection-check','connection-init','clear-remote-unknown'):
         root=path.parent.parent
         local=resolve_backend(settings,'ollama_ssh')
@@ -380,14 +385,19 @@ class ConfigMenu:
             self.ui.page('后端与连接')
             self.ui.write('当前后端：'+settings['llm']['backend'])
             self.ui.write('分别保留两套参数；须先停机，保存后重新启动。切换会开启新上下文，旧历史保留。失败不自动切换。')
-            self.ui.write('1 CodeBuddy CLI / 2 家庭PC本地 / 3 初始化家庭连接资料 / 4 零推理元数据检查 / 5 本地profile参数 / 6 解除远端结果未知 / 0 返回')
-            choice=self.ui.choose({'0','1','2','3','4','5','6'})
+            self.ui.write('1 CodeBuddy CLI / 2 家庭PC本地 / 3 初始化家庭连接资料 / 4 零推理元数据检查 / 5 本地profile参数 / 6 解除远端结果未知 / 7 NapCat登录 / 0 返回')
+            choice=self.ui.choose({'0','1','2','3','4','5','6','7'})
             if choice=='0':return
             try:
                 if choice in ('1','2'):
                     execute(self.path,'backend','set','codebuddy_cli' if choice=='1' else 'ollama_ssh',expected_digest=digest)
                 elif choice=='3':execute(self.path,'connection-init',None)
                 elif choice=='4':execute(self.path,'connection-check',None)
+                elif choice=='7':
+                    self.ui.write('仅配置下次启动的可选单次回退；数据归属未核实不能启用。不会在此认证/登录。')
+                    execute(self.path,'napcat-login','status')
+                    command=self.ui.read('1 无回显保存密码（默认关闭） / 2 清除回退凭据 / 回车返回：')
+                    if command in ('1','2'):execute(self.path,'napcat-login','set-password' if command=='1' else 'clear-password')
                 elif choice=='6':
                     self.ui.write('仅在操作者独立确认远端请求已停止后输入 REMOTE_CHECKED_STOPPED；已加载/ps成功不能证明结束。')
                     execute(self.path,'clear-remote-unknown',None,self.ui.read('确认文字（回车取消）：').strip())
@@ -552,6 +562,8 @@ def main():
     commands.add_parser('connection-init')
     commands.add_parser('connection-check')
     commands.add_parser('clear-remote-unknown').add_argument('identifier')
+    login=commands.add_parser('napcat-login').add_subparsers(dest='action',required=True)
+    for action in ('status','set-password','clear-password'):login.add_parser(action)
     for section in (*OUTPUT_FIELDS,'backend','model','context','context-window','effort','history','overhead','output-reserve'):
         actions=commands.add_parser(section).add_subparsers(dest='action',required=True)
         actions.add_parser('set').add_argument('identifier')

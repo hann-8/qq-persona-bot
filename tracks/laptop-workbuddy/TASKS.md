@@ -2,13 +2,15 @@
 
 返回[全局入口](../../PROGRESS.md) / [工作线交接](HANDOFF.md)。继承[AGENTS](../../AGENTS.md)；本轮体验增量合同见[UX_PLAN](UX_PLAN.md)，原规格见[实施计划](IMPLEMENTATION_PLAN.md)，通过标准见[验收矩阵](ACCEPTANCE.md)。
 
-更新时间：2026-10-18 00:15（Asia/Shanghai）。24 max详细规划复审/medium指引完成，未实施；17日保存配置快照为ollama_ssh/free/adaptive、web/memes=true，当前运行加载未核验。21/22/23离线交付、18搜索及旧真人差额保留。24本轮只读核对/6文档，无认证/启停/真实模型/远程修改/群发，以下旧状态与测试按对应时间理解。
+更新时间：2026-10-18 00:35（Asia/Shanghai）。24自然分条与登录独立代码已实现/248单元/324框架合成通过；原生目录与报告读取能力缺口保留，生产回退不可启用；真实加载/登录/表达接受未验。21/22/23离线交付、18搜索及旧真人差额保留。本轮无本机凭据/settings/身份记录修改、无真实认证/启停/模型/远程修改/群发，以下旧状态与测试按对应时间理解。
 
 LAP-12的97项离线/本机启停及16c6fd6/0d9d309推送为历史检查点；上次交接时停机，本轮未探测当前运行状态，不假定用户试用后仍停止。旧LAP-10与真人验收差额全部保留。
 
 LAP-13实现提交`ee7f2d4`已成功推送origin/main；随后仅同步交付检查点。108项全套及末次菜单10项通过，117个链接/差异检查通过；未操作真实bot，用户persona仍保持原有未提交改动。
 
 ## 当前任务
+
+LAP-24实施续作独立部分已实现/离线通过：session `LAP-24-natural-login-implementation` / “LAP-24自然分条与登录独立部分实施”，2026-10-18 00:20（Asia/Shanghai）领取、00:35交接；开始main/d319811、工作区干净。归属persona.py/persona.md、napcat_login*.py、manage.py/configure_bot.py/verify_lap24.py、相关tests/verify_lap20/21合成场景、README/24报告/24 HANDOFF及进度索引。248单元/324框架用例通过；未证实原生目录/报告能力，生产回退禁用；未操作真实bot/本机配置/凭据/模型/群。详情见[24交接](tasks/LAP-24/HANDOFF.md)。
 
 LAP-24于2026-10-18 00:05续领max详规复审，2026-10-18 00:15交接：用户明确规划/后续medium实施分工；[PLAN](tasks/LAP-24/PLAN.md)与[medium指引/复制命令](tasks/LAP-24/IMPLEMENTATION_GUIDE.md)完成。同一session仅6份文档，基线cf69570且干净。明确Worker环境继承、固定WebUI单次回退/DPAPI/实例账本与数据目录门槛；未实施/认证/启停/真实生成，17日8单元/3合成仅历史基线。
 
@@ -55,7 +57,7 @@ LAP-15内容提交`632fdc5`已推送origin/main，2026-10-17 11:09用ls-remote�
 | LAP-21 | QQ收藏导入/本地表情图库与发送 | 已实现/离线通过，真实未验；[HANDOFF](tasks/LAP-21/HANDOFF.md) / [合同](tasks/LAP-19/GROUP_CHAT_PLAN.md) | 20统一群发送后；收藏静态支持不当本账号已通过 | LAP-21-controlled-memes / LAP-21受控表情实施，2026-10-17 16:49领取；文件归属见交接 | 207单元、136媒体框架与108群/26网页/90旧路径通过；inbox/library/固定只读收藏RPC/meme_id/typed图片ACK与恢复落地；默认关闭、真实收藏/发图未验，见[报告](../../reports/lap-21-2026-10-17.md) |
 | LAP-22 | free模式兜底回复故障修复 | 已实现/离线通过，真实待验；[HANDOFF](tasks/LAP-22/HANDOFF.md) | LAP-20/21合同内修复 | LAP-22-free-framework-delivery，2026-10-17 18:01领取 | 空链修复；207单元/132群框架/136媒体回归通过；未重启加载；归属与命令见交接 |
 | LAP-23 | WebSocket断开后持续409修复 | 已实现/离线通过，真实待验；[HANDOFF](tasks/LAP-23/HANDOFF.md) | 既有连接/恢复合同内修复 | LAP-23-gate-reconnect，2026-10-17 18:47领取 | 状态写失败不再泄漏连接；212单元/18入口/实际框架门槛通过；未启动，现场首异常未完整取证 |
-| LAP-24 | 登录持久化与自然分条详细规划 | max详规复审与medium指引完成，未实施；[HANDOFF](tasks/LAP-24/HANDOFF.md) / [PLAN](tasks/LAP-24/PLAN.md) / [指引](tasks/LAP-24/IMPLEMENTATION_GUIDE.md) | LAP-12生命周期、LAP-14/19分条与free/表情合同 | LAP-24-login-natural-replies-plan，17日领取；18日00:05续领，2026-10-18 00:15交接；本次6文档 | 用户后续由6.1-sol/medium按指引实施；先自然条数，再登录独立部分；原生路径能力缺口/真实登录与表达接受仍待验 |
+| LAP-24 | 自然分条与登录独立部分 | 独立实现/离线通过，原生目录能力/真实验收未完成；[HANDOFF](tasks/LAP-24/HANDOFF.md) / [PLAN](tasks/LAP-24/PLAN.md) / [报告](../../reports/lap-24-2026-10-18.md) | LAP-12生命周期、LAP-14/19分条与free/表情合同 | LAP-24-natural-login-implementation，2026-10-18 00:20领取、00:35交接；文件见HANDOFF | 248单元/324实际框架合成通过；原生目录与报告接入回规划，生产unverified不可启用；真实加载/登录/表达接受另授权 |
 
 G0可行性、G1环境、G2通道、G3实际provider调用已有证据，见[工作线交接](HANDOFF.md#已验证与重要修复)。这是阶段基线；W02/W10等未真实制造的情形仍按验收矩阵记录，不能据此把完整W/Q/P/O标成通过。G4完整验收归LAP-02/03，G7文本相关部分归LAP-01/04/05。
 

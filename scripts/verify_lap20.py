@@ -14,7 +14,7 @@ sys.path[:0]=[str(ROOT),str(ROOT/'src')]
 os.environ['ASTRBOT_DISABLE_METRICS']='1'
 
 
-async def verify(root,backend,mode,full_lifecycle=False):
+async def verify(root,backend,mode,full_lifecycle=False,lap24=False):
     import yaml
     from aiohttp import web
     from astrbot.api.platform import AstrBotMessage,MessageMember,MessageType,PlatformMetadata
@@ -143,6 +143,21 @@ async def verify(root,backend,mode,full_lifecycle=False):
     report=[]
     try:
         if full_lifecycle:
+            if lap24:
+                for kind,number in [('chat',1),('chat',2),('chat',3),('answer',3)]:
+                    router.group_turns.reset('111')
+                    e=event(True);gen=router.on_group(e);req=await anext(gen)
+                    raw=json.dumps(dict(qqbot_group_reply=1,decision='speak',kind=kind,
+                        bubbles=['合成正文'+str(i) for i in range(number)],meme_id=None),ensure_ascii=False)
+                    before=harness.attempts
+                    await complete(e,req,raw);await finish(gen)
+                    expected=number if kind=='chat' and mode=='adaptive' else 1
+                    assert len(e.bot.sent)==expected,(kind,number,e.bot.sent)
+                    key=e.get_extra('qq_delivery_key')
+                    assert all(state=='sent' for _,state,_ in router.tasks.parts(key))
+                    count=len(e.bot.sent);await router.deliver_reply(e);assert len(e.bot.sent)==count
+                    assert harness.attempts==before+1
+                    report.append(dict(case='lap24_'+kind+str(number),sends=count,generations=1,ack=True))
             for mention in (False,True):
                 for case,text in (('speak',speak),('silent',silent),('bad','invalid JSON')):
                     router.group_turns.reset('111')

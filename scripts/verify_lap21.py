@@ -15,7 +15,7 @@ sys.path[:0]=[str(ROOT),str(ROOT/'src')]
 os.environ['ASTRBOT_DISABLE_METRICS']='1'
 
 
-async def verify(root,backend,mode,participation):
+async def verify(root,backend,mode,participation,full_lifecycle=False,lap24=False):
     import yaml
     from PIL import Image
     from aiohttp import web
@@ -83,6 +83,7 @@ async def verify(root,backend,mode,participation):
     report=[]
     try:
         cases=['text_image','image_only','invalid_id','answer','missing2','duplicate2','error2','timeout2','stop','hash_changed','cooldown','bad','metadata_missing','metadata_mismatch','image_only_missing','web_answer']
+        if lap24:cases+=['text1','text2','text3','text2_image','capacity_image']
         if participation=='free':cases+=['ambient_image_only','silent']
         for case in cases:
             if participation=='free':
@@ -116,11 +117,20 @@ async def verify(root,backend,mode,participation):
             e=AiocqhttpMessageEvent(question,msg,PlatformMetadata(name='aiocqhttp',description='offline',id='qqbot'),'111',Bot())
             gen=router.on_group(e);req=await anext(gen)
             raw=dict(kind='answer' if case in ('answer','web_answer') else 'chat',bubbles=[] if only or case=='silent' else ['合成文字'],meme_id='invalid' if case=='invalid_id' else None if case=='silent' else mid)
+            if case in ('text1','text2','text3','text2_image','capacity_image'):
+                n=3 if case in ('text3','capacity_image') else 2 if case in ('text2','text2_image') else 1
+                raw.update(bubbles=['合成文字'+str(i) for i in range(n)],meme_id=mid if case in ('text2_image','capacity_image') else None)
             if participation=='free':raw.update(qqbot_group_reply=1,decision='silent' if case=='silent' else 'speak')
             else:raw.update(qqbot_media_reply=1)
             harness.text='bad' if case=='bad' else json.dumps(raw,ensure_ascii=False)
             prior=harness.attempts
-            if case=='text_image':
+            path,_=c.resolve(mid);original=path.read_bytes()
+            if case in ('hash_changed','image_only_missing'):path.write_bytes(b'changed')
+            flag={'allowed':True};old_allowed=router.delivery.allowed
+            router.delivery.allowed=lambda ev:flag['allowed'] and old_allowed(ev)
+            if case=='cooldown':
+                router.delivery.catalog.cfg['cooldown_seconds']=60;router.delivery.image_times['111']=__import__('time').monotonic()
+            if case=='text_image' or full_lifecycle:
                 from astrbot.core.astr_main_agent import build_main_agent,MainAgentBuildConfig
                 from astrbot.api.star import Context
                 from unittest.mock import AsyncMock
@@ -135,34 +145,55 @@ async def verify(root,backend,mode,participation):
                     built=await build_main_agent(event=e,plugin_context=pc,provider=provider,config=MainAgentBuildConfig(tool_call_timeout=5,streaming_response=False,add_cron_tools=False,llm_safety_mode=False,provider_settings=config['provider_settings'],request_max_retries=1))
                 assert built.provider_request.session_id==req.session_id
                 assert built.provider_request.func_tool is None or built.provider_request.func_tool.empty()
-                responses=[r async for r in built.agent_runner._iter_llm_responses()];assert len(responses)==1;response=responses[0]
+                if full_lifecycle:
+                    from astrbot.core.astr_agent_run_util import run_agent
+                    async def done(context,response):
+                        meta_name='qqbot_group_plan' if participation=='free' else 'qqbot_reply_plan'
+                        if case=='metadata_missing':setattr(response.raw_completion,meta_name,None)
+                        if case=='metadata_mismatch':getattr(response.raw_completion,meta_name)['plan_hash' if participation=='free' else 'content_sha256']='bad'
+                        await router.preserve_gateway_text(e,context,response)
+                    from astrbot.core.star.star_handler import EventType
+                    handler=SimpleNamespace(handler_module_path='lap21',handler_name='deliver_reply',handler=router.deliver_reply)
+                    def handlers(kind,**kwargs):return [handler] if kind==EventType.OnDecoratingResultEvent else []
+                    with patch.object(built.agent_runner.agent_hooks,'on_agent_done',side_effect=done),patch.object(decorate_module.star_handlers_registry,'get_handlers_by_event_type',side_effect=handlers),patch.dict(decorate_module.star_map,{'lap21':SimpleNamespace(name='lap21')}):
+                        async for _ in run_agent(built.agent_runner,max_step=1,show_tool_use=False):
+                            async for _ in decorate.process(e):pass
+                            await respond.process(e)
+                    response=built.agent_runner.get_final_llm_resp()
+                else:
+                    responses=[r async for r in built.agent_runner._iter_llm_responses()];assert len(responses)==1;response=responses[0]
             else:response=await provider.text_chat(prompt=req.prompt,system_prompt=router.persona,contexts=req.contexts,session_id=req.session_id,func_tool=None,request_max_retries=1)
             assert harness.attempts==prior+1
             meta_name='qqbot_group_plan' if participation=='free' else 'qqbot_reply_plan'
-            if case=='metadata_missing':setattr(response.raw_completion,meta_name,None)
-            if case=='metadata_mismatch':getattr(response.raw_completion,meta_name)['plan_hash' if participation=='free' else 'content_sha256']='bad'
+            if not full_lifecycle and case=='metadata_missing':setattr(response.raw_completion,meta_name,None)
+            if not full_lifecycle and case=='metadata_mismatch':getattr(response.raw_completion,meta_name)['plan_hash' if participation=='free' else 'content_sha256']='bad'
             prior_messages=[Message.model_validate(m) for m in json.loads(req.conversation.history)] if req.conversation else []
             rc=SimpleNamespace(messages=prior_messages+[Message(role='user',content=req.prompt),Message(role='assistant',content=response.completion_text)])
-            await router.preserve_gateway_text(e,rc,response)
+            if full_lifecycle:rc=built.agent_runner.run_context
+            else:await router.preserve_gateway_text(e,rc,response)
             key=e.get_extra('qq_delivery_key')
             if case not in ('silent','metadata_missing','metadata_mismatch'):assert router.tasks.delivery(key),case
             if participation=='mentions':await stage._save_to_history(e,req,response,rc.messages,None)
-            path,_=c.resolve(mid);original=path.read_bytes()
-            if case in ('hash_changed','image_only_missing'):path.write_bytes(b'changed')
-            flag={'allowed':True};old_allowed=router.delivery.allowed
-            router.delivery.allowed=lambda ev:flag['allowed'] and old_allowed(ev)
-            if case=='cooldown':
-                router.delivery.catalog.cfg['cooldown_seconds']=60;router.delivery.image_times['111']=__import__('time').monotonic()
-            e.set_result(e.plain_result(response.completion_text))
+            if not full_lifecycle:e.set_result(e.plain_result(response.completion_text))
             handler=SimpleNamespace(handler_module_path='lap21',handler_name='deliver_reply',handler=router.deliver_reply)
-            with patch.object(decorate_module.star_handlers_registry,'get_handlers_by_event_type',return_value=[handler]),patch.dict(decorate_module.star_map,{'lap21':SimpleNamespace(name='lap21')}):
-                async for _ in decorate.process(e):pass
-            await respond.process(e);count=len(e.bot.sent);await router.deliver_reply(e);assert len(e.bot.sent)==count
+            if not full_lifecycle:
+                with patch.object(decorate_module.star_handlers_registry,'get_handlers_by_event_type',return_value=[handler]),patch.dict(decorate_module.star_map,{'lap21':SimpleNamespace(name='lap21')}):
+                    async for _ in decorate.process(e):pass
+                await respond.process(e)
+            count=len(e.bot.sent)
+            # Invalid mentions metadata stops the real pipeline before decoration.
+            # Do not invent a decoration call that the framework would never make.
+            stopped_metadata=full_lifecycle and participation=='mentions' and case in ('metadata_missing','metadata_mismatch')
+            if not stopped_metadata:await router.deliver_reply(e)
+            assert len(e.bot.sent)==count,(case,count,len(e.bot.sent))
             try:await anext(gen)
             except StopAsyncIteration:pass
             router.delivery.allowed=old_allowed;router.delivery.catalog.cfg['cooldown_seconds']=0;path.write_bytes(original)
             types=[s['message'][0]['type'] for s in e.bot.sent]
             expected=[] if case=='silent' else ['image'] if case in ('image_only','ambient_image_only') else ['text'] if case in ('invalid_id','answer','stop','hash_changed','cooldown','bad','metadata_missing','metadata_mismatch','image_only_missing','web_answer') else ['text','image']
+            if case in ('text1','text2','text3'):expected=['text']*(int(case[-1]) if mode=='adaptive' else 1)
+            if case in ('text2_image','capacity_image'):expected=['text']*((3 if case=='capacity_image' else 2) if mode=='adaptive' else 1)+(['image'] if case=='text2_image' or mode=='single' else [])
+            if stopped_metadata:expected=[]
             assert types==expected,(case,types,expected)
             if case=='web_answer':
                 assert '来源：Synthetic source https://example.com/page' in e.bot.sent[0]['message'][0]['data']['text']
