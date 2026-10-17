@@ -80,6 +80,17 @@ class MenuTests(unittest.TestCase):
             self.assertEqual(shell.call_count,1)
             self.assertIn('仍可阅读\n',output)
 
+    def test_web_menu_preserves_profiles_and_never_probes(self):
+        ui=RecordedConsole(['1','true','','5','3','','0'])
+        with patch('qqbot_gateway.web_retrieval.PublicHTTP.get',side_effect=AssertionError('no network')):
+            ConfigMenu(self.path,ui).web_group()
+        result=load_settings(self.path)
+        self.assertTrue(result['web']['enabled'])
+        self.assertEqual(result['web']['max_results'],3)
+        self.assertEqual(result['extension'],{'preserve':'existing'})
+        self.assertEqual(result['llm']['profiles']['codebuddy_cli']['input_budget']['context_input_limit_tokens'],200000)
+        self.assertIn('质量门槛',ui.text)
+
     def test_each_field_has_its_own_prompt_and_cancel_never_writes(self):
         for section,action,name,detail in [('groups','add','群号','123456789'),
                 ('groups','remove','完整群号','至少保留一个'),('blacklist','add','QQ号','所有授权群'),

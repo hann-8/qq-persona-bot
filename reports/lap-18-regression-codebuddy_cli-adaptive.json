@@ -1,0 +1,594 @@
+{
+  "real_model_requests": 0,
+  "real_qq_messages": 0,
+  "cases": [
+    {
+      "case": "chat1",
+      "order": "save_first",
+      "send_calls": 1,
+      "confirmed_parts": 1,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "chat2",
+      "order": "save_first",
+      "send_calls": 2,
+      "confirmed_parts": 2,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "chat3",
+      "order": "save_first",
+      "send_calls": 3,
+      "confirmed_parts": 3,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "answer",
+      "order": "save_first",
+      "send_calls": 1,
+      "confirmed_parts": 1,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "overflow",
+      "order": "save_first",
+      "send_calls": 1,
+      "confirmed_parts": 1,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "literal",
+      "order": "save_first",
+      "send_calls": 1,
+      "confirmed_parts": 1,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "metadata_missing",
+      "order": "save_first",
+      "send_calls": 1,
+      "confirmed_parts": 1,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "metadata_mismatch",
+      "order": "save_first",
+      "send_calls": 1,
+      "confirmed_parts": 1,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "error1",
+      "order": "save_first",
+      "send_calls": 1,
+      "confirmed_parts": 0,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "missing1",
+      "order": "save_first",
+      "send_calls": 1,
+      "confirmed_parts": 0,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "timeout1",
+      "order": "save_first",
+      "send_calls": 1,
+      "confirmed_parts": 0,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "error2",
+      "order": "save_first",
+      "send_calls": 2,
+      "confirmed_parts": 1,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "missing2",
+      "order": "save_first",
+      "send_calls": 2,
+      "confirmed_parts": 1,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "timeout2",
+      "order": "save_first",
+      "send_calls": 2,
+      "confirmed_parts": 1,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "error3",
+      "order": "save_first",
+      "send_calls": 3,
+      "confirmed_parts": 2,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "missing3",
+      "order": "save_first",
+      "send_calls": 3,
+      "confirmed_parts": 2,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "timeout3",
+      "order": "save_first",
+      "send_calls": 3,
+      "confirmed_parts": 2,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "duplicate2",
+      "order": "save_first",
+      "send_calls": 2,
+      "confirmed_parts": 1,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "before_send",
+      "order": "save_first",
+      "send_calls": 0,
+      "confirmed_parts": 0,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "stop_delay",
+      "order": "save_first",
+      "send_calls": 1,
+      "confirmed_parts": 1,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "chat1",
+      "order": "send_first",
+      "send_calls": 1,
+      "confirmed_parts": 1,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "chat2",
+      "order": "send_first",
+      "send_calls": 2,
+      "confirmed_parts": 2,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "chat3",
+      "order": "send_first",
+      "send_calls": 3,
+      "confirmed_parts": 3,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "answer",
+      "order": "send_first",
+      "send_calls": 1,
+      "confirmed_parts": 1,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "overflow",
+      "order": "send_first",
+      "send_calls": 1,
+      "confirmed_parts": 1,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "literal",
+      "order": "send_first",
+      "send_calls": 1,
+      "confirmed_parts": 1,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "metadata_missing",
+      "order": "send_first",
+      "send_calls": 1,
+      "confirmed_parts": 1,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "metadata_mismatch",
+      "order": "send_first",
+      "send_calls": 1,
+      "confirmed_parts": 1,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "error1",
+      "order": "send_first",
+      "send_calls": 1,
+      "confirmed_parts": 0,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "missing1",
+      "order": "send_first",
+      "send_calls": 1,
+      "confirmed_parts": 0,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "timeout1",
+      "order": "send_first",
+      "send_calls": 1,
+      "confirmed_parts": 0,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "error2",
+      "order": "send_first",
+      "send_calls": 2,
+      "confirmed_parts": 1,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "missing2",
+      "order": "send_first",
+      "send_calls": 2,
+      "confirmed_parts": 1,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "timeout2",
+      "order": "send_first",
+      "send_calls": 2,
+      "confirmed_parts": 1,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "error3",
+      "order": "send_first",
+      "send_calls": 3,
+      "confirmed_parts": 2,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "missing3",
+      "order": "send_first",
+      "send_calls": 3,
+      "confirmed_parts": 2,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "timeout3",
+      "order": "send_first",
+      "send_calls": 3,
+      "confirmed_parts": 2,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "duplicate2",
+      "order": "send_first",
+      "send_calls": 2,
+      "confirmed_parts": 1,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "before_send",
+      "order": "send_first",
+      "send_calls": 0,
+      "confirmed_parts": 0,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    },
+    {
+      "case": "stop_delay",
+      "order": "send_first",
+      "send_calls": 1,
+      "confirmed_parts": 1,
+      "history_equals_confirmed": true,
+      "next_request_only_confirmed": true,
+      "lease_until_repair": true,
+      "default_resend": false,
+      "ack": "simulated",
+      "runner_attempts": 1
+    }
+  ],
+  "adaptive_admission": [
+    {
+      "variant": "no_at",
+      "tasks": 0,
+      "history": 0,
+      "model": 0,
+      "sends": 0
+    },
+    {
+      "variant": "name",
+      "tasks": 0,
+      "history": 0,
+      "model": 0,
+      "sends": 0
+    },
+    {
+      "variant": "quoted_at",
+      "tasks": 0,
+      "history": 0,
+      "model": 0,
+      "sends": 0
+    },
+    {
+      "variant": "self",
+      "tasks": 0,
+      "history": 0,
+      "model": 0,
+      "sends": 0
+    },
+    {
+      "variant": "blocked",
+      "tasks": 0,
+      "history": 0,
+      "model": 0,
+      "sends": 0
+    },
+    {
+      "variant": "unauthorized",
+      "tasks": 0,
+      "history": 0,
+      "model": 0,
+      "sends": 0
+    },
+    {
+      "variant": "private",
+      "tasks": 0,
+      "history": 0,
+      "model": 0,
+      "sends": 0
+    }
+  ],
+  "ack_sdk_cases": [
+    {
+      "mode": "ok",
+      "send_calls": 3,
+      "confirmed_parts": 3,
+      "late_or_unmatched_ack_ignored": true,
+      "original_sdk_connection": true,
+      "original_gate": true
+    },
+    {
+      "mode": "fail2",
+      "send_calls": 2,
+      "confirmed_parts": 1,
+      "late_or_unmatched_ack_ignored": true,
+      "original_sdk_connection": true,
+      "original_gate": true
+    },
+    {
+      "mode": "timeout1",
+      "send_calls": 1,
+      "confirmed_parts": 0,
+      "late_or_unmatched_ack_ignored": true,
+      "original_sdk_connection": true,
+      "original_gate": true
+    },
+    {
+      "mode": "unknown_echo1",
+      "send_calls": 1,
+      "confirmed_parts": 0,
+      "late_or_unmatched_ack_ignored": true,
+      "original_sdk_connection": true,
+      "original_gate": true
+    },
+    {
+      "mode": "duplicate1",
+      "send_calls": 3,
+      "confirmed_parts": 3,
+      "late_or_unmatched_ack_ignored": true,
+      "original_sdk_connection": true,
+      "original_gate": true
+    }
+  ],
+  "concurrent_delivery": {
+    "same_group_noninterleaved": true,
+    "event_scoped_bot_restored": true
+  },
+  "local_model_error": {
+    "single_local_text": true,
+    "no_assistant_history": true,
+    "raw_error_not_disclosed": true
+  },
+  "startup_recovery": {
+    "confirmed_prefix_only": true,
+    "before_ready": true,
+    "no_send_or_model": true
+  },
+  "synthetic_attempts": 40
+}

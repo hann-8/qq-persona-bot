@@ -59,6 +59,8 @@ def normalize_settings(raw):
     if type(version) is not int or version not in (1, 2, 3):
         raise ValueError('Unsupported schema_version')
     data['schema_version'] = 3
+    from .web_policy import validate_web
+    data['web'] = validate_web(data.get('web', {}))
     for section in ('bot', 'access', 'onebot', 'llm', 'chat', 'output'):
         data.setdefault(section, {})
         if not isinstance(data[section], dict):

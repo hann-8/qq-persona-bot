@@ -35,7 +35,8 @@ class QQRouter(Star):
         self.bot=settings['bot']['qq'];self.groups=set(settings['access']['allowed_groups']);self.admins=set(settings['access']['admin_users'])
         self.blocked=set(settings['access']['blocked_users'])
         self.output=settings['output']
-        self.persona=compose_persona((self.root/'config/persona.md').read_text(encoding='utf-8'),self.output)
+        self.web=settings['web']
+        self.persona=compose_persona((self.root/'config/persona.md').read_text(encoding='utf-8'),self.output,self.web)
         self.persona_id=session_version(self.persona,settings)
         chat=settings.get('chat',{})
         self.budget=InputBudget.from_settings(settings,validate_model_settings(settings))
@@ -75,6 +76,16 @@ class QQRouter(Star):
             if getattr(self,'output',{}).get('delivery_mode')=='adaptive' and event.get_extra('qq_delivery_key'):
                 event.clear_result();event.stop_event()
             return
+        if getattr(raw,'qqbot_web_expired',False) is True:
+            # Authenticated gateway deadline marker: never save/send its internal body.
+            event.set_extra('qq_web_expired',True)
+            event.set_extra('qq_router_success',False)
+            response.result_chain=MessageChain()
+            response.reasoning_content=None
+            if run_context.messages and run_context.messages[-1].role=='assistant':
+                run_context.messages[-1]._no_save=True
+                run_context.messages[-1].content=[]
+            event.clear_result();event.stop_event();return
         text=raw.choices[0].message.content
         if not isinstance(text,str) or not text.strip() or response.role!='assistant':
             if getattr(self,'output',{}).get('delivery_mode')=='adaptive' and event.get_extra('qq_delivery_key'):
@@ -112,6 +123,8 @@ class QQRouter(Star):
 
     @filter.on_decorating_result()
     async def deliver_reply(self,event:AstrMessageEvent):
+        if event.get_extra('qq_web_expired'):
+            event.clear_result();event.stop_event();return
         if getattr(self,'output',{}).get('delivery_mode')!='adaptive' or not event.get_extra('qq_delivery_key'):
             return
         # Always take over this model event, even if the hook/SDK failed to prepare a plan.
@@ -159,8 +172,8 @@ class QQRouter(Star):
             prompt=''.join(c.text for c in components if isinstance(c,Plain)).strip()
             if not prompt:
                 self.tasks.set(key,'failed');yield event.plain_result('我在~ 带上想问的文字再叫我吧。');return
-            if re.search(r'https?://\S+',prompt,re.I):
-                self.tasks.set(key,'failed');yield event.plain_result('我目前只接通文字聊天，B站和网页正文还没接入。贴段文字，我先帮你捋捋。');return
+            if re.search(r'https?://\S+',prompt,re.I) and not self.web['enabled']:
+                self.tasks.set(key,'failed');yield event.plain_result('网页读取尚未开启，视频正文还没接入。贴段文字，我先帮你捋捋。');return
             try:self.budget.select_history(self.persona,prompt,[])
             except GatewayError:
                 self.tasks.set(key,'failed');yield event.plain_result(MESSAGES['INPUT_TOO_LONG']);return
@@ -200,6 +213,8 @@ class QQRouter(Star):
                         status=self.tasks.db.execute('SELECT status FROM tasks WHERE message_key=?',(key,)).fetchone()[0]
                     else:
                         status='failed';self.tasks.set(key,status)
+                elif event.get_extra('qq_web_expired'):
+                    status='failed';self.tasks.set(key,status)
                 else:
                     sent=bool(getattr(event,'_has_send_oper',False))
                     success=event.get_extra('qq_router_success')

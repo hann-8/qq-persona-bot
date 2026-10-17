@@ -1,0 +1,41 @@
+[
+  {
+    "query": "中国长江长度是多少",
+    "error": "WebFailure",
+    "reason": "blocked_ip",
+    "audit": {
+      "search_calls": 1,
+      "fetch_calls": 0,
+      "http_calls": 1,
+      "redirect_hops": 0,
+      "bytes": 0,
+      "latency": 0
+    }
+  },
+  {
+    "query": "2026年10月17日 新闻",
+    "error": "WebFailure",
+    "reason": "blocked_ip",
+    "audit": {
+      "search_calls": 1,
+      "fetch_calls": 0,
+      "http_calls": 1,
+      "redirect_hops": 0,
+      "bytes": 0,
+      "latency": 0
+    }
+  },
+  {
+    "query": "site:docs.ollama.com api chat",
+    "error": "WebFailure",
+    "reason": "blocked_ip",
+    "audit": {
+      "search_calls": 1,
+      "fetch_calls": 0,
+      "http_calls": 1,
+      "redirect_hops": 0,
+      "bytes": 0,
+      "latency": 0
+    }
+  }
+]

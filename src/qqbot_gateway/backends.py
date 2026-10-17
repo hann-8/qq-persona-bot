@@ -27,6 +27,9 @@ class BackendResult:
     usage: dict = field(default_factory=dict)
     parameters: dict = field(default_factory=dict)
     finish_reason: str = 'stop'
+    prepared_plan: object = None
+    generation_performed: bool = True
+    web_expired: bool = False
 
 
 def numeric_usage(value):

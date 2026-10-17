@@ -47,6 +47,7 @@ def show(settings):
         supported=known_models().get(llm['model'],{}).get('reasoning',{}).get('supportedEfforts',[])
         print('当前模型可显式选强度：'+('/'.join(supported) or '未知，仅auto'))
     print(f"回复方式：{settings['output']['delivery_mode']}；闲聊最多{settings['output']['max_bubbles']}条/{settings['output']['casual_max_chars']}字符，认真问题单条；切换后新上下文，旧历史保留。")
+    print(f"共用网页：{settings.get('web',{}).get('enabled',False)}；搜索候选未通过质量门槛，仅受控公共URL读取；不上传历史。")
 
 
 def parameter(settings, section, value):
@@ -184,11 +185,12 @@ class ConfigMenu:
             self.ui.write(f"推理强度：{EFFORT_NAMES.get(llm.get('reasoning_effort','关闭思考'), llm.get('reasoning_effort','关闭思考'))}（{llm.get('reasoning_effort','关闭思考')}）")
             self.ui.write(f"授权群：{len(access['allowed_groups'])} 个    黑名单：{len(access['blocked_users'])} 人    记忆：{chat['history_turns']} 轮")
             self.ui.write(f"输入预算：{chat['context_input_limit_tokens']:,}（可见内容保守计数）")
-            self.ui.write('\n1  群与黑名单\n2  模型与对话\n3  详细设置与能力说明\n4  回复方式\n5  后端与连接\n0  退出')
+            self.ui.write('\n1  群与黑名单\n2  模型与对话\n3  详细设置与能力说明\n4  回复方式\n5  后端与连接\n6  联网搜索\n0  退出')
             self.ui.write('\n修改前请先关闭机器人；保存后，下次启动生效')
-            choice = self.ui.choose({'0','1','2','3','4','5'})
+            choice = self.ui.choose({'0','1','2','3','4','5','6'})
             if choice == '0':return
-            if choice == '5':self.backend_group()
+            if choice == '6':self.web_group()
+            elif choice == '5':self.backend_group()
             elif choice == '4':self.output_group()
             elif choice == '3':
                 self.ui.page('详细设置与能力说明')
@@ -197,6 +199,31 @@ class ConfigMenu:
                 self.ui.write(content.getvalue().rstrip())
                 self.ui.pause()
             else:self.group(choice)
+
+    def web_group(self):
+        from qqbot_gateway.web_policy import DEFAULTS
+        while True:
+            settings,digest=read_settings(self.path)
+            self.ui.page('联网搜索')
+            self.ui.write('搜索候选未通过质量门槛，目前仅明确URL可读取。公共查询会外发；不上传历史。保存须停机，重启生效；不自动重启或探测。')
+            self.ui.write('enabled: true/false；trigger: auto/explicit；provider仅bing_rss；搜索固定1次；结果1..5、页1..2、总时限5..15秒、跳转0..2、响应65536..1048576字节、每页1000..8000字节、材料1000..12000字节、来源1..2。')
+            keys=list(DEFAULTS)
+            for index,key in enumerate(keys,1):self.ui.write(f'{index} {key}: {settings["web"][key]}')
+            self.ui.write('0 返回')
+            choice=self.ui.choose({'0'}|{str(i) for i in range(1,len(keys)+1)})
+            if choice=='0':return
+            key=keys[int(choice)-1];value=self.ui.read('新值（回车保留）：').strip()
+            if not value:continue
+            try:
+                if key=='enabled':
+                    if value not in ('true','false'):raise ValueError('Expected true/false')
+                    value=value=='true'
+                elif type(DEFAULTS[key]) is int:value=int(value)
+                settings['web'][key]=value
+                save_settings(self.path,settings,digest)
+                self.ui.write('已保存，重启生效；没有执行联网或模型探测。')
+            except (ValueError,OSError) as error:self.ui.write(operation_error(error)+' 请核对页面范围。')
+            self.ui.pause()
 
     def backend_group(self):
         while True:

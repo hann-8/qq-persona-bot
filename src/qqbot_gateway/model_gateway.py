@@ -98,7 +98,10 @@ class ModelQueue:
                     if any(isinstance(e,GatewayError) and e.code in ('CLEANUP_FAILED','REMOTE_RESULT_UNKNOWN') for e in outcomes):self.state=next(e.code for e in outcomes if isinstance(e,GatewayError) and e.code in ('CLEANUP_FAILED','REMOTE_RESULT_UNKNOWN'))
                     continue
                 result=await task
-                self.state='ready';self.last_success=time.time()
+                self.state='ready'
+                if not isinstance(result,BackendResult) or result.generation_performed:
+                    self.last_success=time.time()
+                    if self.last_error:self.last_error['historical']=True
                 if isinstance(result,BackendResult):self.last_usage=result.usage
                 if not job.future.done():job.future.set_result(result)
             except GatewayError as error:
@@ -146,7 +149,7 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
     async def health(request):
         last_error=dict(queue.last_error) if queue.last_error else None
         if last_error:
-            last_error['historical']=bool(queue.last_success and queue.last_success>last_error.get('time',0))
+            last_error['historical']=bool(last_error.get('historical') or queue.last_success and queue.last_success>last_error.get('time',0))
         current_error=last_error if last_error and not last_error['historical'] else None
         return web.json_response({'alive':True,'backend_state':queue.state,'queue':queue.queue.qsize(),
                                   'stopping':bool(root and stopping(root)),
@@ -164,6 +167,8 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
                                   'remote_result_unknown':bool(getattr(queue.runner,'marker',None) and queue.runner.marker.exists()),
                                   'active':queue.active,'cli_attempts':queue.runner.attempts if getattr(queue.runner,'backend','codebuddy_cli')=='codebuddy_cli' else 0,
                                   'backend_attempts':queue.runner.attempts,'local_post_attempts':getattr(queue.runner,'post_attempts',0),
+                                  'web_audit':getattr(getattr(queue.runner,'retriever',None),'last_audit',{}),
+                                  'web_search_quality_passed':False,
                                   'last_usage':queue.last_usage,'credits':None,'credits_state':'unknown',
                                   'last_success':queue.last_success,'real_inference_verified':queue.last_success is not None,
                                   'router_ready':router_ready(),'last_contract':queue.last_shape,'last_error':last_error})
@@ -185,7 +190,14 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
         result=backend_result.text
         response_id='chatcmpl-'+request[TRACE]
         metadata={}
-        if output['delivery_mode']=='adaptive':
+        if backend_result.web_expired:
+            metadata['qqbot_web_expired']=True
+            limited=False
+        elif backend_result.prepared_plan is not None:
+            plan=backend_result.prepared_plan
+            result,limited=plan.canonical_text,plan.limited
+            if output['delivery_mode']=='adaptive':metadata['qqbot_reply_plan']=plan.metadata(response_id)
+        elif output['delivery_mode']=='adaptive':
             question=json.loads(prompt)[-1]['content']
             plan=make_reply_plan(result,output,question)
             result,limited=plan.canonical_text,plan.limited
@@ -218,6 +230,9 @@ def main():
     tokens=json.loads((root/settings['secrets_file']).read_text(encoding='utf-8'))
     budget=InputBudget.from_settings(settings,validate_model_settings(settings))
     runner=create_runner(root,settings,budget)
+    from .web_retrieval import WebRunner, Retriever
+    ids=[settings['bot']['qq']]+sum((settings['access'][k] for k in ('allowed_groups','admin_users','blocked_users')),[])
+    runner=WebRunner(runner,Retriever(settings['web'],ids),budget,settings['output'],root)
     queue=ModelQueue(runner,llm['queue_limit'],llm['queue_wait_seconds'])
     logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(message)s')
     web.run_app(application(queue,tokens['model_gateway'],root/'state/router-ready.json',budget,settings['output']['max_reply_chars'],root,settings['output']),host=llm['host'],port=llm['port'],
