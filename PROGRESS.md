@@ -1,110 +1,70 @@
 # QQ 人设聊天 Bot：项目入口
 
-更新时间：2026-10-17 11:35（Asia/Shanghai）。
+更新时间：2026-10-17 15:21（Asia/Shanghai）。本文件是唯一项目进度入口，不另建根HANDOFF。
 
 ## 当前阶段与授权
 
-LAP-16内容提交`2a2bb93`已推送origin/main，2026-10-17 11:36（Asia/Shanghai）用ls-remote核对完整SHA一致，已跟踪工作区无剩余差异；随后仅同步本交付记录。state中的备份/测试日志及本机settings保持忽略，未实际启用adaptive或部署/真实验收。
+[LAP-19总体计划](tracks/laptop-workbuddy/tasks/LAP-19/PLAN.md)、[自由群聊/表情包合同](tracks/laptop-workbuddy/tasks/LAP-19/GROUP_CHAT_PLAN.md)与[medium执行指引](tracks/laptop-workbuddy/tasks/LAP-19/IMPLEMENTATION_GUIDE.md)详细规划完成，10份文档/143个本地链接/21个任务ID及隐私/差异检查通过，准备Git交付。CodeBuddy和PC均保留、配置cmd手动切换、共用按需联网；自由群聊/真实@必答/直接群发/QQ收藏与本地表情均已规划，额度由用户后续观察。实施17→18→20→21，每会话一项，均待后续指令。
 
-[LAP-16](tracks/laptop-workbuddy/tasks/LAP-16/HANDOFF.md)已独立实现/离线通过，见[报告](reports/lap-16-2026-10-17.md)：一次生成/有限分条、事件ACK、逐条账本、部分历史修复/启动恢复和有界发送队列落地；124项单元、40组实际框架合成回环及原SDK/gate回执/并发/准入/恢复通过。缺项仍single，adaptive须操作者显式配置；本机设置未改，未启停/真实推理/群发或部署，当前运行状态未知。
+本轮SSH只读确认Ollama0.40.5、`qwen3.5:9b-q4_K_M`已安装/加载、当前16K上下文、回环监听；固定既有主机指纹的direct-tcpip读取版本成功。见[PC交接](tracks/local-5070/HANDOFF.md)。模型由用户安装，本轮没有生成/远程修改/启停/下载。搜索候选Bing RSS取得记录，但相关性/时效未验，DDG遇验证码；接口200不代表联网功能通过。
 
-LAP-15人设正文保持。single组合3618字节/原版本不变，adaptive组合4563字节；切模式/生成限额会开启新上下文，旧历史保留。真实QQ ACK/多人/关闭中发送、P01风格和完整文本交付未验。下一步由用户指定启用/真实范围；LAP-17/18未领取，旧LAP-10/13及真人差额保留。
+方案保持笔记本唯一QQ入口、PC只做Ollama推理，分别保存参数、停机切换重启生效、无自动fallback；检索为网关共用受控能力，CLI/AstrBot工具隔离保留。计划未实施，本轮不改代码/本机配置/人设，不启停或探活bot、不登录QQ/CodeBuddy、不推理/群发；当前bot运行状态未知。Git按[AGENTS长期授权](AGENTS.md)提交推送，交付不等于部署或真实验收。
 
-LAP-15内容提交`632fdc5`已推送origin/main，2026-10-17 11:09用ls-remote核对完整SHA一致，已跟踪工作区无剩余差异；原文备份/本机diff/框架scratch工件均忽略保留。随后仅同步本交付记录，未部署或真实验收。
-
-[LAP-15](tracks/laptop-workbuddy/tasks/LAP-15/HANDOFF.md)已按用户指令独立实施、离线通过，见[报告](reports/lap-15-2026-10-17.md)：完整备份原persona后统一40行角色/9个人工场景，组合prompt3618 UTF-8字节；108项单元、5组实际框架合成回环及入口/历史/版本迁移通过。固定政策/共用compose代码保持，仍单条纯文本、当前CLI/模型/账号/预算/真实@和工具隔离。
-
-未启停/探活真实bot、登录、推理或群发，当前运行状态未知；真实加载/P01用户接受与完整文本交付未验。下次协调加载会因persona版本变化新建当前上下文，旧历史保留。LAP-16当前结果见顶部；LAP-17/18未领取，下一范围由用户指定。既有[LAP-14详细计划](tracks/laptop-workbuddy/tasks/LAP-14/PLAN.md)及[实施指引](tracks/laptop-workbuddy/tasks/LAP-14/IMPLEMENTATION_GUIDE.md)保留。
-
-用户正在自行部署家庭5070，并追加明确授权SSH只读查看配置/选型：已确认Windows10、7800X3D、约32GB内存、RTX5070/12227MiB、Ollama0.40.5；10:50快照模型列表为空。首选候选Qwen3.5-9B Q4_K_M，4B为轻量备选，见[PC选型证据](tracks/local-5070/MODEL_SELECTION.md)。家庭入口/账户和加密凭据仅本机忽略记录，与工作环境隔离；未下载/加载/推理或改PC服务。LAP-17后端/群聊参与仍待独立规划，不能把SSH盘点当部署或放开@。
-
-用户新增联网检索/网页读取为中优先级LAP-18，排在人设/分条之后，提供方/引用/预算/工具边界另规划；当前工具隔离保持。旧LAP-10/13及真人验收差额保留。Git交付沿用AGENTS长期授权；LAP-15提交不含原文备份、本机配置或家庭访问资料，不代表部署/真实验收。
-
-以下为LAP-13交付检查点：
-
-用户后续“执行吧”授权实施[LAP-13控制台交互](tracks/laptop-workbuddy/tasks/LAP-13/HANDOFF.md)。本轮**已实现/离线通过**：配置分组菜单、TTY切页清屏/结果等待、逐项格式/范围/单位说明、能力驱动的强度编号映射，以及每次启动/重复/失败分支固定NapCat地址；[实施报告](reports/lap-13-2026-10-17.md)记录108项测试、中文空格路径/外部CWD实际配置入口通过，真实终端视觉接受待用户体验。
-
-只更新控制台脚本、配置cmd及相关测试/文档；没有启停/探活当前bot、改settings.local、登录、真实推理或群发。用户persona原有245行未提交增量及内容hash核对保留，不纳入提交。本机预算不回默认；没有改变账号/模型/后端/额度/权限或预算算法。用户重新打开配置cmd即可使用新交互，无需为菜单改动重启bot；启动URL下次自行启动时显示。已有提交/推送授权沿用。
-
-LAP-10能力缺口及原真人验收差额保留，不将菜单支持项当模型真实生效/计费证据。当前bot运行状态未经本轮探测；下段停机结论仅为上轮历史。
-
-以下为上次LAP-12实施/停机历史检查点：
-
-上轮按用户指令实施[LAP-12](tracks/laptop-workbuddy/tasks/LAP-12/HANDOFF.md)，23:43登记领取；**已实现/离线及本机无推理启停通过，后台已按要求关闭，留给用户自行试用。** 开始时main工作区干净，沿用本会话提交/推送授权。结果见[LAP-12报告](reports/lap-12-2026-10-16.md)：97项单元测试、实际框架路由/保存发送回归、中文空格路径cmd调度及本机启动/重复启动/两入口停止通过。
-
-新启动/关闭/状态cmd、共用OS锁、幂等生命周期、实例停止准入、动态后代清理/失败身份保留、QQ/模型分层状态已落地。新组件曾保持暂停准入加载LAP-09—12，模型not_probed且0CLI；QQ为waiting_login，未要求用户登录。最终所有受管进程退出，6185/6199/6200/6099/8765无监听，15个外部QQ/WorkBuddy创建身份全部存活，任务库仍completed=9/failed=1。真实模型/群消息均为0；没有修改settings.local.yaml、日常QQ或WorkBuddy全局配置。
-
-用户自行试用：双击根目录“启动机器人.cmd”，按提示在本机NapCat登录，再用“查看状态.cmd”确认QQ已连接后真实@；用完“关闭机器人.cmd”。新组合人设版本下次请求开启新上下文，旧历史保留。实际扫码恢复、QQ基本操作、真实模型/ACK中停机、群回归和P01最终人设接受仍待用户参与，不写完整验收通过。
-
-**文字核心已有历史证据，完整文本交付未完成。** LAP-09/11实现和离线证据保留；LAP-12只完成有证据的离线/本机部分。LAP-10原生窗口未证实、CLI强制压缩/内部恢复缺口仍需回规划，不将一次CLI当严格一次上游API，见[LAP-10报告](reports/lap-10-2026-10-16.md)。未扩大实际预算或换模型/账号/额度来源；当前只推进笔记本，PC不启动。
-
-历史实现4560ab6、LAP-09的fc20133、LAP-10的b19b050、LAP-11的d00d11f均已推送origin/main。历史G0/G1/G2/G3及G4单条/无@/两轮口令有证据；真人多人/三轮/恢复长稳尚有差额。LAP-01旧trace与未登录的跨层因果仍缺技术证据，保留并入LAP-12，不为旧错误重复推理。完整历史从各任务交接恢复。
-
-LAP-12实现交付提交`16c6fd6`已成功推送origin/main；随后仅同步交付检查点。最终再次核对后台stopped、所有受管身份退出、五端口无监听；当前保持关闭，供用户自行启动。
-
-LAP-13实现提交`ee7f2d4`已成功推送origin/main；随后仅同步交付检查点。108项全套及末次菜单10项通过，117个链接/差异检查通过；未操作真实bot，用户persona仍保持原有未提交改动。
+已有[LAP-15人设](tracks/laptop-workbuddy/tasks/LAP-15/HANDOFF.md)与[LAP-16一次生成/有限分条](tracks/laptop-workbuddy/tasks/LAP-16/HANDOFF.md)实现及离线证据保留；adaptive未实际启用。LAP-16有124项单元、40组实际框架合成回环及原SDK/gate回执/恢复证据；内容2a2bb93、交付记录391be0f已在origin/main，本轮开始HEAD391be0f且工作区干净。LAP-19不改变旧运行/真实验收结论。
 
 ## 已确认的全局需求
 
-- 当前优先笔记本WorkBuddy/CodeBuddy CLI。用户正在自行部署家庭RTX5070小LLM，本项目已按追加授权完成SSH只读盘点/初选；模型接入和群聊参与排入近期后续规划，不重复安装已有Ollama、不因旧“周末”计划自动部署。
-- 使用闲置个人 QQ 账号，不能替换成 QQ 官方机器人。
-- 笔记本使用 WorkBuddy 登录账号的订阅/免费额度，不能擅自改为额外付费 API。
-- 第一阶段只接指定群，只在消息中真实 @bot 时回复。
-- 支持自定义人设和连续聊天；视频先支持 B站，输出内容大意和要点。
-- 文本优先，B站/ASR低优先级；当前默认Deepseek-V4.1-Flash。用户最新要求本机可显式配置模型、模型上下文输入上限、推理强度；聊天记忆轮数为辅助，额度不必极限节省。仍不自动换模型、账号/站点或额度来源。
-- QQ答复采用自然纯文本，无Markdown格式；方便配置授权群和全局用户黑名单，一键脚本启停；保留日常QQ实例隔离，不承诺平台同号登录绝对互不影响。
-- 人设参考用户指定Obsidian人设v2，采用鲸鱼娘/鱼片称呼和口语；当前仍单条、无旁听/概率/喊名/冷场冒泡。2026-10-17新增日常简练并有限多气泡、认真问题按需完整作答的需求，LAP-15/16已实现/离线通过，adaptive未实际启用；长期参与未@群聊等待后续独立规划和授权。
-- 视频以字幕/语音为内容证据；暂不要求细粒度画面理解。
-- 联网检索与网页读取为中优先级，后续独立规划；答复来源可追溯，调用/页数/内容上限明确，不擅自增加付费API或直接放开CLI全部工具。
-- 新功能先由gpt-6.1-sol/max及以上规划并落盘，再由gpt-6.1-sol/medium按用户后续指令实施；一个session一个任务，以可验证阶段结果推进。
+- 使用闲置个人QQ，不能替换成QQ官方机器人；仅指定授权群，私聊关闭。当前实现仅真实@；后续free显式启用后可自然参与非@聊天，真实@绕过自发沉默/冷却必须进入回应流程。黑名单在入口先过滤，不进入框架/群窗口/模型/新增历史。
+- 笔记本沿用同账号同站点CodeBuddy CLI订阅/免费额度，默认保留deepseek-v4.1-flash，不增付费API；不保证免费。真实credits缺少证据就标未知，不把token或占位0当积分。
+- 家庭RTX5070上的Qwen3.5 9B Q4_K_M由用户安装；两路线均保留，比较效果和消耗后由操作者选择，不自动换模型/账号/后端/额度来源。不重装Ollama或执行旧周末全套迁移预案。
+- 配置cmd将提供后端切换/共用联网设置，分别保留参数。原生上下文/思考与保守输入字节预算口径分开；schema3迁移/只读检查/回滚详见LAP-19，当前仍为旧单CLI实现。
+- QQ正文自然纯文本，有限气泡仅显式adaptive；后续21允许已登记表情图，20起所有模式直接群发、无引用/自动@。角色为鲸鱼娘/鱼片和口语，认真问题完整回答，不靠人设扩大能力。自由参与已在20详细规划，不使用概率/关键词唯一触发；无新消息的定时冷场发言未规划。
+- 两后端共用按需联网，来源可追溯，调用/页数/大小/超时有界，网页材料与指令隔离；升级默认web关闭，真实启用另执行。候选搜索质量不足回规划，不临时增加付费API或放开CLI全部工具。
+- mentions连续聊天按群/用户隔离；后续free采用每群/epoch独立RAM窗口，不把旧个人历史公开到群上下文。B站/ASR低优先级，不以标题代替视频正文；发送表情不代表接入收到图片/视频的理解。
+- 启停只操作有创建身份的项目进程和受管子进程，不按QQ/Node/Python进程名批量结束，不改日常QQ/WorkBuddy全局配置。健康检查不生成模型内容。
+- 家庭地址/账号/凭据只放项目忽略secrets，本机使用、不输出/提交、不进入全局记忆、不复用于工作环境；原始私密群消息和本机运行配置继续排除。
+- 新功能先由AGENTS指定模型/max及以上规划，再由指定模型/medium按后续指令实施。会话设置由用户选择，不声称自动检测或切换；一个session一个任务。
 
-## 当前结论
+## 当前技术结论
 
-调研后推荐共用底座为 NapCat + 严格反向WS入口 + AstrBot。当前接入已选用户新装且确认同账号同站点的官方CodeBuddy CLI2.168.0；桌面内置CLI失败记录保留，ACP不进入主线。MCP 工具可调用不等于 QQ 入站可自动唤醒。独立CLI账号调用/工具隔离/历史/超时恢复已实测，精确额度扣减和最终无人值守能力尚未核验。
+共用底座NapCat + 严格反向WS入口 + AstrBot，现有唯一后端为官方CodeBuddy CLI2.168.0。MCP可调用不等于QQ入站自动唤醒；CLI账号调用/隔离/历史有旧真实证据，精确积分与完整无人值守仍未核验。LAP-10的原生窗口/强制压缩/内部恢复缺口保留，一次CLI启动不等于严格一次上游API。
 
-## 阅读顺序
+LAP-19拟用SSH访问PC回环Ollama原生chat并在网关共用检索；尚未新增runner、配置schema或联网政策。PC元数据/通道通过与模型生成/人设/群验收是不同阶段。
 
-1. [项目准则](AGENTS.md)和[笔记本当前交接](tracks/laptop-workbuddy/HANDOFF.md)。
-2. [任务台账](tracks/laptop-workbuddy/TASKS.md)，确认本session唯一任务和负责人；最新人设/分条需求见[LAP-14计划](tracks/laptop-workbuddy/tasks/LAP-14/PLAN.md)，既有实现合同见[UX_PLAN](tracks/laptop-workbuddy/UX_PLAN.md)。
-3. 按任务读取规格、验收项和证据；全局背景按需查[需求](docs/REQUIREMENTS.md)与[调研](docs/RESEARCH.md)。
+## 阅读顺序与下一步
+
+1. [AGENTS](AGENTS.md)→本入口→[笔记本HANDOFF](tracks/laptop-workbuddy/HANDOFF.md)与[TASKS](tracks/laptop-workbuddy/TASKS.md)。
+2. 新需求读[LAP-19 HANDOFF](tracks/laptop-workbuddy/tasks/LAP-19/HANDOFF.md)、[PLAN](tracks/laptop-workbuddy/tasks/LAP-19/PLAN.md)、[GROUP_CHAT_PLAN](tracks/laptop-workbuddy/tasks/LAP-19/GROUP_CHAT_PLAN.md)与[复制指令](tracks/laptop-workbuddy/tasks/LAP-19/IMPLEMENTATION_GUIDE.md)，本地再读[PC交接](tracks/local-5070/HANDOFF.md)。后续17→18→20→21，每项独立领取，不在17顺手放开非@。
+3. 涉及已有输出/ACK路径再查[LAP-16交接](tracks/laptop-workbuddy/tasks/LAP-16/HANDOFF.md)、[LAP-15交接](tracks/laptop-workbuddy/tasks/LAP-15/HANDOFF.md)及[LAP-14原合同](tracks/laptop-workbuddy/tasks/LAP-14/PLAN.md)/[实施指引](tracks/laptop-workbuddy/tasks/LAP-14/IMPLEMENTATION_GUIDE.md)，不重新领取已交付任务。全局背景见[需求](docs/REQUIREMENTS.md)/[调研](docs/RESEARCH.md)。
+4. 不重复硬件盘点/安装、旧trace推理或全部真人基线；受影响路径按新任务回归。当前bot状态未知，真实模型/群验收和启停须登记执行归属。
 
 ## 工作线索引
 
 | 工作线 | 状态 | 最近更新 | 下一步 | 交接入口 |
 | --- | --- | --- | --- | --- |
-| 笔记本 WorkBuddy | active，LAP-16已实现/离线通过；真实待验 | 2026-10-17 11:35 | 用户指定adaptive启用/真实接受范围；联网LAP-18中优先级 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [任务台账](tracks/laptop-workbuddy/TASKS.md) / [实施指引](tracks/laptop-workbuddy/tasks/LAP-14/IMPLEMENTATION_GUIDE.md) |
-| 家庭5070 PC本地模型 | planned，用户自部署中；SSH只读盘点/初选完成，项目接入未开始 | 2026-10-17 10:57 | 复用已有Ollama，后续LAP-17独立后端能力/接入规划；未做推理 | [HANDOFF](tracks/local-5070/HANDOFF.md) / [模型选择](tracks/local-5070/MODEL_SELECTION.md) |
+| 笔记本 WorkBuddy / 共用网关 | active；LAP-19仅规划，LAP-15/16已实现/离线通过 | 2026-10-17 15:21 | 按指引17→18→20→21；adaptive真实启用另列 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [新计划](tracks/laptop-workbuddy/tasks/LAP-19/PLAN.md) |
+| 家庭5070 PC本地模型 | planned；用户已装/加载，SSH元数据/回环转发通过，项目尚未接入 | 2026-10-17 15:21 | LAP-17接入/配置切换，复用Ollama，本轮0生成 | [HANDOFF](tracks/local-5070/HANDOFF.md) / [选型历史/最新快照](tracks/local-5070/MODEL_SELECTION.md) |
 
-已登记的任务级交接：[LAP-08 体验改进规划](tracks/laptop-workbuddy/tasks/LAP-08/HANDOFF.md)、[LAP-09 配置准入实施](tracks/laptop-workbuddy/tasks/LAP-09/HANDOFF.md)、[LAP-10 参数与预算](tracks/laptop-workbuddy/tasks/LAP-10/HANDOFF.md)（部分完成/能力缺口待规划）、[LAP-11 纯文本与人设v2](tracks/laptop-workbuddy/tasks/LAP-11/HANDOFF.md)（实现/离线通过，真实待验）、[LAP-12 启停与分层状态](tracks/laptop-workbuddy/tasks/LAP-12/HANDOFF.md)（已实现/本机启停通过，停机为历史检查点）、[LAP-13 配置控制台交互](tracks/laptop-workbuddy/tasks/LAP-13/HANDOFF.md)（已实现/离线通过，视觉接受待验）、[LAP-14 人设与分条规划](tracks/laptop-workbuddy/tasks/LAP-14/HANDOFF.md)（仅规划完成）、[LAP-15 精简人设与场景表达](tracks/laptop-workbuddy/tasks/LAP-15/HANDOFF.md)（已实现/离线通过，真实待验）、[LAP-16 一次生成与有限分条](tracks/laptop-workbuddy/tasks/LAP-16/HANDOFF.md)（已实现/离线通过，未实际启用）。其余实施任务领取时再建立独立HANDOFF，不批量创建空文件。
+已建立任务交接：[LAP-08规划](tracks/laptop-workbuddy/tasks/LAP-08/HANDOFF.md)、[09配置/准入](tracks/laptop-workbuddy/tasks/LAP-09/HANDOFF.md)、[10预算/参数](tracks/laptop-workbuddy/tasks/LAP-10/HANDOFF.md)、[11纯文本/人设](tracks/laptop-workbuddy/tasks/LAP-11/HANDOFF.md)、[12启停/状态](tracks/laptop-workbuddy/tasks/LAP-12/HANDOFF.md)、[13配置控制台](tracks/laptop-workbuddy/tasks/LAP-13/HANDOFF.md)、[14人设/分条规划](tracks/laptop-workbuddy/tasks/LAP-14/HANDOFF.md)、[15精简人设](tracks/laptop-workbuddy/tasks/LAP-15/HANDOFF.md)、[16一次生成/分条](tracks/laptop-workbuddy/tasks/LAP-16/HANDOFF.md)、[19双后端/联网规划](tracks/laptop-workbuddy/tasks/LAP-19/HANDOFF.md)。17/18/20/21实施未领取，不预建空交接。
 
-## 多session任务管理
+## 必须保留的验收差额
 
-- PROGRESS.md是唯一项目入口；工作线HANDOFF保存当前检查点，[TASKS.md](tracks/laptop-workbuddy/TASKS.md)保存任务状态、依赖、负责人和验收出口。一个session只推进一个已领取任务。
-- 领取时先写任务ID、session标识/标题、开始时间和涉及文件；实施任务在首次领取时建立独立任务HANDOFF，并在本入口和台账登记链接。结束或交接时同步证据、未完成项和下一步，不能只在聊天里报告。
-- 共同工作区的文档登记不提供文件锁；不得覆盖其他session未提交修改。修改同一文件、共用真实模型测试或启停同一bot实例前，先协调执行归属；没有登记不代表没有其他session。
-- “已实现”“离线通过”“真人实测通过”“完整验收通过”分开记录。新想法先记需求，再分配新任务或明确调整旧任务，不把原有未完成项抹掉。
+- LAP-10部分完成：选定DeepSeek/high有真实证据，原生窗口未证实，CLI force压缩/内部恢复未排除；不改写为严格一次上游推理，见[报告](reports/lap-10-2026-10-16.md)。
+- LAP-09授权群/黑名单真实缺项、LAP-11/15最终P01风格接受、LAP-13终端视觉接受、LAP-16真实QQ ACK/多人/关闭中发送和adaptive启用均未由本轮补齐。
+- LAP-02/03/04/05真人交错/隔离/三轮记忆/重置/长稳/完整文本交付保留。旧G4仅单条/无@/两轮口令有证据，两小时混合文本/视频完整验收不以离线代替；见[TASKS验收差额](tracks/laptop-workbuddy/TASKS.md#验收差额)。
+- LAP-12最后全停/端口关闭是历史检查点，不能推断用户试用后状态；当前未探活bot。旧失败trace上游根因缺完整证据，不为旧错误循环消费额度。
+- LAP-06/07视频/ASR延期；原LAP-17未@分支已明确转入LAP-20计划，尚未实现/启用。新后端/联网/free/表情包尚无真实生成/群验收，PC已加载或NapCat静态API存在不等于项目已交付。
+
+## 多session与Git交付
+
+PROGRESS保存全局结论，工作线HANDOFF保存当前检查点，TASKS登记唯一任务/负责人/文件归属。领取后建任务HANDOFF并双向链接，结束前更新完成、剩余、文件和验证，区分已规划/已实现/离线通过/真实通过/完整验收。Markdown台账无锁，同文件不明修改、真实模型/群操作和bot启停先协调，不覆盖其他session。
+
+长期授权允许在可审阅检查点自行commit/push，规划也须Git交付。只提交本任务检查过的文件，推送后核对完整SHA与对应远端分支、报告保留差异；凭据/本机配置/原始私密消息排除，详细以AGENTS为准。
 
 ## 最近里程碑
 
-- LAP-16一次生成/有限分条、事件回执/历史修复及启动恢复已实现/离线通过；缺省single，本机adaptive未启用，真实接受未验。
-
-- LAP-15人设整理已实现/离线通过：原文完整hash备份，组合3618字节；108项单元及实际框架回环/版本迁移通过，真实加载/P01仍未验。
-
-- LAP-14 v2完成详细行为/配置合同和medium逐步实施指引；用户追加授权的家庭PC SSH只读盘点/候选模型选择有证据，远程修改/模型请求0；联网LAP-18登记中优先级。bot新功能未实施，persona增量保留。
-
-- LAP-12一键入口/生命周期/分层状态落地；97项单元及框架回归通过，暂停准入本机启动0CLI、重复启动同实例、最终关闭/五端口无监听，外部15身份保留。真人登录/QQ操作/群验收仍待补。
-
-- LAP-11网关纯文本、固定政策/人设v2、框架原文保留和版本迁移落地；82项单元、5组实际框架回环和入口反例通过，真实群ACK/P01未验，未部署。
-
-- LAP-10独立预算/模型/强度菜单完成；70项离线及实际框架预算回归通过，DeepSeek/high修复后本机provider成功。累计真实CLI3次（含零推理探针）、4控制、2user消息，首次解析失败证据保留；不当作严格上游API计数。原生窗口/force压缩缺口待规划，未部署。
-- LAP-09配置工具/共享校验/原子保存/黑名单前置过滤完成；53项离线测试及实际框架回归通过。U04—07真实差额保留，当时未重启实例；真实差额继续保留。
-- 已编写体验改进详细计划及AGENTS分工准则，拆为LAP-09—12实施；原真人隔离、人设接受、恢复/长稳和文本交付任务保留，旧LAP-01并入登录/状态提示。
-- 上次21:35快照确认21:02失败后4条completed；用户补充NapCat未登录的现场情况，本轮没有重复推理探测。
-- 实现提交4560ab6已中文commit并push到origin/main；info.txt保留本机并停止跟踪，既有历史凭据问题已提醒，不改写历史。
-- G4真实单条回复、无@静默及修复后口令两轮通过；39项离线测试及额外框架集成通过。修复At昵称查询兼容和CLI自动记忆DSML输出，见[G4报告](reports/g4-2026-10-16.md)。真实多人和长稳待验。
-- G3真实AstrBot provider调用与单次尝试边界通过，见[G3证据](reports/g3-2026-10-16.json)。
-- G0可行性、G1隔离环境、G2严格通道及真实握手完成；详细证据从活动线HANDOFF进入。视频/ASR/PC未部署。
-
-## 恢复工作时的第一步
-
-先读AGENTS→本入口→笔记本HANDOFF/TASKS→LAP-14 HANDOFF/PLAN/IMPLEMENTATION_GUIDE。LAP-15已独立实现/离线通过，先读其HANDOFF及报告；LAP-16也已独立实现/离线通过，先读其HANDOFF/报告；后续由用户指定启用/真实范围，不重复领取LAP-15/16。会话设置由用户选择，不伪称检测/切换。当前bot状态未经本轮探测，不自动启停/推理/群发或放开@。PC硬件/Ollama盘点已有证据，从其HANDOFF/MODEL_SELECTION恢复，不重做登录探测或安装；后端/联网另规划。LAP-10/13及旧真人差额保留，视频/ASR不推进。
+- LAP-19四项详细设计/medium复制指令落盘；PC/SSH有只读证据，黑名单直接过滤与收藏API静态核对，0生成/群发/运行修改；联网候选/QQ表情均未真实功能验收。
+- LAP-16一次生成/有限气泡、事件回执/历史修复/启动恢复实现并离线通过；缺省single，adaptive未启用。
+- LAP-15角色正文整理完成，组合3618字节；原文hash备份本机忽略，真实风格接受未验。
+- LAP-12一键生命周期本机无推理验证有历史证据；LAP-13配置交互实现/离线通过，真实终端接受待验。
+- G0—G4和LAP-09—11技术/群文本基线可从工作线及各任务恢复，不等同完整第一版文本/视频交付。

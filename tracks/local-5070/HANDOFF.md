@@ -1,33 +1,32 @@
 # 5070 PC 本地模型工作线
 
-返回全局入口：[PROGRESS.md](../../PROGRESS.md)。继承全局规则与需求。
+返回[PROGRESS](../../PROGRESS.md) / [LAP-19计划](../laptop-workbuddy/tasks/LAP-19/PLAN.md) / [TASKS](../laptop-workbuddy/TASKS.md)。继承[AGENTS](../../AGENTS.md)，家庭访问与工作环境隔离。
 
-状态：planned，**用户自行部署中，项目SSH只读盘点/模型初选完成；后端接入未开始**。更新时间：2026-10-17 10:56（Asia/Shanghai）。当前实施优先级仍是笔记本CodeBuddy CLI；本轮只完善LAP-14规划，不领取PC实施任务。
+更新时间：2026-10-17 15:21（Asia/Shanghai）。状态：planned；**用户已完成模型安装并加载，项目只读元数据/SSH回环转发通过，后端尚未接入**。LAP-19仅规划，后续17本地接入/切换→18共用联网→20自由群聊→21表情包，详见[追加合同](../laptop-workbuddy/tasks/LAP-19/GROUP_CHAT_PLAN.md)和[执行指引](../laptop-workbuddy/tasks/LAP-19/IMPLEMENTATION_GUIDE.md)；free已纳入本轮规划，未启用。
 
-## 目标
+## 最新已验证事实
 
-在家庭RTX5070上复用用户自行部署的本地推理能力，未来沿用笔记本的人设/输出/预算和严格入口合同。当前先文本，B站/ASR仍低优先级；未@群聊参与需独立扩大读取/触发的规划和授权，不因模型在本地就自动开启。
+2026-10-17 14:53:59 +08:00，通过既有家庭SSH凭据和固定既有SHA256主机指纹，只读得到：
 
-## 已知与未知
+- Ollama0.40.5，11434监听分类仅loopback；已装`qwen3.5:9b-q4_K_M`，GGUF/Q4_K_M/9.0B，6550825550字节。
+- digest为`56671c2ab9385f9cfcb404638e32cd62d88e3501d44822208363c010179a3c90`；模型已加载，context_length=16384，size_vram=6147423600字节；RTX5070整卡显存快照7019/12227MiB。
+- show允许think:false/true，默认true，标称窗口262144；completion/vision/tools/thinking只是元数据声明，本项目不因此启用视觉或工具。
+- SSH direct-tcpip访问PC127.0.0.1:11434的GET /api/version返回200，未建立持久本地转发监听。
 
-用户说明家庭小LLM正在自行部署，并明确允许SSH只读查看配置和选型；与工作环境无关。入口/账户及Windows当前用户DPAPI保护的凭据仅在本机忽略secrets/home-5070-access.local.md，不进入本文件或全局工作记忆。
+本机忽略证据state/lap19-pc-metadata.local.json。既有known_hosts为空，首次严格检查拒绝；随后使用10:50盘点留存指纹，认证前比对通过才连接，不自动信任新指纹、不改SSH配置。入口/账号/DPAPI凭据仅在忽略secrets，未输出/提交；临时Paramiko只在uv隔离环境。
 
-本轮SSH已真实连通；实机是Windows10/19045、Ryzen7 7800X3D 8核16线程、系统可见31.16GiB内存、RTX5070总显存12227MiB、驱动576.88；Ollama0.40.5正在运行，10:50:29快照tags/ps为空。细节与来源见[MODEL_SELECTION](MODEL_SELECTION.md)；本机原始结构证据位于忽略的state/home-5070-inventory-2026-10-17.json。笔记本RTX4060不能当PC证据。
+旧10:50硬件盘点Windows10/7800X3D/约32GB/RTX5070和[MODEL_SELECTION](MODEL_SELECTION.md)保留；当时空tags已由新观测更新，不能再据此说未安装。模型安装/加载由用户完成，本轮只读查看，不读取私人聊天或工作文件。
 
-未知/未验：实际GPU推理、峰值VRAM、模型人设/速度、模型digest、原生上下文/关闭思考、局域网监听与鉴权、项目后端兼容。空tags是当时快照，不断言用户之后仍未下载。
+## 已规划的接入合同
 
-## 初步路线
+保留笔记本唯一NapCat/gate/AstrBot/模型网关，PC只提供Ollama；CLI不依赖PC在线。本地原生chat走固定SSH通道，单次POST/单并发、think:false、请求级num_ctx初始16K/生成1024，实际生效/资源仍待验证。配置cmd分别保留两套参数，停机保存/重启生效/手动切换，失败不自动换后端；切换新建当前上下文，旧历史保留。
 
-当前首选候选Ollama + Qwen3.5-9B Q4_K_M（明确tag qwen3.5:9b-q4_K_M），先8K上下文/单并发/关闭思考；4B Q4为轻量备选，不自动混用。官方包大小与参数依据见[选型报告](MODEL_SELECTION.md)；没有下载/加载/推理，不宣称速度或人格效果通过。
+PC使用前提是开机不睡眠、Ollama后台运行、SSH可达；接入完成后不要求一直开ollama run聊天窗口。停机器人只释放本项目连接，不关闭用户Ollama。联网由笔记本网关共用受控检索，打开本地Ollama本身不会自动赋予搜索；提供方/质量/预算/来源/失败处理见LAP-19。
 
-后续优先评估保留笔记本单一QQ入口、PC只提供模型，以复用已有部署；受控网络连接/鉴权及两机在线条件在LAP-17明确。旧全套迁PC拓扑保留为选择，不能直接执行历史Ollama重装/Qwen3-8B预案。
+原[DEPLOYMENT_PLAN](DEPLOYMENT_PLAN.md)全套迁PC/Qwen3-8B/周末预案为历史，不直接执行；原模型选择8K候选由LAP-19按当前16K加载更新为新的试验起点，未实际改参数或承诺速度。
 
-## 下一步
+## 未验证与下一步
 
-先由用户后续指令实施笔记本LAP-15/16。用户自行部署完成或要求转入本地接入时，先读[MODEL_SELECTION](MODEL_SELECTION.md)，以已有Ollama/模型为基线做LAP-17能力与后端合同规划；不重复安装、不打断其他session部署。同一QQ账号只有一个活动回复入口。
+未验证项目模型生成、think:false/结构化输出/实际窗口、峰值显存/速度/风格、超时后远端停止、联网质量或QQ接入。加载/GET成功不能代替这些验收；本轮远程修改/下载/安装/启停/模型生成0，当前bot状态未探测。
 
-[DEPLOYMENT_PLAN](DEPLOYMENT_PLAN.md)已加本次协调更新；其旧周末全套迁移/模型段落为历史预案。联网工具列LAP-18中优先级，与本地接入独立排期；PC模型连通不构成放开bot联网/旁听的授权。
-
-## 验证状态
-
-已验证：SSH连通、硬件/磁盘/GPU驱动读数、Ollama进程和回环元数据GET。未验证：任何模型生成或QQ接入。两次SSH盘点（首轮输出编码解析失败、第二轮成功）；远程修改0、模型生成0、下载/安装/服务启停0，用户现有部署保留。当前bot运行状态不探测。后续真实推理与部署须在明确任务范围内登记归属。
+后续17先完成schema3/profile/菜单/SSH原生runner与离线回归，18独立联网，20/21按追加合同实现自由参与/表情。真实推理/群启用按后续范围登记；不把仅规划的free当当前已放开准入，不关闭旧验收差额。

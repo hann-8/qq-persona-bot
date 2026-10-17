@@ -2,13 +2,15 @@
 
 返回[全局入口](../../PROGRESS.md) / [工作线交接](HANDOFF.md)。继承[AGENTS](../../AGENTS.md)；本轮体验增量合同见[UX_PLAN](UX_PLAN.md)，原规格见[实施计划](IMPLEMENTATION_PLAN.md)，通过标准见[验收矩阵](ACCEPTANCE.md)。
 
-更新时间：2026-10-17 11:35（Asia/Shanghai）。LAP-16已实现/离线通过，124项单元、40组实际框架合成回环与原SDK/gate回执、并发/启动恢复/准入通过；single兼容，本机adaptive未启用，真实加载/群ACK/风格未验，当前运行状态未知。未启停/探活真实bot、登录、真实推理/群发；LAP-17/18未领取，旧LAP-10/13/真人差额保留。
+更新时间：2026-10-17 15:21（Asia/Shanghai）。LAP-19总体/自由群聊表情包详细合同/medium指引已落盘，待文档检查/Git；实施顺序17→18→20→21，均待后续指令。PC模型/SSH只读通过，黑名单直接过滤及NapCat收藏API静态核对，本轮0生成/远程修改/群发；搜索质量/用户收藏未验。bot未探活，运行状态未知。LAP-16离线/未实际启用adaptive和旧LAP-10/13/真人差额保留。
 
 LAP-12的97项离线/本机启停及16c6fd6/0d9d309推送为历史检查点；上次交接时停机，本轮未探测当前运行状态，不假定用户试用后仍停止。旧LAP-10与真人验收差额全部保留。
 
 LAP-13实现提交`ee7f2d4`已成功推送origin/main；随后仅同步交付检查点。108项全套及末次菜单10项通过，117个链接/差异检查通过；未操作真实bot，用户persona仍保持原有未提交改动。
 
 ## 当前任务
+
+LAP-19仅规划：`LAP-19-dual-backend-web-plan` / “双后端、联网、自由群聊与表情包规划”，2026-10-17 14:49领取，15:01首版落盘，随后按用户追加扩为四项合同；[PLAN](tasks/LAP-19/PLAN.md)、[GROUP_CHAT_PLAN](tasks/LAP-19/GROUP_CHAT_PLAN.md)、[复制指令](tasks/LAP-19/IMPLEMENTATION_GUIDE.md)、[HANDOFF](tasks/LAP-19/HANDOFF.md)记录范围/证据/归属。本轮不实施/改运行配置，不启停/模型生成/群发。
 
 LAP-16内容提交`2a2bb93`已推送origin/main，2026-10-17 11:36（Asia/Shanghai）用ls-remote核对完整SHA一致，已跟踪工作区无剩余差异；随后仅同步本交付记录。state中的备份/测试日志及本机settings保持忽略，未实际启用adaptive或部署/真实验收。
 
@@ -34,8 +36,11 @@ LAP-15内容提交`632fdc5`已推送origin/main，2026-10-17 11:09用ls-remote�
 | LAP-14 | 人设落地与分条对话调研规划 | completed，仅v2规划；[HANDOFF](tasks/LAP-14/HANDOFF.md) / [PLAN](tasks/LAP-14/PLAN.md) / [指引](tasks/LAP-14/IMPLEMENTATION_GUIDE.md) | 用户后续明确先规划、CLI优先；另授权SSH只读配置核对 | 同一LAP-14规划会话，10:31首次、10:45续领、10:57规划交接、11:01 Git交付；本任务文档归属 | `c7d2f27`已推送并核对；medium先15后16，bot新功能未实现，persona/私密资料未提交 |
 | LAP-15 | 精简人设与场景表达 | 已实现/离线通过，真实加载/P01未验；[HANDOFF](tasks/LAP-15/HANDOFF.md) / [报告](../../reports/lap-15-2026-10-17.md) | 用户已明确指定；仅本任务，单条保持 | LAP-15-persona-implementation / LAP-15精简人设与场景表达，2026-10-17 11:06领取、11:09离线交接 | 原文完整hash备份；组合3618字节；108单元/5组框架回环及版本迁移通过；用户接受待验 |
 | LAP-16 | 一次生成与有限分条发送 | 已实现/离线通过，未实际启用；[HANDOFF](tasks/LAP-16/HANDOFF.md) / [报告](../../reports/lap-16-2026-10-17.md) | 用户明确继续，LAP-15离线通过 | LAP-16-adaptive-delivery / LAP-16一次生成与有限分条，2026-10-17 11:16领取、11:35离线交接 | 124单元/40框架回环/原SDK-gate ACK及恢复并发通过；single兼容，真实启用/接受另列 |
-| LAP-17 | 本地后端与群聊参与能力规划 | 待后续详细规划；[硬件/Ollama/模型初选资料](../local-5070/MODEL_SELECTION.md)已补 | 家庭PC用户自部署中，CLI仍优先；模型API与未@参与分开授权 | 未领取实施，不预建HANDOFF | 明确API/鉴权/原生预算/思考/质量与回滚；当前无模型推理/接入，不旁听/放开@/自动切后端 |
-| LAP-18 | 联网检索与网页读取能力规划 | 需求已登记，中优先级；用户2026-10-17新增 | 先LAP-15/16；与本地接入独立排期，提供方/费用待核对 | 未领取，不预建HANDOFF | 来源链接可追溯、检索/页数/长度/超时有界、材料与指令隔离；不自动增加付费API或放开CLI全部工具 |
+| LAP-17 | 本地后端/配置切换；原群参与分支转LAP-20 | 已由[LAP-19](tasks/LAP-19/PLAN.md)详细规划，待实施；[PC资料](../local-5070/HANDOFF.md)有模型/通道只读证据 | 两路线保留；先17→18→20→21；群参与明确拆入20不在17启用 | 实施未领取，不预建HANDOFF | schema3/两profile/配置cmd、SSH原生chat/元数据/状态/回滚；离线后按后续范围真实验证 |
+| LAP-18 | 两后端共用联网检索/网页读取 | 已由[LAP-19](tasks/LAP-19/PLAN.md)详细规划，待实施；候选接口探测不等于质量通过 | LAP-17共用backend合同后独立领取；搜索质量门槛先行 | 实施未领取，不预建HANDOFF | 按需自动/来源/预算/安全读取/历史ACK；两后端真实分开验收；候选质量不足回规划，不增付费API或放开CLI工具 |
+| LAP-19 | 双后端/联网/自由群聊/表情包总体详细规划 | 详细规划/文档验证完成，Git待交付；[HANDOFF](tasks/LAP-19/HANDOFF.md) / [PLAN](tasks/LAP-19/PLAN.md) / [追加合同](tasks/LAP-19/GROUP_CHAT_PLAN.md) / [指令](tasks/LAP-19/IMPLEMENTATION_GUIDE.md) | 用户明确只规划、后由gpt-6.1-sol/medium执行；17/18与追加20/21均在此设计 | LAP-19-dual-backend-web-plan / 四项总体规划，2026-10-17 14:49领取；文件归属见HANDOFF | 10份文档/143链接/21唯一ID/隐私与diff检查通过，完成commit/push即规划交付；不部署/真实生成/群发 |
+| LAP-20 | 自由参与群聊、@必答与直接群发 | 已详细规划，待实施；[合同](tasks/LAP-19/GROUP_CHAT_PLAN.md) | 17/18共用接口后；原17群参与分支明确拆入，黑名单/群授权保留 | 未领取，不预建HANDOFF | mentions/free、RAM群窗口/合批、一次决策/优先队列、silent拦截、全模式无Reply/自动@、ACK/恢复；真实另验 |
+| LAP-21 | QQ收藏导入/本地表情图库与发送 | 已详细规划，待实施；[合同](tasks/LAP-19/GROUP_CHAT_PLAN.md) | 20统一群发送后；收藏静态支持不当本账号已通过 | 未领取，不预建HANDOFF | 本地inbox/library/目录表、固定只读收藏RPC、meme_id、typed图片/ACK/部分失败/恢复；模型不获任意媒体/账号工具 |
 
 G0可行性、G1环境、G2通道、G3实际provider调用已有证据，见[工作线交接](HANDOFF.md#已验证与重要修复)。这是阶段基线；W02/W10等未真实制造的情形仍按验收矩阵记录，不能据此把完整W/Q/P/O标成通过。G4完整验收归LAP-02/03，G7文本相关部分归LAP-01/04/05。
 
@@ -62,4 +67,4 @@ G0可行性、G1环境、G2通道、G3实际provider调用已有证据，见[工
 
 2026-10-16 21:35前后，只读健康页为ready、router_ready=true、queue=0、active=false、cli_attempts=7，最后模型成功21:21:24。任务库只读计数completed=9、failed=1，最后completed为21:21:25；该计数是处理状态，不是功能验收通过率。21:02失败后的4次成功来自已有试用记录，本会话没有发起推理或群消息。
 
-上段保留21:35历史快照。LAP-08及LAP-09—13历史检查点保留；LAP-14 v2规划/SSH只读盘点初选完成，LAP-15已实现/离线通过、真实未验，LAP-16已实现/离线通过、未实际启用，LAP-17后端详细规划未领取，LAP-18联网登记中优先级。后续新任务从LAP-19起分配编号。任务交接与全局入口双向可达。
+上段为21:35历史。LAP-08/09—14保留；15/16离线通过、真实差额保留、adaptive未启用。最新19统一详细规划17/18/20/21，实施均未领取；原17群参与明确转20，不抹旧需求。新任务从LAP-22起编号，不为尚未领取的实施预建空HANDOFF；任务交接与PROGRESS双向可达。

@@ -1,6 +1,12 @@
 # 家庭5070：本地模型选择与只读盘点
 
-返回[PROGRESS](../../PROGRESS.md) / [PC交接](HANDOFF.md) / [CLI主线计划](../laptop-workbuddy/tasks/LAP-14/PLAN.md)。2026-10-17；当前是选型建议和实机只读盘点，**没有部署、加载模型或做推理验收**。用户正在自行部署小LLM；仍先完成CodeBuddy CLI人设/有限分条，后续再接本地后端。
+返回[PROGRESS](../../PROGRESS.md) / [PC交接](HANDOFF.md) / [最新双后端计划](../laptop-workbuddy/tasks/LAP-19/PLAN.md) / [原CLI主线计划](../laptop-workbuddy/tasks/LAP-14/PLAN.md)。下文保留2026-10-17 10:50的选型/盘点证据；最新状态以上方更新为准。
+
+## 最新快照：模型已由用户安装/加载
+
+2026-10-17 14:53:59 +08:00只读核对：Ollama0.40.5已列出并加载`qwen3.5:9b-q4_K_M`，9.0B/GGUF/Q4_K_M，digest `56671c2ab9385f9cfcb404638e32cd62d88e3501d44822208363c010179a3c90`；当前context_length=16384，整卡显存7019/12227MiB。SSH固定既有指纹访问回环11434成功，监听仅loopback，show允许think:false/true且默认true。新证据在本机忽略state/lap19-pc-metadata.local.json；本轮没有模型生成或远程修改。
+
+用户要求两条路线都推进并支持配置cmd手动切换与共用按需联网，详细合同已转入LAP-19。其本地num_ctx候选以已加载16K作为新试验起点，下面8K等为先前建议；尚未写项目参数或验证思考/速度/结构化输出/人设质量。下文“tags为空/用户正在部署/先15后16”均是10:50的历史状态，不能用来覆盖最新事实；项目后端接入仍未实施。
 
 ## 1. 授权、数据和已验证事实
 
