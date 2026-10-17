@@ -2,7 +2,7 @@
 
 返回[全局入口](../../PROGRESS.md)。继承[AGENTS](../../AGENTS.md)；原规格见[实施计划](IMPLEMENTATION_PLAN.md)，本轮体验改进执行[UX_PLAN](UX_PLAN.md)，验收见[ACCEPTANCE](ACCEPTANCE.md)，领取/交接见[任务台账](TASKS.md)。本轮任务记录：[LAP-08](tasks/LAP-08/HANDOFF.md)。
 
-更新时间：2026-10-17 15:21（Asia/Shanghai）。[LAP-19](tasks/LAP-19/HANDOFF.md)双后端切换与共用联网[详细计划](tasks/LAP-19/PLAN.md)已落盘，当前为文档检查/交付阶段，未实施。用户保留CodeBuddy和本地两路线、配置cmd手动切换，联网按需自动；先LAP-17本地接入/切换，再LAP-18共用联网。PC只读确认已有Qwen3.5 9B Q4_K_M、当前16K、回环监听和固定既有指纹SSH转发可用；本轮0生成/远程修改。公共搜索接口只做候选探测，相关性/时效未验；不放开CLI工具。文件归属与证据见任务交接和[PC交接](../local-5070/HANDOFF.md)。
+更新时间：2026-10-17 15:23（Asia/Shanghai）。[LAP-19](tasks/LAP-19/HANDOFF.md)双后端切换与共用联网[详细计划](tasks/LAP-19/PLAN.md)已落盘，详细规划完成，内容提交91b96d5已推送origin/main并核对，未实施。用户保留CodeBuddy和本地两路线、配置cmd手动切换，联网按需自动；先LAP-17本地接入/切换，再LAP-18共用联网。PC只读确认已有Qwen3.5 9B Q4_K_M、当前16K、回环监听和固定既有指纹SSH转发可用；本轮0生成/远程修改。公共搜索接口只做候选探测，相关性/时效未验；不放开CLI工具。文件归属与证据见任务交接和[PC交接](../local-5070/HANDOFF.md)。
 
 用户随后追加自由群聊/@必答/直接群发及表情包，详见[追加合同](tasks/LAP-19/GROUP_CHAT_PLAN.md)与[medium复制指令](tasks/LAP-19/IMPLEMENTATION_GUIDE.md)，实施顺序已扩为17→18→20→21。黑名单直接消息在框架/模型/历史前过滤可复用；QQ/NapCat仍收到事件，转述不保证识别。NapCat静态包有QQ收藏读取，本轮未读用户2个真实收藏。
 

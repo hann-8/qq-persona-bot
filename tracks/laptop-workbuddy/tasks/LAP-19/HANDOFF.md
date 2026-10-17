@@ -23,14 +23,14 @@
 
 ## 规划交付检查点
 
-2026-10-17 15:21（Asia/Shanghai），四项详细规划完成，Git交付准备中。交付物：[PLAN](PLAN.md)、[GROUP_CHAT_PLAN](GROUP_CHAT_PLAN.md)、[IMPLEMENTATION_GUIDE](IMPLEMENTATION_GUIDE.md)。已同步AGENTS范围、PROGRESS、TASKS、两线HANDOFF和PC选型最新快照；仅上述10份Markdown纳入提交。
+2026-10-17 15:23（Asia/Shanghai），四项详细规划完成；内容提交`91b96d592e5bb5be67950909c5ae8df54c3e161a`已推送origin/main，git ls-remote核对完整SHA一致，内容交付检查点工作区干净。随后仅同步本交付记录。交付物：[PLAN](PLAN.md)、[GROUP_CHAT_PLAN](GROUP_CHAT_PLAN.md)、[IMPLEMENTATION_GUIDE](IMPLEMENTATION_GUIDE.md)。已同步AGENTS范围、PROGRESS、TASKS、两线HANDOFF和PC选型最新快照；仅上述10份Markdown纳入提交。
 
-验证：`.venv/Scripts/python.exe state/verify_lap19_docs.py`检查本地链接、代码围栏/JSON样例、21个任务ID和文档文件范围；`git diff --check`无错误。另在进程内对照家庭访问资料扫描本轮10份文档，主机/用户名/密码原值匹配均false，未打印值；长凭据块检查无匹配。扫描脚本/报告仅忽略state，本轮没有新增实现测试或重跑旧124项。
+验证：`.venv/Scripts/python.exe state/verify_lap19_docs.py`通过10份Markdown、143个本地链接、代码围栏/1个JSON样例、21个唯一任务ID和文档文件范围检查；`git diff --check`无错误。另在进程内对照家庭访问资料扫描本轮10份文档，主机/用户名/密码原值匹配均false，未打印值；长凭据块检查无匹配。扫描脚本/报告仅忽略state，本轮没有新增实现测试或重跑旧124项。
 
 只读能力：PC实际元数据/通道通过；搜索适配器只做公共探测、质量未验；黑名单/NapCat收藏/框架无conversation为源码证据，不冒充运行通过。未改任何运行源代码/settings/persona/PC配置，未启停/探活真实bot、登录QQ/CodeBuddy、生成或群发，未读取真实收藏。
 
 ## 剩余与下一步
 
-本轮剩余仅Git差异审阅、commit/push及远端SHA核对；交付后同步结果。后续用户在会话设置选择gpt-6.1-sol/medium，按执行指引分别开会话实施17→18→20→21；真实推理/观察群/收藏导入/发图和最终启停范围另由用户指定。PC目前只需保持Ollama后台/SSH可达作为接入前提，无需常开聊天窗口，但项目本地runner仍未实现。
+本轮规划与内容Git交付已完成，无实施任务在本session领取；本交付记录也按相同授权提交/推送并再次核对。后续用户在会话设置选择gpt-6.1-sol/medium，按执行指引分别开会话实施17→18→20→21；真实推理/观察群/收藏导入/发图和最终启停范围另由用户指定。PC目前只需保持Ollama后台/SSH可达作为接入前提，无需常开聊天窗口，但项目本地runner仍未实现。
 
-旧LAP-10/13/15/16及真人差额继续保留；新功能仅已规划，无实现/离线运行/真实生成/完整群验收结论。工作区只保留本任务文档变化；家庭凭据、本机settings、原始证据和临时脚本均继续忽略。
+旧LAP-10/13/15/16及真人差额继续保留；新功能仅已规划，无实现/离线运行/真实生成/完整群验收结论。内容交付检查点工作区干净，本次仅有交付记录同步；家庭凭据、本机settings、原始证据和临时脚本均继续忽略，不纳入Git。

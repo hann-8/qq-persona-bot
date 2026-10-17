@@ -1,10 +1,10 @@
 # QQ 人设聊天 Bot：项目入口
 
-更新时间：2026-10-17 15:21（Asia/Shanghai）。本文件是唯一项目进度入口，不另建根HANDOFF。
+更新时间：2026-10-17 15:23（Asia/Shanghai）。本文件是唯一项目进度入口，不另建根HANDOFF。
 
 ## 当前阶段与授权
 
-[LAP-19总体计划](tracks/laptop-workbuddy/tasks/LAP-19/PLAN.md)、[自由群聊/表情包合同](tracks/laptop-workbuddy/tasks/LAP-19/GROUP_CHAT_PLAN.md)与[medium执行指引](tracks/laptop-workbuddy/tasks/LAP-19/IMPLEMENTATION_GUIDE.md)详细规划完成，10份文档/143个本地链接/21个任务ID及隐私/差异检查通过，准备Git交付。CodeBuddy和PC均保留、配置cmd手动切换、共用按需联网；自由群聊/真实@必答/直接群发/QQ收藏与本地表情均已规划，额度由用户后续观察。实施17→18→20→21，每会话一项，均待后续指令。
+[LAP-19总体计划](tracks/laptop-workbuddy/tasks/LAP-19/PLAN.md)、[自由群聊/表情包合同](tracks/laptop-workbuddy/tasks/LAP-19/GROUP_CHAT_PLAN.md)与[medium执行指引](tracks/laptop-workbuddy/tasks/LAP-19/IMPLEMENTATION_GUIDE.md)详细规划完成，10份文档/143个本地链接/21个任务ID及隐私/差异检查通过，内容提交91b96d592e5bb5be67950909c5ae8df54c3e161a已推送origin/main，并用ls-remote核对一致；随后仅同步本交付记录。CodeBuddy和PC均保留、配置cmd手动切换、共用按需联网；自由群聊/真实@必答/直接群发/QQ收藏与本地表情均已规划，额度由用户后续观察。实施17→18→20→21，每会话一项，均待后续指令。
 
 本轮SSH只读确认Ollama0.40.5、`qwen3.5:9b-q4_K_M`已安装/加载、当前16K上下文、回环监听；固定既有主机指纹的direct-tcpip读取版本成功。见[PC交接](tracks/local-5070/HANDOFF.md)。模型由用户安装，本轮没有生成/远程修改/启停/下载。搜索候选Bing RSS取得记录，但相关性/时效未验，DDG遇验证码；接口200不代表联网功能通过。
 
