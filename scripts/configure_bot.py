@@ -212,7 +212,7 @@ class ConfigMenu:
             settings,digest=read_settings(self.path)
             self.ui.page('表情包')
             self.ui.write('默认关闭；扫描/标签/激活须停机，重启生效。收藏仅在现有机器人连接可用时显式读取，绝不启动或登录。导入暂存后须停机激活并确认标签。真实收藏/显示未验。')
-            self.ui.write('1 打开本地inbox / 2 扫描本地表情 / 3 初始化独立管理token / 4 从机器人QQ收藏详情导入 / 5 基础接口导入（仅显式选择） / 6 停机激活暂存 / 7 填写标签并确认 / 8 表情参数 / 0 返回')
+            self.ui.write('1 打开本地inbox / 2 扫描本地表情 / 3 初始化独立管理token / 4 从机器人QQ收藏详情导入 / 5 基础接口导入（仅显式选择） / 6 停机激活暂存 / 7 看图填写标签 / 8 表情参数 / 0 返回')
             choice=self.ui.choose({str(i) for i in range(9)})
             if choice=='0':return
             try:
@@ -227,15 +227,7 @@ class ConfigMenu:
                     self.ui.write('暂存接收/失败数量：'+str(result)+'；停机激活后再填写标签，未启用memes。')
                 elif choice=='6':catalog.activate_pending();self.ui.write('已停机激活；请确认名称/标签后重启。')
                 elif choice=='7':
-                    for i,row in enumerate(catalog.rows,1):self.ui.write(f'{i} {row["id"]} {row["name"]} enabled={row["enabled"]}')
-                    value=self.ui.read('选择序号（回车取消）：').strip()
-                    if not value:continue
-                    row=catalog.rows[int(value)-1]
-                    row['name']=self.ui.read('简短名称：').strip()
-                    row['context']=self.ui.read('简短使用语境：').strip()
-                    row['tags']=[x.strip() for x in self.ui.read('标签（逗号分隔）：').split(',') if x.strip()]
-                    row['enabled']=self.ui.read('确认登记并启用此图？输入 YES，其余禁用：').strip()=='YES'
-                    catalog.save();self.ui.write('目录已保存，下次启动生效；未调用模型或发图。')
+                    self.label_memes(settings['memes'])
                 elif choice=='8':
                     keys=list(DEFAULTS)
                     for i,key in enumerate(keys,1):self.ui.write(f'{i} {key}: {settings["memes"][key]}')
@@ -251,6 +243,40 @@ class ConfigMenu:
                     self.ui.write('配置已保存，须重启生效；未启停或发图。')
             except (ValueError,OSError,IndexError,TimeoutError,aiohttp.ClientError):self.ui.write('操作未完成：检查连接、停机状态、目录、标签和参数；未自动重试/登录/扩域。')
             self.ui.pause()
+
+    def label_memes(self,cfg):
+        from qqbot_gateway.meme_catalog import MemeCatalog
+        import os
+        while True:
+            catalog=MemeCatalog(self.path.parent.parent,cfg)
+            if not catalog.rows:
+                self.ui.write('图库为空，请先扫描本地图片或激活收藏导入暂存。');return
+            self.ui.page('看图填写表情标签')
+            for i,row in enumerate(catalog.rows,1):
+                self.ui.write(f'{i}  {row["name"] or "未命名"}  {Path(row["file"]).suffix[1:].upper()}  '+('已启用' if row['enabled'] else '未启用'))
+            self.ui.write('P 打开带编号的图片预览总览；输入编号打开该张原图，再决定是否编辑。预览不启用/发送图片，不修改目录。')
+            value=self.ui.read('输入 P 或图片编号（回车返回）：').strip()
+            if not value:return
+            try:
+                if value.lower()=='p':
+                    page=catalog.preview_page();os.startfile(page)
+                    self.ui.write('编号预览页已打开；看图后回到这里选择相同编号。');continue
+                if not value.isdecimal() or not 1<=int(value)<=len(catalog.rows):
+                    self.ui.write('请输入列表中的图片编号，或输入 P 看全部图片。');continue
+                row=catalog.rows[int(value)-1]
+                image,_=catalog.preview(row['id']);os.startfile(image)
+                self.ui.write(f'已打开第{value}张图片：{row["name"] or "未命名"}')
+                if self.ui.read('确认是这张？输入 E 编辑名称/标签，回车重选：').strip().lower()!='e':continue
+                for key,title in (('name','简短名称'),('context','简短使用语境')):
+                    row[key]=self.ui.read(f'{title}（当前：{row[key] or "未填写"}；回车保留）：').strip() or row[key]
+                value=self.ui.read('标签（逗号分隔，回车保留现有标签）：').strip()
+                if value:row['tags']=[x.strip() for x in value.split(',') if x.strip()]
+                row['enabled']=self.ui.read('确认登记并启用此图？输入 YES，其余禁用：').strip()=='YES'
+                catalog.save();self.ui.write('目录已保存，下次启动生效；未调用模型或发图。')
+                self.ui.pause()
+            except (ValueError,OSError):
+                self.ui.write('无法预览或保存：请检查图片完整性、系统图片/浏览器默认打开方式，以及保存前是否已停机。目录未被本次失败操作覆盖。')
+                self.ui.pause()
 
     def participation_group(self):
         from qqbot_gateway.participation import DEFAULTS,RANGES

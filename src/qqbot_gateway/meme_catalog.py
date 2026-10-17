@@ -165,11 +165,40 @@ class MemeCatalog:
     def resolve(self,mid):
         row=next((x for x in self.rows if x['id']==mid and x['enabled'] and x['name'].strip() and x['tags']),None)
         if row is None:raise ValueError('Unavailable meme')
+        return self.preview(mid)
+
+    def preview(self,mid):
+        """Read-only local inspection also permits unconfirmed, disabled images."""
+        row=next((x for x in self.rows if x['id']==mid),None)
+        if row is None:raise ValueError('Unavailable meme')
+        self.validate_row(row)
         p=controlled_path(self.root,self.cfg['library_dir']+'/'+row['file'])
         if not p.is_file() or p.stat().st_size>self.cfg['max_file_bytes']:raise ValueError('Missing image')
         data=p.read_bytes();info=inspect_image(data,self.cfg['max_file_bytes'],p.suffix)
         if info['sha256']!=row['sha256'] or info['media_type']!=row['media_type']:raise ValueError('Image changed')
         return p,row
+
+    def preview_page(self):
+        """Numbered local-only gallery; no remote resources or JavaScript."""
+        from html import escape
+        cards=[]
+        for index,row in enumerate(self.rows,1):
+            try:
+                path,_=self.preview(row['id'])
+                uri=escape(path.as_uri(),quote=True)
+                image=f'<a href="{uri}"><img loading="lazy" src="{uri}" alt="图片 {index}"></a>'
+            except (ValueError,OSError):image='<p>文件缺失或校验失败，不能预览</p>'
+            name=escape(row['name'] or '未命名')
+            state='已登记启用' if row['enabled'] else '未启用'
+            cards.append(f'<article><h2>{index} · {name}</h2>{image}<p>{state}</p></article>')
+        page='''<!doctype html><html lang="zh-CN"><meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src file:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>表情包编号预览</title><style>body{font:16px system-ui;margin:24px;background:#f4f5f7;color:#20242a}main{display:flex;flex-wrap:wrap;gap:16px}article{background:white;padding:16px;border-radius:12px;width:240px}h2{font-size:18px;overflow-wrap:anywhere}img{width:240px;height:200px;object-fit:contain}p{color:#505864}</style>
+<h1>表情包编号预览</h1><p>先看图，再回配置窗口选择相同编号填写标签。点击图片可查看原图；本页只读取本机文件，不会启用或发送表情。编辑后重新按 P 刷新预览页。</p><main>'''+''.join(cards)+'</main></html>'
+        target=controlled_path(self.root,'state/meme-preview/index.html')
+        target.parent.mkdir(parents=True,exist_ok=True)
+        target.write_text(page,encoding='utf-8')
+        return target
 
     def candidates(self,question):
         rows=[]

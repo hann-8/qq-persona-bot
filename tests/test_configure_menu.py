@@ -59,6 +59,41 @@ class MenuTests(unittest.TestCase):
         self.assertEqual(after['llm'],before['llm']);self.assertEqual(after['participation'],before['participation'])
         self.assertIn('收藏仅在现有机器人连接',ui.text);self.assertIn('图片1048576',ui.text.replace('文件','图片'))
 
+    def synthetic_memes(self):
+        import io
+        from PIL import Image
+        from qqbot_gateway.meme_catalog import MemeCatalog
+        catalog=MemeCatalog(self.root)
+        for color in ('red','blue'):
+            image=io.BytesIO();Image.new('RGB',(3,3),color).save(image,format='PNG')
+            catalog.add(image.getvalue())
+        catalog.save();return catalog
+
+    def test_numbered_preview_then_labels_only_selected_image(self):
+        catalog=self.synthetic_memes()
+        ui=RecordedConsole(['8','7','p','2','e','第二张','开心','高兴','YES','','','','0','0'])
+        with patch('os.startfile') as opened:menu(self.path,ui)
+        self.assertEqual(opened.call_count,2)
+        page=opened.call_args_list[0].args[0]
+        self.assertTrue(page.is_relative_to(self.root/'state/meme-preview'))
+        self.assertIn('2 · 未命名',page.read_text(encoding='utf-8'))
+        self.assertEqual(opened.call_args_list[1].args[0].name,catalog.rows[1]['file'])
+        from qqbot_gateway.meme_catalog import MemeCatalog
+        saved=MemeCatalog(self.root)
+        self.assertFalse(saved.rows[0]['enabled'])
+        self.assertEqual(saved.rows[1]['name'],'第二张');self.assertTrue(saved.rows[1]['enabled'])
+        self.assertEqual(self.path.read_bytes(),self.original)
+        self.assertNotIn(catalog.rows[0]['id'],ui.text)
+
+    def test_preview_reselect_and_invalid_index_never_changes_catalog(self):
+        catalog=self.synthetic_memes();before=catalog.path.read_bytes()
+        ui=RecordedConsole(['8','7','0','-1','99','1','','','','0','0'])
+        with patch('os.startfile') as opened:menu(self.path,ui)
+        opened.assert_called_once()
+        self.assertEqual(opened.call_args.args[0].name,catalog.rows[0]['file'])
+        self.assertEqual(catalog.path.read_bytes(),before)
+        self.assertEqual(self.path.read_bytes(),self.original)
+
     def test_explicit_free_menu_preserves_profiles_and_units(self):
         before=load_settings(self.path)
         ui=RecordedConsole(['7','1','free','','0','0'])

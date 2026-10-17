@@ -4,6 +4,8 @@
 
 ## 当前阶段与授权
 
+2026-10-17 23:32：[LAP-21标签流程预览修复](tracks/laptop-workbuddy/tasks/LAP-21/HANDOFF.md)已修复/215单元离线通过；新增P编号缩略图总览/原图查看及返回重选，保留22/23交付，不操作真实图库、配置或bot。
+
 2026-10-17 18:50：[LAP-23 WebSocket断线409修复](tracks/laptop-workbuddy/tasks/LAP-23/HANDOFF.md)已实现/离线通过。状态写失败跳过active释放已复现修复；Windows读句柄冲突/重连、212单元和18入口及实际框架门槛通过。现场首个异常仍缺直接证据，新增固定类别日志；本轮只读时端口无监听，0启停/真实生成/群发。真实稳定性待用户启动观察。
 
 2026-10-17 18:05：[LAP-22 free框架发送修复](tracks/laptop-workbuddy/tasks/LAP-22/HANDOFF.md)已实现/离线通过，207单元、132群框架（含真实run_agent生命周期）、136媒体回归；空链跳过发送装饰已修复，运行中实例未重启加载。只读确认用户现已选择ollama_ssh/free/web开启、memes关闭；此前“本机未启用”段落为历史。0本session真实模型/群发/启停，真实QQ待验。

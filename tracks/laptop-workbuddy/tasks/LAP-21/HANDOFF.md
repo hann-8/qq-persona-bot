@@ -17,3 +17,9 @@
 交付前检查：159个本地Markdown链接、compileall、uv lock --check（24包）、Git diff及忽略规则通过；7份JSON可解析且仅合成内容，新增assets仅2份README，无用户素材。剩余：仅等待用户指定真实范围，不启用任何新模式或推进其他任务。回滚见报告/README，回退旧文本代码前先隔离pending/unknown并配对备份。开始无用户/其他session差异，所有本轮已跟踪和新增文件归本任务；state测试工件继续忽略。
 
 Git交付：2026-10-17，内容提交`5bb29d04c9966aa0e11f9cc6d26b3f6cc2c42eb9`已推送origin/main，git rev-parse HEAD与git ls-remote完整SHA一致，内容检查点工作区干净。42份任务文件已检查，未夹带用户/其他任务修改；本机settings、secrets、原始群消息、用户图片和state测试工件持续忽略。随后仅同步本交付记录/入口，最终记录提交SHA由main/HEAD恢复，不自引用；最终SHA在回复中核对报告。无保留的已跟踪/未跟踪差异。Git交付不等于部署或真实验收。
+
+2026-10-17 23:32：LAP-21既有标签流程体验修复，session `LAP-21-controlled-memes` 续作。起点main/0a7fdab8c8a32e847a4678207f5580a6204b2311，工作区干净；后续LAP-22/23已交付内容保留。本轮归属：meme_catalog.py、configure_bot.py、test_memes/test_configure_menu、README及PROGRESS/TASKS/工作线与本交接。目标：编号本机预览总览、单图预览、返回重选后再编辑；预览支持未启用图片但复用路径/真实类型/hash校验，不修改激活规则。只用自造图片和模拟打开器验证；不读取真实图库/收藏、不打开用户图片、不改settings或素材标签、不启停/模型/群发。已实现/离线通过；按既有计划范围内修复处理，不另开新任务。
+
+续作结果：菜单7“看图填写标签”提供P编号缩略图总览、编号原图查看、E确认编辑和回车重选；隐藏完整hash，列表显示名称/未命名、格式与状态，已有字段回车保留。MemeCatalog.preview允许查看禁用素材但复用真实路径/类型/hash校验，不扩大模型候选；HTML仅本机file图源、无JS/远程资源、名称转义，位于忽略state/meme-preview。保存/停机锁/激活与发送规则保持。
+验证：`.venv/Scripts/python.exe -X utf8 -m unittest discover -s tests` 215项通过（state/lap21-preview-unit.log）；菜单定向16项通过，自造红/蓝图片+模拟os.startfile验证总览编号/选择正确图编辑、取消和非法编号不写目录；禁用预览不开放候选/名称HTML转义/hash变更拒绝通过。compileall/diff检查通过。未实际打开用户图片/默认浏览器，系统关联及真人预览观感由用户重开配置窗口确认；未读真实素材、QQ或settings，未改标签/启用状态。LAP-22/23和旧真实差额保留。
+Git：本次9份范围文件及报告补充将单独commit/push，并在最终回复核对完整SHA；交接记录随同提交，不自引用。没有其他session未提交差异；本机素材/设置/state继续忽略。

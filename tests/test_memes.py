@@ -46,6 +46,19 @@ class CatalogTests(unittest.TestCase):
     def test_hash_change(self):
         c,r=registered(self.root);p,_=c.resolve(r['id']);p.write_bytes(picture('GIF'))
         self.assertEqual(c.candidates('开心'),[])
+
+    def test_disabled_preview_keeps_selection_closed_and_escapes_gallery(self):
+        c=MemeCatalog(self.root);row=c.add(picture());row['name']='<script>alert(1)</script>'
+        c.save();before=c.path.read_bytes()
+        path,_=c.preview(row['id']);self.assertTrue(path.is_file())
+        with self.assertRaises(ValueError):c.resolve(row['id'])
+        page=c.preview_page();html=page.read_text(encoding='utf-8')
+        self.assertIn('1 · &lt;script&gt;',html);self.assertNotIn('<script>',html)
+        self.assertIn(path.as_uri(),html);self.assertIn("default-src 'none'",html)
+        self.assertEqual(c.path.read_bytes(),before)
+        path.write_bytes(picture('GIF'))
+        with self.assertRaises(ValueError):c.preview(row['id'])
+        self.assertIn('文件缺失或校验失败',c.preview_page().read_text(encoding='utf-8'))
     def test_paths(self):
         with self.assertRaises(ValueError):controlled_path(self.root,'../escape')
         outside=self.root/'outside';outside.mkdir();link=self.root/'link'
