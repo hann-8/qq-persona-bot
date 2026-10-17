@@ -150,6 +150,14 @@ def operation_error(error):
             return '另一项配置或启停操作正在进行，请稍后重新进入本项。'
         if 'Configuration changed' in text:
             return '配置已在别处更新，请重新进入本项读取最新值。'
+        if 'Catalog changed' in text:
+            return '表情目录已在别处更新，请返回列表重新选择，避免覆盖。'
+        if text == 'Confirm name and tags before enabling':
+            return '启用图片必须填写名称和至少一个标签；使用语境不能代替标签。'
+        if text == 'Invalid meme tags':
+            return '标签最多8个；请用逗号分隔，启用时至少填写一个。'
+        if text == 'Invalid meme label':
+            return '名称、语境及每个标签最多80字符，不能包含换行、URL、file或base64内容。'
         if 'Requested effort' in text:
             return '该模型与推理强度不兼容。先将推理强度设为自动（auto），再修改模型。'
         if 'exceeds known model capacity' in text:
@@ -265,18 +273,38 @@ class ConfigMenu:
                     self.ui.write('请输入列表中的图片编号，或输入 P 看全部图片。');continue
                 row=catalog.rows[int(value)-1]
                 image,_=catalog.preview(row['id']);os.startfile(image)
-                self.ui.write(f'已打开第{value}张图片：{row["name"] or "未命名"}')
-                if self.ui.read('确认是这张？输入 E 编辑名称/标签，回车重选：').strip().lower()!='e':continue
-                for key,title in (('name','简短名称'),('context','简短使用语境')):
-                    row[key]=self.ui.read(f'{title}（当前：{row[key] or "未填写"}；回车保留）：').strip() or row[key]
-                value=self.ui.read('标签（逗号分隔，回车保留现有标签）：').strip()
-                if value:row['tags']=[x.strip() for x in value.split(',') if x.strip()]
-                row['enabled']=self.ui.read('确认登记并启用此图？输入 YES，其余禁用：').strip()=='YES'
-                catalog.save();self.ui.write('目录已保存，下次启动生效；未调用模型或发图。')
-                self.ui.pause()
             except (ValueError,OSError):
-                self.ui.write('无法预览或保存：请检查图片完整性、系统图片/浏览器默认打开方式，以及保存前是否已停机。目录未被本次失败操作覆盖。')
+                self.ui.write('图片预览失败：请检查图片完整性或系统默认打开方式；尚未修改标签或保存目录。')
                 self.ui.pause()
+                continue
+            self.ui.write(f'已打开第{value}张图片：{row["name"] or "未命名"}')
+            if self.ui.read('确认是这张？输入 E 编辑名称/标签，回车重选：').strip().lower()!='e':continue
+            for key,title in (('name','简短名称'),('context','简短使用语境')):
+                row[key]=self.ui.read(f'{title}（当前：{row[key] or "未填写"}；回车保留）：').strip() or row[key]
+            value=self.ui.read('标签（首次启用至少填1个，逗号分隔；已有标签回车保留）：').strip()
+            if value:row['tags']=[x.strip() for x in value.replace('，',',').split(',') if x.strip()]
+            row['enabled']=self.ui.read('确认登记并启用此图？输入 YES，其余禁用：').strip()=='YES'
+            cancelled=False
+            while row['enabled'] and (not row['name'].strip() or not row['tags']):
+                missing='name' if not row['name'].strip() else 'tags'
+                self.ui.write('尚未保存：启用图片必须有名称和至少一个标签。已填写的名称/语境保留；使用语境不能代替标签。')
+                value=self.ui.read(('补填名称' if missing=='name' else '补填至少一个标签（逗号分隔）')+'，输入0取消编辑：').strip()
+                if value=='0':cancelled=True;break
+                if missing=='name':row['name']=value
+                else:row['tags']=[x.strip() for x in value.replace('，',',').split(',') if x.strip()]
+            if not cancelled:self.save_meme_draft(catalog,row)
+
+    def save_meme_draft(self,catalog,row):
+        while True:
+            try:
+                catalog.validate_row(row)
+                catalog.save()
+            except (ValueError,OSError) as error:
+                self.ui.write('表情目录未保存：'+operation_error(error))
+                if self.ui.read('已填写内容暂时保留；输入 R 重试保存，回车返回列表且不保存：').strip().lower()!='r':return
+            else:
+                self.ui.write('目录已保存，下次启动生效；未调用模型或发图。')
+                self.ui.pause();return
 
     def participation_group(self):
         from qqbot_gateway.participation import DEFAULTS,RANGES

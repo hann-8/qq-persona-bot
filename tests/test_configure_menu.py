@@ -94,6 +94,31 @@ class MenuTests(unittest.TestCase):
         self.assertEqual(catalog.path.read_bytes(),before)
         self.assertEqual(self.path.read_bytes(),self.original)
 
+    def test_first_enable_empty_tags_repompts_without_losing_name_context(self):
+        self.synthetic_memes()
+        ui=RecordedConsole(['8','7','1','e','示例游戏','游戏话题','','YES','游戏，开心','','','','0','0'])
+        with patch('os.startfile'):menu(self.path,ui)
+        from qqbot_gateway.meme_catalog import MemeCatalog
+        saved=MemeCatalog(self.root).rows[0]
+        self.assertEqual((saved['name'],saved['context'],saved['tags']),('示例游戏','游戏话题',['游戏','开心']))
+        self.assertTrue(saved['enabled'])
+        self.assertIn('使用语境不能代替标签',ui.text)
+        self.assertEqual(ui.text.count('简短名称（当前'),1)
+        self.assertNotIn('预览失败',ui.text)
+
+    def test_running_save_error_is_explicit_and_retry_preserves_draft(self):
+        self.synthetic_memes()
+        ui=RecordedConsole(['8','7','1','e','示例名称','示例语境','开心','YES','r','','','','0','0'])
+        with patch('os.startfile'),patch('qqbot_gateway.config.require_stopped',side_effect=[ValueError('Stop project processes before changing configuration'),None]) as stopped:
+            menu(self.path,ui)
+        self.assertEqual(stopped.call_count,2)
+        self.assertIn('表情目录未保存：请先关闭机器人',ui.text)
+        self.assertNotIn('预览失败',ui.text)
+        from qqbot_gateway.meme_catalog import MemeCatalog
+        saved=MemeCatalog(self.root).rows[0]
+        self.assertEqual((saved['name'],saved['context'],saved['tags']),('示例名称','示例语境',['开心']))
+        self.assertTrue(saved['enabled'])
+
     def test_explicit_free_menu_preserves_profiles_and_units(self):
         before=load_settings(self.path)
         ui=RecordedConsole(['7','1','free','','0','0'])

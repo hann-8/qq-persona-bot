@@ -23,3 +23,10 @@ Git交付：2026-10-17，内容提交`5bb29d04c9966aa0e11f9cc6d26b3f6cc2c42eb9`�
 续作结果：菜单7“看图填写标签”提供P编号缩略图总览、编号原图查看、E确认编辑和回车重选；隐藏完整hash，列表显示名称/未命名、格式与状态，已有字段回车保留。MemeCatalog.preview允许查看禁用素材但复用真实路径/类型/hash校验，不扩大模型候选；HTML仅本机file图源、无JS/远程资源、名称转义，位于忽略state/meme-preview。保存/停机锁/激活与发送规则保持。
 验证：`.venv/Scripts/python.exe -X utf8 -m unittest discover -s tests` 215项通过（state/lap21-preview-unit.log）；菜单定向16项通过，自造红/蓝图片+模拟os.startfile验证总览编号/选择正确图编辑、取消和非法编号不写目录；禁用预览不开放候选/名称HTML转义/hash变更拒绝通过。compileall/diff检查通过。未实际打开用户图片/默认浏览器，系统关联及真人预览观感由用户重开配置窗口确认；未读真实素材、QQ或settings，未改标签/启用状态。LAP-22/23和旧真实差额保留。
 Git：本次9份范围文件及报告补充将单独commit/push，并在最终回复核对完整SHA；交接记录随同提交，不自引用。没有其他session未提交差异；本机素材/设置/state继续忽略。
+
+
+2026-10-17 23:44：同session续作修复首次启用留空标签后错误提示混淆。基线5024879，检测到LAP-24正在修改PROGRESS/工作线HANDOFF/TASKS及其新任务目录；本轮不写、不暂存或提交这些共享改动。已领取LAP-21内修复继续登记在本任务交接，归属仅configure_bot.py/test_configure_menu.py、README、本交接及21报告。目标：至少1标签合同不变，YES后标签为空时保留名称/语境并补填；区分预览/校验/停机保存错误。仅自造图片/模拟打开器，无真实图片/目录标签/settings读写，无bot/模型/群发。
+
+23:44续作已实现/离线通过：标签首次为空时YES不再直接失败，保留名称/语境要求补填至少1标签，0可取消；支持中文逗号。预览异常与保存异常分别处理；字段/停机/目录竞争使用固定原因，不输出任意异常/路径内容。保存失败可R重试，草稿留在当前配置进程内，不写额外持久草稿。原启用校验/停机锁/真实素材范围保持。
+验证：`.venv/Scripts/python.exe -X utf8 -m unittest discover -s tests` 217项通过（忽略state/lap21-label-validation-unit.log）；新增自造图片+模拟打开器/停止检查覆盖用户步骤、空标签补填保留名称语境、停机保存错误准确显示且R重试不丢草稿。未操作用户真实图片/标签/运行配置或bot。compileall/diff和任务本地链接检查通过。
+交付：本轮仅configure_bot.py、test_configure_menu.py、README、21报告/本交接共5文件；LAP-24所属PROGRESS、工作线HANDOFF、TASKS及其新目录均保留，不暂存或夹带。上一轮预览修复5024879已推送核对；本轮随本交接单独提交/推送并在回复核对最终SHA，不自引用。真实系统界面/当前bot状态仍未探测。
