@@ -16,9 +16,9 @@
 
 剩余顺序：先回规划补原生路径/归属证据和报告接入方法，再由用户另行指定唯一实例负责人/启停与登录范围，操作者本机录入并做正常重启观察；表达接受另指定后端/请求预算/群范围。旧LAP-10/18及其他真人差额保留。回滚不删除设备/历史/图库/pending/unknown及登录尝试账本；无明文降级或删除账本重试。
 
-最终文件：PROGRESS、README、工作线HANDOFF/TASKS、本HANDOFF、config/persona.md、src/qqbot_gateway/{persona,napcat_login,napcat_login_client}.py、scripts/{manage,configure_bot,verify_lap20,verify_lap21,verify_lap24}.py、tests/{test_lap24,test_napcat_login_http}.py、reports/lap-24-2026-10-18.md与lap-24-framework-offline.json。Git交付检查点将在下方登记；忽略的测试日志未纳入，其他任务文档/旧报告/本机配置无改动。
+最终文件：PROGRESS、README、工作线HANDOFF/TASKS、本HANDOFF、config/persona.md、src/qqbot_gateway/{persona,napcat_login,napcat_login_client}.py、scripts/{manage,configure_bot,verify_lap20,verify_lap21,verify_lap24}.py、tests/{test_lap24,test_napcat_login_http}.py、reports/lap-24-2026-10-18.md与lap-24-framework-offline.json。Git交付检查点见下段；忽略的测试日志未纳入，其他任务文档/旧报告/本机配置无改动。
 
-交付前检查：194个本地Markdown链接均存在，git diff --check通过；18份归属文件，未发现其他session差异。远端main在提交前仍为开始SHA `d3198117f5868709b12da9d9d1c7be01a1665597`。内容提交/推送后另登记实际SHA，不能把Git交付标部署或真实验收。
+交付检查：最终192个本地Markdown链接均存在，git diff --check通过；18份归属文件，未发现其他session差异。远端main在提交前仍为开始SHA `d3198117f5868709b12da9d9d1c7be01a1665597`。2026-10-18 00:37（Asia/Shanghai），内容提交`b8cc29901c5893eae9f18a0db495d08b0916e5ec`已推送origin/main，rev-parse与ls-remote完整SHA相同，检查点工作区干净。随后仅同步本交付记录并独立提交/推送，最终记录提交SHA以会话回执为准。Git交付不等于部署或真实验收；本机忽略配置/凭据未改，合成测试日志保留忽略。
 
 以下是规划阶段历史记录，当前实施状态以上为准。
 
