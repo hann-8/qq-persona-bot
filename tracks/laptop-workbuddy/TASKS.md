@@ -2,13 +2,15 @@
 
 返回[全局入口](../../PROGRESS.md) / [工作线交接](HANDOFF.md)。继承[AGENTS](../../AGENTS.md)；本轮体验增量合同见[UX_PLAN](UX_PLAN.md)，原规格见[实施计划](IMPLEMENTATION_PLAN.md)，通过标准见[验收矩阵](ACCEPTANCE.md)。
 
-更新时间：2026-10-17 17:25（Asia/Shanghai）。21已实现/离线通过，真实未验、未启用memes；20未启用free；17独立交付，18搜索缺口回规划。本轮0真实模型/远程修改/群发、无bot操作，运行状态未知。LAP-19合同、LAP-16未实际启用adaptive和旧LAP-10/13/真人差额保留。
+更新时间：2026-10-17 23:50（Asia/Shanghai）。24排查/详细规划完成、未实施；保存配置已选ollama_ssh/free/adaptive，web/memes=true，当前运行加载未核验。21/22/23已有离线交付，21并行续作由原session独占；18搜索缺口与LAP-10/13及旧真人差额保留。24本轮无bot操作/真实模型/远程修改/群发，以下“未启用”等旧快照按对应时间理解。
 
 LAP-12的97项离线/本机启停及16c6fd6/0d9d309推送为历史检查点；上次交接时停机，本轮未探测当前运行状态，不假定用户试用后仍停止。旧LAP-10与真人验收差额全部保留。
 
 LAP-13实现提交`ee7f2d4`已成功推送origin/main；随后仅同步交付检查点。108项全套及末次菜单10项通过，117个链接/差异检查通过；未操作真实bot，用户persona仍保持原有未提交改动。
 
 ## 当前任务
+
+LAP-24于2026-10-17 23:42由`LAP-24-login-natural-replies-plan` / “登录持久化与自然分条排查规划”领取，23:50完成排查/详细[规划](tasks/LAP-24/PLAN.md)，未实施；[HANDOFF](tasks/LAP-24/HANDOFF.md)登记证据与文件归属。仅写本任务HANDOFF/PLAN、PROGRESS、工作线HANDOFF/TASKS；8项既有单元、3项合成协议与文档链接检查通过。后续按用户指令实施，当前无启停/登录/真实模型/群发，密码未用/保存；LAP-21代码/测试/README/报告/交接并行改动不纳入24。
 
 LAP-21 2026-10-17 23:32续作：既有标签流程编号预览修复已实现/215单元通过，由原session独占；涉及菜单/图库校验/自造测试/README与交接索引，详见[21交接](tasks/LAP-21/HANDOFF.md)。本机素材和运行配置不读写，0真实服务操作。
 
@@ -51,6 +53,7 @@ LAP-15内容提交`632fdc5`已推送origin/main，2026-10-17 11:09用ls-remote�
 | LAP-21 | QQ收藏导入/本地表情图库与发送 | 已实现/离线通过，真实未验；[HANDOFF](tasks/LAP-21/HANDOFF.md) / [合同](tasks/LAP-19/GROUP_CHAT_PLAN.md) | 20统一群发送后；收藏静态支持不当本账号已通过 | LAP-21-controlled-memes / LAP-21受控表情实施，2026-10-17 16:49领取；文件归属见交接 | 207单元、136媒体框架与108群/26网页/90旧路径通过；inbox/library/固定只读收藏RPC/meme_id/typed图片ACK与恢复落地；默认关闭、真实收藏/发图未验，见[报告](../../reports/lap-21-2026-10-17.md) |
 | LAP-22 | free模式兜底回复故障修复 | 已实现/离线通过，真实待验；[HANDOFF](tasks/LAP-22/HANDOFF.md) | LAP-20/21合同内修复 | LAP-22-free-framework-delivery，2026-10-17 18:01领取 | 空链修复；207单元/132群框架/136媒体回归通过；未重启加载；归属与命令见交接 |
 | LAP-23 | WebSocket断开后持续409修复 | 已实现/离线通过，真实待验；[HANDOFF](tasks/LAP-23/HANDOFF.md) | 既有连接/恢复合同内修复 | LAP-23-gate-reconnect，2026-10-17 18:47领取 | 状态写失败不再泄漏连接；212单元/18入口/实际框架门槛通过；未启动，现场首异常未完整取证 |
+| LAP-24 | 登录持久化与自然分条排查规划 | 排查/详细规划完成，未实施；[HANDOFF](tasks/LAP-24/HANDOFF.md) / [PLAN](tasks/LAP-24/PLAN.md) | LAP-12登录生命周期、LAP-14/19分条与free/表情合同 | LAP-24-login-natural-replies-plan，2026-10-17 23:42领取，23:50交接；仅5份文档 | 8单元/3合成协议通过；后续先自然分条，再核实QQ数据归属/安全密码回退；未证实根因/真实能力，须用户后续实施指令 |
 
 G0可行性、G1环境、G2通道、G3实际provider调用已有证据，见[工作线交接](HANDOFF.md#已验证与重要修复)。这是阶段基线；W02/W10等未真实制造的情形仍按验收矩阵记录，不能据此把完整W/Q/P/O标成通过。G4完整验收归LAP-02/03，G7文本相关部分归LAP-01/04/05。
 

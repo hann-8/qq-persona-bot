@@ -1,8 +1,10 @@
 # QQ 人设聊天 Bot：项目入口
 
-更新时间：2026-10-17 17:15（Asia/Shanghai）。本文件是唯一项目进度入口，不另建根HANDOFF。
+更新时间：2026-10-17 23:50（Asia/Shanghai）。本文件是唯一项目进度入口，不另建根HANDOFF。
 
 ## 当前阶段与授权
+
+2026-10-17 23:50：[LAP-24登录持久化与自然分条](tracks/laptop-workbuddy/tasks/LAP-24/HANDOFF.md)排查/详细[规划](tracks/laptop-workbuddy/tasks/LAP-24/PLAN.md)完成，未实施。本机只读确认ollama_ssh/free/adaptive、最多3条，web/memes均开启；8项既有单元与3项合成协议基线通过。现有发送不补满，free缺少“不凑条数”约束；登录已传目标账号，真实QQ数据目录/重复验证根因仍未证实。只改5份本任务文档；0启停/登录/真实模型/群发，密码未使用/保存。后续按AGENTS由用户指定medium实施，先自然分条、再登录独立部分；保留LAP-21并行修改与旧验收差额。
 
 2026-10-17 23:32：[LAP-21标签流程预览修复](tracks/laptop-workbuddy/tasks/LAP-21/HANDOFF.md)已修复/215单元离线通过；新增P编号缩略图总览/原图查看及返回重选，保留22/23交付，不操作真实图库、配置或bot。
 
@@ -54,7 +56,7 @@ LAP-17已有SSH原生runner/schema3/切换及统一结果/版本；LAP-18安全�
 
 | 工作线 | 状态 | 最近更新 | 下一步 | 交接入口 |
 | --- | --- | --- | --- | --- |
-| 笔记本 WorkBuddy / 共用网关 | active；21离线交付未启用；18搜索未完成 | 2026-10-17 17:25 | 18搜索缺口回规划；21离线交付，真实启用待指令 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [20交接](tracks/laptop-workbuddy/tasks/LAP-20/HANDOFF.md) |
+| 笔记本 WorkBuddy / 共用网关 | active；24规划完成待实施；21/22/23离线交付，18搜索未完成 | 2026-10-17 23:50 | 用户指定24后续实施；free/adaptive与web/memes本机已选，当前运行加载/真实效果未由24核验 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [24计划](tracks/laptop-workbuddy/tasks/LAP-24/PLAN.md) |
 | 家庭5070 PC本地模型 | active；17接入已实现/离线与元数据通过，真实生成未验 | 2026-10-17 15:52 | 17待真实范围；保留0生成/未改本机后端 | [HANDOFF](tracks/local-5070/HANDOFF.md) / [选型历史/最新快照](tracks/local-5070/MODEL_SELECTION.md) |
 
 已建立任务交接：[LAP-08规划](tracks/laptop-workbuddy/tasks/LAP-08/HANDOFF.md)、[09配置/准入](tracks/laptop-workbuddy/tasks/LAP-09/HANDOFF.md)、[10预算/参数](tracks/laptop-workbuddy/tasks/LAP-10/HANDOFF.md)、[11纯文本/人设](tracks/laptop-workbuddy/tasks/LAP-11/HANDOFF.md)、[12启停/状态](tracks/laptop-workbuddy/tasks/LAP-12/HANDOFF.md)、[13配置控制台](tracks/laptop-workbuddy/tasks/LAP-13/HANDOFF.md)、[14人设/分条规划](tracks/laptop-workbuddy/tasks/LAP-14/HANDOFF.md)、[15精简人设](tracks/laptop-workbuddy/tasks/LAP-15/HANDOFF.md)、[16一次生成/分条](tracks/laptop-workbuddy/tasks/LAP-16/HANDOFF.md)、[19双后端/联网规划](tracks/laptop-workbuddy/tasks/LAP-19/HANDOFF.md)、[17本地接入/配置切换](tracks/laptop-workbuddy/tasks/LAP-17/HANDOFF.md)、[18共用联网独立部分/搜索缺口](tracks/laptop-workbuddy/tasks/LAP-18/HANDOFF.md)；[LAP-20已实现/离线通过](tracks/laptop-workbuddy/tasks/LAP-20/HANDOFF.md)，未启用free；[LAP-21受控表情](tracks/laptop-workbuddy/tasks/LAP-21/HANDOFF.md)本轮已领取实施。
@@ -83,4 +85,4 @@ PROGRESS保存全局结论，工作线HANDOFF保存当前检查点，TASKS登记
 - LAP-12一键生命周期本机无推理验证有历史证据；LAP-13配置交互实现/离线通过，真实终端接受待验。
 - G0—G4和LAP-09—11技术/群文本基线可从工作线及各任务恢复，不等同完整第一版文本/视频交付。
 
-当前交付：[LAP-21受控表情](tracks/laptop-workbuddy/tasks/LAP-21/HANDOFF.md)，session LAP-21-controlled-memes；仅21，实现/离线通过，真实未验；不启停或改本机settings，Git记录见任务交接。
+当前规划交付：[LAP-24登录持久化与自然分条](tracks/laptop-workbuddy/tasks/LAP-24/HANDOFF.md)，session LAP-24-login-natural-replies-plan；排查/详细规划完成，未实施或操作bot，Git检查点见任务交接。LAP-21并行续作保持原session归属，不纳入24提交。
