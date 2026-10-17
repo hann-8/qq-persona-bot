@@ -6,7 +6,7 @@
 
 2026-10-17 15:52（Asia/Shanghai）。状态：已实现、离线/实际框架合成通过、实际SSH零推理元数据通过；真实生成/QQ/完整验收未做，未部署或切换本机后端。仅领取17，18/20/21等待用户后续指令。
 
-session `LAP-17-dual-profile-implementation` / “LAP-17双profile与SSH原生后端实施”，15:35登记；main起点6a2f244，开始工作区干净，没有其他session修改。Git已获授权，当前待内容审阅提交/推送及远端SHA核对，完成后同步交付记录。
+session `LAP-17-dual-profile-implementation` / “LAP-17双profile与SSH原生后端实施”，15:35登记；main起点6a2f244，开始工作区干净，没有其他session修改。2026-10-17 15:55内容提交`34f62843b29c99d746a944216cab74f85eb8e932`已推送origin/main并用git ls-remote核对完整SHA一致；该检查点工作区干净。随后仅同步本交付记录，仍按长期授权提交/推送。
 
 ## 已完成
 
@@ -40,4 +40,6 @@ session `LAP-17-dual-profile-implementation` / “LAP-17双profile与SSH原生�
 
 回滚：操作者停机选保留CLI profile再启动，不删模型/旧历史/SSH资料。远端未知标记须独立核对并停机显式确认，不能以ps判断。回退schema2代码先处理/隔离pending发送与远端未知请求，恢复同一检查点配置备份并保留schema3/新历史。完整操作见README/报告。
 
-下一步仅完成本任务Git交付；完成后停止，不开始18/20/21。后续真实启用：操作者停机初始化JSON→只读检查→核对digest→手动选择/重启；本轮没有执行这些步骤。
+本任务实现/离线/元数据与内容Git交付已完成；同步本交付记录后停止，不开始18/20/21。后续真实启用：操作者停机初始化JSON→只读检查→核对digest→手动选择/重启；本轮没有执行这些步骤。
+
+保留本机差异：无已跟踪/未跟踪任务文件差异；原有settings/家庭凭据及新增state测试/元数据工件继续忽略，未纳入提交。最终交付记录提交可由当前main/HEAD恢复，不自引用自身SHA。

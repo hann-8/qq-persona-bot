@@ -6,7 +6,7 @@
 
 LAP-17已独立实现，146项单元、两后端实际runner+AstrBot合成90组及入口/ACK/恢复通过，见[报告](reports/lap-17-2026-10-17.md) / [任务HANDOFF](tracks/laptop-workbuddy/tasks/LAP-17/HANDOFF.md)。schema3与两profile、旧配置保留迁移、配置cmd停机手动切换、固定指纹SSH原生Ollama/零推理预检、未知结果持久阻断已落地。真实生成/QQ/完整验收未做，不能标双路线真实可用。
 
-2026-10-17 15:51（Asia/Shanghai）交付检查中；main起点6a2f244，用户授权commit/push，远端SHA待最后核对。本轮没有修改本机settings/persona或初始化长期运行连接JSON，没有启停/登录bot、真实CLI/Ollama生成/群发、PC下载/全局参数/服务修改。当前bot状态未知。PC最终零推理元数据15:44通过，digest一致；最新ps未加载所选模型，不沿用早期16K加载状态。证据见[PC交接](tracks/local-5070/HANDOFF.md)。
+2026-10-17 15:51（Asia/Shanghai）内容提交`34f62843b29c99d746a944216cab74f85eb8e932`已推送origin/main，git ls-remote核对完整SHA一致，内容交付检查点工作区干净；随后仅同步本交付记录。本轮没有修改本机settings/persona或初始化长期运行连接JSON，没有启停/登录bot、真实CLI/Ollama生成/群发、PC下载/全局参数/服务修改。当前bot状态未知。PC最终零推理元数据15:44通过，digest一致；最新ps未加载所选模型，不沿用早期16K加载状态。证据见[PC交接](tracks/local-5070/HANDOFF.md)。
 
 [LAP-19总体计划](tracks/laptop-workbuddy/tasks/LAP-19/PLAN.md)、[自由群聊/表情包合同](tracks/laptop-workbuddy/tasks/LAP-19/GROUP_CHAT_PLAN.md)与[实施指引](tracks/laptop-workbuddy/tasks/LAP-19/IMPLEMENTATION_GUIDE.md)仍是17/18/20/21合同。17本轮交付；18共用联网→20自由参与/直接群发→21表情包各待用户后续指令，本会话不自动领取。当前仍仅真实@/纯文字，CLI/AstrBot工具隔离不变。
 

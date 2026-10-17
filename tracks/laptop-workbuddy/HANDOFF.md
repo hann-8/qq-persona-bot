@@ -2,7 +2,7 @@
 
 返回[全局入口](../../PROGRESS.md)。继承[AGENTS](../../AGENTS.md)；原规格见[实施计划](IMPLEMENTATION_PLAN.md)，本轮体验改进执行[UX_PLAN](UX_PLAN.md)，验收见[ACCEPTANCE](ACCEPTANCE.md)，领取/交接见[任务台账](TASKS.md)。本轮任务记录：[LAP-08](tasks/LAP-08/HANDOFF.md)。
 
-更新时间：2026-10-17 15:51（Asia/Shanghai）。最新检查点：[LAP-17](tasks/LAP-17/HANDOFF.md)已实现/离线与SSH零推理元数据通过；146单元、90组两后端实际runner+AstrBot合成、原SDK/gate ACK/恢复与严格入口通过。见[报告](../../reports/lap-17-2026-10-17.md)。两profile/schema3无损迁移/菜单切换/原生runner/未知阻断落地；本机settings/persona/长期运行连接文件未改，0真实生成/启停/登录/群发/PC修改。当前bot状态未知，真实能力/旧验收差额保留。仅17，18/20/21待后续指令；Git提交/推送核对中。
+更新时间：2026-10-17 15:51（Asia/Shanghai）。最新检查点：[LAP-17](tasks/LAP-17/HANDOFF.md)已实现/离线与SSH零推理元数据通过；146单元、90组两后端实际runner+AstrBot合成、原SDK/gate ACK/恢复与严格入口通过。见[报告](../../reports/lap-17-2026-10-17.md)。两profile/schema3无损迁移/菜单切换/原生runner/未知阻断落地；本机settings/persona/长期运行连接文件未改，0真实生成/启停/登录/群发/PC修改。当前bot状态未知，真实能力/旧验收差额保留。仅17，18/20/21待后续指令；内容提交`34f62843b29c99d746a944216cab74f85eb8e932`已推送origin/main并用ls-remote核对完整SHA，内容检查点工作区干净；随后仅同步交付记录。
 
 以下为LAP-19及更早历史检查点，新实施结论以上段及LAP-17交接为准：
 

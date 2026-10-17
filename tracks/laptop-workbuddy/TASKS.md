@@ -10,7 +10,7 @@ LAP-13实现提交`ee7f2d4`已成功推送origin/main；随后仅同步交付检
 
 ## 当前任务
 
-LAP-17已实现/离线通过、真实未验：`LAP-17-dual-profile-implementation` / “LAP-17双profile与SSH原生后端实施”，2026-10-17 15:35领取；146单元/90实际框架合成及元数据通过，见[报告](../../reports/lap-17-2026-10-17.md) / [任务HANDOFF](tasks/LAP-17/HANDOFF.md)。仅17，0真实生成/启停/群发；Git交付核对中。
+LAP-17已实现/离线通过、真实未验：`LAP-17-dual-profile-implementation` / “LAP-17双profile与SSH原生后端实施”，2026-10-17 15:35领取；146单元/90实际框架合成及元数据通过，见[报告](../../reports/lap-17-2026-10-17.md) / [任务HANDOFF](tasks/LAP-17/HANDOFF.md)。仅17，0真实生成/启停/群发；内容提交`34f62843b29c99d746a944216cab74f85eb8e932`已推送origin/main并核对完整SHA一致；随后仅同步交付记录。
 
 以下LAP-19为已完成的历史规划检查点：`LAP-19-dual-backend-web-plan` / “双后端、联网、自由群聊与表情包规划”，2026-10-17 14:49领取，15:01首版落盘，随后按用户追加扩为四项合同；[PLAN](tasks/LAP-19/PLAN.md)、[GROUP_CHAT_PLAN](tasks/LAP-19/GROUP_CHAT_PLAN.md)、[复制指令](tasks/LAP-19/IMPLEMENTATION_GUIDE.md)、[HANDOFF](tasks/LAP-19/HANDOFF.md)记录范围/证据/归属。本轮不实施/改运行配置，不启停/模型生成/群发。
 
@@ -38,7 +38,7 @@ LAP-15内容提交`632fdc5`已推送origin/main，2026-10-17 11:09用ls-remote�
 | LAP-14 | 人设落地与分条对话调研规划 | completed，仅v2规划；[HANDOFF](tasks/LAP-14/HANDOFF.md) / [PLAN](tasks/LAP-14/PLAN.md) / [指引](tasks/LAP-14/IMPLEMENTATION_GUIDE.md) | 用户后续明确先规划、CLI优先；另授权SSH只读配置核对 | 同一LAP-14规划会话，10:31首次、10:45续领、10:57规划交接、11:01 Git交付；本任务文档归属 | `c7d2f27`已推送并核对；medium先15后16，bot新功能未实现，persona/私密资料未提交 |
 | LAP-15 | 精简人设与场景表达 | 已实现/离线通过，真实加载/P01未验；[HANDOFF](tasks/LAP-15/HANDOFF.md) / [报告](../../reports/lap-15-2026-10-17.md) | 用户已明确指定；仅本任务，单条保持 | LAP-15-persona-implementation / LAP-15精简人设与场景表达，2026-10-17 11:06领取、11:09离线交接 | 原文完整hash备份；组合3618字节；108单元/5组框架回环及版本迁移通过；用户接受待验 |
 | LAP-16 | 一次生成与有限分条发送 | 已实现/离线通过，未实际启用；[HANDOFF](tasks/LAP-16/HANDOFF.md) / [报告](../../reports/lap-16-2026-10-17.md) | 用户明确继续，LAP-15离线通过 | LAP-16-adaptive-delivery / LAP-16一次生成与有限分条，2026-10-17 11:16领取、11:35离线交接 | 124单元/40框架回环/原SDK-gate ACK及恢复并发通过；single兼容，真实启用/接受另列 |
-| LAP-17 | 本地后端/配置切换；原群参与分支转LAP-20 | 已由[LAP-19](tasks/LAP-19/PLAN.md)已实现/离线与SSH元数据通过，真实生成/启用未验；[PC资料](../local-5070/HANDOFF.md)有模型/通道只读证据 | 两路线保留；先17→18→20→21；群参与明确拆入20不在17启用 | LAP-17-dual-profile-implementation，2026-10-17 15:35；[HANDOFF](tasks/LAP-17/HANDOFF.md)登记文件归属 | 146单元/90框架合成与SSH零推理元数据通过；Git核对中；真实能力另按范围验证，不自动开始下一任务 |
+| LAP-17 | 本地后端/配置切换；原群参与分支转LAP-20 | 已由[LAP-19](tasks/LAP-19/PLAN.md)已实现/离线与SSH元数据通过，真实生成/启用未验；[PC资料](../local-5070/HANDOFF.md)有模型/通道只读证据 | 两路线保留；先17→18→20→21；群参与明确拆入20不在17启用 | LAP-17-dual-profile-implementation，2026-10-17 15:35；[HANDOFF](tasks/LAP-17/HANDOFF.md)登记文件归属 | 146单元/90框架合成与SSH零推理元数据通过；内容34f6284已推送/核对；真实能力另按范围验证，不自动开始下一任务 |
 | LAP-18 | 两后端共用联网检索/网页读取 | 已由[LAP-19](tasks/LAP-19/PLAN.md)详细规划，待实施；候选接口探测不等于质量通过 | LAP-17共用backend合同后独立领取；搜索质量门槛先行 | 实施未领取，不预建HANDOFF | 按需自动/来源/预算/安全读取/历史ACK；两后端真实分开验收；候选质量不足回规划，不增付费API或放开CLI工具 |
 | LAP-19 | 双后端/联网/自由群聊/表情包总体详细规划 | completed，仅详细规划；内容91b96d5已推送核对；[HANDOFF](tasks/LAP-19/HANDOFF.md) / [PLAN](tasks/LAP-19/PLAN.md) / [追加合同](tasks/LAP-19/GROUP_CHAT_PLAN.md) / [指令](tasks/LAP-19/IMPLEMENTATION_GUIDE.md) | 用户明确只规划、后由gpt-6.1-sol/medium执行；17/18与追加20/21均在此设计 | LAP-19-dual-backend-web-plan / 四项总体规划，2026-10-17 14:49领取；文件归属见HANDOFF | 10份文档/143链接/21唯一ID/隐私与diff检查通过，内容commit/push及远端SHA一致；后续按指引分别实施，不部署/生成/群发 |
 | LAP-20 | 自由参与群聊、@必答与直接群发 | 已详细规划，待实施；[合同](tasks/LAP-19/GROUP_CHAT_PLAN.md) | 17/18共用接口后；原17群参与分支明确拆入，黑名单/群授权保留 | 未领取，不预建HANDOFF | mentions/free、RAM群窗口/合批、一次决策/优先队列、silent拦截、全模式无Reply/自动@、ACK/恢复；真实另验 |
