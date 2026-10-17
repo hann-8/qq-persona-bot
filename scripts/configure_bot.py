@@ -187,10 +187,11 @@ class ConfigMenu:
             self.ui.write(f"输入预算：{chat['context_input_limit_tokens']:,}（可见内容保守计数）")
             self.ui.write('\n1  群与黑名单\n2  模型与对话\n3  详细设置与能力说明\n4  回复方式\n5  后端与连接\n6  联网搜索\n0  退出')
             self.ui.write('\n修改前请先关闭机器人；保存后，下次启动生效')
-            self.ui.write('7  群聊参与与活跃度')
-            choice = self.ui.choose({'0','1','2','3','4','5','6','7'})
+            self.ui.write('7  群聊参与与活跃度\n8  表情包')
+            choice = self.ui.choose({'0','1','2','3','4','5','6','7','8'})
             if choice == '0':return
-            if choice == '7':self.participation_group()
+            if choice == '8':self.memes_group()
+            elif choice == '7':self.participation_group()
             elif choice == '6':self.web_group()
             elif choice == '5':self.backend_group()
             elif choice == '4':self.output_group()
@@ -201,6 +202,55 @@ class ConfigMenu:
                 self.ui.write(content.getvalue().rstrip())
                 self.ui.pause()
             else:self.group(choice)
+
+    def memes_group(self):
+        from qqbot_gateway.meme_catalog import MemeCatalog,DEFAULTS,controlled_path
+        from qqbot_gateway.meme_import import favorites,admin_token
+        import asyncio,os,aiohttp
+        root=self.path.parent.parent
+        while True:
+            settings,digest=read_settings(self.path)
+            self.ui.page('表情包')
+            self.ui.write('默认关闭；扫描/标签/激活须停机，重启生效。收藏仅在现有机器人连接可用时显式读取，绝不启动或登录。导入暂存后须停机激活并确认标签。真实收藏/显示未验。')
+            self.ui.write('1 打开本地inbox / 2 扫描本地表情 / 3 初始化独立管理token / 4 从机器人QQ收藏详情导入 / 5 基础接口导入（仅显式选择） / 6 停机激活暂存 / 7 填写标签并确认 / 8 表情参数 / 0 返回')
+            choice=self.ui.choose({str(i) for i in range(9)})
+            if choice=='0':return
+            try:
+                catalog=MemeCatalog(root,settings['memes'])
+                if choice=='1':
+                    folder=controlled_path(root,settings['memes']['inbox_dir']);folder.mkdir(parents=True,exist_ok=True);os.startfile(folder)
+                elif choice=='2':self.ui.write('扫描接收/拒绝数量：'+str(catalog.scan()))
+                elif choice=='3':
+                    admin_token(root,create=True);self.ui.write('独立管理token已准备在项目secrets内；下次正常启动gate时加载。未显示token、未启停。')
+                elif choice in ('4','5'):
+                    result=asyncio.run(favorites(root,settings['memes'],settings['onebot']['port'],basic=choice=='5'))
+                    self.ui.write('暂存接收/失败数量：'+str(result)+'；停机激活后再填写标签，未启用memes。')
+                elif choice=='6':catalog.activate_pending();self.ui.write('已停机激活；请确认名称/标签后重启。')
+                elif choice=='7':
+                    for i,row in enumerate(catalog.rows,1):self.ui.write(f'{i} {row["id"]} {row["name"]} enabled={row["enabled"]}')
+                    value=self.ui.read('选择序号（回车取消）：').strip()
+                    if not value:continue
+                    row=catalog.rows[int(value)-1]
+                    row['name']=self.ui.read('简短名称：').strip()
+                    row['context']=self.ui.read('简短使用语境：').strip()
+                    row['tags']=[x.strip() for x in self.ui.read('标签（逗号分隔）：').split(',') if x.strip()]
+                    row['enabled']=self.ui.read('确认登记并启用此图？输入 YES，其余禁用：').strip()=='YES'
+                    catalog.save();self.ui.write('目录已保存，下次启动生效；未调用模型或发图。')
+                elif choice=='8':
+                    keys=list(DEFAULTS)
+                    for i,key in enumerate(keys,1):self.ui.write(f'{i} {key}: {settings["memes"][key]}')
+                    self.ui.write('enabled/allow_meme_only: true或false；候选1..32/字节500..4000；单轮图片固定1；冷却0..600秒/同图0..3600秒；文件1048576..8388608字节；导入1..48；路径固定项目忽略位置。')
+                    value=self.ui.read('参数序号（回车取消）：').strip()
+                    if not value:continue
+                    key=keys[int(value)-1];value=self.ui.read('新值：').strip()
+                    if type(DEFAULTS[key]) is bool:
+                        if value not in ('true','false'):raise ValueError()
+                        value=value=='true'
+                    elif type(DEFAULTS[key]) is int:value=int(value)
+                    settings['memes'][key]=value;save_settings(self.path,settings,digest)
+                    self.ui.write('配置已保存，须重启生效；未启停或发图。')
+            except (ValueError,OSError,IndexError,TimeoutError,aiohttp.ClientError):self.ui.write('操作未完成：检查连接、停机状态、目录、标签和参数；未自动重试/登录/扩域。')
+            self.ui.pause()
 
     def participation_group(self):
         from qqbot_gateway.participation import DEFAULTS,RANGES

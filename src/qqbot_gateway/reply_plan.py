@@ -31,17 +31,36 @@ def truncate(text, maximum):
 
 
 @dataclass(frozen=True)
+class PreparedPart:
+    type: str
+    digest: str
+    payload_ref: str
+    semantic_label: str
+
+    def metadata(self):return dict(type=self.type,digest=self.digest,payload_ref=self.payload_ref,semantic_label=self.semantic_label)
+
+
+@dataclass(frozen=True)
 class ReplyPlan:
     kind: str
     bubbles: tuple[str, ...]
     canonical_text: str
     limited: bool = False
     fallback_reason: str | None = None
+    prepared_parts: tuple[PreparedPart,...] = ()
+
+    @property
+    def parts(self):
+        return self.prepared_parts or tuple(PreparedPart('text',digest(x),x,x) for x in self.bubbles)
 
     def metadata(self, response_id):
-        return dict(version=1, response_id=response_id, kind=self.kind, bubbles=list(self.bubbles),
+        value=dict(version=2 if self.prepared_parts else 1, response_id=response_id, kind=self.kind, bubbles=list(self.bubbles),
                     content_sha256=digest(self.canonical_text), limited=self.limited,
                     fallback_reason=self.fallback_reason)
+        if self.prepared_parts:
+            value['parts']=[p.metadata() for p in self.parts]
+            value['plan_sha256']=digest(json.dumps(value,sort_keys=True,ensure_ascii=False,separators=(',',':')))
+        return value
 
 
 def _pairs(pairs):
@@ -117,6 +136,9 @@ def trusted_plan(metadata, text, response_id, output):
     fallback = ReplyPlan('answer', (text,), text, fallback_reason='metadata_missing_or_mismatch')
     if not isinstance(metadata, dict):
         return fallback
+    if metadata.get('version')==2:
+        from .media_protocol import trusted_media_plan
+        return trusted_media_plan(metadata,text,response_id,output)
     parts = metadata.get('bubbles')
     if (type(metadata.get('version')) is not int or metadata['version'] != 1 or
             metadata.get('response_id') != response_id or metadata.get('content_sha256') != digest(text) or

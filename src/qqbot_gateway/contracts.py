@@ -9,7 +9,10 @@ def normalize_request(payload, char_limit=None, budget=None):
         raise fail()
     if 'qqbot_request' in payload:
         from .group_protocol import validate_request
-        validate_request(payload['qqbot_request'])
+        request=payload['qqbot_request']
+        if isinstance(request,dict) and request.get('kind')=='media_turn':
+            if set(request)!={'version','kind'} or type(request['version']) is not int or request['version']!=1:raise fail()
+        else:validate_request(request)
     if payload.get('model') != 'workbuddy-local' or payload.get('stream', False) is not False:
         raise fail()
     messages = payload.get('messages')
@@ -49,7 +52,7 @@ def normalize_request(payload, char_limit=None, budget=None):
     if any(m['role'] != ('user' if index%2 == 0 else 'assistant') for index,m in enumerate(dialog)):
         raise fail()
     prompt = dialog_text(dialog)
-    if 'qqbot_request' in payload:
+    if 'qqbot_request' in payload and payload['qqbot_request'].get('kind')=='group_turn':
         from .reply_plan import digest
         if len(dialog)!=1 or payload['qqbot_request']['snapshot_digest']!=digest(dialog[0]['content']):raise fail()
         from .group_protocol import validate_snapshot

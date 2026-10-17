@@ -43,13 +43,15 @@ class QQRouter(Star):
         self.output=settings['output']
         self.web=settings['web']
         self.participation=settings['participation']
-        self.persona=compose_persona((self.root/'config/persona.md').read_text(encoding='utf-8'),self.output,self.web,self.participation)
-        self.persona_id=session_version(self.persona,settings)
+        from qqbot_gateway.meme_catalog import MemeCatalog
+        self.memes=MemeCatalog(self.root,settings['memes'])
+        self.persona=compose_persona((self.root/'config/persona.md').read_text(encoding='utf-8'),self.output,self.web,self.participation,settings['memes'])
+        self.persona_id=session_version(self.persona+('\n'+self.memes.fingerprint() if self.memes.cfg['enabled'] else ''),settings)
         chat=settings.get('chat',{})
         self.budget=InputBudget.from_settings(settings,validate_model_settings(settings))
         self.coordinator=SessionCoordinator(chat.get('user_cooldown_seconds',5),chat.get('session_queue_limit',2),chat.get('session_queue_timeout_seconds',600))
         self.tasks=TaskStore(self.root/'state/tasks.sqlite')
-        self.delivery=ReplyDelivery(self.tasks,self.output,self.delivery_allowed)
+        self.delivery=ReplyDelivery(self.tasks,self.output,self.delivery_allowed,catalog=self.memes)
         self.group_turns=Participation(self.participation,digest(self.persona_id+uuid.uuid4().hex),settings['llm']['queue_limit'],chat.get('session_queue_timeout_seconds',600))
         self.connection_id=None
         self.connection_watcher=None
@@ -136,7 +138,7 @@ class QQRouter(Star):
         raw=response.raw_completion
         if (raw is None or raw.model!='workbuddy-local' or
                 not raw.id.startswith('chatcmpl-') or len(raw.choices)!=1):
-            if getattr(self,'output',{}).get('delivery_mode')=='adaptive' and event.get_extra('qq_delivery_key'):
+            if (getattr(self,'output',{}).get('delivery_mode')=='adaptive' or event.get_extra('qq_media_turn')) and event.get_extra('qq_delivery_key'):
                 event.clear_result();event.stop_event()
             return
         if getattr(raw,'qqbot_web_expired',False) is True:
@@ -151,7 +153,7 @@ class QQRouter(Star):
             event.clear_result();event.stop_event();return
         text=raw.choices[0].message.content
         if not isinstance(text,str) or not text.strip() or response.role!='assistant':
-            if getattr(self,'output',{}).get('delivery_mode')=='adaptive' and event.get_extra('qq_delivery_key'):
+            if (getattr(self,'output',{}).get('delivery_mode')=='adaptive' or event.get_extra('qq_media_turn')) and event.get_extra('qq_delivery_key'):
                 event.clear_result();event.stop_event()
             return
         response.result_chain=MessageChain().message(text)
@@ -159,11 +161,12 @@ class QQRouter(Star):
         if run_context.messages and run_context.messages[-1].role=='assistant':
             run_context.messages[-1].content=[TextPart(text=text)]
         event.set_extra('qq_router_success',True)
-        if getattr(self,'output',{}).get('delivery_mode')=='adaptive' and event.get_extra('qq_delivery_key'):
+        if (getattr(self,'output',{}).get('delivery_mode')=='adaptive' or event.get_extra('qq_media_turn')) and event.get_extra('qq_delivery_key'):
             # Persist before the framework can either save history or dispatch a result.
             try:
                 key=event.get_extra('qq_delivery_key')
                 plan=trusted_plan(getattr(raw,'qqbot_reply_plan',None),text,raw.id,self.output)
+                if event.get_extra('qq_media_turn') and plan.fallback_reason=='metadata_missing_or_mismatch':raise ValueError('Missing media identity')
                 expected=[m.model_dump() for m in run_context.messages if m.role!='system' and not m._no_save]
                 self.tasks.prepare_delivery(key,event.unified_msg_origin,event.get_extra('qq_delivery_cid'),
                     raw.id,plan,event.get_extra('qq_delivery_before'),expected)
@@ -175,6 +178,9 @@ class QQRouter(Star):
             except Exception:
                 # Framework swallows hook exceptions; explicitly stop unsafe save/dispatch.
                 event.set_extra('qq_router_success',False)
+                if event.get_extra('qq_media_turn') and run_context.messages and run_context.messages[-1].role=='assistant':
+                    run_context.messages[-1]._no_save=True
+                    run_context.messages[-1].content=[]
                 event.clear_result();event.stop_event()
                 LOG.error('QQ_DELIVERY_PREPARE_FAILED')
 
@@ -201,6 +207,7 @@ class QQRouter(Star):
                 except Exception:plan=None;event.set_extra('qq_group_invalid',True)
             if plan and self.delivery_allowed(event):
                 with guard.grant():await self.delivery.send(event,key,plan)
+                await self.failed_image_notice(event,key,plan)
             else:
                 event.set_extra('qq_delivery_handled',True)
                 if request['must_reply'] and (event.get_extra('qq_group_invalid') or not event.get_extra('qq_group_metadata')):
@@ -215,7 +222,7 @@ class QQRouter(Star):
             return
         if event.get_extra('qq_web_expired'):
             event.clear_result();event.stop_event();return
-        if getattr(self,'output',{}).get('delivery_mode')!='adaptive' or not event.get_extra('qq_delivery_key'):
+        if (getattr(self,'output',{}).get('delivery_mode')!='adaptive' and not event.get_extra('qq_media_turn')) or not event.get_extra('qq_delivery_key'):
             return
         # Always take over this model event, even if the hook/SDK failed to prepare a plan.
         event.clear_result()
@@ -235,6 +242,15 @@ class QQRouter(Star):
         if guard:
             with guard.grant():await self.delivery.send(event,key,plan)
         else:await self.delivery.send(event,key,plan)
+        await self.failed_image_notice(event,key,plan)
+
+    async def failed_image_notice(self,event,key,plan):
+        request=event.get_extra('qq_group_request')
+        if (len(plan.parts)==1 and plan.parts[0].type=='image' and
+            (not request or request['must_reply']) and self.tasks.parts(key)[0][1]=='failed' and
+            not event.get_extra('qq_image_notice')):
+            event.set_extra('qq_image_notice',True)
+            await self.local_notice(event,'这张表情暂时发不了。')
 
     @filter.event_message_type(filter.EventMessageType.GROUP_MESSAGE)
     async def on_group(self,event:AstrMessageEvent):
@@ -305,17 +321,19 @@ class QQRouter(Star):
             history=self.budget.select_history(self.persona,prompt,history)
             await manager.update_conversation(umo,cid,history=history)
             conv.history=json.dumps(history,ensure_ascii=False)
-            if self.output['delivery_mode']=='adaptive':
+            if self.output['delivery_mode']=='adaptive' or self.memes.cfg['enabled']:
                 event.set_extra('qq_delivery_key',key)
                 event.set_extra('qq_delivery_cid',cid)
                 event.set_extra('qq_delivery_before',history)
                 event.set_extra('qq_delivery_version',self.persona_id)
                 event.set_extra('qq_delivery_identity',(str(event.get_self_id()),str(event.get_group_id()),str(event.get_sender_id())))
+            if self.memes.cfg['enabled']:event.set_extra('qq_media_turn',True)
+            event.set_extra('qq_meme_question',prompt)
             LOG.warning('QQ_TASK_RUNNING trace=%s',trace)
             try:
-                yield event.request_llm(prompt=prompt,conversation=conv,tool_set=None)
+                yield event.request_llm(prompt=prompt,conversation=conv,tool_set=None,session_id='qqbot-media' if event.get_extra('qq_media_turn') else None)
             finally:
-                if self.output['delivery_mode']=='adaptive':
+                if self.output['delivery_mode']=='adaptive' or event.get_extra('qq_media_turn'):
                     row=self.tasks.delivery(key)
                     if row:
                         await self.tasks.repair_delivery(key,manager)
@@ -425,6 +443,7 @@ class QQRouter(Star):
             request=dict(version=1,kind='group_turn',trigger='mention' if mention else 'ambient',must_reply=mention,
                          epoch=epoch,snapshot_digest=digest(body),request_key=digest(key))
             event.set_extra('qq_group_request',request);event.set_extra('qq_delivery_key',key)
+            event.set_extra('qq_meme_question',next((r['text'] for r in json.loads(body)['messages'] if r['seq']==json.loads(body).get('target_seq')),''))
             event.set_extra('qq_snapshot_range',[snapshot[0]['seq'],snapshot[-1]['seq']])
             event.should_call_llm(True);self.tasks.set(key,'running')
             yield event.request_llm(prompt=body,contexts=[],system_prompt=self.persona,conversation=None,tool_set=None,

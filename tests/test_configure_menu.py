@@ -50,6 +50,15 @@ class MenuTests(unittest.TestCase):
         self.original = self.path.read_bytes()
     def tearDown(self):self.temp.cleanup()
 
+    def test_meme_menu_explicit_enable_preserves_profiles(self):
+        before=load_settings(self.path)
+        ui=RecordedConsole(['8','8','1','true','','0','0'])
+        menu(self.path,ui)
+        after=load_settings(self.path)
+        self.assertTrue(after['memes']['enabled'])
+        self.assertEqual(after['llm'],before['llm']);self.assertEqual(after['participation'],before['participation'])
+        self.assertIn('收藏仅在现有机器人连接',ui.text);self.assertIn('图片1048576',ui.text.replace('文件','图片'))
+
     def test_explicit_free_menu_preserves_profiles_and_units(self):
         before=load_settings(self.path)
         ui=RecordedConsole(['7','1','free','','0','0'])

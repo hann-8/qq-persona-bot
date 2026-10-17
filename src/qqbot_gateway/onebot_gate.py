@@ -49,10 +49,35 @@ def allowed_action(event, config):
     if action in ('get_login_info', 'get_version_info', 'get_status', 'get_group_list'):
         return True
     if action in ('get_group_info', 'get_group_member_info', 'get_group_member_list', 'send_group_msg'):
-        return qq_id(params.get('group_id')) in config.allowed_groups
+        return qq_id(params.get('group_id')) in config.allowed_groups and (action!='send_group_msg' or allowed_segments(params.get('message'),config))
     if action == 'send_msg':
-        return params.get('message_type') == 'group' and qq_id(params.get('group_id')) in config.allowed_groups
+        return params.get('message_type') == 'group' and qq_id(params.get('group_id')) in config.allowed_groups and allowed_segments(params.get('message'),config)
     return False
+
+
+def allowed_segments(message,config):
+    if not isinstance(message,list) or not message or len(message)>1:return False
+    for part in message:
+        if not isinstance(part,dict) or set(part)!={'type','data'} or not isinstance(part['data'],dict):return False
+        data=part['data']
+        if part['type']=='text':
+            if set(data)!={'text'} or not isinstance(data['text'],str) or '[CQ:' in data['text']:return False
+        elif part['type']=='image':
+            if not config.media_catalog or set(data)!={'file'} or not isinstance(data.get('file'),str):return False
+            try:
+                # Exact library URI + hash validation; remote/base64/other local paths denied.
+                valid=False
+                from .meme_catalog import controlled_path,inspect_image
+                for row in config.media_catalog.rows:
+                    try:
+                        path,_=config.media_catalog.resolve(row['id'])
+                        for candidate in (path,controlled_path(config.media_catalog.root,'state/meme-delivery/'+row['file'])):
+                            if candidate.as_uri()==data['file'] and candidate.stat().st_size<=config.media_catalog.cfg['max_file_bytes'] and inspect_image(candidate.read_bytes())['sha256']==row['sha256']:valid=True
+                    except (OSError,ValueError):continue
+                if not valid:return False
+            except (OSError,ValueError):return False
+        else:return False
+    return True
 
 
 def echo_key(value):
@@ -94,6 +119,11 @@ class OneBotGate:
         self.online = None
         self.online_at = None
         self.health_pending = {}
+        self.admin_pending={}
+        self.admin_busy=False
+        from .meme_import import admin_token
+        self.admin_token=admin_token(root) if root else None
+        if self.admin_token in (config.inbound_token,config.upstream_token):raise ValueError('Independent admin token required')
         self.connection_id=secrets.token_hex(32)
 
     def publish_connection(self):
@@ -184,6 +214,9 @@ class OneBotGate:
             self.online = None
             self.online_at = None
             self.health_pending.clear()
+            for future in self.admin_pending.values():
+                if not future.done():future.set_exception(ConnectionError('disconnected'))
+            self.admin_pending.clear()
             LOG.info('CHANNEL_DISCONNECTED')
             self.active = None
             if downstream.prepared:
@@ -232,7 +265,10 @@ class OneBotGate:
                   event.get('status') in ('ok', 'failed') and
                   isinstance(event.get('retcode'), int) and not isinstance(event['retcode'], bool)):
                 key = echo_key(event['echo'])
-                if key in self.health_pending:
+                if key in self.admin_pending:
+                    future=self.admin_pending[key]
+                    if not future.done():future.set_result(event)
+                elif key in self.health_pending:
                     future = self.health_pending[key]
                     self.observe_online(event.get('data') if event.get('status')=='ok' and event['retcode']==0 else None)
                     if not future.done():future.set_result(None)
@@ -251,7 +287,7 @@ class OneBotGate:
             if not isinstance(event, dict):
                 continue
             key = echo_key(event['echo']) if 'echo' in event else None
-            if allowed_action(event, self.config) and key is not None and key not in self.health_pending and len(pending) < 128:
+            if allowed_action(event, self.config) and key is not None and key not in self.health_pending and key not in self.admin_pending and len(pending) < 128:
                 pending.add(key)
                 await downstream.send_str(frame.data)
             else:
@@ -264,6 +300,7 @@ class OneBotGate:
         app.router.add_get('/ws', self.handle)
         async def health(request):return web.json_response(self.status())
         app.router.add_get('/health', health)
+        app.router.add_post('/admin/memes/favorites',self.favorites)
 
         async def cleanup(app):
             if self.active is not None:
@@ -272,6 +309,33 @@ class OneBotGate:
 
         app.on_cleanup.append(cleanup)
         return app
+
+    async def favorites(self,request):
+        if (not self.admin_token or len(request.headers.getall('Authorization',[]))!=1 or
+            not secrets.compare_digest(request.headers.get('Authorization',''),'Bearer '+self.admin_token)):
+            raise web.HTTPUnauthorized(text='AUTH_FAILED')
+        try:
+            obj=await request.json()
+            if (not isinstance(obj,dict) or set(obj)!={'count','mode'} or type(obj['count']) is not int or
+                not 1<=obj['count']<=48 or obj['mode'] not in ('detail','basic')):raise ValueError()
+        except (ValueError,TypeError):raise web.HTTPBadRequest(text='INVALID_FIXED_REQUEST') from None
+        if self.admin_busy:raise web.HTTPConflict(text='IMPORT_BUSY')
+        if not self.connected or self.online is not True or self.active is None:raise web.HTTPServiceUnavailable(text='BOT_NOT_CONNECTED')
+        self.admin_busy=True;echo='gate-memes-'+secrets.token_hex(32);key=echo_key(echo)
+        future=asyncio.get_running_loop().create_future();self.admin_pending[key]=future
+        try:
+            await self.active.send_json(dict(action='fetch_custom_face' if obj['mode']=='basic' else 'fetch_custom_face_detail',params={'count':obj['count']},echo=echo))
+            result=await asyncio.wait_for(future,5)
+            if result.get('status')!='ok' or result.get('retcode')!=0 or not isinstance(result.get('data'),list):raise ValueError()
+            # Only URL survives transiently. No arbitrary account metadata reaches client/framework.
+            rows=[]
+            for row in result['data'][:obj['count']]:
+                url=row if isinstance(row,str) else row.get('url') if isinstance(row,dict) else None
+                if not isinstance(url,str) or len(url)>2048:raise ValueError()
+                rows.append(url)
+            return web.json_response(rows)
+        except (ValueError,ConnectionError,TimeoutError):raise web.HTTPServiceUnavailable(text='FAVORITES_UNAVAILABLE') from None
+        finally:self.admin_pending.pop(key,None);self.admin_busy=False
 
 
 def main():

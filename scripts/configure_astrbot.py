@@ -29,8 +29,10 @@ async def configure():
         'identifier':False,'group_name_display':False,'datetime_system_prompt':False})
     config['provider_settings']['proactive_capability']['add_cron_tools']=False
     config['provider_settings']['file_extract']['enable']=False
-    persona=compose_persona((ROOT/'config/persona.md').read_text(encoding='utf-8'),settings['output'],settings['web'],settings['participation'])
-    persona_id=session_version(persona,settings)
+    persona=compose_persona((ROOT/'config/persona.md').read_text(encoding='utf-8'),settings['output'],settings['web'],settings['participation'],settings['memes'])
+    from qqbot_gateway.meme_catalog import MemeCatalog
+    catalog=MemeCatalog(ROOT,settings['memes'])
+    persona_id=session_version(persona+('\n'+catalog.fingerprint() if settings['memes']['enabled'] else ''),settings)
     from astrbot.core.config.agent_runner import get_agent_runner_config_default
     runner=get_agent_runner_config_default('local')
     runner['model'].update(provider_id='workbuddy-local',request_max_retries=1,fallback_provider_ids=[])

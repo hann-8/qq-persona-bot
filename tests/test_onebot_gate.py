@@ -79,8 +79,8 @@ class PredicateTests(unittest.TestCase):
     def test_outgoing_scope(self):
         allowed=[{'action':'get_login_info'}, {'action':'get_status'},
                  {'action':'get_stranger_info','params':{'user_id':222}},
-                 {'action':'send_group_msg','params':{'group_id':111,'message':'hello'}}]
-        denied=[{'action':'send_private_msg','params':{'user_id':333,'message':'hello'}},
+                 {'action':'send_group_msg','params':{'group_id':111,'message':[{'type':'text','data':{'text':'hello'}}]}}]
+        denied=[{'action':'send_private_msg','params':{'user_id':333,'message':[{'type':'text','data':{'text':'hello'}}]}},
                 {'action':'get_stranger_info','params':{'user_id':333}},
                 {'action':'get_stranger_info','params':{'user_id':True}},
                 {'action':'get_stranger_info'},
@@ -164,7 +164,7 @@ class TransportTests(unittest.IsolatedAsyncioTestCase):
         with patch.dict('os.environ',{'QQBOT_INSTANCE_ID':'current'}), \
              patch.object(self.gate.store,'reserve',side_effect=AssertionError('draining must not reserve')):
             await ws.send_json(message())
-            action={'action':'send_group_msg','params':{'group_id':111,'message':'already accepted'},'echo':'final'}
+            action={'action':'send_group_msg','params':{'group_id':111,'message':[{'type':'text','data':{'text':'already accepted'}}]},'echo':'final'}
             await up.send_json(action)
             self.assertEqual(await ws.receive_json(timeout=2),action)
             await ws.send_json({'status':'ok','retcode':0,'data':{'message_id':2},'echo':'final'})

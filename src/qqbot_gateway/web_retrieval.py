@@ -302,7 +302,10 @@ class WebRunner:
         if not sources:return BackendResult(SILENT,generation_performed=False,web_expired=True)
         result=await self.guarded(self.runner.run(system,enriched,request_id))
         result=result if isinstance(result,BackendResult) else BackendResult(result)
-        decision,plan=group_plan(result.text,self.output,question,request['must_reply'])
+        if getattr(self,'memes',None) is not None and self.memes.cfg['enabled']:
+            from .media_protocol import media_plan
+            decision,plan=media_plan(result.text,self.output,question,self.memes,[],group=True,must_reply=request['must_reply'])
+        else:decision,plan=group_plan(result.text,self.output,question,request['must_reply'])
         if plan and decision=='speak':
             try:plan=source_plan(plan,sources,self.output,question,retrieval.partial)
             except WebFailure:
@@ -327,7 +330,10 @@ class WebRunner:
             outcomes=await asyncio.gather(task,return_exceptions=True)
             for outcome in outcomes:
                 if isinstance(outcome,GatewayError) and outcome.code in ('REMOTE_RESULT_UNKNOWN','CLEANUP_FAILED'):raise outcome
-    async def run(self,system,prompt,request_id):
+    async def run_media(self,system,prompt,request_id):
+        return await self.run(system,prompt,request_id,media=True)
+
+    async def run(self,system,prompt,request_id,media=False):
         from .backends import BackendResult
         from .errors import GatewayError
         self.check_stopping()
@@ -349,6 +355,11 @@ class WebRunner:
         result=await self.guarded(self.runner.run(system,enriched,request_id))
         self.check_stopping()
         result=result if isinstance(result,BackendResult) else BackendResult(result)
-        try:plan=source_plan(result.text,sources,self.output,question,retrieval.partial)
+        try:
+            raw=result.text
+            if media:
+                from .media_protocol import media_plan
+                _,raw=media_plan(raw,self.output,question,self.memes,[])
+            plan=source_plan(raw,sources,self.output,question,retrieval.partial)
         except WebFailure:raise GatewayError('PROTOCOL_ERROR') from None
         return BackendResult(plan.canonical_text,result.usage,result.parameters,result.finish_reason,plan)

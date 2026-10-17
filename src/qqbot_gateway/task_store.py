@@ -37,6 +37,9 @@ class TaskStore:
         self.db.execute('''CREATE TABLE IF NOT EXISTS delivery_part (
             message_key TEXT NOT NULL, part INTEGER NOT NULL, state TEXT NOT NULL,
             message_id TEXT, PRIMARY KEY(message_key,part))''')
+        self.db.execute('''CREATE TABLE IF NOT EXISTS prepared_part (
+            message_key TEXT, part INTEGER, part_type TEXT, digest TEXT, media_ref TEXT,
+            semantic_label TEXT, PRIMARY KEY(message_key,part))''')
         with self.db:self.db.execute("UPDATE tasks SET status='unknown' WHERE status IN ('accepted','running')")
 
     def accept(self,key,trace):
@@ -64,6 +67,7 @@ class TaskStore:
                  history_digest(before),history_digest(expected),json.dumps({'confirmed_hashes':confirmed_hashes}),
                  'prepared','pending',plan.fallback_reason))
             if cursor.rowcount:
+                self.record_parts(key,plan)
                 self.db.executemany('INSERT INTO delivery_part VALUES (?, ?, ?, NULL)',
                                     [(key,i,'prepared') for i in range(len(plan.bubbles))])
         return bool(cursor.rowcount)
@@ -80,7 +84,9 @@ class TaskStore:
             cur=self.db.execute('INSERT OR IGNORE INTO delivery VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
                 (key,'group:'+group,'@ram',response_id,digest(plan.canonical_text),json.dumps(plan.bubbles,ensure_ascii=False),
                  snapshot_digest,snapshot_digest,identity,'prepared','pending',plan.fallback_reason))
-            if cur.rowcount:self.db.executemany('INSERT INTO delivery_part VALUES (?,?,?,NULL)',[(key,i,'prepared') for i in range(len(plan.bubbles))])
+            if cur.rowcount:
+                self.record_parts(key,plan)
+                self.db.executemany('INSERT INTO delivery_part VALUES (?,?,?,NULL)',[(key,i,'prepared') for i in range(len(plan.bubbles))])
         return bool(cur.rowcount)
 
     def group_blocked(self,group):
@@ -95,6 +101,12 @@ class TaskStore:
 
     def parts(self,key):
         return self.db.execute('SELECT part,state,message_id FROM delivery_part WHERE message_key=? ORDER BY part',(key,)).fetchall()
+
+    def record_parts(self,key,plan):
+        self.db.executemany('INSERT INTO prepared_part VALUES (?,?,?,?,?,?)',[(key,i,p.type,p.digest,p.payload_ref if p.type=='image' else None,p.semantic_label) for i,p in enumerate(plan.parts)])
+
+    def fail_prepared_part(self,key,index):
+        with self.db:self.db.execute("UPDATE delivery_part SET state='failed' WHERE message_key=? AND part=? AND state='prepared'",(key,index))
 
     def begin_part(self,key,index):
         with self.db:
@@ -115,6 +127,7 @@ class TaskStore:
         parts=self.parts(key)
         complete=bool(parts) and all(state=='sent' for _,state,_ in parts)
         state='sent' if complete else ('unknown' if any(s in ('sending','unknown','sent') for _,s,_ in parts) else 'failed')
+        if not complete and any(s=='sent' for _,s,_ in parts) and all(s in ('sent','failed') for _,s,_ in parts):state='partial'
         with self.db:
             self.db.execute("UPDATE delivery_part SET state='unknown' WHERE message_key=? AND state='sending'",(key,))
             self.db.execute('UPDATE delivery SET state=?,reason=COALESCE(?,reason) WHERE message_key=?',(state,reason,key))

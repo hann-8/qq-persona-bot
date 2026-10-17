@@ -1,5 +1,7 @@
 # 笔记本 WorkBuddy 工作线交接
 
+2026-10-17 17:15当前检查点：[LAP-21受控表情](tasks/LAP-21/HANDOFF.md)已实现/离线通过，进行Git交付；207单元、136媒体及108群/26网页/90旧路径回归通过。inbox/library/本机目录、配置菜单、独立固定收藏RPC/安全导入暂存、候选ID与typed图片/逐条ACK/部分失败/恢复落地。默认关闭，本机settings未改；0真实收藏/下载用户图/启停/登录/探活/真实模型/群发，QQ/GIF/真实ACK未验。只21，保留18搜索与所有旧差额。详细验证/归属/下一步见21交接；以下20及更早为历史证据。
+
 2026-10-17 16:44当前检查点：[LAP-20](tasks/LAP-20/HANDOFF.md)已实现/离线通过，[报告](../../reports/lap-20-2026-10-17.md)。187单元、108群聊实际框架、26网页及90原路径回归通过；mentions/free、RAM窗口/合批、一次决策/@优先、全模式直接群发、silent/异常事件防护、ACK/停止/恢复已落地。默认mentions，本机未切free；0真实模型/SSH/群发，无启停/登录/探活或本机settings/persona修改。只20，不开始21；18搜索缺口及所有旧真人差额保留。Git交付核对见20任务交接；以下为历史检查点。
 
 返回[全局入口](../../PROGRESS.md)。继承[AGENTS](../../AGENTS.md)；原规格见[实施计划](IMPLEMENTATION_PLAN.md)，本轮体验改进执行[UX_PLAN](UX_PLAN.md)，验收见[ACCEPTANCE](ACCEPTANCE.md)，领取/交接见[任务台账](TASKS.md)。本轮任务记录：[LAP-08](tasks/LAP-08/HANDOFF.md)。

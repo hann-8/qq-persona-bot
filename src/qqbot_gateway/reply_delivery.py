@@ -51,8 +51,9 @@ class GroupDeliveryQueue:
 
 class EventReceiptProxy:
     """One event's bot reference is wrapped; shared CQHttp instance is untouched."""
-    def __init__(self,bot,group):
+    def __init__(self,bot,group,image_uri=None,image_digest=None):
         self.original=bot;self.group=str(group);self.calls=0;self.message_id=None
+        self.image_uri=image_uri;self.image_digest=image_digest
 
     def __getattr__(self,name):
         return getattr(self.original,name)
@@ -61,6 +62,16 @@ class EventReceiptProxy:
         self.calls+=1
         if self.calls!=1 or str(kwargs.get('group_id'))!=self.group:
             raise DeliveryStopped('unexpected_send_route')
+        if self.image_uri:
+            import base64,hashlib
+            segments=kwargs.get('message')
+            if not isinstance(segments,list) or len(segments)!=1 or segments[0].get('type')!='image':raise DeliveryStopped('image_conversion_mismatch')
+            file=segments[0].get('data',{}).get('file','')
+            if not file.startswith('base64://'):raise DeliveryStopped('image_conversion_mismatch')
+            try:data=base64.b64decode(file[9:],validate=True)
+            except ValueError:raise DeliveryStopped('image_conversion_mismatch') from None
+            if hashlib.sha256(data).hexdigest()!=self.image_digest:raise DeliveryStopped('image_conversion_mismatch')
+            kwargs=dict(kwargs,message=[{'type':'image','data':{'file':self.image_uri}}])
         result=await self.original.send_group_msg(**kwargs)
         if isinstance(result,dict):
             mid=result.get('message_id')
@@ -72,9 +83,10 @@ class EventReceiptProxy:
 
 
 class ReplyDelivery:
-    def __init__(self,store,output,allowed,timeout=3):
+    def __init__(self,store,output,allowed,timeout=3,catalog=None):
         self.store=store;self.output=output;self.allowed=allowed;self.timeout=timeout
         self.queue=GroupDeliveryQueue()
+        self.catalog=catalog;self.image_times={};self.same_times={}
 
     async def send(self,event,key,plan):
         # Mark before awaiting: duplicate hook invocations cannot dispatch again.
@@ -84,19 +96,51 @@ class ReplyDelivery:
         reason=None
         try:
             async with self.queue.hold(str(event.get_group_id()),lambda:self.allowed(event)):
-                for index,text in enumerate(plan.bubbles):
+                for index,part in enumerate(plan.parts):
                     if index:
                         delay=random.uniform(self.output['bubble_delay_min_ms'],self.output['bubble_delay_max_ms'])/1000
                         await cancellable(asyncio.sleep(delay),lambda:self.allowed(event),6)
                     if not self.allowed(event):raise DeliveryStopped('stopped_or_invalidated')
+                    uri=None
+                    if part.type=='image':
+                        try:
+                            if self.catalog is None:raise ValueError()
+                            group=str(event.get_group_id());now=time.monotonic()
+                            from .media_protocol import explicit_meme
+                            bypass=explicit_meme(event.get_extra('qq_meme_question') or '')
+                            if not bypass and (now-self.image_times.get(group,float('-inf'))<self.catalog.cfg['cooldown_seconds'] or now-self.same_times.get((group,part.payload_ref),float('-inf'))<self.catalog.cfg['same_meme_cooldown_seconds']):raise ValueError()
+                            path,row=self.catalog.resolve(part.payload_ref)
+                            if row['sha256']!=part.digest or part.semantic_label!='[bot发了表情：'+row['name']+']':raise ValueError()
+                            from .meme_catalog import controlled_path,inspect_image
+                            data=path.read_bytes()
+                            if inspect_image(data,self.catalog.cfg['max_file_bytes'])['sha256']!=part.digest:raise ValueError()
+                            frozen=controlled_path(self.catalog.root,'state/meme-delivery/'+row['file'])
+                            frozen.parent.mkdir(parents=True,exist_ok=True)
+                            if not frozen.exists():
+                                with frozen.open('xb') as f:f.write(data)
+                            if frozen.read_bytes()!=data:raise ValueError()
+                            uri=frozen.as_uri()
+                        except (ValueError,OSError):
+                            self.store.fail_prepared_part(key,index)
+                            continue
                     if not self.store.begin_part(key,index):raise DeliveryStopped('part_already_attempted')
                     original=event.bot
-                    proxy=EventReceiptProxy(original,event.get_group_id())
+                    proxy=EventReceiptProxy(original,event.get_group_id(),uri,part.digest if uri else None)
                     event.bot=proxy
                     try:
-                        chain=event.plain_result(text)
-                        await cancellable(event.send(chain),lambda:self.allowed(event),self.timeout)
+                        if uri:
+                            from astrbot.api.message_components import Image
+                            from astrbot.core.message.message_event_result import MessageChain
+                            chain=MessageChain([Image.fromFileSystem(str(frozen))])
+                        else:chain=event.plain_result(part.payload_ref)
+                        guard=event.get_extra('qq_send_guard')
+                        if uri and guard:
+                            with guard.grant(image_uri=chain.chain[0].file):
+                                await cancellable(event.send(chain),lambda:self.allowed(event),self.timeout)
+                        else:await cancellable(event.send(chain),lambda:self.allowed(event),self.timeout)
                         state=self.store.part_result(key,index,'sent' if proxy.calls==1 and proxy.message_id else 'unknown',proxy.message_id)
+                        if uri and state=='sent':
+                            self.image_times[group]=time.monotonic();self.same_times[(group,part.payload_ref)]=time.monotonic()
                     except BaseException:
                         # A correlated ACK already captured is evidence even if stop/cancel
                         # arrives while the framework finishes its local send bookkeeping.

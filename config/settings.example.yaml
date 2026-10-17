@@ -89,3 +89,18 @@ output:
   bubble_max_chars: 40
   bubble_delay_min_ms: 800
   bubble_delay_max_ms: 1600
+
+# 受控表情；默认关闭，扫描/标签/目录激活须停机，重启生效
+memes:
+  enabled: false
+  inbox_dir: assets/memes/inbox
+  library_dir: assets/memes/library
+  catalog_file: config/memes.local.yaml
+  max_candidates: 16
+  catalog_prompt_max_bytes: 2000
+  max_images_per_turn: 1
+  cooldown_seconds: 60
+  same_meme_cooldown_seconds: 300
+  allow_meme_only: true
+  max_file_bytes: 8388608
+  import_count: 48

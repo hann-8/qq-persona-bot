@@ -1,0 +1,242 @@
+[
+  {
+    "backend": "codebuddy_cli",
+    "mode": "single",
+    "cases": [
+      {
+        "case": "body",
+        "generations": 1,
+        "one_send": true,
+        "original_question_history": true,
+        "evidence_not_persisted": true,
+        "ack": "synthetic"
+      },
+      {
+        "case": "partial",
+        "generations": 1,
+        "one_send": true,
+        "original_question_history": true,
+        "evidence_not_persisted": true,
+        "ack": "synthetic"
+      },
+      {
+        "case": "literal",
+        "generations": 1,
+        "one_send": true,
+        "original_question_history": true,
+        "evidence_not_persisted": true,
+        "ack": "synthetic"
+      },
+      {
+        "case": "failure",
+        "generations": 0,
+        "one_send": true,
+        "original_question_history": true,
+        "evidence_not_persisted": true,
+        "ack": "synthetic"
+      },
+      {
+        "case": "search_gap",
+        "generations": 0,
+        "one_send": true,
+        "original_question_history": true,
+        "evidence_not_persisted": true,
+        "ack": "synthetic"
+      },
+      {
+        "case": "expired",
+        "generations": 0,
+        "sends": 0,
+        "no_internal_marker_history": true
+      }
+    ],
+    "admission_zero_http": true,
+    "real_model_requests": 0,
+    "real_qq_messages": 0,
+    "actual_runner": true
+  },
+  {
+    "backend": "codebuddy_cli",
+    "mode": "adaptive",
+    "cases": [
+      {
+        "case": "body",
+        "generations": 1,
+        "one_send": true,
+        "original_question_history": true,
+        "evidence_not_persisted": true,
+        "ack": "synthetic"
+      },
+      {
+        "case": "partial",
+        "generations": 1,
+        "one_send": true,
+        "original_question_history": true,
+        "evidence_not_persisted": true,
+        "ack": "synthetic"
+      },
+      {
+        "case": "literal",
+        "generations": 1,
+        "one_send": true,
+        "original_question_history": true,
+        "evidence_not_persisted": true,
+        "ack": "synthetic"
+      },
+      {
+        "case": "failure",
+        "generations": 0,
+        "one_send": true,
+        "original_question_history": true,
+        "evidence_not_persisted": true,
+        "ack": "synthetic"
+      },
+      {
+        "case": "search_gap",
+        "generations": 0,
+        "one_send": true,
+        "original_question_history": true,
+        "evidence_not_persisted": true,
+        "ack": "synthetic"
+      },
+      {
+        "case": "expired",
+        "generations": 0,
+        "sends": 0,
+        "no_internal_marker_history": true
+      },
+      {
+        "case": "unknown_ack",
+        "generations": 1,
+        "one_send": true,
+        "original_question_history": true,
+        "evidence_not_persisted": true,
+        "ack": "synthetic"
+      }
+    ],
+    "admission_zero_http": true,
+    "real_model_requests": 0,
+    "real_qq_messages": 0,
+    "actual_runner": true
+  },
+  {
+    "backend": "ollama_ssh",
+    "mode": "single",
+    "cases": [
+      {
+        "case": "body",
+        "generations": 1,
+        "one_send": true,
+        "original_question_history": true,
+        "evidence_not_persisted": true,
+        "ack": "synthetic"
+      },
+      {
+        "case": "partial",
+        "generations": 1,
+        "one_send": true,
+        "original_question_history": true,
+        "evidence_not_persisted": true,
+        "ack": "synthetic"
+      },
+      {
+        "case": "literal",
+        "generations": 1,
+        "one_send": true,
+        "original_question_history": true,
+        "evidence_not_persisted": true,
+        "ack": "synthetic"
+      },
+      {
+        "case": "failure",
+        "generations": 0,
+        "one_send": true,
+        "original_question_history": true,
+        "evidence_not_persisted": true,
+        "ack": "synthetic"
+      },
+      {
+        "case": "search_gap",
+        "generations": 0,
+        "one_send": true,
+        "original_question_history": true,
+        "evidence_not_persisted": true,
+        "ack": "synthetic"
+      },
+      {
+        "case": "expired",
+        "generations": 0,
+        "sends": 0,
+        "no_internal_marker_history": true
+      }
+    ],
+    "admission_zero_http": true,
+    "real_model_requests": 0,
+    "real_qq_messages": 0,
+    "actual_runner": true
+  },
+  {
+    "backend": "ollama_ssh",
+    "mode": "adaptive",
+    "cases": [
+      {
+        "case": "body",
+        "generations": 1,
+        "one_send": true,
+        "original_question_history": true,
+        "evidence_not_persisted": true,
+        "ack": "synthetic"
+      },
+      {
+        "case": "partial",
+        "generations": 1,
+        "one_send": true,
+        "original_question_history": true,
+        "evidence_not_persisted": true,
+        "ack": "synthetic"
+      },
+      {
+        "case": "literal",
+        "generations": 1,
+        "one_send": true,
+        "original_question_history": true,
+        "evidence_not_persisted": true,
+        "ack": "synthetic"
+      },
+      {
+        "case": "failure",
+        "generations": 0,
+        "one_send": true,
+        "original_question_history": true,
+        "evidence_not_persisted": true,
+        "ack": "synthetic"
+      },
+      {
+        "case": "search_gap",
+        "generations": 0,
+        "one_send": true,
+        "original_question_history": true,
+        "evidence_not_persisted": true,
+        "ack": "synthetic"
+      },
+      {
+        "case": "expired",
+        "generations": 0,
+        "sends": 0,
+        "no_internal_marker_history": true
+      },
+      {
+        "case": "unknown_ack",
+        "generations": 1,
+        "one_send": true,
+        "original_question_history": true,
+        "evidence_not_persisted": true,
+        "ack": "synthetic"
+      }
+    ],
+    "admission_zero_http": true,
+    "real_model_requests": 0,
+    "real_qq_messages": 0,
+    "actual_runner": true
+  }
+]

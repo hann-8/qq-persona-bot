@@ -14,6 +14,7 @@ class QQBotProvider(ProviderOpenAIOfficial):
         request=None
         if isinstance(session_id,str) and session_id.startswith('qqbot-group:'):
             request=validate_request(json.loads(session_id[len('qqbot-group:'):]))
+        if session_id=='qqbot-media':request={'version':1,'kind':'media_turn'}
         token=self._group_request.set(request)
         try:return await super().text_chat(prompt=prompt,session_id=session_id,**kwargs)
         finally:self._group_request.reset(token)

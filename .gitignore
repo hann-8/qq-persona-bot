@@ -7,3 +7,8 @@ runtime/
 .venv/
 config/settings.local.yaml
 __pycache__/
+assets/memes/inbox/*
+!assets/memes/inbox/README.md
+assets/memes/library/*
+!assets/memes/library/README.md
+config/memes.local.yaml

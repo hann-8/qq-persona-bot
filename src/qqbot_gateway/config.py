@@ -35,6 +35,7 @@ class GateConfig:
     port: int = 6200
     blocked_users: frozenset[str] = frozenset()
     participation_mode: str = 'mentions'
+    media_catalog: object = None
 
     def __post_init__(self):
         if self.participation_mode not in ('mentions','free'):raise ValueError('Invalid participation mode')
@@ -65,6 +66,8 @@ def normalize_settings(raw):
     data['web'] = validate_web(data.get('web', {}))
     from .participation import validate_participation
     data['participation']=validate_participation(data.get('participation',{}))
+    from .meme_catalog import validate_memes
+    data['memes']=validate_memes(data.get('memes',{}))
     for section in ('bot', 'access', 'onebot', 'llm', 'chat', 'output'):
         data.setdefault(section, {})
         if not isinstance(data[section], dict):
@@ -209,11 +212,15 @@ def load_gate_config(path):
     if not token_path.is_relative_to(root / 'secrets'):
         raise ValueError('Secrets file must remain in project secrets directory')
     tokens = json.loads(token_path.read_text(encoding='utf-8'))
+    from .meme_import import admin_token
+    admin=admin_token(root)
+    if admin and admin in tokens.values():raise ValueError('Independent memes admin token required')
     if data['access'].get('private_enabled') is not False:
         raise ValueError('Private messages must be disabled')
     groups, admins = data['access']['allowed_groups'], data['access']['admin_users']
     if not isinstance(groups, list) or not isinstance(admins, list):
         raise ValueError('Groups/admins must be explicit lists')
+    from .meme_catalog import MemeCatalog
     return GateConfig(
         bot_qq=data['bot']['qq'], allowed_groups=frozenset(groups), admin_users=frozenset(admins),
         inbound_token=tokens['onebot_inbound'], upstream_token=tokens['onebot_upstream'],
@@ -221,6 +228,7 @@ def load_gate_config(path):
         host=data['onebot']['host'], port=data['onebot']['port'],
         blocked_users=frozenset(data['access']['blocked_users']),
         participation_mode=data['participation']['mode'],
+        media_catalog=MemeCatalog(root,data['memes']) if data['memes']['enabled'] else None,
     )
 
 
