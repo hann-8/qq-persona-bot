@@ -76,6 +76,35 @@ class PredicateTests(unittest.TestCase):
         self.assertTrue(store.reserve(event))
         store.close()
 
+    def test_metadata_replace_retries_windows_sharing_error_only(self):
+        from unittest.mock import patch
+        gate=OneBotGate(self.config,Path(self.temp.name))
+        original=Path.replace;calls=[]
+        error=PermissionError('synthetic sharing error');error.winerror=32
+        def transient(path,target):
+            calls.append(path)
+            if len(calls)<3:raise error
+            return original(path,target)
+        try:
+            with patch.object(Path,'replace',transient),patch('qqbot_gateway.onebot_gate.time.sleep') as sleep:
+                gate.publish_connection()
+                self.assertEqual(len(calls),3)
+                self.assertEqual(sleep.call_count,2)
+            value=json.loads((gate.root/'state/gate-connection.json').read_text())
+            self.assertFalse(value['connected'])
+            with patch.object(Path,'replace',side_effect=error) as replace_file,patch('qqbot_gateway.onebot_gate.time.sleep'):
+                with self.assertLogs('qqbot_gateway.onebot_gate',level='WARNING') as logs:
+                    with self.assertRaises(PermissionError):gate.publish_connection()
+                self.assertEqual(replace_file.call_count,3)
+                self.assertIn('CHANNEL_METADATA_WRITE_FAILED code=SHARING_VIOLATION',logs.output[0])
+                self.assertNotIn('synthetic',logs.output[0])
+            with patch.object(Path,'replace',side_effect=OSError('synthetic disk failure')) as replace_file:
+                with self.assertLogs('qqbot_gateway.onebot_gate',level='WARNING'):
+                    with self.assertRaises(OSError):gate.publish_connection()
+                self.assertEqual(replace_file.call_count,1)
+            self.assertFalse((gate.root/'state/gate-connection.tmp').exists())
+        finally:gate.store.close()
+
     def test_outgoing_scope(self):
         allowed=[{'action':'get_login_info'}, {'action':'get_status'},
                  {'action':'get_stranger_info','params':{'user_id':222}},
@@ -254,6 +283,53 @@ class TransportTests(unittest.IsolatedAsyncioTestCase):
         await ws.send_json(next_message)
         self.assertEqual(await asyncio.wait_for(self.received.get(),2),next_message)
         self.assertTrue(self.received.empty())
+        await ws.close()
+
+    async def test_metadata_failure_during_disconnect_does_not_latch_connection(self):
+        from unittest.mock import patch
+        ws,up=await self.connect()
+        with patch.object(self.gate,'publish_connection',side_effect=PermissionError('synthetic metadata lock')):
+            await ws.close()
+            for _ in range(40):
+                if self.gate.active is None:break
+                await asyncio.sleep(.01)
+            self.assertIsNone(self.gate.active)
+            self.assertIsNone(self.gate.status()['online'])
+            self.assertFalse(self.gate.status()['connected'])
+        ws,up=await self.connect()
+        await ws.send_json(message())
+        self.assertEqual(await asyncio.wait_for(self.received.get(),2),message())
+        await ws.close()
+
+    @unittest.skipUnless(sys.platform=='win32','Windows file-sharing semantics')
+    async def test_windows_open_reader_during_disconnect_releases_and_reconnects(self):
+        self.gate.root=Path(self.temp.name)
+        ws,up=await self.connect()
+        await asyncio.sleep(.02)
+        path=self.gate.root/'state/gate-connection.json'
+        with path.open('rb'),self.assertLogs('qqbot_gateway.onebot_gate',level='WARNING') as logs:
+            await ws.close()
+            for _ in range(40):
+                if self.gate.active is None:break
+                await asyncio.sleep(.01)
+            self.assertIsNone(self.gate.active)
+            self.assertFalse(self.gate.connected)
+        self.assertTrue(any('CHANNEL_METADATA_WRITE_FAILED code=' in line for line in logs.output))
+        ws,up=await self.connect()
+        await asyncio.sleep(.02)
+        value=json.loads(path.read_text())
+        self.assertTrue(value['connected']);self.assertTrue(value['online'])
+        await ws.close()
+
+    async def test_metadata_failure_at_connect_closes_and_allows_later_connection(self):
+        from unittest.mock import patch
+        with patch.object(self.gate,'publish_connection',side_effect=PermissionError('synthetic metadata lock')):
+            ws=await self.client.ws_connect(self.url,headers=self.auth)
+            frame=await asyncio.wait_for(ws.receive(),2)
+            self.assertIn(frame.type,(aiohttp.WSMsgType.CLOSE,aiohttp.WSMsgType.CLOSED))
+            self.assertIsNone(self.gate.active)
+            self.assertFalse(self.gate.connected)
+        ws,up=await self.connect()
         await ws.close()
 
 

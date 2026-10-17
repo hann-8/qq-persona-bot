@@ -10,6 +10,9 @@ def safe_line(component,line):
         return 'CHANNEL_CONNECTED_SELF_ID_VERIFIED'
     if component=='gate' and line.rstrip().endswith('CHANNEL_DISCONNECTED'):
         return 'CHANNEL_DISCONNECTED'
+    if component=='gate':
+        match=re.search(r'\bCHANNEL_METADATA_WRITE_FAILED code=(?:ACCESS_DENIED|SHARING_VIOLATION|LOCK_VIOLATION|IO_ERROR)$',line.rstrip())
+        if match:return match.group(0)
     if component=='model':
         match=re.search(r'\b(CLI_START|REQUEST_ACCEPTED|REQUEST_FAILED) request_id=([a-z0-9]{10})(?: (attempt=1|code=[A-Z_]+))?$',line.rstrip())
         if match:return match.group(0)

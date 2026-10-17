@@ -20,6 +20,11 @@ LOG = logging.getLogger(__name__)
 MAX_FRAME = 1024 * 1024
 
 
+def metadata_error_code(error):
+    # Fixed categories only: never log paths or arbitrary OS exception text.
+    return {5:'ACCESS_DENIED',32:'SHARING_VIOLATION',33:'LOCK_VIOLATION'}.get(getattr(error,'winerror',None),'IO_ERROR')
+
+
 def admitted_message(event, config):
     if not isinstance(event, dict):
         return False
@@ -129,11 +134,26 @@ class OneBotGate:
     def publish_connection(self):
         if self.root:
             path=self.root/'state/gate-connection.json'
-            path.parent.mkdir(parents=True,exist_ok=True)
             temp=path.with_suffix('.tmp')
-            temp.write_text(json.dumps(dict(id=self.connection_id,connected=self.connected,online=self.online,
-                pid=os.getpid(),created=psutil.Process().create_time(),updated=time.time())),encoding='utf-8')
-            temp.replace(path)
+            try:
+                path.parent.mkdir(parents=True,exist_ok=True)
+                temp.write_text(json.dumps(dict(id=self.connection_id,connected=self.connected,online=self.online,
+                    pid=os.getpid(),created=psutil.Process().create_time(),updated=time.time())),encoding='utf-8')
+                # Windows readers can briefly deny replacement. Bound the retry
+                # to 20 ms; a permanent failure still closes the channel.
+                for attempt in range(3):
+                    try:
+                        temp.replace(path)
+                        break
+                    except PermissionError as error:
+                        if getattr(error,'winerror',None) not in (5,32,33) or attempt==2:raise
+                        time.sleep(.01)
+            except OSError as error:
+                LOG.warning('CHANNEL_METADATA_WRITE_FAILED code=%s',metadata_error_code(error))
+                raise
+            finally:
+                try:temp.unlink(missing_ok=True)
+                except OSError:pass
 
     def status(self):
         online = self.online if self.connected and self.online_at and time.time()-self.online_at < 45 else None
@@ -209,16 +229,20 @@ class OneBotGate:
             self.failures += 1
             LOG.warning('UPSTREAM_OR_PROTOCOL_FAILURE')
         finally:
+            # Release ownership before fallible file I/O, including when the
+            # metadata error itself is why the channel is closing.
+            self.active = None
             self.connected = False
-            self.publish_connection()
             self.online = None
             self.online_at = None
             self.health_pending.clear()
             for future in self.admin_pending.values():
                 if not future.done():future.set_exception(ConnectionError('disconnected'))
             self.admin_pending.clear()
+            try:self.publish_connection()
+            except OSError:
+                pass  # Already logged safely; must not skip socket cleanup.
             LOG.info('CHANNEL_DISCONNECTED')
-            self.active = None
             if downstream.prepared:
                 await downstream.close(code=1011, message=b'CHANNEL_CLOSED')
         return downstream
