@@ -18,4 +18,4 @@
 
 文件归属：src/qqbot_gateway/onebot_gate.py、scripts/process_host.py、tests/test_onebot_gate.py、tests/test_process_host.py、reports/lap-23-2026-10-17.md及本交接/PROGRESS/TASKS/工作线。只有本任务修改；框架导入产生的4个data模板移到忽略state，原运行文件/凭据未改。
 
-剩余：用户启动后真实稳定性观察；若新日志有错误类别再针对取证。0真实生成/群发/启停；旧验收差额保留。Git commit/push核对待完成。
+剩余：用户启动后真实稳定性观察；若新日志有错误类别再针对取证。0真实生成/群发/启停；旧验收差额保留。Git：2026-10-17 18:50（Asia/Shanghai），内容提交`1bd9a9fb0e244b3833b5e50f7b63f14a6d7be47f`已推送origin/main，rev-parse/ls-remote完整SHA一致；检查点工作区干净。差异/编译/链接检查通过。保留的本机配置、secrets和state验证工件继续忽略；本段随后独立同步。Git不代表已启动或真实验收。
