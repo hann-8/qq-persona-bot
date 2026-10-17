@@ -4,6 +4,8 @@
 
 ## 当前阶段与授权
 
+2026-10-17 18:05：[LAP-22 free框架发送修复](tracks/laptop-workbuddy/tasks/LAP-22/HANDOFF.md)已实现/离线通过，207单元、132群框架（含真实run_agent生命周期）、136媒体回归；空链跳过发送装饰已修复，运行中实例未重启加载。只读确认用户现已选择ollama_ssh/free/web开启、memes关闭；此前“本机未启用”段落为历史。0本session真实模型/群发/启停，真实QQ待验。
+
 2026-10-17 17:15：[LAP-21受控表情](tracks/laptop-workbuddy/tasks/LAP-21/HANDOFF.md)已实现、离线/实际框架通过，内容已commit/push并核对远端SHA，见任务交接。图库/配置菜单/固定收藏RPC/单次候选ID/typed图片逐条ACK与恢复落地；207单元、136媒体、108群/26网页/90旧路径框架通过，[报告](reports/lap-21-2026-10-17.md)/交接记录证据。默认memes=false，本机未启用，0真实收藏/用户图片下载/登录/启停/模型/群发；真实QQ与旧差额保留。
 
 [LAP-20自由群聊与直接群发](tracks/laptop-workbuddy/tasks/LAP-20/HANDOFF.md)已实现/离线通过，见[报告](reports/lap-20-2026-10-17.md)：显式mentions/free、RAM窗口/合批、一次说/不说、真实@优先、全模式直发、群ACK/未知隔离与恢复。187单元、两真实runner底层替身+实际框架108组群聊用例（含完整build_main_agent），26网页与90原路径回归通过。默认mentions，本机未切free；0启停/登录/真实模型/群发，运行状态未探测。仅20，21待新指令。以下17/18是继承的历史证据；18搜索缺口与旧真人差额保留。Git交付核对见20交接。

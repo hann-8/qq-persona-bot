@@ -14,7 +14,7 @@ sys.path[:0]=[str(ROOT),str(ROOT/'src')]
 os.environ['ASTRBOT_DISABLE_METRICS']='1'
 
 
-async def verify(root,backend,mode):
+async def verify(root,backend,mode,full_lifecycle=False):
     import yaml
     from aiohttp import web
     from astrbot.api.platform import AstrBotMessage,MessageMember,MessageType,PlatformMetadata
@@ -115,21 +115,50 @@ async def verify(root,backend,mode):
         assert built.provider_request.prompt==req.prompt and built.provider_request.extra_user_content_parts==[]
         assert built.provider_request.func_tool is None or built.provider_request.func_tool.empty()
         runner=built.agent_runner;messages=runner.run_context.messages
-        responses=[r async for r in runner._iter_llm_responses()]
-        assert len(responses)==1
-        await router.preserve_gateway_text(e,runner.run_context,responses[0])
-        await stage._save_to_history(e,req,responses[0],messages,None)
-        e.set_result(e.plain_result(responses[0].completion_text))
         handler=SimpleNamespace(handler_module_path='lap20',handler_name='deliver_reply',handler=router.deliver_reply)
-        with patch.object(decorate_module.star_handlers_registry,'get_handlers_by_event_type',return_value=[handler]),patch.dict(decorate_module.star_map,{'lap20':SimpleNamespace(name='lap20')}):
-            async for _ in decorate.process(e):pass
-        await respond.process(e)
+        from astrbot.core.star.star_handler import EventType
+        def handlers(kind,**kwargs):return [handler] if kind==EventType.OnDecoratingResultEvent else []
+        with patch.object(decorate_module.star_handlers_registry,'get_handlers_by_event_type',side_effect=handlers),patch.dict(decorate_module.star_map,{'lap20':SimpleNamespace(name='lap20')}):
+            if full_lifecycle:
+                from astrbot.core.astr_agent_run_util import run_agent
+                async def done(context,response):
+                    await router.preserve_gateway_text(e,context,response)
+                with patch.object(runner.agent_hooks,'on_agent_done',side_effect=done):
+                    async for _ in run_agent(runner,max_step=1,show_tool_use=False):
+                        async for _ in decorate.process(e):pass
+                        await respond.process(e)
+                await stage._save_to_history(e,req,runner.get_final_llm_resp(),messages,None)
+            else:
+                responses=[r async for r in runner._iter_llm_responses()]
+                assert len(responses)==1
+                await router.preserve_gateway_text(e,runner.run_context,responses[0])
+                await stage._save_to_history(e,req,responses[0],messages,None)
+                e.set_result(e.plain_result(responses[0].completion_text))
+                async for _ in decorate.process(e):pass
+                await respond.process(e)
 
     silent=json.dumps(dict(qqbot_group_reply=1,decision='silent',kind='chat',bubbles=[],meme_id=None))
     speak=json.dumps(dict(qqbot_group_reply=1,decision='speak',kind='chat',bubbles=['合成回复'],meme_id=None),ensure_ascii=False)
 
     report=[]
     try:
+        if full_lifecycle:
+            for mention in (False,True):
+                for case,text in (('speak',speak),('silent',silent),('bad','invalid JSON')):
+                    router.group_turns.reset('111')
+                    e=event(mention);gen=router.on_group(e);req=await anext(gen)
+                    before=harness.attempts
+                    await complete(e,req,text)
+                    await finish(gen)
+                    count=len(e.bot.sent)
+                    assert count==int(mention or case=='speak'),(case,mention,count)
+                    if case=='speak':
+                        assert '合成回复' in str(e.bot.sent),(case,mention,'canonical reply missing')
+                    elif mention:
+                        assert '没接住' in str(e.bot.sent),(case,mention,'protocol fallback missing')
+                    assert harness.attempts==before+1
+                    assert e.get_extra('qq_delivery_handled'),(case,mention,'delivery hook skipped')
+                    report.append(dict(case='full_lifecycle_'+case,mention=mention,generations=1,sends=count))
         for mention in (False,True):
             for case in ('speak','silent','bad','tamper','missing','error','timeout','stop','disconnect','framework_error','late','blocked'):
                 router.group_turns.reset('111')
@@ -163,12 +192,14 @@ async def verify(root,backend,mode):
                     async def on_agent_done(self,context,result):await router.preserve_gateway_text(e,context,result)
                 runner=ToolLoopAgentRunner.__new__(ToolLoopAgentRunner);runner._state=AgentState.RUNNING
                 runner.stats=SimpleNamespace(end_time=None);runner.run_context=run;runner.agent_hooks=Hooks();runner._pending_follow_ups=[]
-                await runner._complete_with_assistant_response(response)
-                await stage._save_to_history(e,req,response,run.messages,None)
-                await e.send(e.plain_result(SILENT));assert not e.bot.sent
+                # Recheck invalidation at completion as well as result decoration.
                 if case=='stop':(root/'state/stop-request.json').write_text('{"instance_id":"lap20-synthetic"}',encoding='utf-8')
                 if case=='disconnect':connect('b'*64)
                 if case=='late':e.set_extra('qq_group_created',e.get_extra('qq_group_created')-181)
+                await runner._complete_with_assistant_response(response)
+                await stage._save_to_history(e,req,response,run.messages,None)
+                sent_before=len(e.bot.sent)
+                await e.send(e.plain_result(SILENT));assert len(e.bot.sent)==sent_before
                 e.set_result(e.plain_result(response.completion_text))
                 handler=SimpleNamespace(handler_module_path='lap20',handler_name='deliver_reply',handler=router.deliver_reply)
                 with patch.object(decorate_module.star_handlers_registry,'get_handlers_by_event_type',return_value=[handler]),patch.dict(decorate_module.star_map,{'lap20':SimpleNamespace(name='lap20')}):

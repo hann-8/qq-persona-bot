@@ -47,6 +47,7 @@ LAP-15内容提交`632fdc5`已推送origin/main，2026-10-17 11:09用ls-remote�
 | LAP-19 | 双后端/联网/自由群聊/表情包总体详细规划 | completed，仅详细规划；内容91b96d5已推送核对；[HANDOFF](tasks/LAP-19/HANDOFF.md) / [PLAN](tasks/LAP-19/PLAN.md) / [追加合同](tasks/LAP-19/GROUP_CHAT_PLAN.md) / [指令](tasks/LAP-19/IMPLEMENTATION_GUIDE.md) | 用户明确只规划、后由gpt-6.1-sol/medium执行；17/18与追加20/21均在此设计 | LAP-19-dual-backend-web-plan / 四项总体规划，2026-10-17 14:49领取；文件归属见HANDOFF | 10份文档/143链接/21唯一ID/隐私与diff检查通过，内容commit/push及远端SHA一致；后续按指引分别实施，不部署/生成/群发 |
 | LAP-20 | 自由参与群聊、@必答与直接群发 | 已实现/离线通过，真实未验；[HANDOFF](tasks/LAP-20/HANDOFF.md) / [报告](../../reports/lap-20-2026-10-17.md) | 17/18共用接口后；原17群参与分支明确拆入，黑名单/群授权保留 | LAP-20-group-participation / LAP-20自由群聊与直接群发实施，2026-10-17 16:19领取；[HANDOFF](tasks/LAP-20/HANDOFF.md)登记文件归属 | 187单元/108群框架/26网页与90原路径回归通过；默认mentions，本机未启用free；旧真人差额保留 |
 | LAP-21 | QQ收藏导入/本地表情图库与发送 | 已实现/离线通过，真实未验；[HANDOFF](tasks/LAP-21/HANDOFF.md) / [合同](tasks/LAP-19/GROUP_CHAT_PLAN.md) | 20统一群发送后；收藏静态支持不当本账号已通过 | LAP-21-controlled-memes / LAP-21受控表情实施，2026-10-17 16:49领取；文件归属见交接 | 207单元、136媒体框架与108群/26网页/90旧路径通过；inbox/library/固定只读收藏RPC/meme_id/typed图片ACK与恢复落地；默认关闭、真实收藏/发图未验，见[报告](../../reports/lap-21-2026-10-17.md) |
+| LAP-22 | free模式兜底回复故障修复 | 已实现/离线通过，真实待验；[HANDOFF](tasks/LAP-22/HANDOFF.md) | LAP-20/21合同内修复 | LAP-22-free-framework-delivery，2026-10-17 18:01领取 | 空链修复；207单元/132群框架/136媒体回归通过；未重启加载；归属与命令见交接 |
 
 G0可行性、G1环境、G2通道、G3实际provider调用已有证据，见[工作线交接](HANDOFF.md#已验证与重要修复)。这是阶段基线；W02/W10等未真实制造的情形仍按验收矩阵记录，不能据此把完整W/Q/P/O标成通过。G4完整验收归LAP-02/03，G7文本相关部分归LAP-01/04/05。
 

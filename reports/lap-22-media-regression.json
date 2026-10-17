@@ -1,0 +1,1506 @@
+[
+  {
+    "backend": "codebuddy_cli",
+    "mode": "single",
+    "participation": "mentions",
+    "cases": [
+      {
+        "case": "text_image",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "image_only",
+        "types": [
+          "image"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "invalid_id",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "answer",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "missing2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "duplicate2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "error2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "timeout2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "stop",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent",
+          "prepared"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "hash_changed",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent",
+          "failed"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "cooldown",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent",
+          "failed"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "bad",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "metadata_missing",
+        "types": [
+          "text"
+        ],
+        "ack": [],
+        "generations": 1
+      },
+      {
+        "case": "metadata_mismatch",
+        "types": [
+          "text"
+        ],
+        "ack": [],
+        "generations": 1
+      },
+      {
+        "case": "image_only_missing",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "failed"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "web_answer",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      }
+    ],
+    "recovery": true,
+    "real_model_requests": 0,
+    "real_qq_messages": 0,
+    "real_favorites_reads": 0
+  },
+  {
+    "backend": "codebuddy_cli",
+    "mode": "single",
+    "participation": "free",
+    "cases": [
+      {
+        "case": "text_image",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "image_only",
+        "types": [
+          "image"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "invalid_id",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "answer",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "missing2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "duplicate2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "error2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "timeout2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "stop",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent",
+          "prepared"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "hash_changed",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent",
+          "failed"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "cooldown",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent",
+          "failed"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "bad",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "metadata_missing",
+        "types": [
+          "text"
+        ],
+        "ack": [],
+        "generations": 1
+      },
+      {
+        "case": "metadata_mismatch",
+        "types": [
+          "text"
+        ],
+        "ack": [],
+        "generations": 1
+      },
+      {
+        "case": "image_only_missing",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "failed"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "web_answer",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "ambient_image_only",
+        "types": [
+          "image"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "silent",
+        "types": [],
+        "ack": [],
+        "generations": 1
+      }
+    ],
+    "recovery": true,
+    "real_model_requests": 0,
+    "real_qq_messages": 0,
+    "real_favorites_reads": 0
+  },
+  {
+    "backend": "codebuddy_cli",
+    "mode": "adaptive",
+    "participation": "mentions",
+    "cases": [
+      {
+        "case": "text_image",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "image_only",
+        "types": [
+          "image"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "invalid_id",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "answer",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "missing2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "duplicate2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "error2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "timeout2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "stop",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent",
+          "prepared"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "hash_changed",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent",
+          "failed"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "cooldown",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent",
+          "failed"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "bad",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "metadata_missing",
+        "types": [
+          "text"
+        ],
+        "ack": [],
+        "generations": 1
+      },
+      {
+        "case": "metadata_mismatch",
+        "types": [
+          "text"
+        ],
+        "ack": [],
+        "generations": 1
+      },
+      {
+        "case": "image_only_missing",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "failed"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "web_answer",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      }
+    ],
+    "recovery": true,
+    "real_model_requests": 0,
+    "real_qq_messages": 0,
+    "real_favorites_reads": 0
+  },
+  {
+    "backend": "codebuddy_cli",
+    "mode": "adaptive",
+    "participation": "free",
+    "cases": [
+      {
+        "case": "text_image",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "image_only",
+        "types": [
+          "image"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "invalid_id",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "answer",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "missing2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "duplicate2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "error2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "timeout2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "stop",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent",
+          "prepared"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "hash_changed",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent",
+          "failed"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "cooldown",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent",
+          "failed"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "bad",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "metadata_missing",
+        "types": [
+          "text"
+        ],
+        "ack": [],
+        "generations": 1
+      },
+      {
+        "case": "metadata_mismatch",
+        "types": [
+          "text"
+        ],
+        "ack": [],
+        "generations": 1
+      },
+      {
+        "case": "image_only_missing",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "failed"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "web_answer",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "ambient_image_only",
+        "types": [
+          "image"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "silent",
+        "types": [],
+        "ack": [],
+        "generations": 1
+      }
+    ],
+    "recovery": true,
+    "real_model_requests": 0,
+    "real_qq_messages": 0,
+    "real_favorites_reads": 0
+  },
+  {
+    "backend": "ollama_ssh",
+    "mode": "single",
+    "participation": "mentions",
+    "cases": [
+      {
+        "case": "text_image",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "image_only",
+        "types": [
+          "image"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "invalid_id",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "answer",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "missing2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "duplicate2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "error2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "timeout2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "stop",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent",
+          "prepared"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "hash_changed",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent",
+          "failed"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "cooldown",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent",
+          "failed"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "bad",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "metadata_missing",
+        "types": [
+          "text"
+        ],
+        "ack": [],
+        "generations": 1
+      },
+      {
+        "case": "metadata_mismatch",
+        "types": [
+          "text"
+        ],
+        "ack": [],
+        "generations": 1
+      },
+      {
+        "case": "image_only_missing",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "failed"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "web_answer",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      }
+    ],
+    "recovery": true,
+    "real_model_requests": 0,
+    "real_qq_messages": 0,
+    "real_favorites_reads": 0
+  },
+  {
+    "backend": "ollama_ssh",
+    "mode": "single",
+    "participation": "free",
+    "cases": [
+      {
+        "case": "text_image",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "image_only",
+        "types": [
+          "image"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "invalid_id",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "answer",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "missing2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "duplicate2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "error2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "timeout2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "stop",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent",
+          "prepared"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "hash_changed",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent",
+          "failed"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "cooldown",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent",
+          "failed"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "bad",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "metadata_missing",
+        "types": [
+          "text"
+        ],
+        "ack": [],
+        "generations": 1
+      },
+      {
+        "case": "metadata_mismatch",
+        "types": [
+          "text"
+        ],
+        "ack": [],
+        "generations": 1
+      },
+      {
+        "case": "image_only_missing",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "failed"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "web_answer",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "ambient_image_only",
+        "types": [
+          "image"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "silent",
+        "types": [],
+        "ack": [],
+        "generations": 1
+      }
+    ],
+    "recovery": true,
+    "real_model_requests": 0,
+    "real_qq_messages": 0,
+    "real_favorites_reads": 0
+  },
+  {
+    "backend": "ollama_ssh",
+    "mode": "adaptive",
+    "participation": "mentions",
+    "cases": [
+      {
+        "case": "text_image",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "image_only",
+        "types": [
+          "image"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "invalid_id",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "answer",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "missing2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "duplicate2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "error2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "timeout2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "stop",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent",
+          "prepared"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "hash_changed",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent",
+          "failed"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "cooldown",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent",
+          "failed"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "bad",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "metadata_missing",
+        "types": [
+          "text"
+        ],
+        "ack": [],
+        "generations": 1
+      },
+      {
+        "case": "metadata_mismatch",
+        "types": [
+          "text"
+        ],
+        "ack": [],
+        "generations": 1
+      },
+      {
+        "case": "image_only_missing",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "failed"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "web_answer",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      }
+    ],
+    "recovery": true,
+    "real_model_requests": 0,
+    "real_qq_messages": 0,
+    "real_favorites_reads": 0
+  },
+  {
+    "backend": "ollama_ssh",
+    "mode": "adaptive",
+    "participation": "free",
+    "cases": [
+      {
+        "case": "text_image",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "image_only",
+        "types": [
+          "image"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "invalid_id",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "answer",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "missing2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "duplicate2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "error2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "timeout2",
+        "types": [
+          "text",
+          "image"
+        ],
+        "ack": [
+          "sent",
+          "unknown"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "stop",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent",
+          "prepared"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "hash_changed",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent",
+          "failed"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "cooldown",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent",
+          "failed"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "bad",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "metadata_missing",
+        "types": [
+          "text"
+        ],
+        "ack": [],
+        "generations": 1
+      },
+      {
+        "case": "metadata_mismatch",
+        "types": [
+          "text"
+        ],
+        "ack": [],
+        "generations": 1
+      },
+      {
+        "case": "image_only_missing",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "failed"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "web_answer",
+        "types": [
+          "text"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "ambient_image_only",
+        "types": [
+          "image"
+        ],
+        "ack": [
+          "sent"
+        ],
+        "generations": 1
+      },
+      {
+        "case": "silent",
+        "types": [],
+        "ack": [],
+        "generations": 1
+      }
+    ],
+    "recovery": true,
+    "real_model_requests": 0,
+    "real_qq_messages": 0,
+    "real_favorites_reads": 0
+  }
+]

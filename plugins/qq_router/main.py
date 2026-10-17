@@ -131,6 +131,12 @@ class QQRouter(Star):
                 event.set_extra('qq_delivery_plan',None)
                 response.result_chain=MessageChain()
                 for message in run_context.messages:message._no_save=True
+            # AstrBot skips result decoration for an empty chain. Keep a verified
+            # text carrier so the normal hook can perform ledger/ACK delivery.
+            # Silent/invalid results have no carrier and must finish here.
+            plan=event.get_extra('qq_delivery_plan')
+            if plan:response.result_chain=MessageChain().message(plan.canonical_text)
+            else:await self.deliver_reply(event)
             return
         if response.role!='assistant':
             event.set_extra('qq_router_success',False)
