@@ -13,6 +13,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'src'))
 from qqbot_gateway.model_gateway import application, ModelQueue
 from qqbot_gateway.workbuddy_cli_runner import CLIRunner
+from qqbot_gateway.backends import resolve_backend
 
 
 def memory_files():
@@ -24,8 +25,9 @@ def memory_files():
 async def verify():
     from astrbot.core.provider.sources.openai_source import ProviderOpenAIOfficial
     import yaml
-    settings=yaml.safe_load((ROOT/'config/settings.local.yaml').read_text(encoding='utf-8-sig'))
-    cli=CLIRunner(ROOT,settings['llm']['model'])
+    from qqbot_gateway.config import load_settings
+    settings=load_settings(ROOT/'config/settings.local.yaml')
+    cli=CLIRunner(ROOT,resolve_backend(settings,'codebuddy_cli')['model'])
     queue=ModelQueue(cli)
     token=secrets.token_urlsafe(32)
     server=web.AppRunner(application(queue,token),access_log=None,handler_cancellation=True)

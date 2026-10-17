@@ -1,0 +1,48 @@
+{
+  "real_model_requests": 0,
+  "real_qq_messages": 0,
+  "cases": [
+    {
+      "name": "mixed",
+      "saved_equals_sent_equals_gateway": true,
+      "send_count": 1,
+      "ack": "simulated"
+    },
+    {
+      "name": "literal_code",
+      "saved_equals_sent_equals_gateway": true,
+      "send_count": 1,
+      "ack": "simulated"
+    },
+    {
+      "name": "literal_think",
+      "saved_equals_sent_equals_gateway": true,
+      "send_count": 1,
+      "ack": "simulated"
+    },
+    {
+      "name": "literal_json",
+      "saved_equals_sent_equals_gateway": true,
+      "send_count": 1,
+      "ack": "simulated"
+    },
+    {
+      "name": "truncated",
+      "saved_equals_sent_equals_gateway": true,
+      "send_count": 1,
+      "ack": "simulated"
+    }
+  ],
+  "synthetic_attempts": 5,
+  "backend": "codebuddy_cli",
+  "mode": "single",
+  "actual_runner": true,
+  "transport": "synthetic",
+  "real_ssh_authentications": 0,
+  "context_switch": {
+    "inactive_edit_preserves_current": true,
+    "backend_and_active_parameters_start_new": true,
+    "old_history_preserved": true,
+    "real_requests": 0
+  }
+}

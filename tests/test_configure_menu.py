@@ -44,7 +44,7 @@ class MenuTests(unittest.TestCase):
         settings = yaml.safe_load((ROOT/'config/settings.example.yaml').read_text(encoding='utf-8'))
         settings['bot']['qq'] = '222'
         settings['access'].update(allowed_groups=['111'], admin_users=['333'])
-        settings['chat']['context_input_limit_tokens'] = 200000
+        settings['llm']['profiles']['codebuddy_cli']['input_budget']['context_input_limit_tokens'] = 200000
         settings['extension'] = {'preserve':'existing'}
         self.path.write_text(yaml.safe_dump(settings), encoding='utf-8')
         self.original = self.path.read_bytes()
@@ -96,7 +96,7 @@ class MenuTests(unittest.TestCase):
         ui=RecordedConsole(['1e5','3','32768',''])
         ConfigMenu(self.path,ui).edit('context','set')
         result=load_settings(self.path)
-        self.assertEqual(result['chat']['context_input_limit_tokens'],32768)
+        self.assertEqual(result['llm']['profiles']['codebuddy_cli']['input_budget']['context_input_limit_tokens'],32768)
         self.assertEqual(result['extension'],{'preserve':'existing'})
         self.assertEqual(sum(kind=='clear' for kind,_ in ui.events),1)
         self.assertIn('1024—1048576',ui.text)
@@ -107,16 +107,16 @@ class MenuTests(unittest.TestCase):
                 ui=RecordedConsole(['99',value,''])
                 ConfigMenu(self.path,ui).edit('effort','set')
                 result=load_settings(self.path)
-                self.assertEqual(result['llm']['reasoning_effort'],expected)
-                self.assertEqual(result['chat']['context_input_limit_tokens'],200000)
+                self.assertEqual(result['llm']['profiles']['codebuddy_cli']['reasoning_effort'],expected)
+                self.assertEqual(result['llm']['profiles']['codebuddy_cli']['input_budget']['context_input_limit_tokens'],200000)
 
     def test_unknown_model_effort_only_auto_and_no_fallback(self):
-        settings=load_settings(self.path);settings['llm']['model']='unknown-model'
+        settings=load_settings(self.path);settings['llm']['profiles']['codebuddy_cli']['model']='unknown-model'
         self.path.write_text(yaml.safe_dump(settings),encoding='utf-8')
         ui=RecordedConsole(['high','2','auto',''])
         ConfigMenu(self.path,ui).edit('effort','set')
         self.assertIn('仅允许auto',ui.text)
-        self.assertEqual(load_settings(self.path)['llm']['reasoning_effort'],'auto')
+        self.assertEqual(load_settings(self.path)['llm']['profiles']['codebuddy_cli']['reasoning_effort'],'auto')
 
     def test_live_lock_conflict_and_failed_replace_are_actionable_and_preserve_file(self):
         ui=RecordedConsole(['32768',''])
@@ -136,13 +136,13 @@ class MenuTests(unittest.TestCase):
 
     def test_digest_conflict_reentry_reads_latest_value_without_overwriting(self):
         def concurrent_edit():
-            raw=yaml.safe_load(self.path.read_text(encoding='utf-8'));raw['chat']['context_input_limit_tokens']=65536
+            raw=yaml.safe_load(self.path.read_text(encoding='utf-8'));raw['llm']['profiles']['codebuddy_cli']['input_budget']['context_input_limit_tokens']=65536
             self.path.write_text(yaml.safe_dump(raw),encoding='utf-8')
             return '32768'
         ui=RecordedConsole([concurrent_edit,''])
         editor=ConfigMenu(self.path,ui);editor.edit('context','set')
         self.assertIn('配置已在别处更新',ui.text)
-        self.assertEqual(load_settings(self.path)['chat']['context_input_limit_tokens'],65536)
+        self.assertEqual(load_settings(self.path)['llm']['profiles']['codebuddy_cli']['input_budget']['context_input_limit_tokens'],65536)
         ui=RecordedConsole(['','']);ConfigMenu(self.path,ui).edit('context','set')
         self.assertIn('当前输入预算：65536',ui.text)
 
@@ -152,7 +152,7 @@ class MenuTests(unittest.TestCase):
         self.assertEqual(self.path.read_bytes(),self.original)
         ui=RecordedConsole(['555','']);ConfigMenu(self.path,ui).edit('blacklist','add')
         self.assertEqual(load_settings(self.path)['access']['blocked_users'],['555'])
-        self.assertEqual(load_settings(self.path)['chat']['context_input_limit_tokens'],200000)
+        self.assertEqual(load_settings(self.path)['llm']['profiles']['codebuddy_cli']['input_budget']['context_input_limit_tokens'],200000)
         ui=RecordedConsole(['555','']);ConfigMenu(self.path,ui).edit('blacklist','remove')
         self.assertIn('要移除的完整QQ号',ui.text)
         self.assertEqual(load_settings(self.path)['access']['blocked_users'],[])
@@ -173,7 +173,7 @@ class MenuTests(unittest.TestCase):
         menu(self.path,ui)
         settings=load_settings(self.path)
         self.assertEqual(settings['output']['delivery_mode'],'adaptive')
-        self.assertEqual(settings['chat']['context_input_limit_tokens'],200000)
+        self.assertEqual(settings['llm']['profiles']['codebuddy_cli']['input_budget']['context_input_limit_tokens'],200000)
         self.assertEqual(settings['extension'],{'preserve':'existing'})
         self.assertTrue(list((self.root/'state/config-backups').glob('*.yaml')))
         self.assertIn('下次启动生效',ui.text)

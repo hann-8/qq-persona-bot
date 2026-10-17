@@ -33,3 +33,15 @@ qqbot_reply必须是整数1；kind只能为chat或answer；bubbles为非空字�
 
 def persona_version(prompt):
     return 'fatfish-chat-' + hashlib.sha256(prompt.encode('utf-8')).hexdigest()[:16]
+
+
+def session_version(prompt, settings):
+    """Only the selected profile affects the current context, never inactive edits."""
+    import json
+    from .backends import resolve_backend
+    cfg = resolve_backend(settings)
+    # Keep transport details and secrets out of prompts, IDs, and conversation material.
+    keys = ('backend','model','reasoning_effort','context_window_tokens','expected_digest',
+            'num_ctx','think','num_predict','keep_alive_seconds','temperature','top_p','top_k','input_budget')
+    parameters = {key:cfg[key] for key in keys if key in cfg}
+    return persona_version(prompt+'\n'+json.dumps(parameters,sort_keys=True,separators=(',',':')))

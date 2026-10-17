@@ -22,13 +22,17 @@ class InputBudget:
     history_turns: int = 8
     max_input: int | None = None
     window: int | None = None
+    native_profile: dict | None = None
 
     @classmethod
     def from_settings(cls, settings, metadata=None):
-        chat = settings['chat']
+        from .backends import resolve_backend
+        chat = resolve_backend(settings)['input_budget']
         metadata = metadata or {}
+        cfg = resolve_backend(settings)
         return cls(chat['context_input_limit_tokens'], chat['context_overhead_reserve_tokens'],
-                   chat['output_reserve_tokens'], chat['history_turns'], metadata.get('maxInputTokens'))
+                   chat['output_reserve_tokens'], settings['chat']['history_turns'], metadata.get('maxInputTokens'),
+                   cfg.get('num_ctx'),cfg if cfg['backend']=='ollama_ssh' else None)
 
     @property
     def payload_limit(self):
@@ -40,6 +44,9 @@ class InputBudget:
             raise ValueError('Input budget/output reserve exceeds known model capacity')
 
     def usage(self, system, prompt):
+        if self.native_profile is not None:
+            from .ollama_ssh_runner import native_payload
+            return len(json.dumps(native_payload(self.native_profile,system,prompt),ensure_ascii=False,allow_nan=False).encode('utf-8'))+self.overhead
         envelope = json.dumps(user_message(prompt), ensure_ascii=False, separators=(',', ':'))
         return len(system.encode('utf-8')) + len(envelope.encode('utf-8')) + self.overhead
 
@@ -70,14 +77,17 @@ def known_models():
     return {model['id']:model for model in data['models']}
 
 
-def validate_model_settings(settings, models=None):
+def validate_model_settings(settings, models=None, backend=None):
     models = known_models() if models is None else models
-    llm = settings['llm']
+    from .backends import resolve_backend
+    llm = resolve_backend(settings,backend)
+    if llm['backend'] == 'ollama_ssh':return {}
     model = models.get(llm['model'], {})
     if llm.get('context_window_tokens') is not None:
         raise ValueError('Native context window has not been verified for this CLI; use input budget')
     effort = llm.get('reasoning_effort', 'auto')
     if effort != 'auto' and effort not in model.get('reasoning', {}).get('supportedEfforts', []):
         raise ValueError('Requested effort is unsupported or capability is unknown for this model')
-    InputBudget.from_settings(settings, model).validate_capacity()
+    cfg = dict(settings, llm=dict(settings['llm'],backend='codebuddy_cli'))
+    InputBudget.from_settings(cfg, model).validate_capacity()
     return model

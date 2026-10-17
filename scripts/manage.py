@@ -20,7 +20,7 @@ STATE = ROOT / 'state/managed-processes.json'
 NAPCAT = ROOT / 'runtime/napcat/installer/NapCat.52230.Shell'
 NAPCAT_URL = 'http://127.0.0.1:6099'
 sys.path.insert(0, str(ROOT / 'src'))
-from qqbot_gateway.config import load_gate_config, configuration_lock
+from qqbot_gateway.config import load_settings, load_gate_config, configuration_lock
 from qqbot_gateway.lifecycle import atomic_json
 
 
@@ -152,10 +152,15 @@ def status_report():
         phase='starting'
     channel=gate.get('channel_state','unknown') if counts['gate'] else 'disconnected'
     if phase=='stopped':channel='disconnected'
+    try:
+        from qqbot_gateway.backends import resolve_backend
+        cfg=resolve_backend(load_settings(ROOT/'config/settings.local.yaml'))
+        configured={'backend':cfg['backend'],'model':cfg['model']}
+    except (ValueError,OSError):configured={'state':'unavailable'}
     return {'process_state':phase,'mode':mode,'processes':counts,'channel':gate,'channel_state':channel,
             'can_receive_group_messages':bool(complete and gate.get('connected') is True and
                  gate.get('self_id_verified') is True and gate.get('online') is True and not gate.get('stopping')),
-            'model':model,'task_counts':task_counts()}
+            'model':model,'configured_profile':configured,'task_counts':task_counts()}
 
 
 def task_counts():
@@ -176,6 +181,9 @@ def show_status(report=None):
     print('QQ通道：'+channels.get(report['channel_state'],'登录状态未确认'))
     print('群消息：'+('可接收授权群真实@' if report['can_receive_group_messages'] else '尚未确认可接收'))
     model=report['model']
+    configured=report.get('configured_profile',{})
+    if configured.get('backend'):print('保存的后端（下次启动）：'+configured['backend']+'；模型：'+configured['model'])
+    if model.get('backend'):print('当前后端：'+model['backend']+'；模型：'+str(model.get('model'))+'；元数据：'+str(model.get('metadata',{}).get('state'))+'；本次状态查询0生成')
     if not model.get('alive'):print('模型：网关未运行/不可达，本次未推理探测')
     else:
         error=model.get('current_error')
@@ -292,7 +300,7 @@ def _start_channel(full=False, paused=False):
     specs=[('astrbot',[str(ROOT/'runtime/astrbot-bin/astrbot.exe'),'run'],ROOT/'runtime/astrbot',(6185,6199),25),
            ('gate',[str(ROOT/'.venv/Scripts/python.exe'),'-m','qqbot_gateway.onebot_gate','--config',str(ROOT/'config/settings.local.yaml')],ROOT,(6200,),10),
            ('napcat',[str(NAPCAT/'NapCatWinBootMain.exe'),gate.bot_qq],NAPCAT,(6099,),30)]
-    if full:specs.insert(1,('model',[str(ROOT/'.venv/Scripts/python.exe'),'-m','qqbot_gateway.model_gateway','--config',str(ROOT/'config/settings.local.yaml')],ROOT,(8765,),10))
+    if full:specs.insert(1,('model',[str(ROOT/'.venv/Scripts/python.exe'),'-m','qqbot_gateway.model_gateway','--config',str(ROOT/'config/settings.local.yaml')],ROOT,(8765,),30 if load_settings(ROOT/'config/settings.local.yaml')['llm']['backend']=='ollama_ssh' else 10))
     try:
         for component,args,cwd,ports,timeout in specs:
             started=time.time()

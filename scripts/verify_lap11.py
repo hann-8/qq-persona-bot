@@ -8,12 +8,13 @@ import secrets
 import sys
 import tempfile
 from types import SimpleNamespace
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT), str(ROOT / 'src')]
 
 
-async def verify():
+async def verify(synthetic=None, backend='codebuddy_cli', report_path=None):
     from aiohttp import web
     from astrbot.core.agent.message import Message
     from astrbot.core.agent.runners.base import AgentState
@@ -23,6 +24,7 @@ async def verify():
     from astrbot.core.pipeline.process_stage.method.agent_sub_stages.internal import InternalAgentSubStage
     from astrbot.core.pipeline.result_decorate.stage import ResultDecorateStage
     from astrbot.core.pipeline.respond.stage import RespondStage
+    import astrbot.core.pipeline.result_decorate.stage as decorate_module
     from astrbot.core.provider.entities import ProviderRequest
     from astrbot.core.provider.sources.openai_source import ProviderOpenAIOfficial
     from astrbot.api.platform import AstrBotMessage, MessageMember, MessageType, PlatformMetadata
@@ -51,7 +53,7 @@ async def verify():
             return {'message_id': len(self.sent)}  # Simulated ACK only.
 
     router = QQRouter.__new__(QQRouter)
-    synthetic = Synthetic()
+    synthetic = synthetic or Synthetic()
     queue = ModelQueue(synthetic)
     token = secrets.token_urlsafe(32)
     server = web.AppRunner(application(queue, token, max_reply_chars=200), access_log=None)
@@ -123,7 +125,9 @@ async def verify():
             saved = history.saved[-1]['content']
             if isinstance(saved, list): saved = ''.join(p['text'] for p in saved if p['type'] == 'text')
             event.set_result(event.plain_result(response.completion_text))
-            async for _ in decorate.process(event): pass
+            handler=SimpleNamespace(handler_module_path='lap17-single',handler_name='deliver_reply',handler=router.deliver_reply)
+            with patch.object(decorate_module.star_handlers_registry,'get_handlers_by_event_type',return_value=[handler]),patch.dict(decorate_module.star_map,{'lap17-single':SimpleNamespace(name='lap17-single')}):
+                async for _ in decorate.process(event): pass
             await respond.process(event)
             assert len(bot.sent) == 1
             wire = bot.sent[0]['message']
@@ -138,7 +142,7 @@ async def verify():
     finally:
         await provider.client.close()
         await server.cleanup()
-    (ROOT / 'reports/lap-11-offline-2026-10-16.json').write_text(
+    (report_path or ROOT / 'reports/lap-11-offline-2026-10-16.json').write_text(
         json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
 
 

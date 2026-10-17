@@ -2,6 +2,10 @@
 
 返回[全局入口](../../PROGRESS.md)。继承[AGENTS](../../AGENTS.md)；原规格见[实施计划](IMPLEMENTATION_PLAN.md)，本轮体验改进执行[UX_PLAN](UX_PLAN.md)，验收见[ACCEPTANCE](ACCEPTANCE.md)，领取/交接见[任务台账](TASKS.md)。本轮任务记录：[LAP-08](tasks/LAP-08/HANDOFF.md)。
 
+更新时间：2026-10-17 15:51（Asia/Shanghai）。最新检查点：[LAP-17](tasks/LAP-17/HANDOFF.md)已实现/离线与SSH零推理元数据通过；146单元、90组两后端实际runner+AstrBot合成、原SDK/gate ACK/恢复与严格入口通过。见[报告](../../reports/lap-17-2026-10-17.md)。两profile/schema3无损迁移/菜单切换/原生runner/未知阻断落地；本机settings/persona/长期运行连接文件未改，0真实生成/启停/登录/群发/PC修改。当前bot状态未知，真实能力/旧验收差额保留。仅17，18/20/21待后续指令；Git提交/推送核对中。
+
+以下为LAP-19及更早历史检查点，新实施结论以上段及LAP-17交接为准：
+
 更新时间：2026-10-17 15:23（Asia/Shanghai）。[LAP-19](tasks/LAP-19/HANDOFF.md)双后端切换与共用联网[详细计划](tasks/LAP-19/PLAN.md)已落盘，详细规划完成，内容提交91b96d5已推送origin/main并核对，未实施。用户保留CodeBuddy和本地两路线、配置cmd手动切换，联网按需自动；先LAP-17本地接入/切换，再LAP-18共用联网。PC只读确认已有Qwen3.5 9B Q4_K_M、当前16K、回环监听和固定既有指纹SSH转发可用；本轮0生成/远程修改。公共搜索接口只做候选探测，相关性/时效未验；不放开CLI工具。文件归属与证据见任务交接和[PC交接](../local-5070/HANDOFF.md)。
 
 用户随后追加自由群聊/@必答/直接群发及表情包，详见[追加合同](tasks/LAP-19/GROUP_CHAT_PLAN.md)与[medium复制指令](tasks/LAP-19/IMPLEMENTATION_GUIDE.md)，实施顺序已扩为17→18→20→21。黑名单直接消息在框架/模型/历史前过滤可复用；QQ/NapCat仍收到事件，转述不保证识别。NapCat静态包有QQ收藏读取，本轮未读用户2个真实收藏。
@@ -99,4 +103,4 @@ LAP-09历史检查点：配置菜单及groups/blacklist命令、共享校验/迁
 4. LAP-06/07视频/ASR仍延期；当前代码遇链接只说明未支持，未来LAP-18按新计划调整网页分支。已有BV178JX6wEaa样本，进入视频阶段再补其余样本/登录意愿；PC已有模型但本轮不启停/生成，接入按LAP-19计划由后续LAP-17实施。
 5. 任务归属见台账；LAP-09交付后按用户明确指令转入LAP-10，LAP-11本轮已独立交付，LAP-12本轮已交付且后台最终关闭。真实@入口、无工具/主动任务/项目自动重试/fallback保持，成功路径不stop_event；CLI内部强制压缩/恢复仍未排除，不冒充上游严格单次推理。
 
-当前恢复顺序：PROGRESS→本文件/TASKS→LAP-19 HANDOFF/PLAN/GROUP_CHAT_PLAN/IMPLEMENTATION_GUIDE→按后续指令17→18→20→21。不必重读全部历史报告；旧“最终全停”为历史，当前bot状态未探测，新功能仅规划，真实群和旧验收差额保留。
+当前恢复顺序：PROGRESS→本文件/TASKS→LAP-19 HANDOFF/PLAN/GROUP_CHAT_PLAN/IMPLEMENTATION_GUIDE→17已实现/离线完成，后续按指令18→20→21。不必重读全部历史报告；旧“最终全停”为历史，当前bot状态未探测，新功能仅规划，真实群和旧验收差额保留。

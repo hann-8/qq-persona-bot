@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'src'))
 from qqbot_gateway.cli_control import ControlExchange, model_metadata
 from qqbot_gateway.workbuddy_cli_runner import CLIRunner
+from qqbot_gateway.backends import resolve_backend
 
 
 async def probe():
@@ -118,7 +119,7 @@ async def real():
     from qqbot_gateway.token_budget import InputBudget
     from qqbot_gateway.config import load_settings
     settings=load_settings(ROOT/'config/settings.local.yaml')
-    model=settings['llm']['model']
+    model=resolve_backend(settings,'codebuddy_cli')['model']
     # User's current model is preserved; high is known to be supported by this selected model.
     budget=InputBudget(limit=32768,history_turns=12)
     cli=CLIRunner(ROOT,model,reasoning_effort='high',budget=budget)

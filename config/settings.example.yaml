@@ -1,10 +1,14 @@
-schema_version: 2
+# schema1/2 are migrated in memory; saving writes schema3 with a full backup.
+# Budget fields count visible UTF-8 bytes and envelope, not exact model tokens.
+schema_version: 3
 bot:
-  qq: "REQUIRED_PERSONAL_BOT_QQ"
+  qq: REQUIRED_PERSONAL_BOT_QQ
 access:
-  allowed_groups: ["REQUIRED_TEST_GROUP"]
+  allowed_groups:
+  - REQUIRED_TEST_GROUP
   blocked_users: []
-  admin_users: ["REQUIRED_ADMIN_QQ"]
+  admin_users:
+  - REQUIRED_ADMIN_QQ
   private_enabled: false
 onebot:
   host: 127.0.0.1
@@ -13,24 +17,41 @@ onebot:
 secrets_file: secrets/local-tokens.json
 llm:
   backend: codebuddy_cli
-  model: deepseek-v4.1-flash
-  reasoning_effort: auto
-  context_window_tokens: null  # Native window unverified: only null/auto is accepted.
   host: 127.0.0.1
   port: 8765
   max_concurrency: 1
   queue_limit: 5
   queue_wait_seconds: 30
-  run_timeout_seconds: 90
   cleanup_seconds: 5
-# Input budget counts visible UTF-8 bytes + serialized envelope + overhead, not exact model tokens.
+  profiles:
+    codebuddy_cli:
+      model: deepseek-v4.1-flash
+      reasoning_effort: auto
+      context_window_tokens: null
+      run_timeout_seconds: 90
+      input_budget:
+        context_input_limit_tokens: 16384
+        context_overhead_reserve_tokens: 2048
+        output_reserve_tokens: 2048
+    ollama_ssh:
+      model: qwen3.5:9b-q4_K_M
+      expected_digest: null
+      access_file: secrets/home-5070-runtime.local.json
+      num_ctx: 16384
+      think: false
+      num_predict: 1024
+      keep_alive_seconds: 300
+      temperature: 0.7
+      top_p: 0.8
+      top_k: 20
+      run_timeout_seconds: 120
+      input_budget:
+        context_input_limit_tokens: 12288
+        context_overhead_reserve_tokens: 2048
+        output_reserve_tokens: 2048
 chat:
   history_turns: 8
-  context_input_limit_tokens: 16384
-  context_overhead_reserve_tokens: 2048
-  output_reserve_tokens: 2048
 output:
-  # Explicitly choose adaptive for limited bubbles; missing fields keep single.
   mode: plain_chat
   max_reply_chars: 1200
   delivery_mode: single

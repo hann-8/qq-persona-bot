@@ -1,4 +1,4 @@
-"""Local configuration editor. No network calls or service lifecycle operations."""
+"""Stopped configuration writes and explicit metadata-only connection checks."""
 import argparse
 from contextlib import redirect_stdout
 from io import StringIO
@@ -11,6 +11,8 @@ sys.path[:0] = [str(ROOT / 'src'), str(ROOT)]
 from qqbot_gateway.config import (read_settings, save_settings, qq_id,
                                   configuration_lock, require_stopped)
 from qqbot_gateway.token_budget import known_models
+from qqbot_gateway.backends import resolve_backend
+from qqbot_gateway.errors import GatewayError, MESSAGES
 from scripts.console_ui import Console
 
 OUTPUT_FIELDS = {
@@ -23,18 +25,27 @@ OUTPUT_FIELDS = {
 }
 
 
+def budget_view(settings):
+    return settings['chat'] | resolve_backend(settings)['input_budget']
+
+
 def show(settings):
     access = settings['access']
     print(f"配置版本：{settings['schema_version']}；授权群 {len(access['allowed_groups'])} 个；黑名单 {len(access['blocked_users'])} 人")
     print('私聊关闭；管理员不豁免授权群或黑名单。完整ID仅在 groups/blacklist list 中显示。')
     print('修改前请关闭机器人；保存后下次启动生效。手工修改运行中的YAML也只在下次启动生效。')
-    llm, chat = settings['llm'], settings['chat']
-    print(f"模型：{llm['model']}；推理强度：{llm['reasoning_effort']}；输入预算：{chat['context_input_limit_tokens']}（可见UTF-8字节保守估算，非精确token）")
+    llm, chat = resolve_backend(settings), budget_view(settings)
+    print('当前后端：'+llm['backend'])
+    if llm['backend']=='ollama_ssh':
+        print('请求参数：'+str({k:llm[k] for k in ('num_ctx','think','num_predict','keep_alive_seconds')}))
+        print('元数据须显式只读检查；实际生效/生成质量未验。标称最大窗口不是实际窗口。')
+    print(f"模型：{llm['model']}；推理强度：{llm.get('reasoning_effort','关闭思考')}；输入预算：{chat['context_input_limit_tokens']}（可见UTF-8字节保守估算，非精确token）")
     print(f"开销预留：{chat['context_overhead_reserve_tokens']}；输出/推理预留：{chat['output_reserve_tokens']}；轮数：{chat['history_turns']}")
-    print('原生窗口：未证实支持，仅auto可用；模型容量/支持强度按能力元数据核对，不承诺实际计费或未知模型容量。')
-    print('下次启动将关闭常规自动压缩；CLI强制压缩/内部恢复仍有能力缺口，大上下文的严格单次推理合同未验收。')
-    supported=known_models().get(llm['model'],{}).get('reasoning',{}).get('supportedEfforts',[])
-    print('当前模型可显式选强度：'+('/'.join(supported) or '未知，仅auto'))
+    if llm['backend']=='codebuddy_cli':
+        print('原生窗口：未证实支持，仅auto可用；模型容量/支持强度按能力元数据核对，不承诺实际计费或未知模型容量。')
+        print('下次启动将关闭常规自动压缩；CLI强制压缩/内部恢复仍有能力缺口，大上下文的严格单次推理合同未验收。')
+        supported=known_models().get(llm['model'],{}).get('reasoning',{}).get('supportedEfforts',[])
+        print('当前模型可显式选强度：'+('/'.join(supported) or '未知，仅auto'))
     print(f"回复方式：{settings['output']['delivery_mode']}；闲聊最多{settings['output']['max_bubbles']}条/{settings['output']['casual_max_chars']}字符，认真问题单条；切换后新上下文，旧历史保留。")
 
 
@@ -46,16 +57,21 @@ def parameter(settings, section, value):
                 raise ValueError('Output value must be a decimal integer')
             value = int(value)
         settings['output'][key] = value
-    elif section == 'model': settings['llm']['model'] = value
-    elif section == 'effort': settings['llm']['reasoning_effort'] = value
+    elif section == 'backend':settings['llm']['backend'] = value
+    elif section == 'model': settings['llm']['profiles'][settings['llm']['backend']]['model'] = value
+    elif section == 'effort':
+        if settings['llm']['backend']!='codebuddy_cli':raise ValueError('Local backend supports only think:false')
+        settings['llm']['profiles']['codebuddy_cli']['reasoning_effort'] = value
     elif section == 'context-window':
         if value != 'auto':
             raise ValueError('原生窗口未取得有效预算证据；当前只支持auto，请调整context输入预算')
-        settings['llm']['context_window_tokens'] = None
+        if settings['llm']['backend']!='codebuddy_cli':raise ValueError('Use local num_ctx')
+        settings['llm']['profiles']['codebuddy_cli']['context_window_tokens'] = None
     else:
         key={'context':'context_input_limit_tokens','history':'history_turns',
              'overhead':'context_overhead_reserve_tokens','output-reserve':'output_reserve_tokens'}[section]
-        try:settings['chat'][key] = int(value)
+        target = settings['chat'] if section == 'history' else settings['llm']['profiles'][settings['llm']['backend']]['input_budget']
+        try:target[key] = int(value)
         except (ValueError,TypeError):raise ValueError('预算或轮数必须为整数') from None
 
 
@@ -63,10 +79,26 @@ def execute(path, section, action, identifier=None, *, expected_digest=None):
     settings, digest = read_settings(path)
     if expected_digest is not None and digest != expected_digest:
         raise ValueError('Configuration changed; reload before saving')
+    if section in ('connection-check','connection-init','clear-remote-unknown'):
+        root=path.parent.parent
+        local=resolve_backend(settings,'ollama_ssh')
+        if section=='connection-init':
+            from qqbot_gateway.ssh_transport import initialize_access
+            initialize_access(root,local['access_file'])
+            print('已初始化项目内DPAPI连接资料，未切换后端。')
+        elif section=='clear-remote-unknown':
+            from qqbot_gateway.ollama_ssh_runner import clear_unknown
+            clear_unknown(root,identifier);print('已按操作者确认解除；未推理/重启。')
+        else:
+            import asyncio,json
+            from qqbot_gateway.ollama_ssh_runner import OllamaSSHRunner
+            from qqbot_gateway.token_budget import InputBudget
+            print(json.dumps(asyncio.run(OllamaSSHRunner(root,local,InputBudget()).preflight(require_digest=False)),ensure_ascii=False))
+        return
     if section == 'show':
         show(settings)
         return
-    if section in OUTPUT_FIELDS or section in ('model','context','context-window','effort','history','overhead','output-reserve'):
+    if section in OUTPUT_FIELDS or section in ('backend','model','context','context-window','effort','history','overhead','output-reserve'):
         parameter(settings,section,identifier)
         save_settings(path,settings,digest)
         print('参数已校验保存，下次启动生效；账号/站点不变。')
@@ -100,12 +132,13 @@ EFFORT_NAMES = {'auto':'自动', 'minimal':'最低', 'low':'低', 'medium':'中'
 
 
 def effort_options(settings):
-    supported = known_models().get(settings['llm']['model'], {}).get('reasoning', {}).get('supportedEfforts', [])
+    supported = known_models().get(resolve_backend(settings)['model'], {}).get('reasoning', {}).get('supportedEfforts', [])
     return ['auto'] + list(dict.fromkeys(value for value in supported if value in EFFORT_NAMES and value != 'auto'))
 
 
 def operation_error(error):
     """Translate known validation categories, never display arbitrary exception payloads."""
+    if isinstance(error,GatewayError):return MESSAGES[error.code]
     if isinstance(error, ValueError):
         text = str(error)
         if 'Stop project processes' in text:
@@ -120,6 +153,12 @@ def operation_error(error):
             return '该模型与推理强度不兼容。先将推理强度设为自动（auto），再修改模型。'
         if 'exceeds known model capacity' in text:
             return '输入预算超过当前已知模型容量，请重新进入本项设置较小的值。'
+        if 'Confirm local model digest' in text:
+            return '先在后端与连接页只读检查模型，再把核对的digest填入本地profile；本次未切换。'
+        if 'Provider timeout' in text:
+            return '排队等待+当前后端生成期限+25秒预留超过provider的180秒，请减小期限。'
+        if 'Conflicting legacy/profile' in text:
+            return '新旧配置字段冲突，请对照备份核对；本次未覆盖任何值。'
         if 'allowed_groups' in text or 'Groups must' in text:
             return '至少保留一个授权群；移除最后一个群不会放行所有群。'
         if text == '该ID不在列表中':
@@ -139,17 +178,18 @@ class ConfigMenu:
     def run(self):
         while True:
             settings, _ = read_settings(self.path)
-            access, llm, chat = settings['access'], settings['llm'], settings['chat']
+            access, llm, chat = settings['access'], resolve_backend(settings), budget_view(settings)
             self.ui.page('机器人配置')
-            self.ui.write(f"模型：{llm['model']}")
-            self.ui.write(f"推理强度：{EFFORT_NAMES.get(llm['reasoning_effort'], llm['reasoning_effort'])}（{llm['reasoning_effort']}）")
+            self.ui.write(f"当前后端：{llm['backend']}；模型：{llm['model']}")
+            self.ui.write(f"推理强度：{EFFORT_NAMES.get(llm.get('reasoning_effort','关闭思考'), llm.get('reasoning_effort','关闭思考'))}（{llm.get('reasoning_effort','关闭思考')}）")
             self.ui.write(f"授权群：{len(access['allowed_groups'])} 个    黑名单：{len(access['blocked_users'])} 人    记忆：{chat['history_turns']} 轮")
             self.ui.write(f"输入预算：{chat['context_input_limit_tokens']:,}（可见内容保守计数）")
-            self.ui.write('\n1  群与黑名单\n2  模型与对话\n3  详细设置与能力说明\n4  回复方式\n0  退出')
+            self.ui.write('\n1  群与黑名单\n2  模型与对话\n3  详细设置与能力说明\n4  回复方式\n5  后端与连接\n0  退出')
             self.ui.write('\n修改前请先关闭机器人；保存后，下次启动生效')
-            choice = self.ui.choose({'0','1','2','3','4'})
+            choice = self.ui.choose({'0','1','2','3','4','5'})
             if choice == '0':return
-            if choice == '4':self.output_group()
+            if choice == '5':self.backend_group()
+            elif choice == '4':self.output_group()
             elif choice == '3':
                 self.ui.page('详细设置与能力说明')
                 content = StringIO()
@@ -157,6 +197,42 @@ class ConfigMenu:
                 self.ui.write(content.getvalue().rstrip())
                 self.ui.pause()
             else:self.group(choice)
+
+    def backend_group(self):
+        while True:
+            settings,digest=read_settings(self.path)
+            self.ui.page('后端与连接')
+            self.ui.write('当前后端：'+settings['llm']['backend'])
+            self.ui.write('分别保留两套参数；须先停机，保存后重新启动。切换会开启新上下文，旧历史保留。失败不自动切换。')
+            self.ui.write('1 CodeBuddy CLI / 2 家庭PC本地 / 3 初始化家庭连接资料 / 4 零推理元数据检查 / 5 本地profile参数 / 6 解除远端结果未知 / 0 返回')
+            choice=self.ui.choose({'0','1','2','3','4','5','6'})
+            if choice=='0':return
+            try:
+                if choice in ('1','2'):
+                    execute(self.path,'backend','set','codebuddy_cli' if choice=='1' else 'ollama_ssh',expected_digest=digest)
+                elif choice=='3':execute(self.path,'connection-init',None)
+                elif choice=='4':execute(self.path,'connection-check',None)
+                elif choice=='6':
+                    self.ui.write('仅在操作者独立确认远端请求已停止后输入 REMOTE_CHECKED_STOPPED；已加载/ps成功不能证明结束。')
+                    execute(self.path,'clear-remote-unknown',None,self.ui.read('确认文字（回车取消）：').strip())
+                else:
+                    local=settings['llm']['profiles']['ollama_ssh']
+                    keys=['expected_digest','model','num_ctx','num_predict','keep_alive_seconds','run_timeout_seconds','temperature','top_p','top_k','context_input_limit_tokens','context_overhead_reserve_tokens','output_reserve_tokens','access_file']
+                    for i,key in enumerate(keys,1):self.ui.write(f"{i} {key}: {local.get(key,local['input_budget'].get(key))}")
+                    self.ui.write('请求级num_ctx 4096..32768、num_predict 128..4096、保温0..1800秒、超时受provider180秒约束；think固定false。输入预算为UTF-8字节保守估算，输入+输出预留<=num_ctx且预留>=num_predict。temperature 0..2、top_p (0,1]、top_k 1..100。只选已安装tag，不下载；digest需本机核对固定。')
+                    entry=self.ui.choose({'0'}|{str(i) for i in range(1,len(keys)+1)})
+                    if entry=='0':continue
+                    key=keys[int(entry)-1];value=self.ui.read('新值（回车保留）：').strip()
+                    if not value:continue
+                    if key in ('temperature','top_p'):value=float(value)
+                    elif key not in ('model','expected_digest','access_file'):value=int(value)
+                    if key in local['input_budget']:local['input_budget'][key]=value
+                    else:local[key]=value
+                    save_settings(self.path,settings,digest)
+                    self.ui.write('本地profile已保存，活动后端未自动切换；重启后生效。')
+            except GatewayError as error:self.ui.write(MESSAGES[error.code])
+            except (ValueError,OSError) as error:self.ui.write(operation_error(error)+' 请检查digest、连接资料和参数关系。')
+            self.ui.pause()
 
     def output_group(self):
         fields = list(OUTPUT_FIELDS.items())
@@ -192,8 +268,9 @@ class ConfigMenu:
                 self.ui.write(f"授权群：{len(settings['access']['allowed_groups'])} 个；黑名单：{len(settings['access']['blocked_users'])} 人")
                 self.ui.write('\n1  查看授权群\n2  添加授权群\n3  移除授权群\n4  查看黑名单\n5  屏蔽用户\n6  解除屏蔽')
             else:
-                llm, chat = settings['llm'], settings['chat']
-                self.ui.write(f"1  模型ID      {llm['model']}\n2  输入预算    {chat['context_input_limit_tokens']:,}\n3  推理强度    {llm['reasoning_effort']}\n4  记忆轮数    {chat['history_turns']} 轮")
+                llm, chat = resolve_backend(settings), budget_view(settings)
+                self.ui.write('编辑当前profile：'+llm['backend'])
+                self.ui.write(f"1  模型ID      {llm['model']}\n2  输入预算    {chat['context_input_limit_tokens']:,}\n3  推理强度    {llm.get('reasoning_effort','关闭思考')}\n4  记忆轮数    {chat['history_turns']} 轮")
             self.ui.write('\n0  返回')
             choice = self.ui.choose(set(choices) | {'0'})
             if choice == '0':return
@@ -231,23 +308,27 @@ class ConfigMenu:
         else:
             title = {'model':'模型ID','context':'输入预算','effort':'推理强度','history':'记忆轮数'}[section]
             self.ui.page(title)
+            self.ui.write('当前profile：'+settings['llm']['backend'])
+            if section=='effort' and settings['llm']['backend']=='ollama_ssh':
+                self.ui.write('本地profile固定请求think:false（关闭思考），不映射CLI强度；真实效果尚未验证。')
+                self.ui.pause();return
             if section == 'model':
-                current = settings['llm']['model']
-                self.ui.write('填写站点使用的字符串模型ID，不是菜单编号或展示名。示例：deepseek-v4.1-flash')
+                current = resolve_backend(settings)['model']
+                self.ui.write('填写已安装的本地tag，例如qwen3.5:9b-q4_K_M；随后需核对digest，不自动下载。' if settings['llm']['backend']=='ollama_ssh' else '填写站点使用的字符串模型ID，不是菜单编号或展示名。示例：deepseek-v4.1-flash')
                 self.ui.write('以字母或数字开头，可含 . _ : / -，最多128个字符。')
                 self.ui.write('不保证账号可用或免费；若与现有强度冲突，先返回将强度设为auto。')
             elif section == 'context':
-                current = settings['chat']['context_input_limit_tokens']
+                current = budget_view(settings)['context_input_limit_tokens']
                 self.ui.write('限制送入模型的固定设定、当前问题、历史与开销。范围：1024—1048576；默认16384仅作参考。')
                 self.ui.write('内部按可见UTF-8字节保守计数，非精确token、模型原生窗口或计费上限。')
-                self.ui.write('较大预算不代表模型支持同样大的窗口；CLI内部强制压缩/恢复问题尚未解决。')
+                self.ui.write('本地输入+输出预留不能超过请求num_ctx；原生窗口不是精确分词保证。' if settings['llm']['backend']=='ollama_ssh' else '较大预算不代表模型支持同样大的窗口；CLI内部强制压缩/恢复问题尚未解决。')
                 self.ui.write('输入不带单位的十进制整数，例如32768；已知模型容量限制可能更小。')
             elif section == 'history':
                 current = settings['chat']['history_turns']
                 self.ui.write('范围：1—64轮；默认8轮仅作参考，包含当前这轮。1代表不携带旧轮次。')
                 self.ui.write('不会删除存储历史；输入预算仍会裁剪旧轮次。请填整数，例如8。')
             else:
-                current = settings['llm']['reasoning_effort']
+                current = resolve_backend(settings).get('reasoning_effort','关闭思考')
                 choices = effort_options(settings)
                 for index, effort in enumerate(choices, 1):
                     description = '跟随模型产品默认，不等于关闭推理' if effort == 'auto' else '当前能力快照支持的档位'
@@ -292,7 +373,10 @@ def main():
     parser = argparse.ArgumentParser(description='本机授权群/黑名单配置，停止后保存、下次启动生效')
     commands = parser.add_subparsers(dest='section')
     commands.add_parser('show')
-    for section in (*OUTPUT_FIELDS,'model','context','context-window','effort','history','overhead','output-reserve'):
+    commands.add_parser('connection-init')
+    commands.add_parser('connection-check')
+    commands.add_parser('clear-remote-unknown').add_argument('identifier')
+    for section in (*OUTPUT_FIELDS,'backend','model','context','context-window','effort','history','overhead','output-reserve'):
         actions=commands.add_parser(section).add_subparsers(dest='action',required=True)
         actions.add_parser('set').add_argument('identifier')
     for section in ('groups', 'blacklist'):
@@ -307,10 +391,9 @@ def main():
             menu(path)
         else:
             execute(path, args.section, getattr(args, 'action', None), getattr(args, 'identifier', None))
-    except (ValueError, OSError) as error:
+    except (ValueError, OSError, GatewayError) as error:
         # Parser errors may contain secrets or user supplied YAML; never print them.
-        print('配置操作失败：检查配置格式、ID、停止状态和并发修改。旧配置保持完整。', file=sys.stderr)
-        if isinstance(error,ValueError):print(str(error),file=sys.stderr)
+        print('配置操作失败：'+operation_error(error),file=sys.stderr)
         return 1
     except (EOFError, KeyboardInterrupt):
         print('\n已退出。')

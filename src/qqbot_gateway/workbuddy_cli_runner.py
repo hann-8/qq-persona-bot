@@ -10,6 +10,7 @@ import tempfile
 
 import psutil
 
+from .backends import BackendResult, numeric_usage
 from .errors import GatewayError, classify_error
 from .text_safety import has_tool_markup
 from .cli_control import ControlExchange, model_metadata
@@ -26,6 +27,7 @@ class ResultParser:
         self.bytes = 0
         self.initialized = False
         self.result = None
+        self.usage = {}
         self.events = []
 
     def feed(self, chunk, final=False):
@@ -81,6 +83,9 @@ class ResultParser:
             if has_tool_markup(event['result']):
                 raise GatewayError('TOOL_ISOLATION_FAILED')
             self.result = event['result']
+            self.usage = numeric_usage(event.get('usage',{}))
+            model_usage = event.get('modelUsage',{})
+            if isinstance(model_usage,dict):self.usage.update(numeric_usage(model_usage.get(self.expected_model,{})))
 
     def finish(self, exit_code):
         self.feed(b'', final=True)
@@ -92,6 +97,7 @@ class ResultParser:
 
 
 class CLIRunner:
+    backend = 'codebuddy_cli'
     def __init__(self, root, model, timeout=90, cleanup_seconds=5, reasoning_effort='auto', budget=None):
         self.root = Path(root)
         lock = json.loads((self.root/'config/versions.lock.json').read_text(encoding='utf-8'))
@@ -244,7 +250,7 @@ class CLIRunner:
             try:
                 async with asyncio.timeout(self.timeout):
                     await asyncio.gather(*io,process.wait())
-                return parser.finish(process.returncode)
+                return BackendResult(parser.finish(process.returncode),parser.usage,self.last_parameters,'stop')
             except TimeoutError:
                 raise GatewayError('MODEL_TIMEOUT') from None
             except (ValueError,UnicodeError,BrokenPipeError,ConnectionResetError):

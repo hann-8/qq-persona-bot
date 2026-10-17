@@ -8,11 +8,13 @@ import sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'src'))
 from qqbot_gateway.config import load_settings
-from qqbot_gateway.persona import compose_persona, persona_version
+from qqbot_gateway.backends import resolve_backend
+from qqbot_gateway.persona import compose_persona, session_version
 
 
 async def configure():
     settings=load_settings(ROOT/'config/settings.local.yaml')
+    budget=resolve_backend(settings)['input_budget']
     path=ROOT/'runtime/astrbot/data/cmd_config.json'
     config=json.loads(path.read_text(encoding='utf-8-sig'))
     tokens=json.loads((ROOT/'secrets/local-tokens.json').read_text(encoding='utf-8'))
@@ -27,13 +29,13 @@ async def configure():
     config['provider_settings']['proactive_capability']['add_cron_tools']=False
     config['provider_settings']['file_extract']['enable']=False
     persona=compose_persona((ROOT/'config/persona.md').read_text(encoding='utf-8'),settings['output'])
-    persona_id=persona_version(persona)
+    persona_id=session_version(persona,settings)
     from astrbot.core.config.agent_runner import get_agent_runner_config_default
     runner=get_agent_runner_config_default('local')
     runner['model'].update(provider_id='workbuddy-local',request_max_retries=1,fallback_provider_ids=[])
     runner['persona']['persona_id']=persona_id
     runner['compression'].update(max_turns=settings['chat']['history_turns'],trim_turns=1,
-        fallback_max_tokens=settings['chat']['context_input_limit_tokens']+settings['chat']['output_reserve_tokens'],
+        fallback_max_tokens=budget['context_input_limit_tokens']+budget['output_reserve_tokens'],
         overflow_strategy='truncate_by_turns')
     runner['misc'].update(max_steps=1)
     config['agent_runner']={'runner_type':'local','config':runner}

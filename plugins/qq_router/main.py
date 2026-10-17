@@ -18,7 +18,7 @@ from qqbot_gateway.task_store import TaskStore
 from qqbot_gateway.config import load_settings
 from qqbot_gateway.token_budget import InputBudget, validate_model_settings
 from qqbot_gateway.errors import GatewayError, MESSAGES
-from qqbot_gateway.persona import compose_persona, persona_version
+from qqbot_gateway.persona import compose_persona, session_version
 from qqbot_gateway.lifecycle import stopping
 from qqbot_gateway.reply_plan import trusted_plan, digest
 from qqbot_gateway.reply_delivery import ReplyDelivery, cancellable
@@ -36,7 +36,7 @@ class QQRouter(Star):
         self.blocked=set(settings['access']['blocked_users'])
         self.output=settings['output']
         self.persona=compose_persona((self.root/'config/persona.md').read_text(encoding='utf-8'),self.output)
-        self.persona_id=persona_version(self.persona)
+        self.persona_id=session_version(self.persona,settings)
         chat=settings.get('chat',{})
         self.budget=InputBudget.from_settings(settings,validate_model_settings(settings))
         self.coordinator=SessionCoordinator(chat.get('user_cooldown_seconds',5),chat.get('session_queue_limit',2),chat.get('session_queue_timeout_seconds',600))

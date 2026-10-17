@@ -1,0 +1,15 @@
+{
+  "state": "metadata_ready",
+  "version": "0.40.5",
+  "digest": "56671c2ab9385f9cfcb404638e32cd62d88e3501d44822208363c010179a3c90",
+  "digest_confirmed": true,
+  "declared_context_max": 262144,
+  "think_false_supported": true,
+  "loaded_observation": [],
+  "checked_at": 1792223066.518457,
+  "real_generation_verified": false,
+  "real_generation_requests": 0,
+  "settings_written": false,
+  "bot_operations": 0,
+  "ssh_authentications": 1
+}

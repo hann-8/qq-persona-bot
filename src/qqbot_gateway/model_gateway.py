@@ -14,7 +14,7 @@ from .config import load_settings
 
 from .contracts import normalize_request, contract_shape
 from .errors import GatewayError, MESSAGES
-from .workbuddy_cli_runner import CLIRunner
+from .backends import BackendResult, create_runner
 from .token_budget import InputBudget, validate_model_settings
 from .chat_text import prepare_reply
 from .reply_plan import make_reply_plan, DEFAULTS
@@ -48,19 +48,21 @@ class ModelQueue:
         self.last_success=None
         self.last_shape=None
         self.last_error=None
+        self.last_usage={}
 
     async def start(self):
         self.worker=asyncio.create_task(self._work())
 
     async def close(self):
-        self.worker.cancel()
-        await asyncio.gather(self.worker,return_exceptions=True)
+        if self.worker:
+            self.worker.cancel()
+            await asyncio.gather(self.worker,return_exceptions=True)
         while not self.queue.empty():
             job=self.queue.get_nowait()
             if not job.future.done():job.future.set_exception(GatewayError('BACKEND_UNAVAILABLE'))
 
     async def submit(self,system,prompt,request_id):
-        if self.state in ('AUTH_REQUIRED','QUOTA_EXHAUSTED','CLEANUP_FAILED'):
+        if self.state in ('AUTH_REQUIRED','QUOTA_EXHAUSTED','CLEANUP_FAILED','REMOTE_RESULT_UNKNOWN'):
             raise GatewayError(self.state)
         if self.queue.qsize()>=self.limit+(0 if self.active else 1):raise GatewayError('QUEUE_FULL')
         job=Job(system,prompt,request_id,time.monotonic()+self.wait,asyncio.get_running_loop().create_future())
@@ -83,7 +85,7 @@ class ModelQueue:
             if job.future.cancelled() or job.cancelled.is_set():continue
             if time.monotonic()>job.deadline:
                 job.future.set_exception(GatewayError('QUEUE_TIMEOUT'));continue
-            if self.state in ('AUTH_REQUIRED','QUOTA_EXHAUSTED','CLEANUP_FAILED'):
+            if self.state in ('AUTH_REQUIRED','QUOTA_EXHAUSTED','CLEANUP_FAILED','REMOTE_RESULT_UNKNOWN'):
                 job.future.set_exception(GatewayError(self.state));continue
             self.active=True
             task=asyncio.create_task(self.runner.run(job.system,job.prompt,job.request_id))
@@ -93,10 +95,11 @@ class ModelQueue:
                 if cancel in done and job.cancelled.is_set():
                     task.cancel()
                     outcomes=await asyncio.gather(task,return_exceptions=True)
-                    if any(isinstance(e,GatewayError) and e.code=='CLEANUP_FAILED' for e in outcomes):self.state='CLEANUP_FAILED'
+                    if any(isinstance(e,GatewayError) and e.code in ('CLEANUP_FAILED','REMOTE_RESULT_UNKNOWN') for e in outcomes):self.state=next(e.code for e in outcomes if isinstance(e,GatewayError) and e.code in ('CLEANUP_FAILED','REMOTE_RESULT_UNKNOWN'))
                     continue
                 result=await task
                 self.state='ready';self.last_success=time.time()
+                if isinstance(result,BackendResult):self.last_usage=result.usage
                 if not job.future.done():job.future.set_result(result)
             except GatewayError as error:
                 self.state=error.code
@@ -152,10 +155,16 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
                                   'overhead_reserve':budget.overhead,'output_reserve':budget.output,
                                   'native_window':'unverified','parameters':getattr(queue.runner,'last_parameters',{}),
                                   'forced_compact_exclusion_verified':False,
-                                  'upstream_inference_attempts':'unverified_cli_internal_recovery',
+                                  'upstream_inference_attempts':'single_native_post' if getattr(queue.runner,'backend',None)=='ollama_ssh' else 'unverified_cli_internal_recovery',
                                   'control_attempts':getattr(queue.runner,'control_attempts',0),
                                   'user_messages_sent':getattr(queue.runner,'user_messages_sent',0),
-                                  'active':queue.active,'cli_attempts':queue.runner.attempts,
+                                  'backend':getattr(queue.runner,'backend','codebuddy_cli'),
+                                  'model':getattr(queue.runner,'model',getattr(queue.runner,'profile',{}).get('model')),
+                                  'metadata':getattr(queue.runner,'metadata',{'state':'not_probed'}),
+                                  'remote_result_unknown':bool(getattr(queue.runner,'marker',None) and queue.runner.marker.exists()),
+                                  'active':queue.active,'cli_attempts':queue.runner.attempts if getattr(queue.runner,'backend','codebuddy_cli')=='codebuddy_cli' else 0,
+                                  'backend_attempts':queue.runner.attempts,'local_post_attempts':getattr(queue.runner,'post_attempts',0),
+                                  'last_usage':queue.last_usage,'credits':None,'credits_state':'unknown',
                                   'last_success':queue.last_success,'real_inference_verified':queue.last_success is not None,
                                   'router_ready':router_ready(),'last_contract':queue.last_shape,'last_error':last_error})
 
@@ -172,6 +181,8 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
         queue.last_shape=contract_shape(payload)
         LOG.info('REQUEST_ACCEPTED request_id=%s',request[TRACE])
         result=await queue.submit(system,prompt,request[TRACE])
+        backend_result=result if isinstance(result,BackendResult) else BackendResult(result)
+        result=backend_result.text
         response_id='chatcmpl-'+request[TRACE]
         metadata={}
         if output['delivery_mode']=='adaptive':
@@ -182,13 +193,16 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
         else:
             result,limited=prepare_reply(result,max_reply_chars)
         return web.json_response({'id':response_id,'object':'chat.completion','created':int(time.time()),
-            'model':'workbuddy-local','choices':[{'index':0,'message':{'role':'assistant','content':result},
-                                               'finish_reason':'length' if limited else 'stop'}],**metadata})
+            'model':'workbuddy-local','qqbot_backend_usage':backend_result.usage,'qqbot_credits':None,'choices':[{'index':0,'message':{'role':'assistant','content':result},
+                                               'finish_reason':'length' if limited or backend_result.finish_reason=='length' else 'stop'}],**metadata})
 
     app.router.add_get('/health',health)
     app.router.add_get('/v1/models',models)
     app.router.add_post('/v1/chat/completions',chat)
-    async def start(app):await queue.start()
+    async def start(app):
+        if hasattr(queue.runner,'preflight'):await queue.runner.preflight()
+        if getattr(queue.runner,'marker',None) and queue.runner.marker.exists():queue.state='REMOTE_RESULT_UNKNOWN'
+        await queue.start()
     async def close(app):await queue.close()
     app.on_startup.append(start);app.on_cleanup.append(close)
     return app
@@ -199,11 +213,11 @@ def main():
     path=Path(args.config).resolve();root=path.parent.parent
     settings=load_settings(path)
     llm=settings['llm']
-    if llm['host']!='127.0.0.1' or llm['backend']!='codebuddy_cli' or llm['max_concurrency']!=1:
+    if llm['host']!='127.0.0.1' or llm['max_concurrency']!=1:
         raise ValueError('Restricted local CLI configuration required')
     tokens=json.loads((root/settings['secrets_file']).read_text(encoding='utf-8'))
     budget=InputBudget.from_settings(settings,validate_model_settings(settings))
-    runner=CLIRunner(root,llm['model'],llm['run_timeout_seconds'],llm['cleanup_seconds'],llm['reasoning_effort'],budget)
+    runner=create_runner(root,settings,budget)
     queue=ModelQueue(runner,llm['queue_limit'],llm['queue_wait_seconds'])
     logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(message)s')
     web.run_app(application(queue,tokens['model_gateway'],root/'state/router-ready.json',budget,settings['output']['max_reply_chars'],root,settings['output']),host=llm['host'],port=llm['port'],

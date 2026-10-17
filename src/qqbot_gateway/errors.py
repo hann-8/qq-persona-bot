@@ -5,6 +5,15 @@ class GatewayError(Exception):
 
 
 MESSAGES = {
+    'REMOTE_RESULT_UNKNOWN':'远端生成是否结束尚未确认，已暂停本地后端；请操作者核对后显式解除。',
+    'SSH_ACCESS_INVALID':'家庭连接资料缺失或无效，请在本机初始化或检查。',
+    'SSH_HOST_KEY_MISMATCH':'家庭SSH主机指纹不匹配，已拒绝认证，请核对既有指纹。',
+    'SSH_AUTH_FAILED':'家庭SSH认证失败，请在本机检查专用连接资料。',
+    'SSH_UNAVAILABLE':'家庭SSH连接不可用，请检查PC和网络。',
+    'OLLAMA_UNAVAILABLE':'家庭Ollama回环接口不可用或响应无效。',
+    'OLLAMA_MODEL_MISMATCH':'家庭PC未找到指定的已安装模型；不会自动下载。',
+    'OLLAMA_DIGEST_MISMATCH':'模型digest与确认值不符，请在本机重新核对。',
+    'OLLAMA_PARAMETERS_UNSUPPORTED':'模型元数据未确认所需参数支持。',
     'SHUTTING_DOWN': '机器人正在关闭，请稍后再试。',
     'EMPTY_REPLY': '这次没有生成可显示的文字，请换个问法再试。',
     'INPUT_TOO_LONG': '这条文字和固定设定已超过当前输入预算，请缩短问题或由管理员调整预算。',

@@ -56,9 +56,9 @@ def normalize_settings(raw):
         raise ValueError('Configuration must be a mapping')
     data = deepcopy(raw)
     version = data.get('schema_version', 1)
-    if type(version) is not int or version not in (1, 2):
+    if type(version) is not int or version not in (1, 2, 3):
         raise ValueError('Unsupported schema_version')
-    data['schema_version'] = 2
+    data['schema_version'] = 3
     for section in ('bot', 'access', 'onebot', 'llm', 'chat', 'output'):
         data.setdefault(section, {})
         if not isinstance(data[section], dict):
@@ -88,20 +88,53 @@ def normalize_settings(raw):
         valid = False
     if not valid:
         raise ValueError('Upstream must be a loopback WS /ws endpoint')
-    if llm.get('backend') != 'codebuddy_cli' or llm.get('host') != '127.0.0.1' or type(llm.get('max_concurrency')) is not int or llm['max_concurrency'] != 1:
-        raise ValueError('Restricted local CLI configuration required')
-    if not isinstance(llm.get('model'), str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}', llm['model']):
-        raise ValueError('Invalid llm.model')
-    llm.setdefault('reasoning_effort', 'auto')
-    llm.setdefault('context_window_tokens', None)
-    if llm['reasoning_effort'] not in ('auto', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max'):
-        raise ValueError('Invalid reasoning_effort')
+    if llm.get('backend') not in ('codebuddy_cli', 'ollama_ssh') or llm.get('host') != '127.0.0.1' or type(llm.get('max_concurrency')) is not int or llm['max_concurrency'] != 1:
+        raise ValueError('Restricted local backend configuration required')
     chat, output = data['chat'], data['output']
-    for key, value in {'history_turns': 8, 'context_input_limit_tokens': 16384,
-                       'context_overhead_reserve_tokens': 2048, 'output_reserve_tokens': 2048,
-                       'user_cooldown_seconds': 5, 'session_queue_limit': 2,
-                       'session_queue_timeout_seconds': 600}.items():
-        chat.setdefault(key, value)
+    from .backends import CLI_DEFAULTS, OLLAMA_DEFAULTS, BUDGET_DEFAULTS
+    profiles = llm.setdefault('profiles', {})
+    if not isinstance(profiles, dict):raise ValueError('profiles must be a mapping')
+    for name, defaults in (('codebuddy_cli', CLI_DEFAULTS), ('ollama_ssh', OLLAMA_DEFAULTS)):
+        profile = profiles.setdefault(name, {})
+        if not isinstance(profile, dict):raise ValueError('profile must be a mapping')
+        if name == 'codebuddy_cli':
+            for key in ('model','reasoning_effort','context_window_tokens','run_timeout_seconds'):
+                if key in llm:
+                    if version == 3 or (key in profile and profile[key] != llm[key]):
+                        raise ValueError('Conflicting legacy/profile value: '+key)
+                    profile[key] = llm.pop(key)
+        budget = profile.setdefault('input_budget', {})
+        if not isinstance(budget, dict):raise ValueError('input_budget must be a mapping')
+        if name == 'codebuddy_cli':
+            for key in BUDGET_DEFAULTS:
+                if key in chat:
+                    if version == 3 or (key in budget and budget[key] != chat[key]):
+                        raise ValueError('Conflicting legacy/profile budget: '+key)
+                    budget[key] = chat.pop(key)
+        for key, value in defaults.items():
+            if key != 'input_budget':profile.setdefault(key, deepcopy(value))
+        for key, value in defaults['input_budget'].items():budget.setdefault(key, value)
+        if not isinstance(profile['model'], str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}', profile['model']):
+            raise ValueError('Invalid profile model')
+        for key, lower, upper in (('context_input_limit_tokens',1024,1048576),('context_overhead_reserve_tokens',0,65536),('output_reserve_tokens',0,65536)):
+            if type(budget[key]) is not int or not lower <= budget[key] <= upper:raise ValueError('Invalid input_budget '+key)
+        if type(profile['run_timeout_seconds']) is not int or not 1 <= profile['run_timeout_seconds'] <= 3600:raise ValueError('Invalid run timeout')
+    cli, local = profiles['codebuddy_cli'], profiles['ollama_ssh']
+    if cli['reasoning_effort'] not in ('auto','minimal','low','medium','high','xhigh','max'):raise ValueError('Invalid reasoning_effort')
+    for key, lower, upper in (('num_ctx',4096,32768),('num_predict',128,4096),('keep_alive_seconds',0,1800),('top_k',1,100)):
+        if type(local[key]) is not int or not lower <= local[key] <= upper:raise ValueError('Invalid local '+key)
+    import math
+    for key, lower, upper in (('temperature',0,2),('top_p',0,1)):
+        if type(local[key]) not in (int,float) or not math.isfinite(local[key]) or not lower <= local[key] <= upper or (key == 'top_p' and local[key] == 0):raise ValueError('Invalid local '+key)
+    if local['think'] is not False:raise ValueError('Only think:false supported')
+    if local['model'].lower().endswith((':cloud','-cloud')) or ':' not in local['model'] or local['model'].endswith(':latest'):raise ValueError('Explicit installed local model tag required')
+    digest = local['expected_digest']
+    if digest is not None and (not isinstance(digest,str) or not re.fullmatch(r'[a-f0-9]{64}',digest)):raise ValueError('Invalid expected_digest')
+    if llm['backend'] == 'ollama_ssh' and digest is None:raise ValueError('Confirm local model digest before activation')
+    access_path = local['access_file']
+    if not isinstance(access_path,str) or not access_path.startswith('secrets/') or '..' in Path(access_path).parts or Path(access_path).is_absolute():raise ValueError('Local access_file must remain in project secrets')
+    if local['input_budget']['context_input_limit_tokens']+local['input_budget']['output_reserve_tokens'] > local['num_ctx'] or local['input_budget']['output_reserve_tokens'] < local['num_predict']:raise ValueError('Local budget exceeds known model capacity / output reserve')
+    for key, value in {'history_turns':8,'user_cooldown_seconds':5,'session_queue_limit':2,'session_queue_timeout_seconds':600}.items():chat.setdefault(key,value)
     output.setdefault('mode', 'plain_chat')
     output.setdefault('max_reply_chars', 1200)
     from .reply_plan import DEFAULTS
@@ -122,16 +155,18 @@ def normalize_settings(raw):
     for section, key, lower, upper in (
         (onebot, 'port', 1, 65535), (llm, 'port', 1, 65535),
         (llm, 'queue_limit', 0, 100), (llm, 'queue_wait_seconds', 1, 3600),
-        (llm, 'run_timeout_seconds', 1, 3600), (llm, 'cleanup_seconds', 1, 60),
-        (chat, 'history_turns', 1, 64), (chat, 'context_input_limit_tokens', 1024, 1048576),
-        (chat, 'context_overhead_reserve_tokens', 0, 65536), (chat, 'output_reserve_tokens', 0, 65536),
+        (llm, 'cleanup_seconds', 1, 60),
+        (chat, 'history_turns', 1, 64),
         (chat, 'user_cooldown_seconds', 0, 3600), (chat, 'session_queue_limit', 0, 100),
         (chat, 'session_queue_timeout_seconds', 1, 3600), (output, 'max_reply_chars', 200, 8000)):
         value = section.get(key)
         if type(value) is not int or not lower <= value <= upper:
             raise ValueError(f'Invalid {key}; expected integer {lower}..{upper}')
     from .token_budget import validate_model_settings
-    validate_model_settings(data)
+    validate_model_settings(data, backend='codebuddy_cli')
+    # 180s provider: reserve 15s retrieval (LAP-18) and 10s delivery margin.
+    active = profiles[llm['backend']]
+    if llm['queue_wait_seconds'] + active['run_timeout_seconds'] + 25 > 180:raise ValueError('Provider timeout 180 exceeded')
     secret = data.get('secrets_file')
     if not isinstance(secret, str) or not secret:
         raise ValueError('Missing secrets_file')
@@ -147,6 +182,8 @@ def read_settings(path):
         raise ValueError('Invalid UTF-8 YAML configuration') from None
     data = normalize_settings(raw)
     root = path.parent.parent
+    from .ssh_transport import secrets_path
+    secrets_path(root,data['llm']['profiles']['ollama_ssh']['access_file'])
     if not (root / data['secrets_file']).resolve().is_relative_to(root / 'secrets'):
         raise ValueError('Secrets file must remain in project secrets directory')
     return data, hashlib.sha256(content).hexdigest()
@@ -238,6 +275,8 @@ def save_settings(path, data, expected_digest):
         if digest != expected_digest:
             raise ValueError('Configuration changed; reload before saving')
         normalized = normalize_settings(data)
+        from .ssh_transport import secrets_path
+        secrets_path(root,normalized['llm']['profiles']['ollama_ssh']['access_file'])
         if not (root / normalized['secrets_file']).resolve().is_relative_to(root / 'secrets'):
             raise ValueError('Secrets file must remain in project secrets directory')
         original = path.read_bytes()

@@ -66,7 +66,7 @@ class RunnerTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_explicit_effort_single_user_after_control_and_isolation(self):
         runner=self.runner()
-        self.assertEqual(await runner.run('SYS','[{"role":"user","content":"hi"}]','test'),'answer')
+        self.assertEqual((await runner.run('SYS','[{"role":"user","content":"hi"}]','test')).text,'answer')
         self.assertEqual((runner.attempts,runner.control_attempts,runner.user_messages_sent),(1,1,1))
         argv=json.loads((self.root/'argv.json').read_text())
         self.assertEqual(argv['memory'],'1')

@@ -20,6 +20,9 @@ from scripts.configure_bot import execute
 def fixture():
     data = yaml.safe_load((ROOT / 'config/settings.example.yaml').read_text(encoding='utf-8'))
     data.pop('schema_version')
+    cli=data['llm'].pop('profiles')['codebuddy_cli']
+    cli.pop('input_budget')
+    data['llm'].update(cli)
     data['bot']['qq'] = 222
     data['access']['allowed_groups'] = [111, '111', '444']
     data['access']['admin_users'] = [333]
@@ -44,12 +47,12 @@ class ConfigTests(unittest.TestCase):
 
     def test_v1_bom_normalization_is_read_only(self):
         data = load_settings(self.path)
-        self.assertEqual(data['schema_version'], 2)
+        self.assertEqual(data['schema_version'], 3)
         self.assertEqual(data['access']['allowed_groups'], ['111', '444'])
         self.assertEqual(data['access']['admin_users'], ['333'])
         self.assertEqual(data['access']['blocked_users'], [])
-        self.assertEqual(data['llm']['reasoning_effort'], 'auto')
-        self.assertIsNone(data['llm']['context_window_tokens'])
+        self.assertEqual(data['llm']['profiles']['codebuddy_cli']['reasoning_effort'], 'auto')
+        self.assertIsNone(data['llm']['profiles']['codebuddy_cli']['context_window_tokens'])
         self.assertEqual(self.path.read_bytes(), self.original)
 
     def test_rejects_invalid_ids_and_empty_authorization(self):
@@ -87,7 +90,7 @@ class ConfigTests(unittest.TestCase):
         saved = load_settings(self.path)
         self.assertEqual(saved['access']['blocked_users'], ['333'])
         self.assertEqual(saved['extension'], fixture()['extension'])
-        self.assertEqual(saved['llm']['model'], fixture()['llm']['model'])
+        self.assertEqual(saved['llm']['profiles']['codebuddy_cli']['model'], fixture()['llm']['model'])
         self.assertEqual(next((self.root / 'state/config-backups').glob('*.yaml')).read_bytes(), self.original)
         changed = self.path.read_bytes()
         with self.assertRaises(ValueError): save_settings(self.path, data, digest)
@@ -167,7 +170,7 @@ class ConfigTests(unittest.TestCase):
         with self.assertRaises(ValueError):execute(self.path,'effort','set','high')
         after=load_settings(self.path)
         self.assertEqual(before['bot'],after['bot']);self.assertEqual(before['access'],after['access'])
-        self.assertEqual(after['chat']['context_input_limit_tokens'],32768)
+        self.assertEqual(after['llm']['profiles']['codebuddy_cli']['input_budget']['context_input_limit_tokens'],32768)
 
     def test_os_lock_blocks_other_process_and_releases(self):
         code = ('import sys; from pathlib import Path; '

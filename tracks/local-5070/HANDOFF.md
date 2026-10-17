@@ -2,6 +2,12 @@
 
 返回[PROGRESS](../../PROGRESS.md) / [LAP-19计划](../laptop-workbuddy/tasks/LAP-19/PLAN.md) / [TASKS](../laptop-workbuddy/TASKS.md)。继承[AGENTS](../../AGENTS.md)，家庭访问与工作环境隔离。
 
+更新时间：2026-10-17 15:51（Asia/Shanghai）。状态：active；[LAP-17](../laptop-workbuddy/tasks/LAP-17/HANDOFF.md)后端实现/离线与实际SSH元数据通过，真实生成未验/未启用。146单元、两后端90组实际框架合成和零推理预检通过，详见[报告](../../reports/lap-17-2026-10-17.md)。本机settings/角色/长期运行连接JSON未改；PC未下载/修改/启停，bot未启停/登录/探活，0真实生成/群发。
+
+15:44:26最新原生SSH预检通过固定旧指纹认证、version/tags/show/ps，digest与已知一致、think:false有元数据支持；ps返回所选模型未加载（不能沿用14:53加载快照或推断空闲）。最终检查一次认证、4元数据请求；含HTTP通道兼容诊断共6次连接，全部0生成，原始证据忽略state，安全字段见[元数据报告](../../reports/lap-17-metadata-2026-10-17.json)。后端须操作者停机初始化连接、检查/确认digest、手动切换重启，本文不代表启用授权；后续18/20/21待指令。
+
+以下为LAP-19规划时的历史快照；实现最新状态以上段和LAP-17为准：
+
 更新时间：2026-10-17 15:21（Asia/Shanghai）。状态：planned；**用户已完成模型安装并加载，项目只读元数据/SSH回环转发通过，后端尚未接入**。LAP-19仅规划，后续17本地接入/切换→18共用联网→20自由群聊→21表情包，详见[追加合同](../laptop-workbuddy/tasks/LAP-19/GROUP_CHAT_PLAN.md)和[执行指引](../laptop-workbuddy/tasks/LAP-19/IMPLEMENTATION_GUIDE.md)；free已纳入本轮规划，未启用。
 
 ## 最新已验证事实

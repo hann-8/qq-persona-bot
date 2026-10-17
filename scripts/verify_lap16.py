@@ -14,7 +14,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path[:0]=[str(ROOT),str(ROOT/'src')]
 
 
-async def verify():
+async def verify(synthetic=None, backend='codebuddy_cli', report_path=None):
     os.environ['ASTRBOT_DISABLE_METRICS']='1'
     import yaml
     from aiohttp import web
@@ -64,7 +64,7 @@ async def verify():
             return {'message_id':n}
 
     cfg=DEFAULTS | dict(delivery_mode='adaptive',bubble_delay_min_ms=0,bubble_delay_max_ms=0)
-    synthetic=Synthetic();queue=ModelQueue(synthetic);token=secrets.token_urlsafe(32)
+    synthetic=synthetic or Synthetic();queue=ModelQueue(synthetic);token=secrets.token_urlsafe(32)
     server=web.AppRunner(application(queue,token,output=cfg),access_log=None)
     await server.setup();site=web.TCPSite(server,'127.0.0.1',0);await site.start()
     port=site._server.sockets[0].getsockname()[1]
@@ -76,6 +76,8 @@ async def verify():
         with tempfile.TemporaryDirectory(prefix='qqbot-lap16-router-',ignore_cleanup_errors=True) as directory:
             root=Path(directory);(root/'config').mkdir()
             settings=yaml.safe_load((ROOT/'config/settings.example.yaml').read_text(encoding='utf-8'))
+            settings['llm']['backend']=backend
+            if backend=='ollama_ssh':settings['llm']['profiles']['ollama_ssh']['expected_digest']='a'*64
             settings['bot']['qq']='222';settings['access'].update(allowed_groups=['111'],admin_users=['333'])
             settings['chat']['user_cooldown_seconds']=0;settings['output']=cfg | {'mode':'plain_chat'}
             (root/'config/settings.local.yaml').write_text(yaml.safe_dump(settings),encoding='utf-8')
@@ -350,7 +352,7 @@ async def verify():
         await provider.client.close();await server.cleanup()
         from astrbot.core import sp, db_helper
         await sp.close();await db_helper.engine.dispose()
-    (ROOT/'reports/lap-16-offline-2026-10-17.json').write_bytes((json.dumps(report,ensure_ascii=False,indent=2)+'\n').encode('utf-8'))
+    (report_path or ROOT/'reports/lap-16-offline-2026-10-17.json').write_bytes((json.dumps(report,ensure_ascii=False,indent=2)+'\n').encode('utf-8'))
 
 
 if __name__=='__main__':
