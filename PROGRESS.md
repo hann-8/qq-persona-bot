@@ -1,8 +1,10 @@
 # QQ 人设聊天 Bot：项目入口
 
-更新时间：2026-10-17 11:10（Asia/Shanghai）。
+更新时间：2026-10-17 11:09（Asia/Shanghai）。
 
 ## 当前阶段与授权
+
+LAP-15内容提交`632fdc5`已推送origin/main，2026-10-17 11:09用ls-remote核对完整SHA一致，已跟踪工作区无剩余差异；原文备份/本机diff/框架scratch工件均忽略保留。随后仅同步本交付记录，未部署或真实验收。
 
 [LAP-15](tracks/laptop-workbuddy/tasks/LAP-15/HANDOFF.md)已按用户指令独立实施、离线通过，见[报告](reports/lap-15-2026-10-17.md)：完整备份原persona后统一40行角色/9个人工场景，组合prompt3618 UTF-8字节；108项单元、5组实际框架合成回环及入口/历史/版本迁移通过。固定政策/共用compose代码保持，仍单条纯文本、当前CLI/模型/账号/预算/真实@和工具隔离。
 
@@ -64,7 +66,7 @@ LAP-13实现提交`ee7f2d4`已成功推送origin/main；随后仅同步交付检
 
 | 工作线 | 状态 | 最近更新 | 下一步 | 交接入口 |
 | --- | --- | --- | --- | --- |
-| 笔记本 WorkBuddy | active，LAP-15已实现/离线通过；真实待验 | 2026-10-17 11:10 | 用户指定LAP-16或协调LAP-15真实接受；联网LAP-18中优先级 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [任务台账](tracks/laptop-workbuddy/TASKS.md) / [实施指引](tracks/laptop-workbuddy/tasks/LAP-14/IMPLEMENTATION_GUIDE.md) |
+| 笔记本 WorkBuddy | active，LAP-15已实现/离线通过；真实待验 | 2026-10-17 11:09 | 用户指定LAP-16或协调LAP-15真实接受；联网LAP-18中优先级 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [任务台账](tracks/laptop-workbuddy/TASKS.md) / [实施指引](tracks/laptop-workbuddy/tasks/LAP-14/IMPLEMENTATION_GUIDE.md) |
 | 家庭5070 PC本地模型 | planned，用户自部署中；SSH只读盘点/初选完成，项目接入未开始 | 2026-10-17 10:57 | 复用已有Ollama，后续LAP-17独立后端能力/接入规划；未做推理 | [HANDOFF](tracks/local-5070/HANDOFF.md) / [模型选择](tracks/local-5070/MODEL_SELECTION.md) |
 
 已登记的任务级交接：[LAP-08 体验改进规划](tracks/laptop-workbuddy/tasks/LAP-08/HANDOFF.md)、[LAP-09 配置准入实施](tracks/laptop-workbuddy/tasks/LAP-09/HANDOFF.md)、[LAP-10 参数与预算](tracks/laptop-workbuddy/tasks/LAP-10/HANDOFF.md)（部分完成/能力缺口待规划）、[LAP-11 纯文本与人设v2](tracks/laptop-workbuddy/tasks/LAP-11/HANDOFF.md)（实现/离线通过，真实待验）、[LAP-12 启停与分层状态](tracks/laptop-workbuddy/tasks/LAP-12/HANDOFF.md)（已实现/本机启停通过，停机为历史检查点）、[LAP-13 配置控制台交互](tracks/laptop-workbuddy/tasks/LAP-13/HANDOFF.md)（已实现/离线通过，视觉接受待验）、[LAP-14 人设与分条规划](tracks/laptop-workbuddy/tasks/LAP-14/HANDOFF.md)（仅规划完成）、[LAP-15 精简人设与场景表达](tracks/laptop-workbuddy/tasks/LAP-15/HANDOFF.md)（已实现/离线通过，真实待验）。其余实施任务领取时再建立独立HANDOFF，不批量创建空文件。
