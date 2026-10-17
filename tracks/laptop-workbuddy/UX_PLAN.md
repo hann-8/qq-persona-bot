@@ -4,6 +4,8 @@
 
 入口：[PROGRESS](../../PROGRESS.md) / [AGENTS](../../AGENTS.md) / [工作线HANDOFF](HANDOFF.md) / [任务台账](TASKS.md) / [本次规划交接](tasks/LAP-08/HANDOFF.md)。原[实施规格](IMPLEMENTATION_PLAN.md)和[验收矩阵](ACCEPTANCE.md)保留；本文是本次新增体验需求的增量合同，冲突处按本文和用户最新指令执行。
 
+2026-10-17增量：[LAP-13控制台交互计划](tasks/LAP-13/PLAN.md)已落盘，覆盖配置清屏/分组、字段说明/强度选择、每次启动显示NapCat地址；尚未实施，不改变本文配置字段/权限/模型与验收差额。
+
 ## 1. 用户目标、范围与决定
 
 | 用户反馈 | 本轮规划决定 | 实施任务 |

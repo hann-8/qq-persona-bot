@@ -2,6 +2,10 @@
 
 返回[全局入口](../../PROGRESS.md)。继承[AGENTS](../../AGENTS.md)；原规格见[实施计划](IMPLEMENTATION_PLAN.md)，本轮体验改进执行[UX_PLAN](UX_PLAN.md)，验收见[ACCEPTANCE](ACCEPTANCE.md)，领取/交接见[任务台账](TASKS.md)。本轮任务记录：[LAP-08](tasks/LAP-08/HANDOFF.md)。
 
+更新时间：2026-10-17 09:56（Asia/Shanghai）。当前新任务[LAP-13](tasks/LAP-13/HANDOFF.md)详细计划已落盘，见[PLAN](tasks/LAP-13/PLAN.md)。范围为菜单清屏/分组、逐项输入解释/强度编号、启动固定NapCat地址；未改实现、配置、人设或启停，未探测用户试用后的当前运行状态。用户persona未提交改动保留。后续按AGENTS由medium在用户新实施指令后执行。
+
+以下为上次LAP-12的历史交接检查点，不能据此判断当前仍在停机：
+
 更新时间：2026-10-16 23:56（Asia/Shanghai）。当前任务[LAP-12](tasks/LAP-12/HANDOFF.md)已实现/离线及本机无推理启停通过；**已按用户要求关闭后台，由用户自行试用**。开始工作区干净，沿用提交/推送授权。
 
 LAP-12实现交付提交`16c6fd6`已成功推送origin/main；随后仅同步交付检查点。最终再次核对后台stopped、所有受管身份退出、五端口无监听；当前保持关闭，供用户自行启动。

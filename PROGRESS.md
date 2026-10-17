@@ -1,10 +1,14 @@
 # QQ 人设聊天 Bot：项目入口
 
-更新时间：2026-10-16 23:56（Asia/Shanghai）。
+更新时间：2026-10-17 09:56（Asia/Shanghai）。
 
 ## 当前阶段与授权
 
-本轮按用户指令实施[LAP-12](tracks/laptop-workbuddy/tasks/LAP-12/HANDOFF.md)，23:43登记领取；**已实现/离线及本机无推理启停通过，后台已按要求关闭，留给用户自行试用。** 开始时main工作区干净，沿用本会话提交/推送授权。结果见[LAP-12报告](reports/lap-12-2026-10-16.md)：97项单元测试、实际框架路由/保存发送回归、中文空格路径cmd调度及本机启动/重复启动/两入口停止通过。
+2026-10-17新反馈转入[LAP-13控制台交互](tracks/laptop-workbuddy/tasks/LAP-13/HANDOFF.md)规划：配置菜单清屏/分组、逐项输入说明/强度选项、启动固定显示NapCat地址。按AGENTS已落盘[详细计划](tracks/laptop-workbuddy/tasks/LAP-13/PLAN.md)，后续由gpt-6.1-sol/medium按用户新实施指令执行；当前不改实现、不启停bot。用户未提交persona修改保留。以下LAP-12停机是上次检查点，不代表本轮实时探测。
+
+以下为上次LAP-12实施/停机历史检查点：
+
+上轮按用户指令实施[LAP-12](tracks/laptop-workbuddy/tasks/LAP-12/HANDOFF.md)，23:43登记领取；**已实现/离线及本机无推理启停通过，后台已按要求关闭，留给用户自行试用。** 开始时main工作区干净，沿用本会话提交/推送授权。结果见[LAP-12报告](reports/lap-12-2026-10-16.md)：97项单元测试、实际框架路由/保存发送回归、中文空格路径cmd调度及本机启动/重复启动/两入口停止通过。
 
 新启动/关闭/状态cmd、共用OS锁、幂等生命周期、实例停止准入、动态后代清理/失败身份保留、QQ/模型分层状态已落地。新组件曾保持暂停准入加载LAP-09—12，模型not_probed且0CLI；QQ为waiting_login，未要求用户登录。最终所有受管进程退出，6185/6199/6200/6099/8765无监听，15个外部QQ/WorkBuddy创建身份全部存活，任务库仍completed=9/failed=1。真实模型/群消息均为0；没有修改settings.local.yaml、日常QQ或WorkBuddy全局配置。
 
@@ -43,10 +47,10 @@ LAP-12实现交付提交`16c6fd6`已成功推送origin/main；随后仅同步交
 
 | 工作线 | 状态 | 最近更新 | 下一步 | 交接入口 |
 | --- | --- | --- | --- | --- |
-| 笔记本 WorkBuddy | active，LAP-12实现/本机启停通过，当前已停机 | 2026-10-16 23:56 | 用户自行试用；LAP-10缺口回规划及原人工验收待补 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [任务台账](tracks/laptop-workbuddy/TASKS.md) / [UX_PLAN](tracks/laptop-workbuddy/UX_PLAN.md) |
+| 笔记本 WorkBuddy | active，LAP-13交互已规划，待实施 | 2026-10-17 09:56 | 后续medium按指令实施LAP-13；本轮未探活/启停，旧差额保留 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [任务台账](tracks/laptop-workbuddy/TASKS.md) / [UX_PLAN](tracks/laptop-workbuddy/UX_PLAN.md) |
 | 5070 PC 本地模型 | planned，本轮不推进 | 2026-10-15（计划）；2026-10-16确认范围 | 待用户后续启动再确认PC参数 | [HANDOFF](tracks/local-5070/HANDOFF.md) |
 
-已登记的任务级交接：[LAP-08 体验改进规划](tracks/laptop-workbuddy/tasks/LAP-08/HANDOFF.md)、[LAP-09 配置准入实施](tracks/laptop-workbuddy/tasks/LAP-09/HANDOFF.md)、[LAP-10 参数与预算](tracks/laptop-workbuddy/tasks/LAP-10/HANDOFF.md)（部分完成/能力缺口待规划）、[LAP-11 纯文本与人设v2](tracks/laptop-workbuddy/tasks/LAP-11/HANDOFF.md)（实现/离线通过，真实待验）、[LAP-12 启停与分层状态](tracks/laptop-workbuddy/tasks/LAP-12/HANDOFF.md)（本次任务，已实现/本机启停通过，当前已关闭）。其余实施任务领取时再建立独立HANDOFF，不批量创建空文件。
+已登记的任务级交接：[LAP-08 体验改进规划](tracks/laptop-workbuddy/tasks/LAP-08/HANDOFF.md)、[LAP-09 配置准入实施](tracks/laptop-workbuddy/tasks/LAP-09/HANDOFF.md)、[LAP-10 参数与预算](tracks/laptop-workbuddy/tasks/LAP-10/HANDOFF.md)（部分完成/能力缺口待规划）、[LAP-11 纯文本与人设v2](tracks/laptop-workbuddy/tasks/LAP-11/HANDOFF.md)（实现/离线通过，真实待验）、[LAP-12 启停与分层状态](tracks/laptop-workbuddy/tasks/LAP-12/HANDOFF.md)（已实现/本机启停通过，停机为历史检查点）、[LAP-13 配置控制台交互](tracks/laptop-workbuddy/tasks/LAP-13/HANDOFF.md)（本次详细计划落盘，待实施）。其余实施任务领取时再建立独立HANDOFF，不批量创建空文件。
 
 ## 多session任务管理
 
@@ -72,4 +76,4 @@ LAP-12实现交付提交`16c6fd6`已成功推送origin/main；随后仅同步交
 
 ## 恢复工作时的第一步
 
-先读AGENTS→本入口→笔记本HANDOFF/TASKS→UX_PLAN及LAP-12交接。当前后台已关闭，用户自行启动试用，不自动重启。LAP-12代码与本机无推理启停已有证据，真实登录恢复/QQ操作和真实请求/ACK中停机仍未验；LAP-10原生窗口与内部强制压缩缺口需符合AGENTS要求的规划会话处理。后续仅按用户反馈/指令补原LAP-02/03/04及LAP-09/11/12差额，再到LAP-05；视频/ASR延期，PC不启动。
+先读AGENTS→本入口→笔记本HANDOFF/TASKS→LAP-13 HANDOFF/PLAN。LAP-13是当前新交互计划，尚未实现，按AGENTS由gpt-6.1-sol/medium在用户后续实施指令后执行；本轮只写文档，保留用户persona修改，不自动启停。LAP-12上次停机之后用户已自行试用，当前运行状态未经本轮探测，不能沿用“仍停止”结论。LAP-10原生窗口/内部强制压缩缺口及LAP-02/03/04/05、LAP-09/11/12真实验收差额保留；PC/视频/ASR不推进。
