@@ -25,3 +25,5 @@
 生效/回滚：没有新增公开配置或schema，不改默认cleanup_seconds=5/1..60。本轮没有部署/启停/探活/登录真实bot或真实模型/QQ/SSH调用；当前加载/运行状态未知。回旧代码前须确认cleanup task结束并保留未决身份，旧版不认识新台账则保持停机直到独立完整退出证明；不删unknown/marker、不切后端绕过。账号/额度/模型、Ollama未知解除、历史/ACK/pending及旧真人验收差额保留。
 
 下一步：仅交付本任务已检查文件并核对origin/main完整SHA；31B缺口回规划，用户指定后续范围前不做真实CLI/模型/QQ验证、不自动开始27—30。Git交付不等于部署或完整验收。
+
+Git交付检查点（2026-10-18 18:35，Asia/Shanghai）：内容提交`fc7fce70c079c8c21cee2ca31d6c040cb22b5593`已推送origin/main，`git rev-parse HEAD`与`git ls-remote origin refs/heads/main`完整SHA一致，内容检查点工作区干净。提交恰15份上述归属文件；283单元/384实际框架及229本地文档链接、围栏、JSON计数和暂存diff --check通过。没有旧报告或本机配置/凭据夹带；忽略的测试控制台/临时框架工件保留，真实运行状态未知。此段另作交付记录提交/推送，最终记录SHA见会话回执；31B缺口和真实验收差额不因Git交付消失。
