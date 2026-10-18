@@ -24,4 +24,10 @@
 
 回滚：先停受管实例并保留pending/unknown/清理账本；7→19导出移除members/vision/attention的旧schema3审阅副本，双摘要/停机锁核对后才显式激活，不自动启停。新mention_receipt表只记录结果，不删除旧ACK/历史。旧代码不能尊重未知清理时保持停机。
 
-Git交付：待本轮归属/文档检查后提交推送，核对origin/main完整SHA；末期检测并行LAP-32-cleanup-ledger-debug：其HANDOFF明确归属cleanup_identity.py/process_host.py/test_lap32.py与根目录说明，共享三台账仅追加32登记。本任务保留其全部差异；共享台账只暂存29归属段，32前缀/文件不夹带。忽略本机配置/凭据/自造测试临时文件继续保留、不纳入提交。最终审阅又收紧发送者/群准入/连接失效整票拒发（目标@名单/人数失效仍同次剥@），独立verify_lap29最终复跑已成功（355单元/52组合790框架），32专项也通过。250链接/围栏/diff检查通过。下一步完成Git交付；之后人数能力缺口回规划，30等待用户新指令。
+Git交付：内容提交`782a48a4c71d82086f7918a82683423fd02f2bc1`已推送origin/main；`git rev-parse HEAD`与`git ls-remote origin refs/heads/main`完整SHA一致。27份已审阅归属文件；共享PROGRESS/TASKS/工作线HANDOFF只暂存29段，32登记保留在工作区。随后仅同步本交付记录，最终文档检查点见Git日志。
+
+最终发送端准入审阅之后，独立verify_lap29完整复跑成功（355单元/52组合790框架），32专项也通过；250链接/围栏/diff检查通过。原发送者/群准入或连接失效整票拒发；仅@目标映射或人数失效在同次发送剥@。没有真实部署/验收。
+
+保留的非本任务本机差异：LAP-32-cleanup-ledger-debug的cleanup_identity.py、process_host.py、test_lap32.py、任务HANDOFF、根目录说明，以及共享三台账的32登记；其HANDOFF已明确归属，本任务不覆盖、不夹带或验收32。忽略的本机配置/凭据与自造临时测试文件继续保留，不纳入提交。
+
+下一步：LAP-29独立离线交付结束；人数观测时间/最大陈旧度证明仍须回规划，生产保持capability_unverified/拒激活，真实验证另需用户指令。28/31B及旧差额保留，不自动开始30。
