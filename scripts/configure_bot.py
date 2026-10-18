@@ -48,6 +48,7 @@ def show(settings):
         print('当前模型可显式选强度：'+('/'.join(supported) or '未知，仅auto'))
     print(f"回复方式：{settings['output']['delivery_mode']}；闲聊最多{settings['output']['max_bubbles']}条/{settings['output']['casual_max_chars']}字符，认真问题单条；切换后新上下文，旧历史保留。")
     print(f"共用网页：{settings.get('web',{}).get('enabled',False)}；搜索候选未通过质量门槛，仅受控公共URL读取；不上传历史。")
+    print(f"原生识图：desired={settings['vision']['enabled']}；生产不可启用（模板/视觉token上界与原生容量未验证）；reserve={settings['vision']['input_reserve_tokens']}仅假设。")
 
 
 def parameter(settings, section, value):
@@ -327,9 +328,11 @@ class ConfigMenu:
             for index,key in enumerate(keys,1):
                 bounds=f'{RANGES[key][0]}..{RANGES[key][1]}' if key in RANGES else ('mentions/free' if key=='mode' else 'true/false')
                 self.ui.write(f'{index} {key}: {settings["participation"][key]} ({bounds})')
-            self.ui.write('17 核对后解除本群未知发送隔离 / 18 关注与续聊 / 19 导出旧版配置审阅副本 / 0 返回')
-            choice=self.ui.choose({'0','17','18','19'}|{str(i) for i in range(1,len(keys)+1)})
+            self.ui.write('17 核对后解除本群未知发送隔离 / 18 关注与续聊 / 19 导出旧版配置审阅副本 / 20 原生识图 / 0 返回')
+            choice=self.ui.choose({'0','17','18','19','20'}|{str(i) for i in range(1,len(keys)+1)})
             if choice=='0':return
+            if choice=='20':
+                self.vision_group();continue
             if choice=='19':
                 try:execute(self.path,'export-legacy-config',None)
                 except (ValueError,OSError) as error:self.ui.write(operation_error(error))
@@ -364,6 +367,26 @@ class ConfigMenu:
                 self.ui.write('已保存，下次启动生效。没有启停/读取群消息/调用模型。')
             except (ValueError,OSError) as error:self.ui.write(operation_error(error)+' 请核对页面范围。')
             self.ui.pause()
+
+    def vision_group(self):
+        from qqbot_gateway.vision import validate_config,require_production
+        settings,digest=read_settings(self.path)
+        self.ui.page('原生识图（生产不可启用）')
+        self.ui.write('当前无可信模板/视觉token上界或原生容量证明；4096仅reserve假设，样图成功不能解锁。状态由证据派生，不可手写status。')
+        self.ui.write('验证入口 scripts/observe_lap28.py --help；独立授权后单次请求，不自动启用，不改后端。只处理当前第一张图，无编辑/视频音频。')
+        self.ui.write(str(settings['vision']))
+        self.ui.write('1 设置reserve（1..65536） / 2 关闭desired / 3 请求启用（须通过证明门槛） / 0 返回')
+        choice=self.ui.choose({'0','1','2','3'})
+        if choice=='0':return
+        try:
+            if choice=='1':settings['vision']['input_reserve_tokens']=int(self.ui.read('reserve：').strip())
+            else:settings['vision']['enabled']=choice=='3'
+            settings['vision']=validate_config(settings['vision'])
+            require_production(settings)
+            save_settings(self.path,settings,digest)
+            self.ui.write('已保存，重启生效；没有启停、下载或模型调用。')
+        except (ValueError,OSError):self.ui.write('未保存：缺可靠上界/原生容量证明不能启用；reserve必须1..65536。')
+        self.ui.pause()
 
     def attention_group(self):
         from qqbot_gateway.participation import ATTENTION_DEFAULTS

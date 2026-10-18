@@ -1,4 +1,4 @@
-"""Closed v2 wire contract. Future private materials deliberately remain empty."""
+"""Closed v2 wire contract; images use private resolution, members/memory stay empty."""
 import copy
 import json
 import logging
@@ -23,7 +23,8 @@ def validate_header(obj):
         obj['addressing'] not in PRIORITY or type(obj['must_reply']) is not bool or obj['must_reply']!=(obj['addressing'] in DIRECT) or
         obj['mode']=='mentions' and obj['addressing']!='mention' or not integer(obj['target_seq']) or
         any(not hexa(obj[k],64) for k in ('request_key','epoch','config_version','source_digest')) or
-        obj['resource_caps']!=[]):raise GatewayError('UNSUPPORTED_REQUEST')
+        not isinstance(obj['resource_caps'],list) or len(obj['resource_caps'])>1 or
+        any(not hexa(c,64) for c in obj['resource_caps'])):raise GatewayError('UNSUPPORTED_REQUEST')
     return dict(obj)
 
 def validate_source(text,request):
@@ -44,7 +45,8 @@ def validate_source(text,request):
                 len(row['text'])>(8000 if row['member_ref']=='bot' else 4000) or not integer(row['age_ms'],0,900000) or
                 not (row['reply_seq'] in (None,'unresolved') or integer(row['reply_seq'])) or
                 not isinstance(row['at_refs'],list) or len(row['at_refs'])>8 or any(not (ref(r) or r=='other_member') for r in row['at_refs']) or
-                row['images']!=[]):raise ValueError()
+                not isinstance(row['images'],list) or len(row['images'])>1 or
+                any(not isinstance(i,str) or not re.fullmatch(r'i_[a-f0-9]{32}',i) for i in row['images'])):raise ValueError()
             previous=row['seq']
         seqs={r['seq'] for r in rows};humans={r['seq'] for r in rows if r['member_ref']!='bot'}
         refs={r['member_ref'] for r in rows}
@@ -59,7 +61,14 @@ def validate_source(text,request):
                 not integer(focus['received_age_ms'],0,900000) or not isinstance(focus['bot_seqs'],list) or
                 not 1<=len(focus['bot_seqs'])<=3 or len(set(focus['bot_seqs']))!=len(focus['bot_seqs']) or
                 any(not integer(s) or not any(r['seq']==s and r['member_ref']=='bot' for r in rows) for s in focus['bot_seqs'])):raise ValueError()
-        if obj['member_candidates']!=[] or obj['memory'] is not None or obj['images']!=[]:raise ValueError()
+        if obj['member_candidates']!=[] or obj['memory'] is not None:raise ValueError()
+        images=obj['images']
+        if (not isinstance(images,list) or len(images)>1 or any(not isinstance(i,dict) or set(i)!={'image_ref'} or
+            not isinstance(i['image_ref'],str) or not re.fullmatch(r'i_[a-f0-9]{32}',i['image_ref']) for i in images)):
+            raise ValueError()
+        refs=[i['image_ref'] for i in images]
+        if bool(refs)!=bool(request['resource_caps']):raise ValueError()
+        if any(r['images']!=(refs if r['seq']==obj['target_seq'] else []) for r in rows):raise ValueError()
         target=next(r for r in rows if r['seq']==obj['target_seq'])
         for key in ('web_anchor','meme_question'):
             anchor=obj[key]
@@ -104,7 +113,7 @@ def fit(obj,request,system,budget,suffix='',history=()):
 
 def manifest(obj):
     return dict(seqs=[r['seq'] for r in obj['messages']],member_refs=sorted({r['member_ref'] for r in obj['messages']}),
-        fact_refs=[],images=[],eligible_seq=list(obj['eligible_seq']))
+        fact_refs=[],images=copy.deepcopy(obj['images']),eligible_seq=list(obj['eligible_seq']))
 
 def plan(raw,output,question,request,effective,catalog=None,candidates=()):
     """Validate core first; aux never repairs broken core or carries future powers."""
@@ -162,6 +171,21 @@ def verify(value,request,response_id,text,output,source):
     if not isinstance(m,dict) or set(m)!={'seqs','member_refs','fact_refs','images','eligible_seq'}:raise ValueError('manifest')
     if not isinstance(m['seqs'],list) or len(set(m['seqs']))!=len(m['seqs']) or any(not integer(s) for s in m['seqs']):raise ValueError('seqs')
     effective=copy.deepcopy(source);effective['messages']=[r for r in effective['messages'] if r['seq'] in m['seqs']];close_refs(effective)
+    if m['images']:
+        from .vision import NORMALIZER,MAX_BLOB
+        if not isinstance(m['images'],list) or len(m['images'])!=1 or len(source['images'])!=1:raise ValueError('images')
+        image=m['images'][0]
+        if (not isinstance(image,dict) or set(image)!={'image_ref','sha256','mime','width','height','byte_length','normalizer_version'} or
+            image['image_ref']!=source['images'][0]['image_ref'] or not hexa(image['sha256'],64) or image['mime']!='image/png' or
+            image['normalizer_version']!=NORMALIZER or not integer(image['width'],1,1024) or not integer(image['height'],1,1024) or
+            image['width']*image['height']>1000000 or not integer(image['byte_length'],1,MAX_BLOB)):
+            raise ValueError('image descriptor')
+        effective['images']=copy.deepcopy(m['images'])
+    elif source['images']:
+        # Failed resolution is explicit in the effective manifest; never pretend
+        # that source availability means actual image delivery.
+        effective['images']=[]
+        for row in effective['messages']:row['images']=[]
     if not required_seqs(source,request)<=set(m['seqs']) or manifest(effective)!=m or sha(effective)!=value['effective_digest']:raise ValueError('effective identity')
     response=value['response_to_seq']
     if response is not None and (not integer(response) or response not in effective['eligible_seq'] or request['must_reply'] and response!=request['target_seq']):raise ValueError('response identity')

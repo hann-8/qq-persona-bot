@@ -29,6 +29,8 @@ class QQBotProvider(ProviderOpenAIOfficial):
                 not re.fullmatch(r'[a-f0-9]{32}',local['trace'])):raise ValueError('Invalid internal trace')
             request=validate_request(local['request']);trace=local['trace']
             if request['version']!=2:raise ValueError('Invalid version')
+            if kwargs.get('image_urls') or kwargs.get('extra_user_content_parts'):
+                raise ValueError('Private image materials are gateway-only')
         elif isinstance(session_id,str) and session_id.startswith('qqbot-group:'):
             request=validate_request(json.loads(session_id[len('qqbot-group:'):]))
             if request['version']!=1:raise ValueError('v2 requires internal trace')

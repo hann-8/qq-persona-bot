@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "adapter_signature": "c1584423edf4f6d3790ce07556da202fa6bd3c0c0177c213e3de0d707bf6d4a3",
+  "unit_tests": 323,
+  "framework_combinations": 56,
+  "framework_cases": 900,
+  "real_model_calls": 0,
+  "real_qq_calls": 0,
+  "real_bot_operations": 0,
+  "production_eligible": false,
+  "capability_state": "offline_passed",
+  "native_observed": false,
+  "visual_reserve_upper_bound_verified": false
+}

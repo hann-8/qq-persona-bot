@@ -45,7 +45,7 @@ LAP-15内容提交`632fdc5`已推送origin/main，2026-10-17 11:09用ls-remote�
 | LAP-26 | 清理可靠性、图片理解、free关注、成员与群记忆规划 | completed，仅规划；[HANDOFF](tasks/LAP-26/HANDOFF.md) | 24登录暂缓，25加载未知、18搜索/旧真人差额保留 | LAP-26-group-understanding-plan，13:14领取、13:47续审/13:57完成；7份文档 | 精确协议/调度/证明/记忆事务/回滚及五项独立指令完成；31→27—30待用户实施指令 |
 | LAP-31 | 请求模型进程清理、阻断诊断与有证据恢复 | 部分完成：31A已实现/离线通过；31B门槛未过，见[交接](tasks/LAP-31/HANDOFF.md)；[合同](tasks/LAP-26/PLAN.md)第13节 | 新反馈反复全局拒单，建议先于27—30 | LAP-31-cleanup-reliability，18:16领取、18:34验证；文件归属见交接 | 31A的283单元/384框架通过；31B breakaway/目标Job成员缺口回规划，生产创建/管道/恢复未交付；unknown不解锁 |
 | LAP-27 | free关注/第二人称与脱敏阶段trace | 已实现/离线通过；[HANDOFF](tasks/LAP-27/HANDOFF.md) | ATT-01—12；301单元/732矩阵+22边界复验；[报告](../../reports/lap-27-2026-10-18.md) | LAP-27-attention-v2；2026-10-18 18:37；文件归属见HANDOFF；根session独占 | 31A交付/31B差额保留；无真实操作，不推进28—30 |
-| LAP-28 | 当前群图片的原生理解 | 已由26规划，未实施；[合同](tasks/LAP-26/PLAN.md) | 27身份/快照基础后独立推进 | 待用户后续指定，未领取/不预建HANDOFF | 现有CLI/local输入链、能力/视觉预算/失败门槛；无编辑/视频音频 |
+| LAP-28 | 当前群图片的原生理解 | 已实现/离线通过；[HANDOFF](tasks/LAP-28/HANDOFF.md) | 323单元/56组合900框架；原生未做/生产不可启用 | LAP-28-native-vision，2026-10-18T19:12+08:00领取 | gate/vision/runner/provider/router/config/菜单/测试/README/报告与台账 |
 | LAP-29 | 少于50人名册与受控@ | 已由26规划，未实施；[合同](tasks/LAP-26/PLAN.md) | 复用27可信身份；不把人数缓存当瞬时准确 | 待用户后续指定，未领取/不预建HANDOFF | 49/50/51/未知、RPC防旁路、候选@与ACK |
 | LAP-30 | 群独立有界长期记忆 | 已由26规划，未实施；[合同](tasks/LAP-26/PLAN.md) | 27/29身份与typed协议，单次模型提议 | 待用户后续指定，未领取/不预建HANDOFF | 稳定群键/来源、silent与ACK分离、容量/删除/恢复 |
 | LAP-01 | 旧偶发后端失败记录 | 并入LAP-12；用户说明当时未登录NapCat，不再独立阻塞 | 有新独立模型失败再重开调查 | 无独立执行 | 保留旧trace证据限制，补分层状态/登录提示，不重复制造错误 |

@@ -130,6 +130,11 @@ class OneBotGate:
         self.admin_token=admin_token(root) if root else None
         if self.admin_token in (config.inbound_token,config.upstream_token):raise ValueError('Independent admin token required')
         self.connection_id=secrets.token_hex(32)
+        from .vision import Materials,context_token
+        self.materials=Materials()
+        self.context_token=context_token(root) if root and config.vision_enabled else None
+        if self.context_token and self.context_token in (config.inbound_token,config.upstream_token,self.admin_token):
+            raise ValueError('Independent context token required')
 
     def publish_connection(self):
         if self.root:
@@ -168,6 +173,7 @@ class OneBotGate:
         self.online = data.get('online') if isinstance(data, dict) and type(data.get('online')) is bool else None
         self.online_at = time.time()
         if self.online is not True and previous is True:self.connection_id=secrets.token_hex(32)
+        if self.online is not True:self.materials.clear()
         self.publish_connection()
 
     async def _status_loop(self, downstream):
@@ -211,6 +217,7 @@ class OneBotGate:
                     self.failures = 0
                     self.connected = True
                     self.connection_id=secrets.token_hex(32);self.publish_connection()
+                    self.materials.clear()
                     self.ever_connected = True
                     LOG.info('CHANNEL_CONNECTED_SELF_ID_VERIFIED')
                     pending = set()
@@ -233,6 +240,7 @@ class OneBotGate:
             # metadata error itself is why the channel is closing.
             self.active = None
             self.connected = False
+            self.materials.clear()
             self.online = None
             self.online_at = None
             self.health_pending.clear()
@@ -263,23 +271,32 @@ class OneBotGate:
             if admitted_message(event, self.config):
                 if self.root and stopping(self.root):continue
                 if self.store.reserve(event):
-                    if self.config.participation_mode=='free':
-                        # Never let adapter quote expansion fetch or expose embedded bodies.
-                        safe=[];reference=None;media=False
-                        for segment in event['message']:
-                            if not isinstance(segment,dict):continue
-                            kind=segment.get('type');data=segment.get('data',{})
-                            if not isinstance(data,dict):continue
-                            if kind=='text' and isinstance(data.get('text'),str):safe.append({'type':'text','data':{'text':data['text']}})
-                            elif kind=='at' and qq_id(data.get('qq'))==self.config.bot_qq:safe.append({'type':'at','data':{'qq':self.config.bot_qq}})
-                            elif kind=='reply':reference=str(data.get('id',''))[:128]
-                            elif kind!='at':media=True;safe.append({'type':'text','data':{'text':'[非文本未解析]'}})
-                        at_ids=[qq_id(s['data'].get('qq')) or 'other_member' for s in event['message'] if s['type']=='at'][:8] if self.config.attention_enabled else []
-                        event=dict(event,message=safe,raw_message='',qqbot_reference=reference,qqbot_media=media,
-                                   qqbot_connection=self.connection_id)
-                        if self.config.attention_enabled:event['qqbot_at_ids']=at_ids
-                        await upstream.send_json(event)
-                    else:await upstream.send_str(frame.data)
+                    if (self.config.participation_mode=='mentions' and not self.config.vision_enabled and
+                        all(s['type'] in ('text','at') for s in event['message']) and
+                        not any(k.startswith('qqbot_') for k in event)):
+                        # Unchanged legacy text-only frame. Attachments and
+                        # embedded replies always take the stripping path below.
+                        await upstream.send_str(frame.data)
+                        continue
+                    # Never let adapter quote expansion fetch or expose embedded bodies.
+                    safe=[];reference=None;media=False
+                    for segment in event['message']:
+                        if not isinstance(segment,dict):continue
+                        kind=segment.get('type');data=segment.get('data',{})
+                        if not isinstance(data,dict):continue
+                        if kind=='text' and isinstance(data.get('text'),str):safe.append({'type':'text','data':{'text':data['text']}})
+                        elif kind=='at' and qq_id(data.get('qq'))==self.config.bot_qq:safe.append({'type':'at','data':{'qq':self.config.bot_qq}})
+                        elif kind=='reply':reference=str(data.get('id',''))[:128]
+                        elif kind!='at':media=True;safe.append({'type':'text','data':{'text':'[非文本未解析]'}})
+                    at_ids=[qq_id(s['data'].get('qq')) or 'other_member' for s in event['message'] if s['type']=='at'][:8] if self.config.attention_enabled else []
+                    image=self.materials.issue(event,self.connection_id) if self.config.vision_enabled else None
+                    image_text=''.join(s['data'].get('text','') for s in event['message'] if s['type']=='text' and isinstance(s['data'].get('text'),str))
+                    event={k:v for k,v in event.items() if k in ('post_type','message_type','sub_type','self_id','group_id','user_id','message_id','time','font','sender')}
+                    event=dict(event,message=safe,raw_message='',qqbot_reference=reference,qqbot_media=media,
+                               qqbot_connection=self.connection_id)
+                    if image:event['qqbot_image']=image;event['qqbot_text']=image_text
+                    if self.config.attention_enabled:event['qqbot_at_ids']=at_ids
+                    await upstream.send_json(event)
             elif (event.get('post_type') == 'meta_event' and
                   event.get('meta_event_type') in ('heartbeat', 'lifecycle') and
                   qq_id(event.get('self_id')) == self.config.bot_qq):
@@ -327,14 +344,40 @@ class OneBotGate:
         async def health(request):return web.json_response(self.status())
         app.router.add_get('/health', health)
         app.router.add_post('/admin/memes/favorites',self.favorites)
+        app.router.add_post('/context/vision/resolve',self.resolve_vision)
+        app.router.add_post('/context/vision/bind',self.resolve_vision)
 
         async def cleanup(app):
             if self.active is not None:
                 await self.active.close(code=1001, message=b'SHUTDOWN')
             self.store.close()
+            self.materials.clear()
 
         app.on_cleanup.append(cleanup)
         return app
+
+    async def resolve_vision(self,request):
+        if (request.remote!='127.0.0.1' or not self.context_token or
+            len(request.headers.getall('Authorization',[]))!=1 or not secrets.compare_digest(
+                request.headers.get('Authorization',''),'Bearer '+self.context_token)):
+            raise web.HTTPUnauthorized(text='AUTH_FAILED')
+        if not self.config.vision_enabled or not self.connected or self.online is not True or self.root and stopping(self.root):
+            raise web.HTTPServiceUnavailable(text='MATERIAL_UNAVAILABLE')
+        from .reply_plan import _pairs
+        try:
+            if request.content_length is None or request.content_length>2048:raise ValueError()
+            body=json.loads(await request.text(),object_pairs_hook=_pairs)
+            def allowed(identity):
+                bot,group,sender,_=identity
+                return (self.connected and self.online is True and not (self.root and stopping(self.root)) and
+                    bot==self.config.bot_qq and group in self.config.allowed_groups and sender not in self.config.blocked_users)
+            if request.path.endswith('/bind'):
+                self.materials.bind(body,self.connection_id,allowed)
+                return web.json_response({'bound':True})
+            result=await self.materials.resolve(body,self.connection_id,allowed)
+            return web.json_response(result)
+        except (ValueError,TypeError,TimeoutError,aiohttp.ClientError,OSError):
+            raise web.HTTPBadRequest(text='MATERIAL_UNAVAILABLE') from None
 
     async def favorites(self,request):
         if (not self.admin_token or len(request.headers.getall('Authorization',[]))!=1 or

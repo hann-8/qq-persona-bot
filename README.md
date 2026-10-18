@@ -1,12 +1,26 @@
 # QQ 人设文字 Bot（笔记本测试版）
 
+LAP-28 已交付原生图片适配与离线验证，**生产仍不可启用**；见[交接](tracks/laptop-workbuddy/tasks/LAP-28/HANDOFF.md)和[报告](reports/lap-28-2026-10-18.md)。没有执行真实识图、群图下载、QQ/模型调用或bot启停。
+
+`vision.enabled=false`为默认值；`vision.input_reserve_tokens=4096`仅为待验证假设。菜单7→20查看/关闭desired及设置1..65536的reserve；没有可编辑status，申请启用会被拒绝。手改true同样在gate/router/gateway启动前拒绝。保存不启停，正常重启加载；本次未改本机配置。
+
+图片入口仅在准入/黑名单后给当前新消息第一张图签发cap，原URL/路径/附件从送往框架的事件剥离，框架不自动下载。gate在现有loopback端口提供固定`/context/vision/bind`、`/context/vision/resolve`，独立`context_service_token`只从项目忽略的`secrets/context-service.local.json`读取（随机至少32字节的64位hex；不复用其他token），当前不创建凭据。provider只转sideband，gateway绑定request/target/source/epoch后一次兑换；失败/并发/重放/过期均不能再下载。重连、失联清理cap；运行配置变更须停机重启。ambient合并会同时替换目标与其cap，不读取承载event的旧图。
+
+只接受当前事件已有的HTTPS `gchat.qpic.cn` / `multimedia.nt.qq.com.cn`来源，逐跳检查DNS/实际连接地址、拒绝私网/代理/cookie/auth。JPEG/PNG/WebP及GIF首帧，原图≤8MiB/16M像素；去元数据、保留全图等比缩至≤1024边长/1M像素，规范化PNG≤512KiB。全RAM材料≤8MiB/TTL60秒，单任务解码、完成释放；图片不写请求文件/历史/普通日志，也不发回处理图。CLI走同一次stream-json image content，SSH Ollama走同一次原生images；均保留工具隔离、现有模型/参数和单次尝试，不做caption、不换后端，不接视频音频。图中文字仍是不可信材料。
+
+最终按原profile扣除视觉reserve检查完整文字/政策/目标/窗口/网页及表情候选，base64另算完整wire≤2MiB；local额外满足文字+视觉+输出≤num_ctx。图片与网页共用原15秒准备预算。看不到图时direct只给一次准确本地说明，ambient静默，失败不换图/重试。
+
+证明分为`unverified / offline_passed / native_observed / production_eligible`，绑定代码/库版本、后端、CLI bundle/Node或Ollama运行版本/model digest、normalizer和上下文/推理/输出/reserve。适配器离线通过不代表本机组合真实通过。当前两路线均无可靠模板/视觉token或patch上界及原生容量证明；production_eligible没有放行来源，不能用一次样图或调低reserve解锁，补证需回规划。31B及既有真实验收差额保留。
+
+独立离线入口：`.venv/Scripts/python.exe -X utf8 scripts/verify_lap28.py`，仅写`reports/lap-28-*`。真实观察命令为`scripts/observe_lap28.py`，本次只检查`--help`。后续必须由用户明确现有选定后端、样图、用例和整轮调用总上限，再在停机状态先运行`--backend <已选后端> --inspect`取得本机binding（纯本机、零网络/推理）；单用例须同时提供`--sample <文件> --case known_content|screenshot|max_normalized --expected-visible-text <已知可见内容> --expected-binding <摘要> --max-calls 1 --authorize-native ONE_NATIVE_IMAGE_CALL`。命令不切后端，每次最多一个原生生成且无重试，另保持用户整轮预算；先写一次尝试账本，失败/未知也保留。仅记录脱敏版本/尺寸/hash/观察结果到忽略的`state/vision-evidence/`，不记录样图/回答/路径，不自动启用。最大尺寸用例需规范化≥990000像素；预期内容匹配只形成观察值，不能证明4096上界。
+
 LAP-27新增free关注/指代与自然续聊，默认关闭，尚未真实验收或自动加载。配置机器人.cmd → 7 群聊参与与活跃度 → 18 关注与续聊：仅`participation.mode=free`且`attention.enabled=true`生效，停机保存、正常重启加载；mentions仍仅真实@并沿用原群+用户历史。所有新能力关闭时保留原v1协议、工具隔离及single/adaptive、web/memes行为。
 
 启用关注后：真实@ > 可靠叫名/引用已ACK的bot文字 > 同人60秒且无插话的第二人称续聊 > 无主语续聊候选 > ambient。同级FIFO，不打断活动生成；不同direct消息各自排队，目标与必要引用冻结到投递/ACK结束。候选每群滚动60秒默认最多4次，同次模型可判断结束确认应沉默。只有已确认的正常模型文字ACK建立焦点，按真实回应对象归因，unknown/图片/本地错误不建焦点。队列/生成/ACK均可能增加等待，不承诺固定时延；新增随机trace关联固定类别日志，不含正文或QQ/群号。
 
-旧代码回滚前，先停止受管实例并保留所有pending/unknown/清理台账。菜单7→19或`.venv/Scripts/python.exe scripts/configure_bot.py export-legacy-config`生成`state/config-exports/`忽略目录内的原配置备份、移除本任务attention键的旧schema3审阅副本及两个摘要；保留其他扩展字段。**只导出不激活**。本机审阅后可显式运行`activate-legacy-config <review路径> <source_digest> <legacy_digest> 已核对`，同配置锁下复核停机与双摘要后原子激活，不重启；任一副本有变化须重新导出。旧版本不认识未决清理台账时保持停机，不能靠回旧代码抹掉unknown。
+旧代码回滚前，先停止受管实例并保留所有pending/unknown/清理台账。菜单7→19或`.venv/Scripts/python.exe scripts/configure_bot.py export-legacy-config`生成`state/config-exports/`忽略目录内的原配置备份、移除attention与vision section的旧schema3审阅副本及两个摘要；保留其他扩展字段。**只导出不激活**。本机审阅后可显式运行`activate-legacy-config <review路径> <source_digest> <legacy_digest> 已核对`，同配置锁下复核停机与双摘要后原子激活，不重启；任一副本有变化须重新导出。旧版本不认识未决清理台账时保持停机，不能靠回旧代码抹掉unknown。
 
-独立离线验证：`.venv/Scripts/python.exe -X utf8 scripts/verify_lap27.py`，只写`reports/lap-27-*`；实际run_agent/provider/原event ACK与两runner底层替身、自造群/图片夹具，不调用真实模型/QQ。图片下载、名册RPC/受控@与长期记忆属于28/29/30，v2本轮仅预留空字段；31B完整覆盖/恢复仍未交付。见[LAP-27交接](tracks/laptop-workbuddy/tasks/LAP-27/HANDOFF.md)。
+独立离线验证：`.venv/Scripts/python.exe -X utf8 scripts/verify_lap27.py`，只写`reports/lap-27-*`；实际run_agent/provider/原event ACK与两runner底层替身、自造群/图片夹具，不调用真实模型/QQ。上述27交付时图片/名册/记忆字段仅预留；28图片进展见本文顶部，29/30未实施，31B完整覆盖/恢复仍未交付。见[LAP-27交接](tracks/laptop-workbuddy/tasks/LAP-27/HANDOFF.md)。
 
 LAP-24已实现/离线通过，尚未重启加载或真实验收：闲聊“最多三条”仅为上限，能一句接住就一句，有必要补充才两三条；认真回答完整单条，表情可不发、不占位凑数。single仍保留单条文字规则，不改操作者已有条数/间隔设置。真实模型的表达与QQ效果仍待另行验证。
 

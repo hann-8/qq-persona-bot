@@ -318,6 +318,13 @@ class WebRunner:
         from .turn_v2 import plan
         from .group_protocol import SILENT
         self.check_stopping()
+        from .vision import CURRENT,text_budget
+        vision=CURRENT.get()
+        budget=text_budget(self.budget)
+        if vision and time.monotonic()>=vision.prepare_deadline:
+            if not request['must_reply']:return BackendResult(SILENT,generation_performed=False,web_expired=True)
+            notice='图片准备已超时，这次没有送入模型，请稍后再试。'
+            return BackendResult(notice,prepared_plan=ReplyPlan('answer',(notice,),notice,fallback_reason='local_image_prepare_timeout'),generation_performed=False)
         source=json.loads(json.loads(prompt)[-1]['content'])
         question=source['web_anchor'] if request['must_reply'] or getattr(self,'allow_ambient_web',True) else None
         if question and not any(r['text']==question and r['seq'] in source['eligible_seq'] and
@@ -325,15 +332,20 @@ class WebRunner:
             from .errors import GatewayError
             raise GatewayError('UNSUPPORTED_REQUEST')
         if not question:return await self.guarded(self.runner.run(system,prompt,request_id))
-        retrieval=await self.guarded(self.retriever.retrieve(question))
+        if vision:
+            remaining=vision.prepare_deadline-time.monotonic()
+            if remaining<=0:return BackendResult(SILENT,generation_performed=False,web_expired=True)
+            try:retrieval=await asyncio.wait_for(self.guarded(self.retriever.retrieve(question)),remaining)
+            except TimeoutError:return BackendResult(SILENT,generation_performed=False,web_expired=True)
+        else:retrieval=await self.guarded(self.retriever.retrieve(question))
         if retrieval.expired or retrieval.notice:
             if not request['must_reply']:return BackendResult(SILENT,generation_performed=False,web_expired=True)
             notice=retrieval.notice or '本次网页读取超时，请稍后再试。'
             return BackendResult(notice,prepared_plan=ReplyPlan('answer',(notice,),notice,fallback_reason='local_web_notice'),generation_performed=False)
         if retrieval.kind=='none':return await self.guarded(self.runner.run(system,prompt,request_id))
-        enriched,sources=evidence_prompt(system,prompt,retrieval,self.budget,self.retriever.cfg)
+        enriched,sources=evidence_prompt(system,prompt,retrieval,budget,self.retriever.cfg)
         if not sources:return BackendResult(SILENT,generation_performed=False,web_expired=True)
-        self.budget.check(system,enriched)
+        budget.check(system,enriched)
         result=await self.guarded(self.runner.run(system,enriched,request_id))
         result=result if isinstance(result,BackendResult) else BackendResult(result)
         decision,reply,response=plan(result.text,self.output,question,request,source)

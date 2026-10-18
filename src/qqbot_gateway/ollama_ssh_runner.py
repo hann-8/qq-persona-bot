@@ -89,9 +89,11 @@ class OllamaSSHRunner:
 
     async def run(self,system,prompt,request_id):
         if self.marker.exists():raise GatewayError('REMOTE_RESULT_UNKNOWN')
-        self.budget.check(system,prompt)
+        from .vision import text_budget,native_payload_images,wire_check
+        text_budget(self.budget).check(system,prompt)
         cfg = self.profile
-        payload = native_payload(cfg,system,prompt)
+        payload = native_payload_images(native_payload(cfg,system,prompt))
+        wire_check(payload)
         self.transport = self.new_transport()
         deadline = time.monotonic()+cfg['run_timeout_seconds']
         sent = False
@@ -104,6 +106,8 @@ class OllamaSSHRunner:
             model = next((m for m in tags.get('models',[]) if isinstance(m,dict) and m.get('name')==cfg['model']),None)
             if model is None:raise GatewayError('OLLAMA_MODEL_MISMATCH')
             if model.get('digest') != cfg['expected_digest']:raise GatewayError('OLLAMA_DIGEST_MISMATCH')
+            text_budget(self.budget).check(system,prompt)
+            wire_check(payload)
             return self.transport.request('POST','/api/chat',payload,deadline=deadline,before_send=before_send)
         try:
             result = await self.call(generate,cfg['run_timeout_seconds'])

@@ -9,6 +9,7 @@ import time
 import uuid
 import re
 import psutil
+import aiohttp
 
 from aiohttp import web
 from .config import load_settings
@@ -26,6 +27,7 @@ TRACE = web.RequestKey('qqbot_trace',str)
 GROUP_REQUEST = web.RequestKey('qqbot_group_request',dict)
 V2_SOURCE = web.RequestKey('qqbot_v2_source',dict)
 V2_EFFECTIVE = web.RequestKey('qqbot_v2_effective',dict)
+VISION_LEASE = web.RequestKey('qqbot_vision_lease',object)
 
 
 @dataclass
@@ -36,11 +38,17 @@ class Job:
     deadline: float
     future: asyncio.Future
     group_request: dict | None = None
+    vision: object = None
     started: asyncio.Event = field(default_factory=asyncio.Event)
     cancelled: asyncio.Event = field(default_factory=asyncio.Event)
 
 
 class ModelQueue:
+    @staticmethod
+    def release_image(job):
+        if job.vision and job.vision.lease:job.vision.lease.release()
+        job.vision=None
+
     def __init__(self,runner,limit=5,wait=30):
         if type(limit) is not int or limit<0 or wait<=0:raise ValueError('Bounded queue configuration required')
         self.runner=runner
@@ -86,9 +94,10 @@ class ModelQueue:
         if self.cleanup_status().get('blocked'):self.state='CLEANUP_FAILED'
         while not self.queue.empty():
             job=self.queue.get_nowait()
+            self.release_image(job)
             if not job.future.done():job.future.set_exception(GatewayError('BACKEND_UNAVAILABLE'))
 
-    async def submit(self,system,prompt,request_id,group_request=None):
+    async def submit(self,system,prompt,request_id,group_request=None,vision=None):
         if self.close_task is not None:raise GatewayError('SHUTTING_DOWN')
         await self.cleanup_admission()
         if self.state in ('AUTH_REQUIRED','QUOTA_EXHAUSTED','CLEANUP_FAILED','REMOTE_RESULT_UNKNOWN'):
@@ -96,8 +105,10 @@ class ModelQueue:
         if self.queue.qsize()>=self.limit+(0 if self.active else 1):raise GatewayError('QUEUE_FULL')
         job=Job(system,prompt,request_id,time.monotonic()+self.wait,asyncio.get_running_loop().create_future())
         job.group_request=group_request
+        job.vision=vision
         try:self.queue.put_nowait(job)
         except asyncio.QueueFull:raise GatewayError('QUEUE_FULL') from None
+        if vision and vision.lease:vision.lease.owned=True
         try:
             try:await asyncio.wait_for(job.started.wait(),timeout=self.wait)
             except TimeoutError:raise GatewayError('QUEUE_TIMEOUT') from None
@@ -112,19 +123,22 @@ class ModelQueue:
         while True:
             job=await self.queue.get()
             job.started.set()
-            if job.future.cancelled() or job.cancelled.is_set():continue
+            if job.future.cancelled() or job.cancelled.is_set():self.release_image(job);continue
             if time.monotonic()>job.deadline:
-                job.future.set_exception(GatewayError('QUEUE_TIMEOUT'));continue
+                job.future.set_exception(GatewayError('QUEUE_TIMEOUT'));self.release_image(job);continue
             await self.cleanup_admission()
             if self.state in ('AUTH_REQUIRED','QUOTA_EXHAUSTED','CLEANUP_FAILED','REMOTE_RESULT_UNKNOWN'):
-                job.future.set_exception(GatewayError(self.state));continue
+                job.future.set_exception(GatewayError(self.state));self.release_image(job);continue
             self.active=True
             if job.group_request and job.group_request.get('kind') in ('group_turn','member_turn') and hasattr(self.runner,'run_group'):
                 call=self.runner.run_group(job.system,job.prompt,job.request_id,job.group_request)
             elif job.group_request=={'version':1,'kind':'media_turn'} and hasattr(self.runner,'run_media'):
                 call=self.runner.run_media(job.system,job.prompt,job.request_id)
             else:call=self.runner.run(job.system,job.prompt,job.request_id)
-            task=asyncio.create_task(call)
+            from .vision import CURRENT
+            image_token=CURRENT.set(job.vision)
+            try:task=asyncio.create_task(call)
+            finally:CURRENT.reset(image_token)
             cancel=asyncio.create_task(job.cancelled.wait())
             try:
                 done,_=await asyncio.wait((task,cancel),return_when=asyncio.FIRST_COMPLETED)
@@ -154,11 +168,13 @@ class ModelQueue:
                 if not job.future.done():job.future.set_exception(GatewayError('BACKEND_UNAVAILABLE'))
             finally:
                 cancel.cancel();await asyncio.gather(cancel,return_exceptions=True)
+                self.release_image(job);task=None;call=None;done=None
                 self.active=False
 
 
-def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,root=None,output=None,memes=None,v2=None):
+def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,root=None,output=None,memes=None,v2=None,materials=None):
     budget=budget or InputBudget()
+    vision_bytes=0
     output=DEFAULTS | {'max_reply_chars':max_reply_chars} | (output or {})
     if not isinstance(token,str) or len(token)<32:raise ValueError('Local bearer token required')
     def router_ready():
@@ -202,7 +218,13 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
                     'QUEUE_TIMEOUT':504,'MODEL_TIMEOUT':504,'PROTOCOL_ERROR':502}.get(error.code,503)
             return web.json_response({'error':{'message':MESSAGES[error.code]+'（追踪'+trace+'）','type':'gateway_error','code':error.code}},status=status)
 
-    app=web.Application(middlewares=[guard],client_max_size=budget.payload_limit)
+    @web.middleware
+    async def ram_release(request,handler):
+        try:return await handler(request)
+        finally:
+            lease=request.get(VISION_LEASE)
+            if lease and not lease.owned:lease.release()
+    app=web.Application(middlewares=[guard,ram_release],client_max_size=budget.payload_limit)
 
     async def health(request):
         last_error=dict(queue.last_error) if queue.last_error else None
@@ -237,6 +259,7 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
         return web.json_response({'object':'list','data':[{'id':'workbuddy-local','object':'model','owned_by':'local'}]})
 
     async def chat(request):
+        nonlocal vision_bytes
         request[TRACE]=uuid.uuid4().hex[:10]
         if root and stopping(root):raise GatewayError('SHUTTING_DOWN')
         try:
@@ -275,9 +298,61 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
         is_media=group_request=={'version':1,'kind':'media_turn'}
         if is_media and (memes is None or not memes.cfg['enabled']):raise GatewayError('UNSUPPORTED_REQUEST')
         candidates=[]
+        native_image=None
         question=json.loads(prompt)[-1]['content']
         if is_group:
             snapshot=json.loads(question)
+            if group_request['version']==2 and snapshot['images']:
+                from .vision import POLICY,NOTICE,CURRENT,text_budget
+                from .turn_v2 import fit
+                from .attention import canonical
+                deadline=time.monotonic()+15
+                try:
+                    if materials is None:raise ValueError('MATERIAL_UNAVAILABLE')
+                    native_image,descriptor=await asyncio.wait_for(materials.resolve(group_request,snapshot,deadline),max(.001,deadline-time.monotonic()))
+                except (ValueError,TypeError,TimeoutError,OSError,aiohttp.ClientError):
+                    # No second image or model attempt. Direct produces one
+                    # truthful local notice; ambient is silent.
+                    from .group_protocol import SILENT
+                    from .turn_v2 import metadata as v2_metadata
+                    snapshot['images']=[]
+                    for row in snapshot['messages']:row['images']=[]
+                    request[V2_EFFECTIVE]=snapshot
+                    from .reply_plan import ReplyPlan
+                    plan=ReplyPlan('answer',(NOTICE,),NOTICE,fallback_reason='local_image_unavailable') if group_request['must_reply'] else None
+                    response_id='chatcmpl-'+request[TRACE]
+                    text=plan.canonical_text if plan else SILENT
+                    meta=v2_metadata(group_request,response_id,'speak' if plan else 'silent',plan,snapshot)
+                    return web.json_response(dict(id=response_id,object='chat.completion',created=int(time.time()),model='workbuddy-local',
+                        choices=[dict(index=0,message=dict(role='assistant',content=text),finish_reason='stop')],qqbot_group_plan=meta))
+                size=len(native_image.blob.data)
+                if vision_bytes+size>8*1024*1024:
+                    snapshot['images']=[]
+                    for row in snapshot['messages']:row['images']=[]
+                    request[V2_EFFECTIVE]=snapshot
+                    raise GatewayError('INPUT_TOO_LONG')
+                from .vision import BlobLease
+                from dataclasses import replace
+                def release_blob():
+                    nonlocal vision_bytes
+                    vision_bytes-=size
+                lease=BlobLease(release_blob)
+                vision_bytes+=size;request[VISION_LEASE]=lease
+                native_image=replace(native_image,lease=lease)
+                snapshot['images']=[descriptor]
+                system=system.replace('当前仅文字聊天','本次可读取当前一张图片并进行文字聊天').replace('、看图','').replace('图片材料/名册/长期记忆尚未接入','名册/长期记忆尚未接入')+POLICY
+                image_token=CURRENT.set(native_image)
+                try:
+                    dialog=json.loads(prompt)
+                    dialog[-1]['content']=fit(snapshot,group_request,system,text_budget(budget),suffix,dialog[:-1])
+                    prompt=json.dumps(dialog,ensure_ascii=False,separators=(',',':'))
+                except GatewayError:
+                    snapshot['images']=[]
+                    for row in snapshot['messages']:row['images']=[]
+                    request[V2_EFFECTIVE]=snapshot
+                    raise
+                finally:CURRENT.reset(image_token)
+                snapshot=json.loads(json.loads(prompt)[-1]['content'])
             if group_request['version']==2:request[V2_EFFECTIVE]=snapshot
             question=next((r['text'] for r in snapshot['messages'] if r['seq']==snapshot.get('target_seq')),snapshot['messages'][-1]['text'])
             if group_request['version']==2:
@@ -290,12 +365,16 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
             candidates=memes.candidates((snapshot.get('meme_question') or '') if is_group and group_request['version']==2 else question)
             while True:
                 instruction=candidate_instruction(candidates)
-                if budget.usage(system+instruction,prompt)<=budget.limit:break
+                final_budget=budget
+                if native_image:
+                    from dataclasses import replace
+                    final_budget=replace(budget,limit=budget.limit-native_image.reserve)
+                if final_budget.usage(system+instruction,prompt)<=final_budget.limit:break
                 if not candidates:raise GatewayError('INPUT_TOO_LONG')
                 candidates.pop()
             system+=instruction
         started=time.monotonic()
-        result=await queue.submit(system,prompt,request[TRACE],group_request)
+        result=await queue.submit(system,prompt,request[TRACE],group_request,vision=native_image)
         backend_result=result if isinstance(result,BackendResult) else BackendResult(result)
         result=backend_result.text
         response_id='chatcmpl-'+request[TRACE]
@@ -377,6 +456,8 @@ def main():
         raise ValueError('Restricted local CLI configuration required')
     tokens=json.loads((root/settings['secrets_file']).read_text(encoding='utf-8'))
     budget=InputBudget.from_settings(settings,validate_model_settings(settings))
+    from .vision import require_production
+    require_production(settings)
     runner=create_runner(root,settings,budget)
     from .web_retrieval import WebRunner, Retriever
     ids=[settings['bot']['qq']]+sum((settings['access'][k] for k in ('allowed_groups','admin_users','blocked_users')),[])
@@ -388,13 +469,15 @@ def main():
     queue=ModelQueue(runner,llm['queue_limit'],llm['queue_wait_seconds'])
     logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(message)s')
     v2=None
-    if settings['participation']['mode']=='free' and settings['participation']['attention']['enabled']:
+    if settings['participation']['mode']=='free' and settings['participation']['attention']['enabled'] or settings['vision']['enabled']:
         from .persona import compose_persona,session_version
         from .reply_plan import digest
-        persona=compose_persona((root/'config/persona.md').read_text(encoding='utf-8'),settings['output'],settings['web'],settings['participation'],settings['memes'])
+        persona=compose_persona((root/'config/persona.md').read_text(encoding='utf-8'),settings['output'],settings['web'],settings['participation'],settings['memes'],settings.get('vision'))
         persona_id=session_version(persona+('\n'+memes.fingerprint() if memes.cfg['enabled'] else ''),settings)
-        v2=dict(mode='free',config_version=digest(persona_id),aliases=settings['participation']['attention']['aliases'])
-    web.run_app(application(queue,tokens['model_gateway'],root/'state/router-ready.json',budget,settings['output']['max_reply_chars'],root,settings['output'],memes,v2),host=llm['host'],port=llm['port'],
+        v2=dict(mode=settings['participation']['mode'],config_version=digest(persona_id),aliases=settings['participation']['attention']['aliases'])
+    from .vision import MaterialClient,context_token
+    materials=MaterialClient(f"http://127.0.0.1:{settings['onebot']['port']}/context/vision/resolve",context_token(root),settings['vision']['input_reserve_tokens']) if settings['vision']['enabled'] else None
+    web.run_app(application(queue,tokens['model_gateway'],root/'state/router-ready.json',budget,settings['output']['max_reply_chars'],root,settings['output'],memes,v2,materials),host=llm['host'],port=llm['port'],
                 access_log=None,handler_cancellation=True)
 
 

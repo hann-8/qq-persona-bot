@@ -1,3 +1,5 @@
+2026-10-18 19:52（Asia/Shanghai）：[LAP-28](tasks/LAP-28/HANDOFF.md)已实现/离线通过：gate唯一材料/独立认证/一次cap、第一图RAM规范化/hash、两runner原生输入和最终预算、派生证明及受控验证命令交付。323单元/56组合900实际框架通过（图片28组合152例），22专项补验通过；无真实识图，4096/容量/上界未证，生产硬阻断。0本机配置/凭据/真实bot/模型/QQ操作，31B与旧差额保留，不开始29/30。
+
 2026-10-18（Asia/Shanghai）：[LAP-27](tasks/LAP-27/HANDOFF.md)已实现/离线通过，301单元、28组合732实际框架及22边界复验通过。可信身份/每票随机ref、v2/source-effective核验、Q/R dispatcher/冻结目标、叫名/引用/焦点/候选、原event ACK归因和随机trace落地；attention默认false，mentions及全关v1保持。配置菜单/旧配置审阅导出及双摘要显式激活同步，本机配置未改；0真实bot/模型/QQ/私密附件操作，真实效果未验；31B及旧差额保留，不推进28—30。[报告](../../reports/lap-27-2026-10-18.md)。
 
 # 笔记本 WorkBuddy 工作线交接

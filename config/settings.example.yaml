@@ -1,6 +1,9 @@
 # schema1/2 are migrated in memory; saving writes schema3 with a full backup.
 # Budget fields count visible UTF-8 bytes and envelope, not exact model tokens.
 schema_version: 3
+vision:
+  enabled: false  # production_eligible未证明；true会在启动时拒绝，不自动调用验证
+  input_reserve_tokens: 4096  # 待验证假设，不能当视觉token/patch上界
 participation:
   # LAP-27仅free显式开启生效，mentions保留真实@；保存须停机/重启加载
   attention:

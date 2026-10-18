@@ -141,7 +141,10 @@ class CLIRunner:
             await owner.join()
 
     async def run(self, system, prompt, request_id):
-        self.budget.check(system, prompt)
+        from .vision import CURRENT,text_budget,cli_message,wire_check
+        text_budget(self.budget).check(system, prompt)
+        image_message=cli_message(prompt)
+        wire_check(dict(system=system,input=image_message))
         parent = self.root/'runtime/requests'
         parent.mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory(prefix=request_id+'-', dir=parent) as directory:
@@ -160,6 +163,7 @@ class CLIRunner:
             args += ['--settings',json.dumps(local_settings)]
             if self.reasoning_effort != 'auto':
                 args += ['--effort',self.reasoning_effort,'--input-format','stream-json']
+            elif CURRENT.get():args += ['--input-format','stream-json']
             env = os.environ.copy()
             env.pop('MAX_THINKING_TOKENS',None)
             for key in list(env):
@@ -262,7 +266,11 @@ class CLIRunner:
                         await asyncio.wait_for(acknowledged.wait(), min(self.control_timeout,self.timeout))
                     except TimeoutError:
                         raise GatewayError('PROTOCOL_ERROR') from None
-                    payload = (json.dumps(user_message(prompt),ensure_ascii=False,separators=(',',':'))+'\n').encode('utf-8')
+                    if CURRENT.get():text_budget(self.budget).check(system,prompt)
+                    payload = (json.dumps(image_message,ensure_ascii=False,separators=(',',':'))+'\n').encode('utf-8')
+                elif CURRENT.get():
+                    text_budget(self.budget).check(system,prompt)
+                    payload = (json.dumps(image_message,ensure_ascii=False,separators=(',',':'))+'\n').encode('utf-8')
                 else:
                     payload = prompt.encode('utf-8')
                 # Identity/ledger overflow must fail before the only user input.

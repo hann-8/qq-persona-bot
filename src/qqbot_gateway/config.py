@@ -28,6 +28,7 @@ def export_legacy_config(path):
         original=path.read_bytes()
         if hashlib.sha256(original).hexdigest()!=source_digest:raise ValueError('Configuration changed')
         if isinstance(value.get('participation'),dict):value['participation'].pop('attention',None)
+        value.pop('vision',None)
         content=yaml.safe_dump(value,allow_unicode=True,sort_keys=False).encode('utf-8')
         directory=root/'state/config-exports';directory.mkdir(parents=True,exist_ok=True)
         tag=uuid.uuid4().hex
@@ -53,7 +54,7 @@ def activate_legacy_config(path,review,source_digest,legacy_digest,confirmation)
         original=path.read_bytes();content=review.read_bytes()
         if hashlib.sha256(original).hexdigest()!=source_digest or hashlib.sha256(content).hexdigest()!=legacy_digest:raise ValueError('Configuration changed')
         data=yaml.safe_load(content);normalize_settings(data)
-        if 'attention' in data.get('participation',{}):raise ValueError('Not legacy compatible')
+        if 'attention' in data.get('participation',{}) or 'vision' in data:raise ValueError('Not legacy compatible')
         backup=review.with_name(review.stem+'.activation-original.yaml')
         with backup.open('xb') as f:f.write(original)
         temporary=path.with_name(path.name+'.legacy-'+uuid.uuid4().hex+'.tmp')
@@ -89,6 +90,7 @@ class GateConfig:
     participation_mode: str = 'mentions'
     attention_enabled: bool = False
     media_catalog: object = None
+    vision_enabled: bool = False
 
     def __post_init__(self):
         if self.participation_mode not in ('mentions','free'):raise ValueError('Invalid participation mode')
@@ -115,6 +117,8 @@ def normalize_settings(raw):
     if type(version) is not int or version not in (1, 2, 3):
         raise ValueError('Unsupported schema_version')
     data['schema_version'] = 3
+    from .vision import validate_config
+    data['vision']=validate_config(data.get('vision',{}))
     from .web_policy import validate_web
     data['web'] = validate_web(data.get('web', {}))
     from .participation import validate_participation
@@ -261,12 +265,17 @@ def load_gate_config(path):
     path = Path(path).resolve()
     root = path.parent.parent
     data = load_settings(path)
+    from .vision import require_production
+    require_production(data)
     token_path = (root / data['secrets_file']).resolve()
     if not token_path.is_relative_to(root / 'secrets'):
         raise ValueError('Secrets file must remain in project secrets directory')
     tokens = json.loads(token_path.read_text(encoding='utf-8'))
     from .meme_import import admin_token
     admin=admin_token(root)
+    from .vision import context_token
+    context=context_token(root) if data['vision']['enabled'] else None
+    if context and context in list(tokens.values())+[admin]:raise ValueError('Independent context token required')
     if admin and admin in tokens.values():raise ValueError('Independent memes admin token required')
     if data['access'].get('private_enabled') is not False:
         raise ValueError('Private messages must be disabled')
@@ -281,6 +290,7 @@ def load_gate_config(path):
         host=data['onebot']['host'], port=data['onebot']['port'],
         blocked_users=frozenset(data['access']['blocked_users']),
         participation_mode=data['participation']['mode'],
+        vision_enabled=data['vision']['enabled'],
         attention_enabled=data['participation']['mode']=='free' and data['participation']['attention']['enabled'],
         media_catalog=MemeCatalog(root,data['memes']) if data['memes']['enabled'] else None,
     )
