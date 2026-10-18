@@ -1,6 +1,6 @@
 # LAP-26：群聊理解、成员身份与长期记忆详细规划
 
-返回[任务交接](HANDOFF.md) / [PROGRESS](../../../../PROGRESS.md) / [TASKS](../../TASKS.md)；后续执行入口见[medium指引](IMPLEMENTATION_GUIDE.md)。
+返回[任务交接](HANDOFF.md) / [PROGRESS](../../../../PROGRESS.md) / [TASKS](../../TASKS.md)；后续执行入口见[medium指引](IMPLEMENTATION_GUIDE.md)和[精确实施合同](IMPLEMENTATION_SPEC.md)。后者补齐v2字段、调度/材料服务、能力证明、记忆schema/生效/事务、回滚和最低验收ID，同项以其精确规则为准。
 
 状态：**仅规划，尚未实施、启用或验收。** 2026-10-18（Asia/Shanghai）；用户说明当前会话为sol6.1 Ultra，未自动检测/切换模型或档位。基线main/`29548796c662b0612f73c1d2b70e5f1b6a2201db`。本轮不改代码、人设、运行配置，不启停/认证/登录，不调用真实模型、群成员接口或群消息。规划中数值是明确的首版默认建议，不是已测出的最佳参数。
 
@@ -81,9 +81,9 @@ LAP-25已有260单元/384实际框架合成通过是旧离线证据；当前运�
 
 真实@、高置信direct_name/reply_bot以及严格合格focused_followup，跳过ambient合批、评估间隔/每分钟评估次数、自发表达冷却/自发每分钟上限；仍遵守全局单并发、去重、访问控制和同级FIFO。优先级明确为真实@ > 可靠叫名/引用bot > 合格焦点续聊 > focused_candidate > ambient。首版所有direct按不同message_id独立ticket，真实@永不与相邻消息合并；去重只针对同一条消息，不能以2秒去抖吞掉第二个真实请求。高置信direct的`must_reply=true`；有歧义且不满足焦点条件的soft_hint保留模型选择与ambient限流。
 
-focused_candidate在焦点有效期间跳过ambient的15秒自发冷却/5秒评估间隔等限制，以当前事件进入同一次语义判断/回答；不额外启动classifier，也不强迫模型发言。每个焦点候选最多4次评估/60秒、从该群非真实@direct的4个待处理额度共用，超限退回原ambient/静默，不侵占真实@。候选一旦决定silent，不为同一message_id自动重评；需要后续新消息才可能再触发。模型输出无可确认目标时可沉默；新真实@始终优先。
+focused_candidate在焦点有效期间跳过ambient的15秒自发冷却/5秒评估间隔等限制，以当前事件进入同一次语义判断/回答；不额外启动classifier，也不强迫模型发言。每群滚动60秒最多4次候选评估，跨focus版本累计、开始实际处理时消耗且失败不返还；与该群其他非真实@direct共用4个待处理额度，超限退回原ambient/静默，不侵占真实@。候选一旦决定silent，不为同一message_id自动重评；需要后续新消息才可能再触发。模型输出无可确认目标时可沉默；新真实@始终优先。
 
-每群最多保留1个待处理ambient快照，新消息更新快照；direct优先于尚未开始的ambient，不取消已经发出的上游生成、不重复启动模型。运行中有新direct时记入pending_direct有界优先FIFO，不能用后到覆盖前到的单槽；下一轮在原请求完成/确定失败后重建最新快照。真实@保留既有mention_queue_limit=8默认额度，非真实@的direct单独最多4个，不能用叫名挤占真实@名额；满/超时使用绑定请求的受控短提示，不无限积压。必须保留target_seq及必要的引用bot行/焦点行，不能在窗口裁剪/marked evaluated时吞掉呼唤；引用行被裁掉则显式降为未解析，不能保留悬空seq。结束/取消时清理pending与锁，重连丢弃旧epoch。
+每群最多保留1个待处理ambient快照，新消息更新快照；direct优先于尚未开始的ambient，不取消已经发出的上游生成、不重复启动模型。v2使用精确合同第3节的router全局优先dispatcher，lease覆盖生成与发送/ACK，不能先占旧群lease等待gateway。全局仍受既有llm.queue_limit（默认5）与真实@保留槽约束；每群mention_queue_limit=8/其他direct4只是额外上限而非保证12个全局名额。票据冻结target及必要引用/焦点材料后再排队，派发只重建可选快照；满/超时走受控busy分支。不能裁剪/marked evaluated吞呼唤；必要依赖装不下明确失败，普通引用被裁掉则降未解析。结束/取消清理pending与锁，重连丢弃旧epoch。
 
 不能承诺固定秒数：全局max_concurrency=1、已有长请求/模型加载/联网/发送ACK仍影响等待。验收将分别测事件→入队、排队、模型、ACK；若长时间排队是主因，先调度再决定是否另行规划并发/模型变更。错误使用现有绑定请求的短状态或静默策略，不能每次漏接另起兜底模型。
 
@@ -182,7 +182,7 @@ NapCat安装包的get_group_info优先缓存，get_group_member_list的no_cache�
 | `vision.max_images_per_turn` / `max_file_bytes` / `max_normalized_bytes` | 1 / 8MiB / 512KiB硬上限 | body<=2MiB、总规范化缓存8MiB，不能放大为任意媒体 |
 | `vision.max_pixels` / `max_edge` / `blob_ttl_seconds` | 16M / 1024 / 60 | 规范化<=1M像素，profile视觉预算更小则从严 |
 | `llm.profiles.<现有后端>.vision.input_reserve_tokens` | 4096规划假设，实际启用需能力证据 | 可见文本预算相应降低；未知不伪称精确token |
-| `llm.profiles.<现有后端>.vision` | `status=unverified`、支持schema/锁定版本/model/digest证据 | 无真实试验不标真实通过；变版本重新核验 |
+| `llm.profiles.<现有后端>.vision` | 仅保留有界参数；能力状态从本机证据派生，非可编辑status | offline/native观察/生产资格分开；变版本失效，见精确合同5.2 |
 | `members.enabled` / `members.mentions_enabled` | false / false | 两开关均显式，群人数门槛不能配置大于50 |
 | `members.roster_member_count_lt` | 固定50，仅1..49允许 | 恰好50默认不取；未知fail closed |
 | `members.count_ttl_seconds` / `roster_ttl_seconds` | 60 / 300 | 仅新消息驱动刷新 |
@@ -226,13 +226,13 @@ LAP-31优先解决全局拒单/不可诊断问题；27再提供可信speaker/rec
 
 旧配置默认所有新增能力关闭；不改当前后端/deepseek模型/额度/人设本机内容，不重写旧历史/图库/pending/unknown账本。已确认运行free是用户反馈，不能据此自动开启本计划attention/vision/members/memory。
 
-回滚先停机、关闭新增开关并保留配置快照/ACK/未知账本，处理pending身份后回旧版本；群记忆只停止注入，不删除已有数据，必要时本机导出有界JSON/MD；旧版本不写新envelope/记忆文件。图片缓存可按所属目录/身份有界清理，不清QQ设备数据。关成员名册同时关typed@并清RAM候选；关关注清焦点/pending，不改真实@合同。
+回滚先停机，导出/核验旧schema3兼容配置：移除本任务新增section/键并备份原配置，不能只关enabled却留下旧代码会拒绝的participation.attention字段。保留配置快照/ACK/未知账本，处理pending身份后回旧版本；群记忆只停止注入，不删除已有数据，必要时本机导出有界JSON/MD；旧版本不写新envelope/记忆文件。图片缓存可按所属目录/身份有界清理，不清QQ设备数据。关成员名册同时关typed@并清RAM候选；关关注清焦点/pending，不改真实@合同。
 
 LAP-31回滚必须先确认cleanup task结束及未决受管进程归属，保留未决身份/阻断台账；不能通过回旧代码、删flag或重启抹去unknown。Windows容器能力不支持时交付独立诊断/取消修复，保持阻断，不临时改为全局taskkill。
 
 未验证能力与处理：图片模型声明≠CLI当前隔离组合/当前量化模型实际识图；原生视觉token预算未测则保持禁用；群人数缓存与成员变更非原子，不能承诺瞬时准确；附件缺request trace不能证明silent/排队根因；本机当前配置/运行加载未探测；登录原生数据根目录与报告仍缺；LAP-18公共搜索仍未通过。独立部分可实施/离线交付，能力缺口明确保留，禁止临时加caption API/向量服务、放宽RPC/网络校验或自动切模型。
 
-分支：基线main且干净，本轮只在当前分支交付6份规划/索引文档；后续实施先重新读PROGRESS/TASKS/git status，确认没有同文件归属冲突。需要新分支使用`codex/`前缀，但不为纯规划无故新建worktree。只提交本任务文件；本机配置/secrets/state/用户日志绝不stage。每个独立可审阅检查点按长期授权commit/push并核对本地与远端完整SHA，Git不等于部署/真实验收。
+分支：首版基线main且干净；续审基线4cb970d干净，增加精确实施合同后共7份规划/索引文档。后续实施先重新读PROGRESS/TASKS/git status，确认没有同文件归属冲突。需要新分支使用`codex/`前缀，但不为纯规划无故新建worktree。只提交本任务文件；本机配置/secrets/state/用户日志绝不stage。每个独立可审阅检查点按长期授权commit/push并核对本地与远端完整SHA，Git不等于部署/真实验收。
 
 ## 12. 官方资料与GitHub参考
 

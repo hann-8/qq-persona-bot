@@ -1,5 +1,13 @@
 # LAP-26：群聊理解、成员身份与长期记忆规划
 
+2026-10-18 13:57（Asia/Shanghai）同任务续审完成，13:47领取：用户要求全部详细规划后再交medium并提供落地指令。基线main/`4cb970d5b6f0ed7c16292abe73bc01f288613d0d`干净；归属扩为原6份文档及新增[IMPLEMENTATION_SPEC](IMPLEMENTATION_SPEC.md)，共7份，根agent独占写入、三个子任务只读复核。精确v2/source-effective manifest、全局优先dispatcher/冻结目标、材料专用认证/一次cap、能力状态、记忆schema/晋升/持久purge/幂等/TTL、兼容配置回滚和[五份独立复制指令](IMPLEMENTATION_GUIDE.md)完成。没有重读私密附件/改代码/本机配置/真实bot/模型/群操作。
+
+续审验证：7份文档本地链接全部存在、五个text复制块、围栏/章节/编码及git diff --check通过；仅文档无需重跑旧代码测试。三项复核指出的接口/队列/来源/生命周期歧义均收口；外部视觉预算、人数新鲜度、Windows实际容器仍是已规划的核验门槛，不是本轮通过。登录依用户偏好明确暂缓，无完整免扫码方案；18搜索与其他旧差额保留。
+
+当前下一步：按长期授权交付本次7份文档并核对远端；用户设置gpt-6.1-sol/medium，以GUIDE第1条领取31，再按27→28→29→30逐项独立session。31A可独立完成而31B差额保留；28/29独立代码/离线出口不假称生产可用；30无需启用名册。没有领取任何实施任务或预建其HANDOFF。
+
+以下为13:35首版的历史检查点与Git证据，最新状态以上述续审为准。
+
 返回[PROGRESS](../../../../PROGRESS.md) / [TASKS](../../TASKS.md) / [工作线](../../HANDOFF.md)。继承[AGENTS](../../../../AGENTS.md)。
 
 2026-10-18 13:14（Asia/Shanghai）领取；session `LAP-26-group-understanding-plan`，标题“群聊理解、成员身份与长期记忆规划”。用户说明当前会话为sol6.1 Ultra；此为用户说明，未自动检测或切换模型/档位。

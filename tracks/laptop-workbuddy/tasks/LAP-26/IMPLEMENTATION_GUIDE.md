@@ -1,6 +1,6 @@
 # LAP-26后续medium实施指引
 
-返回[PROGRESS](../../../../PROGRESS.md) / [LAP-26交接](HANDOFF.md) / [详细合同](PLAN.md) / [TASKS](../../TASKS.md)。
+返回[PROGRESS](../../../../PROGRESS.md) / [LAP-26交接](HANDOFF.md) / [总体合同](PLAN.md) / [精确实施合同及验收ID](IMPLEMENTATION_SPEC.md) / [TASKS](../../TASKS.md)。
 
 本文件只是后续入口，不构成当前实施、启停、真实模型或群消息授权。用户说明规划会话为sol6.1 Ultra；实施按AGENTS由操作者选择gpt-6.1-sol/medium，agent不自动检测或切换。新能力默认关闭，不修改忽略的本机配置来自动启用。
 
@@ -25,14 +25,66 @@
 - LAP-29：1..49才可取名册，50/51/未知不取；gate防宽RPC旁路；承认缓存/非原子缺口。人数与名册双缓存必须同时有效，完整名单本机缓存、只给当轮少量候选；typed@最多1人同文字链，不猜QQ，不@all，仍逐条ACK。
 - LAP-30：按bot/group/user稳定键与持久HMAC key，有限JSON主库+本机MD只读视图；每群全JSON<=64KiB、全模块16群/8MiB含所有副本。同轮memory proposals严格来源验证、去重/更新/TTL/评分淘汰；固定base_revision/phase幂等、来源actor依赖不可丢。silent自述与ACK承诺分开，清除后迟到ACK不得复活，删除副本失败禁读写；不加额外模型/向量库。
 
-## 给后续实施会话的复制文本
+## 五项独立复制指令
 
-选择对应任务编号后使用，不把四项一次交给同一session：
+先在会话设置选择gpt-6.1-sol/medium，再按31→27→28→29→30逐项发送下面的对应文本。每项使用独立实施session，上一项写好交接后再领取下一项；不用手工替换任务名。以下授权只在用户实际发送到对应实施会话时生效，本规划会话不实施。
+
+### 第1项：LAP-31 清理可靠性
 
 ```text
-阅读 E:\CodexWS\QQbot\AGENTS.md 和 PROGRESS.md，再按活动线入口读 TASKS、LAP-26 PLAN/HANDOFF/IMPLEMENTATION_GUIDE。
-我已在会话设置选择 gpt-6.1-sol/medium。本次仅实施 LAP-31（请求模型进程清理、阻断诊断与有证据恢复），先登记任务归属并创建任务HANDOFF，按LAP-26 PLAN第13节完成代码、必要离线/自造受管进程及框架验证和文档，再按长期授权commit/push并核对远端。
-不改忽略的本机配置/凭据，不启停/登录真实bot，不调用真实模型、群成员API或群发；不自动开始LAP-27/28/29/30。只能操作自造测试进程及有本任务创建证据的子孙，不按进程名批量结束。遇改变方案的能力缺口先完成独立部分、保留证据并回规划，不能删unknown假恢复、换模型/付费API/放宽工具。
+项目 E:\CodexWS\QQbot。本会话使用由我在设置中选择的 gpt-6.1-sol/medium。
+先读 AGENTS.md、PROGRESS.md、活动线HANDOFF/TASKS，再读 tracks/laptop-workbuddy/tasks/LAP-26/{HANDOFF.md,PLAN.md,IMPLEMENTATION_SPEC.md,IMPLEMENTATION_GUIDE.md}。
+本次仅实施 LAP-31。按PLAN第13节、SPEC第8—10节与CLEAN-01—06，先登记session/文件归属并创建LAP-31 HANDOFF，写后重读。
+完成原请求结果/清理状态分离、同一cleanup task的取消/关闭接管、总deadline、PID+创建身份逐项处理、有界未决台账、零推理检查和脱敏诊断。31A独立修复与31B容器/完整恢复分别报告；自造进程通过不等于真实CLI组合通过，历史job_complete不能在重启后直接解锁。能力不足先完成31A并保留31B差额，不删unknown、不扩大kill范围。
+实现对应tests和独立scripts/verify_lap31.py，报告写reports/lap-31-*，只用替身及本任务自造受管进程；适用旧生命周期/ModelQueue回归必须通过。不运行会覆盖旧报告的verify主程序。
+不修改忽略的本机配置/凭据，不启停/登录真实bot，不调用真实CLI/Ollama生成、真实QQ接口或群发，不按进程名批量结束。账号/后端/模型/额度及Ollama未知解除合同保持。
+完成代码、必要验证、README及任务/进度交接，按长期授权仅commit/push本任务检查过的文件并核对远端SHA，报告保留差异。一般细节和已规划失败分支自行处理；会改变方案的缺口记录后回规划。不自动开始27—30。
 ```
 
-后续改为LAP-27/28/29/30时，把任务编号、任务名和第13节限定一同替换为对应合同，先检查依赖已交付，不能只替换编号而保留错误范围。用户提供的三份日志包含私密消息，只允许脱敏诊断，不能入Git或复用作模型输入。
+### 第2项：LAP-27 关注、指代与自然续聊
+
+```text
+项目 E:\CodexWS\QQbot。本会话使用由我在设置中选择的 gpt-6.1-sol/medium。
+先读AGENTS、PROGRESS、活动线HANDOFF/TASKS，再读LAP-26 PLAN/IMPLEMENTATION_SPEC/IMPLEMENTATION_GUIDE与LAP-31交接。确认31A已交付；31B未验证差额保留，不据此操作真实实例。
+本次仅实施LAP-27，先登记归属并创建本任务HANDOFF。按PLAN3/4/8—11和SPEC2—4/9/10，完成可信identity、封闭v2协议/source与effective digest、router优先dispatcher/Q-R保留槽、冻结目标、真实@/叫名/引用/60秒焦点与无主语续聊候选、ACK对象归因和随机trace。
+mentions仍仅真实@并保留原群+用户历史；所有新开关关闭完整保留v1。direct不同消息不合并；candidate每群滚动额度、结束确认可沉默；单活动turn且不抢断。预留v2未来材料空字段，不提前实现图片下载、名册RPC/@或持久记忆。同步配置/菜单/示例及旧配置兼容导出合同，不自动启用。
+实现ATT-01—12与独立tests/verify_lap27，实际run_agent/两runner底层替身和原event ACK验证受影响路径；报告写reports/lap-27-*，不覆盖旧报告，不把离线当真实效果。
+不修改忽略的本机配置/凭据，不启停/登录真实bot，不调用真实模型、QQ接口或群发，不读取/重放私密附件。模型/额度/工具隔离和单次尝试保持。
+完成代码、适用验证、README/任务/进度交接后，仅commit/push本任务文件并核对远端。一般细节自行完成，方案级缺口保留证据回规划。不自动开始28/29/30。
+```
+
+### 第3项：LAP-28 图片理解
+
+```text
+项目 E:\CodexWS\QQbot。本会话使用由我在设置中选择的 gpt-6.1-sol/medium。
+先读AGENTS、PROGRESS、活动线HANDOFF/TASKS、LAP-26 PLAN/SPEC/GUIDE和LAP-27交接，确认v2/可信身份基础已交付；仅领取LAP-28并创建HANDOFF。
+按PLAN5及SPEC2/4/5/9/10，实现gate唯一图片材料服务/专用本机认证/一次cap、provider只转sideband、gateway一次兑换、RAM blob规范化与hash、CLI stream-json和现有SSH Ollama原生images同次输入、最终文本/视觉/wire预算及能力证明状态。
+只处理当前获准消息第一张图片，不编辑/发回处理图，不接视频音频；图片中文字不能变工具指令。原始附件剥离，框架不自动下载，黑名单零下载，失败不换图/重试/换backend/开放Read工具。生产默认关闭。
+区分unverified/offline_passed/native_observed/production_eligible；4096只是待验证reserve，一次样图成功不证明上界。交付独立受控验证命令，本次不执行任何真实识图；预算/容量无可靠证明则交付适配器、离线和明确不可启用状态，不能改门槛。
+完成VIS-01—04和ATT适用回归、实际provider/runner/run_agent替身集成、独立verify_lap28及reports/lap-28-*，不覆盖旧报告。同步配置/菜单/README/交接。
+不改忽略本机配置/凭据，不启停/登录真实bot，不真实下载群图、调用模型/QQ或群发；无额外caption模型/付费API。完成后仅commit/push本任务检查过的文件并核对远端，保留差异/能力缺口；不自动开始29/30。
+```
+
+### 第4项：LAP-29 小群名册与受控@
+
+```text
+项目 E:\CodexWS\QQbot。本会话使用由我在设置中选择的 gpt-6.1-sol/medium。
+先读AGENTS、PROGRESS、活动线HANDOFF/TASKS、LAP-26 PLAN/SPEC/GUIDE及27/28交接。依赖共用v2/材料服务代码交付，不要求vision生产启用；仅领取LAP-29并创建HANDOFF。
+按PLAN6及SPEC2/5/6/9/10，实现gate固定成员服务、人数/名册双TTL、1..49门槛、全量仅本机缓存/当轮最多8候选、RPC防旁路、v3 typed mention/一次mention.send许可与文字同链ACK、发送前失效同次剥@及可信回执。
+50/51/未知/过期零list；不得member_info/stranger_info绕过。received_at不等于人数观测时间，现锁定NapCat缓存接口尚无新鲜度证明；严格门槛未通过则完成固定RPC/typed@独立离线交付并拒激活，不临时增加人数来源或默认接受陈旧值。不得@all/任意QQ/CQ码/猜重名，不额外通知或补发。
+完成MEMB-01—04、候选/ref/ACK/错误与旧文字表情回归，独立verify_lap29及reports/lap-29-*；只用自造成员夹具/假OneBot，不调用真实群人数/名单/@。同步配置菜单/示例/README/任务交接。
+不改忽略本机配置/凭据，不启停/登录真实bot，不真实模型/QQ/群发；访问控制/模型/额度保持。完成后仅commit/push本任务检查过的文件并核对远端，分别报告离线与真实可用门槛；不自动开始30。
+```
+
+### 第5项：LAP-30 群长期记忆
+
+```text
+项目 E:\CodexWS\QQbot。本会话使用由我在设置中选择的 gpt-6.1-sol/medium。
+先读AGENTS、PROGRESS、活动线HANDOFF/TASKS、LAP-26 PLAN/SPEC/GUIDE及27/28/29交接。依赖共用身份/候选/v2代码，不要求members或vision生产启用；大群仍可从当前获准sender记忆。仅领取LAP-30并创建HANDOFF。
+按PLAN7及SPEC2/4/7/9/10，实现稳定bot/group/user隔离、有限JSON/持久HMACkey/MD只读视图、相关注入；固定record/proposal schema、自述/管理员/candidate晋升、单值/多值槽、同来源不续TTL、合并/过期/稳定淘汰、同轮proposals与正文共用输出预算，不增加模型/embedding/后台做梦。
+明确speak/silent入站提交与文字ACK承诺分开，固定base_revision/generation/phase幂等及CAS，重启丢未提交pending，删除/黑名单写持久purge intent并净化所有副本，失败禁读、迟到ACK不复活；mentions旧个人history不能升为群共享事实。配置/学习默认关闭，本机固定/确认/纠正/删除走同一锁与校验。
+完成M01—12、组合预算/协议/原event ACK及两runner实际路径替身验证，独立verify_lap30和reports/lap-30-*，不得覆盖旧报告。同步菜单/示例/README/任务进度和回滚。
+不修改忽略的本机配置/凭据/真实记忆，不启停/登录真实bot，不调用真实模型、QQ接口或群发，不使用私密附件当素材。完成后仅commit/push本任务检查过的文件并核对远端；一般细节自行处理，方案级能力缺口记录后回规划，区分离线/真实/完整验收。
+```
+
+五项代码/离线交付后，再按用户指定的唯一session、后端、总调用预算、授权群和样图做部署/真实验收；本指令不自动授予真实登录、群消息/成员查询或模型消耗。登录LAP-24、搜索LAP-18及旧验收差额继续保留。
