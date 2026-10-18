@@ -1,5 +1,19 @@
 # QQ 人设文字 Bot（笔记本测试版）
 
+LAP-30 群长期记忆已实现，离线验证见[报告](reports/lap-30-2026-10-19.md)与[交接](tracks/laptop-workbuddy/tasks/LAP-30/HANDOFF.md)。`memory.enabled`、`memory.learning_enabled`默认均false，本机配置未改，真实效果和完整验收未做。无需启用members/vision，大群也只从当前获准sender学习；mentions仍仅真实@，旧个人history不能成为群共享事实。没有新增模型调用、embedding或后台任务。
+
+“配置机器人.cmd → 7 → 22 本群长期记忆”可分别开启读取/学习；关闭读取会同时关闭学习。保存须停机，正常重启加载，不自动启停。可先开启读取后通过本机管理添加/固定少量非敏感事实，再决定是否学习。该页提供授权群计数/字节、只读MD导出（查看record ID）、新增、确认candidate、固定/取消固定、纠正、删除记录/成员和清空群；写操作核对配置与JSON摘要，共用OS排他锁/校验/原子替换。群内“重置本人会话/本群上下文”保持原语义，不删除持久记忆。
+
+主库仅在忽略的`state/group-memory/<本机HMAC命名空间>/memory.json`，按bot/group/user隔离，不随连接epoch/后端切换改变。持久key仅在忽略的`secrets/group-memory-key.local.json`；已有库而key丢失时禁用记忆，需本机恢复原key，不能重新生成空命名空间。`memory.md`仅本机只读视图，不支持回导；普通诊断不输出事实。最多16群/全部文件与key共8MiB（含MD/备份/坏副本/pending/tmp），每群全JSON64KiB、64事实/16KiB文本/32主体、固定最多4条/1KiB，预留2KiB删除intent及原子替换空间；配额可调小，不能突破上限。
+
+每轮最多8条/1536字节相关active事实，与成员候选共享2304字节和输入预算20%的上限，最终envelope更严时继续裁剪。模型同次输出最多3条、每条240 UTF-8字节的提议，和正文共用原输出预算。宿主核验明确本人自述/管理员群背景、来源和敏感形态；第三方无害转述只作candidate，不注入，后续独立本人自述或本机确认才晋升。语义与隐私过滤是保守规则，仍可能漏判/误拒，不能保证理解任意说法。单值称呼/状态/群目的可由较新自述更新；likes、rules等多值并存。固定项由本机处理冲突，但仍可被删除和黑名单净化。
+
+成员长期事实90天、群背景/约定180天、临时状态/计划及bot承诺7天，candidate最长7天；仅按来源首次接收时间续期，重复窗口/召回不强化，读取和新消息时懒清理。过期后按candidate、置信度、类型、最后确认及ID稳定淘汰；固定项不自动过期。合并保留全部actor依赖，超限拒合并。有效speak/silent的入站事实独立提交；bot承诺须所有依赖正常文字part均有sent+message_id，图片ACK/unknown/失败不算，partial只提交依赖全部满足的提议。
+
+请求绑定固定base_revision/generation/phase和原proposal编号，CAS只做本地校验、不重调模型；每群128已应用marker、8待处理turn/24提议/16KiB/10分钟，重启丢未提交pending，不追发或补ACK。成员/群删除、黑名单加载先轮换generation并持久写purge intent，再清主库派生记录、pending、MD及所有该群副本/tmp；已撤销授权群的同bot本机库也覆盖。失败禁用该群记忆，文字继续；重启优先续净化，不从备份恢复，迟到ACK不复活。若第一份intent都写不进去，删除未完成且意图未持久化，须排除本机存储错误后重试；不宣称磁盘安全擦除。
+
+独立验证：`.venv/Scripts/python.exe -X utf8 scripts/verify_lap30.py`，只写`reports/lap-30-*`，使用临时自造数据、实际AstrBot/provider/run_agent和两runner底层替身。回滚前先停受管实例并保留key/记忆/ACK/pending/unknown/清理台账；7→19导出移除memory/members/vision/attention的旧schema3审阅副本，核对双摘要后显式激活，再回旧代码。旧版不能尊重未决清理时保持停机；不通过删除记忆或台账解除unknown。本轮没有部署或真实操作。
+
 LAP-29 成员服务与受控@已实现/离线通过（355单元、52组合790框架及32专项末次补验）；**真实名册/@不可启用**，人数新鲜度仍为`capability_unverified`。见[交接](tracks/laptop-workbuddy/tasks/LAP-29/HANDOFF.md)和[报告](reports/lap-29-2026-10-18.md)。没有调用真实人数/名单/@或模型，没有启停/登录bot，本机配置未改。
 
 配置机器人.cmd → 7 → 21“小群成员与受控@”：`members.enabled / mentions_enabled`默认均false；开启请求会被拒绝。手改desired=true时gate/router/gateway及AstrBot配置生成仅暂停成员能力，文字聊天继续，不改变访问控制、模型或额度。保存须停机、正常重启加载；本轮不会自动启用。人数门槛固定1..49，50/51/未知/过期均零list；`received_at`只是收到响应的时间，不能证明人数刚观测。现锁定的NapCat缓存接口没有可信观测时间或最大陈旧度，不能通过重请求或手写status解锁；新人数来源须补规划。
@@ -30,7 +44,7 @@ LAP-27新增free关注/指代与自然续聊，默认关闭，尚未真实验收
 
 旧代码回滚前，先停止受管实例并保留所有pending/unknown/清理台账。菜单7→19或`.venv/Scripts/python.exe scripts/configure_bot.py export-legacy-config`生成`state/config-exports/`忽略目录内的原配置备份、移除attention、vision与members section的旧schema3审阅副本及两个摘要；保留其他扩展字段。**只导出不激活**。本机审阅后可显式运行`activate-legacy-config <review路径> <source_digest> <legacy_digest> 已核对`，同配置锁下复核停机与双摘要后原子激活，不重启；任一副本有变化须重新导出。旧版本不认识未决清理台账时保持停机，不能靠回旧代码抹掉unknown。
 
-独立离线验证：`.venv/Scripts/python.exe -X utf8 scripts/verify_lap27.py`，只写`reports/lap-27-*`；实际run_agent/provider/原event ACK与两runner底层替身、自造群/图片夹具，不调用真实模型/QQ。上述27交付时图片/名册/记忆字段仅预留；28图片进展见本文顶部，29已独立实现但生产人数新鲜度未证，30未实施，31B完整覆盖/恢复仍未交付。见[LAP-27交接](tracks/laptop-workbuddy/tasks/LAP-27/HANDOFF.md)。
+独立离线验证：`.venv/Scripts/python.exe -X utf8 scripts/verify_lap27.py`，只写`reports/lap-27-*`；实际run_agent/provider/原event ACK与两runner底层替身、自造群/图片夹具，不调用真实模型/QQ。上述27交付时图片/名册/记忆字段仅预留；28图片进展见本文顶部，29已独立实现但生产人数新鲜度未证，30已独立实现（见顶部），31B完整覆盖/恢复仍未交付。见[LAP-27交接](tracks/laptop-workbuddy/tasks/LAP-27/HANDOFF.md)。
 
 LAP-24已实现/离线通过，尚未重启加载或真实验收：闲聊“最多三条”仅为上限，能一句接住就一句，有必要补充才两三条；认真回答完整单条，表情可不发、不占位凑数。single仍保留单条文字规则，不改操作者已有条数/间隔设置。真实模型的表达与QQ效果仍待另行验证。
 

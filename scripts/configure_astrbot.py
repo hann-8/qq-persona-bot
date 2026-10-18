@@ -31,7 +31,7 @@ async def configure():
     config['provider_settings']['file_extract']['enable']=False
     from qqbot_gateway.members import suspend_unverified
     settings['members']=suspend_unverified(settings)
-    persona=compose_persona((ROOT/'config/persona.md').read_text(encoding='utf-8'),settings['output'],settings['web'],settings['participation'],settings['memes'],settings.get('vision'),settings.get('members'))
+    persona=compose_persona((ROOT/'config/persona.md').read_text(encoding='utf-8'),settings['output'],settings['web'],settings['participation'],settings['memes'],settings.get('vision'),settings.get('members'),settings.get('memory'))
     from qqbot_gateway.meme_catalog import MemeCatalog
     catalog=MemeCatalog(ROOT,settings['memes'])
     persona_id=session_version(persona+('\n'+catalog.fingerprint() if settings['memes']['enabled'] else ''),settings)

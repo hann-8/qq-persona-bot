@@ -50,6 +50,7 @@ def show(settings):
     print(f"共用网页：{settings.get('web',{}).get('enabled',False)}；搜索候选未通过质量门槛，仅受控公共URL读取；不上传历史。")
     print(f"小群成员：desired={settings['members']['enabled']}；capability_unverified，人数观测新鲜度未知，生产暂停；受控@默认关闭。")
     print(f"原生识图：desired={settings['vision']['enabled']}；生产不可启用（模板/视觉token上界与原生容量未验证）；reserve={settings['vision']['input_reserve_tokens']}仅假设。")
+    print(f"本群长期记忆：{settings['memory']['enabled']}；学习：{settings['memory']['learning_enabled']}；默认关闭，本机管理见7→22。")
 
 
 def parameter(settings, section, value):
@@ -138,6 +139,28 @@ def execute(path, section, action, identifier=None, *, expected_digest=None):
         values.remove(identifier)
     save_settings(path, settings, digest)
     print('已校验并保存；旧配置备份位于 state/config-backups/。下次启动生效。')
+
+
+_MEMORY_MANAGER=None
+
+def memory_action(path,group,action,*,config_digest=None,**fields):
+    """Stopped + config digest + memory digest; same OS/JSON locks as runtime."""
+    from qqbot_gateway.group_memory import MemoryStore
+    global _MEMORY_MANAGER
+    with configuration_lock(path.parent.parent):
+        require_stopped(path.parent.parent)
+        settings,current=read_settings(path)
+        if config_digest is not None and config_digest!=current:raise ValueError('Configuration changed')
+        if group not in settings['access']['allowed_groups']:raise ValueError('Unauthorized group')
+        if not settings['memory']['enabled']:raise ValueError('Enable memory explicitly first')
+        identity=(str(path.resolve()),current)
+        # One stopped management session shares one recovered store. Repeating
+        # startup blacklist purge between inspect and confirm would otherwise
+        # rotate generation and invalidate every reviewed memory digest.
+        if _MEMORY_MANAGER is None or _MEMORY_MANAGER[0]!=identity:
+            _MEMORY_MANAGER=(identity,MemoryStore(path.parent.parent,settings['bot']['qq'],settings['access']['allowed_groups'],settings['access']['blocked_users'],settings['access']['admin_users'],settings['memory']))
+        store=_MEMORY_MANAGER[1]
+        return store.manage(group,action,**fields)
 
 
 EFFORT_NAMES = {'auto':'自动', 'minimal':'最低', 'low':'低', 'medium':'中',
@@ -329,9 +352,11 @@ class ConfigMenu:
             for index,key in enumerate(keys,1):
                 bounds=f'{RANGES[key][0]}..{RANGES[key][1]}' if key in RANGES else ('mentions/free' if key=='mode' else 'true/false')
                 self.ui.write(f'{index} {key}: {settings["participation"][key]} ({bounds})')
-            self.ui.write('17 核对后解除本群未知发送隔离 / 18 关注与续聊 / 19 导出旧版配置审阅副本 / 20 原生识图 / 21 小群成员与受控@ / 0 返回')
-            choice=self.ui.choose({'0','17','18','19','20','21'}|{str(i) for i in range(1,len(keys)+1)})
+            self.ui.write('17 核对后解除本群未知发送隔离 / 18 关注与续聊 / 19 导出旧版配置审阅副本 / 20 原生识图 / 21 小群成员与受控@ / 22 本群长期记忆 / 0 返回')
+            choice=self.ui.choose({'0','17','18','19','20','21','22'}|{str(i) for i in range(1,len(keys)+1)})
             if choice=='0':return
+            if choice=='22':
+                self.memory_group();continue
             if choice=='21':
                 self.members_group();continue
             if choice=='20':
@@ -370,6 +395,41 @@ class ConfigMenu:
                 self.ui.write('已保存，下次启动生效。没有启停/读取群消息/调用模型。')
             except (ValueError,OSError) as error:self.ui.write(operation_error(error)+' 请核对页面范围。')
             self.ui.pause()
+
+    def memory_group(self):
+        settings,digest=read_settings(self.path)
+        self.ui.page('本群长期记忆（默认关闭）')
+        self.ui.write('有限JSON主库/MD只读视图；学习不增加模型调用。保存/管理须停机，下次启动加载。删除同时净化副本；失败不代表删除完成。')
+        self.ui.write(f"1 enabled={settings['memory']['enabled']} / 2 learning_enabled={settings['memory']['learning_enabled']} / 3 本机查看与管理 / 0 返回")
+        choice=self.ui.choose({'0','1','2','3'})
+        if choice=='0':return
+        try:
+            if choice in ('1','2'):
+                value=self.ui.read('新值 true/false（回车保留）：').strip()
+                if not value:return
+                if value not in ('true','false'):raise ValueError('Boolean required')
+                settings['memory']['enabled' if choice=='1' else 'learning_enabled']=value=='true'
+                if choice=='1' and value=='false':settings['memory']['learning_enabled']=False
+                save_settings(self.path,settings,digest);self.ui.write('已保存；未启停/调用模型。')
+            else:
+                group=self.ui.read('授权群号：').strip()
+                info=memory_action(self.path,group,'inspect',config_digest=digest)
+                self.ui.write(f"记录{info['records']}条 / JSON {info['bytes']}字节 / revision {info['revision']}")
+                self.ui.write('1 只读导出（含事实与record ID）/ 2 新增 / 3 确认 / 4 固定或取消固定 / 5 纠正 / 6 删除记录 / 7 删除成员 / 8 清空群 / 0 返回')
+                selected=self.ui.choose({str(i) for i in range(9)})
+                if selected=='0':return
+                action={'1':'export','2':'add','3':'confirm','4':'pin','5':'correct','6':'delete','7':'delete-member','8':'clear'}[selected]
+                fields=dict(expected=info['digest'])
+                if action in ('confirm','pin','correct','delete'):fields['record_id']=self.ui.read('record ID（从本机导出查看）：').strip()
+                if action in ('add','delete-member'):fields['user']=self.ui.read('成员QQ（新增群背景时留空）：').strip() or None
+                if action=='add':
+                    fields['kind']=self.ui.read('kind：').strip();fields['slot']=self.ui.read('slot：').strip()
+                if action in ('add','correct'):fields['fact']=self.ui.read('简短非敏感事实（<=240 UTF-8字节）：').strip()
+                if self.ui.read('核对本次操作，输入“已核对”：').strip()!='已核对':return
+                result=memory_action(self.path,group,action,config_digest=digest,**fields)
+                self.ui.write('已完成：'+str(result))
+        except (ValueError,OSError) as error:self.ui.write('未完成：'+operation_error(error))
+        self.ui.pause()
 
     def members_group(self):
         from qqbot_gateway.members import DEFAULTS,validate_config,require_production

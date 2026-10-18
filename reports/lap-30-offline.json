@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "unit_tests": 396,
+  "framework_combinations": 68,
+  "framework_cases": 926,
+  "memory_combinations": 32,
+  "real_model_calls": 0,
+  "real_qq_calls": 0,
+  "real_bot_operations": 0,
+  "memory_default_enabled": false,
+  "learning_default_enabled": false,
+  "real_acceptance": false,
+  "complete_acceptance": false
+}

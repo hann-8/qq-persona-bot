@@ -1,0 +1,22 @@
+{
+  "source_sha256": {
+    "plugins/qq_router/main.py": "add86e2074d967090432a92f706d4703efbd1c804d7b19655b00b04b73776590",
+    "scripts/configure_astrbot.py": "79481ec87ee3b35f65b45718b343edbc0fbb839b73914fb7cc38f0e31265846f",
+    "scripts/configure_bot.py": "9036944112a1183b6d3eb44ca04447ce9958607ac5e96789977c916d890a210b",
+    "scripts/verify_lap28_framework.py": "17e9109081a04eebc8edfa31d34268d1b1586142c101da9a7741cbca752590bd",
+    "scripts/verify_lap29_framework.py": "d7bfb858fe6877880872053396e5768ebd15fc5d598b0c326f0f27d884a81caf",
+    "scripts/verify_lap30.py": "193a5aabde061e31d1a2cece6957cd119898aab9fef3df9d002470bd5720289c",
+    "scripts/verify_lap30_framework.py": "45c2177220182d0d8504fd1912c604dcad96806653f2158df348dc5c153d341e",
+    "src/qqbot_gateway/backends.py": "d826bc82bac058274efe55aee3daa20c94ac77e54aca5ce27ffb08c5abbe6d41",
+    "src/qqbot_gateway/config.py": "e1d1691e8306cfcba26e44485a75a4f7733fcab325a402ba9867e751fec6b970",
+    "src/qqbot_gateway/group_memory.py": "efcedcbf925f4d8850672a041c7ffcc539f642e43815d29d87630b032fc77500",
+    "src/qqbot_gateway/model_gateway.py": "9861a166ca43c206a4d4f01ca2ae8a5ba846eb1724f4d66947ebafbe5b2cd1d9",
+    "src/qqbot_gateway/persona.py": "edbeff31eb5b172eb38dd505940e5112449e46c4330b35079e4e0f53cf1aa729",
+    "src/qqbot_gateway/turn_v2.py": "7937d75594677bd2fd68435e1b54b3484c5e0b78b70a607fafb2e6d3f5ed13e7",
+    "src/qqbot_gateway/web_retrieval.py": "4704d6f06ff64030f928ad798406472c2e297e90ee5e167b844291d557de6aa3",
+    "tests/test_lap30.py": "7ec4f8fb3927ce29626be944cbf8c2d11e666e1a0a8a64dbf16f3885ea10d697"
+  },
+  "real_model_calls": 0,
+  "real_qq_calls": 0,
+  "local_runtime_config_modified": false
+}

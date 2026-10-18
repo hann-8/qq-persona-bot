@@ -290,6 +290,7 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
                     source=validate_source(content,header)
                 except (KeyError,IndexError,TypeError,ValueError):raise GatewayError('UNSUPPORTED_REQUEST') from None
                 if source['self']['names']!=v2['aliases']:raise GatewayError('UNSUPPORTED_REQUEST')
+                if source['memory'] is not None and not v2.get('memory_enabled',False):raise GatewayError('UNSUPPORTED_REQUEST')
                 request[V2_SOURCE]=source
             request[GROUP_REQUEST]=header
         suffix=candidate_instruction([]) if memes is not None and memes.cfg['enabled'] else ''
@@ -318,7 +319,7 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
                 except (ValueError,TypeError,TimeoutError,OSError,aiohttp.ClientError):
                     snapshot['member_candidates']=[]
                 from .members import POLICY as MEMBER_POLICY
-                system=system.replace('mention必须null、memory_proposals必须[]','memory_proposals必须[]')+MEMBER_POLICY
+                system=system.replace('mention必须null；','')+MEMBER_POLICY
                 if not (v2 or {}).get('mentions_enabled',False):system+='本轮受控@关闭，mention必须null。\n'
                 from .turn_v2 import fit
                 dialog=json.loads(prompt);dialog[-1]['content']=fit(snapshot,group_request,system,budget,suffix,dialog[:-1])
@@ -376,7 +377,11 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
                     raise
                 finally:CURRENT.reset(image_token)
                 snapshot=json.loads(json.loads(prompt)[-1]['content'])
-            if group_request['version']==2:request[V2_EFFECTIVE]=snapshot
+            if group_request['version']==2:
+                from .turn_v2 import fit
+                dialog=json.loads(prompt);dialog[-1]['content']=fit(snapshot,group_request,system,budget,suffix,dialog[:-1])
+                prompt=json.dumps(dialog,ensure_ascii=False,separators=(',',':'))
+                snapshot=json.loads(dialog[-1]['content']);request[V2_EFFECTIVE]=snapshot
             question=next((r['text'] for r in snapshot['messages'] if r['seq']==snapshot.get('target_seq')),snapshot['messages'][-1]['text'])
             if group_request['version']==2:
                 from .attention import canonical
@@ -407,6 +412,7 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
             snapshot=json.loads(json.loads(prompt)[-1]['content'])
             question=next((row['text'] for row in snapshot['messages'] if row['seq']==snapshot.get('target_seq')),snapshot['messages'][-1]['text'])
             response_to=None
+            memory_proposals=list(backend_result.memory_proposals)
             if backend_result.prepared_plan is not None:
                 plan=backend_result.prepared_plan
                 response_to=backend_result.response_to_seq
@@ -416,7 +422,7 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
             else:
                 if group_request['version']==2:
                     from .turn_v2 import plan as v2_plan
-                    decision,plan,response_to=v2_plan(result,output,question,group_request,snapshot,memes,candidates)
+                    decision,plan,response_to=v2_plan(result,output,question,group_request,snapshot,memes,candidates,memory_out=memory_proposals)
                 elif memes is not None and memes.cfg['enabled']:
                     from .media_protocol import media_plan
                     decision,plan=media_plan(result,output,question,memes,candidates,group=True,must_reply=group_request['must_reply'])
@@ -428,7 +434,8 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
                 if plan and not (v2 or {}).get('mentions_enabled',False):
                     from dataclasses import replace
                     plan=replace(plan,prepared_parts=tuple(replace(p,mention_ref=None) for p in plan.parts)) if any(p.mention_ref for p in plan.parts) else plan
-                metadata['qqbot_group_plan']=v2_metadata(group_request,response_id,decision,plan,snapshot,response_to,member_receipt)
+                if not (v2 or {}).get('learning_enabled',False):memory_proposals=[]
+                metadata['qqbot_group_plan']=v2_metadata(group_request,response_id,decision,plan,snapshot,response_to,member_receipt,memory_proposals)
                 LOG.info('ATTENTION trace=%s stage=model_done decision=%s elapsed_ms=%s',request[TRACE],decision,int((time.monotonic()-started)*1000))
             else:metadata['qqbot_group_plan']=group_metadata(group_request,response_id,decision,plan)
             queue.last_usage=dict(queue.last_usage,trigger=group_request.get('addressing',group_request.get('trigger')),decision=decision)
@@ -497,12 +504,12 @@ def main():
     from .members import suspend_unverified,MemberClient
     settings['members']=suspend_unverified(settings)
     v2=None
-    if settings['participation']['mode']=='free' and settings['participation']['attention']['enabled'] or settings['vision']['enabled'] or settings['members']['enabled']:
+    if settings['participation']['mode']=='free' and settings['participation']['attention']['enabled'] or settings['vision']['enabled'] or settings['members']['enabled'] or settings['memory']['enabled']:
         from .persona import compose_persona,session_version
         from .reply_plan import digest
-        persona=compose_persona((root/'config/persona.md').read_text(encoding='utf-8'),settings['output'],settings['web'],settings['participation'],settings['memes'],settings.get('vision'),settings['members'])
+        persona=compose_persona((root/'config/persona.md').read_text(encoding='utf-8'),settings['output'],settings['web'],settings['participation'],settings['memes'],settings.get('vision'),settings['members'],settings['memory'])
         persona_id=session_version(persona+('\n'+memes.fingerprint() if memes.cfg['enabled'] else ''),settings)
-        v2=dict(mode=settings['participation']['mode'],config_version=digest(persona_id),aliases=settings['participation']['attention']['aliases'],mentions_enabled=settings['members']['mentions_enabled'])
+        v2=dict(mode=settings['participation']['mode'],config_version=digest(persona_id),aliases=settings['participation']['attention']['aliases'],mentions_enabled=settings['members']['mentions_enabled'],memory_enabled=settings['memory']['enabled'],learning_enabled=settings['memory']['learning_enabled'])
     from .vision import MaterialClient,context_token
     materials=MaterialClient(f"http://127.0.0.1:{settings['onebot']['port']}/context/vision/resolve",context_token(root),settings['vision']['input_reserve_tokens']) if settings['vision']['enabled'] else None
     member_client=MemberClient(f"http://127.0.0.1:{settings['onebot']['port']}/context/members",context_token(root)) if settings['members']['enabled'] else None

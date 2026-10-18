@@ -355,11 +355,18 @@ class WebRunner:
         budget.check(system,enriched)
         result=await self.guarded(self.runner.run(system,enriched,request_id))
         result=result if isinstance(result,BackendResult) else BackendResult(result)
-        decision,reply,response=plan(result.text,self.output,question,request,source)
+        memory=[]
+        decision,reply,response=plan(result.text,self.output,question,request,source,memory_out=memory)
         if reply and decision=='speak':
+            original_text=reply.canonical_text
             try:reply=source_plan(reply,sources,self.output,question,retrieval.partial)
             except WebFailure:return BackendResult(SILENT,web_expired=True)
-            return BackendResult(reply.canonical_text,result.usage,result.parameters,result.finish_reason,reply,response_to_seq=response)
+            # An untruncated source suffix joins the entire answer into one normal
+            # text part. That part's ACK proves all original bubble dependencies.
+            if not reply.limited and reply.canonical_text.startswith(original_text+'\n'):
+                memory=[p|{'parts':[0]} if p['proposal']['phase']=='acked_bot' else p for p in memory]
+            else:memory=[p for p in memory if p['proposal']['phase']=='inbound']
+            return BackendResult(reply.canonical_text,result.usage,result.parameters,result.finish_reason,reply,response_to_seq=response,memory_proposals=tuple(memory))
         return result
     def check_stopping(self):
         from .lifecycle import stopping

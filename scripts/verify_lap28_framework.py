@@ -16,7 +16,7 @@ sys.path[:0]=[str(ROOT),str(ROOT/'src')]
 os.environ['ASTRBOT_DISABLE_METRICS']='1'
 
 
-async def verify(root,backend,mode,participation="free",attention=True,memes=False,web_enabled=False):
+async def verify(root,backend,mode,participation="free",attention=True,memes=False,web_enabled=False,memory_enabled=False):
     full_lifecycle=True
     import yaml
     from aiohttp import web
@@ -75,6 +75,7 @@ async def verify(root,backend,mode,participation="free",attention=True,memes=Fal
     settings['bot']['qq']='222';settings['access'].update(allowed_groups=['111','444'],admin_users=['333'],blocked_users=['999'])
     settings['llm']['backend']=backend
     settings['vision']=dict(enabled=True,input_reserve_tokens=4096)
+    settings['memory']=dict(enabled=memory_enabled,learning_enabled=False)
     settings['chat']['user_cooldown_seconds']=0
     settings['participation'].update(mode=participation,debounce_seconds=.5,max_batch_wait_seconds=2)
     settings['participation']['attention']['enabled']=attention
@@ -101,6 +102,9 @@ async def verify(root,backend,mode,participation="free",attention=True,memes=Fal
     with patch.dict(os.environ,{'QQBOT_ROOT':str(root)}),patch('qqbot_gateway.vision.require_production',return_value=True):
         router=QQRouter(SimpleNamespace(conversation_manager=manager))
     router.delivery.timeout=.03
+    if memory_enabled:
+        info=router.memory.manage('111','inspect')
+        router.memory.manage('111','add',user='333',kind='preference',slot='likes',fact='合成茶',expected=info['digest'])
     harness=Harness(root,backend)
     native_inputs=[]
     if backend=='codebuddy_cli':
@@ -131,7 +135,7 @@ async def verify(root,backend,mode,participation="free",attention=True,memes=Fal
     private_site=web.TCPSite(private_server,'127.0.0.1',0);await private_site.start()
     private_port=private_site._server.sockets[0].getsockname()[1]
     client=MaterialClient(f'http://127.0.0.1:{private_port}/context/vision/resolve','c'*64,4096)
-    v2=dict(mode=participation,config_version=__import__('qqbot_gateway.reply_plan',fromlist=['digest']).digest(router.persona_id),aliases=router.participation['attention']['aliases'])
+    v2=dict(mode=participation,config_version=__import__('qqbot_gateway.reply_plan',fromlist=['digest']).digest(router.persona_id),aliases=router.participation['attention']['aliases'],memory_enabled=memory_enabled)
     server=web.AppRunner(application(queue,token,output=settings['output'],memes=router.memes,v2=v2,materials=client),access_log=None)
     await server.setup();site=web.TCPSite(server,'127.0.0.1',0);await site.start()
     port=site._server.sockets[0].getsockname()[1]
@@ -238,6 +242,7 @@ async def verify(root,backend,mode,participation="free",attention=True,memes=Fal
     async def turn(e,case,generations=1):
         generator=router.on_group(e);req=await anext(generator)
         header=e.get_extra('qq_group_request');source=json.loads(req.prompt)
+        if memory_enabled:assert source['memory'] and source['memory']['records']
         assert header['version']==2 and len(header['resource_caps'])==1 and len(source['images'])==1
         assert header['resource_caps'][0] not in req.prompt and 'gchat.qpic' not in req.prompt
         assert not req.image_urls and not req.extra_user_content_parts
@@ -320,7 +325,7 @@ async def verify(root,backend,mode,participation="free",attention=True,memes=Fal
             assert harness.attempts==before+1 and fetched[-1]=='https://gchat.qpic.cn/newest'
             assert 'https://gchat.qpic.cn/carrier' not in fetched
             report.append(dict(case='ambient_merge_target_and_cap_together',generations=2,sends=len(held.bot.sent)+len(carrier.bot.sent)))
-        return dict(backend=backend,mode=mode,participation=participation,attention=attention,web=web_enabled,
+        return dict(backend=backend,mode=mode,participation=participation,attention=attention,web=web_enabled,memory_enabled=memory_enabled,
             cases=report,real_model_calls=0,real_qq_calls=0,real_run_agent=True,actual_runner=True,
             private_gate_http=True,actual_provider=True,original_event_ACK=True,production_eligible=False)
     finally:

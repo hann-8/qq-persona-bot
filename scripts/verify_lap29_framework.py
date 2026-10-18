@@ -16,7 +16,7 @@ sys.path[:0]=[str(ROOT),str(ROOT/'src')]
 os.environ['ASTRBOT_DISABLE_METRICS']='1'
 
 
-async def verify(root,backend,mode,participation="free",attention=False,memes=False,web_enabled=False):
+async def verify(root,backend,mode,participation="free",attention=False,memes=False,web_enabled=False,memory_enabled=False):
     full_lifecycle=True
     import yaml
     from aiohttp import web
@@ -85,6 +85,7 @@ async def verify(root,backend,mode,participation="free",attention=False,memes=Fa
     settings['llm']['backend']=backend
     settings['vision']=dict(enabled=False,input_reserve_tokens=4096)
     settings['members']=MEMBER_DEFAULTS|dict(enabled=True,mentions_enabled=True)
+    settings['memory']=dict(enabled=memory_enabled,learning_enabled=False)
     settings['chat']['user_cooldown_seconds']=0
     settings['participation'].update(mode=participation,debounce_seconds=.5,max_batch_wait_seconds=2)
     settings['participation']['attention']['enabled']=attention
@@ -111,6 +112,9 @@ async def verify(root,backend,mode,participation="free",attention=False,memes=Fa
     with patch.dict(os.environ,{'QQBOT_ROOT':str(root)}),patch('qqbot_gateway.members.suspend_unverified',side_effect=lambda settings:settings['members']),patch('qqbot_gateway.vision.context_token',return_value='c'*64):
         router=QQRouter(SimpleNamespace(conversation_manager=manager))
     router.delivery.timeout=.03
+    if memory_enabled:
+        info=router.memory.manage('111','inspect')
+        router.memory.manage('111','add',user='333',kind='preference',slot='likes',fact='合成茶',expected=info['digest'])
     harness=Harness(root,backend)
     native_inputs=[]
     if backend=='codebuddy_cli':
@@ -150,7 +154,7 @@ async def verify(root,backend,mode,participation="free",attention=False,memes=Fa
     private_port=private_site._server.sockets[0].getsockname()[1]
     client=MemberClient(f'http://127.0.0.1:{private_port}/context/members','c'*64)
     router.member_client=client;router.delivery.members=client
-    v2=dict(mode=participation,config_version=__import__('qqbot_gateway.reply_plan',fromlist=['digest']).digest(router.persona_id),aliases=router.participation['attention']['aliases'],mentions_enabled=True)
+    v2=dict(mode=participation,config_version=__import__('qqbot_gateway.reply_plan',fromlist=['digest']).digest(router.persona_id),aliases=router.participation['attention']['aliases'],mentions_enabled=True,memory_enabled=memory_enabled)
     server=web.AppRunner(application(queue,token,output=settings['output'],memes=router.memes,v2=v2,members=client),access_log=None)
     await server.setup();site=web.TCPSite(server,'127.0.0.1',0);await site.start()
     port=site._server.sockets[0].getsockname()[1]
@@ -317,8 +321,11 @@ async def verify(root,backend,mode,participation="free",attention=False,memes=Fa
             assert 'resource_caps' not in str(histories) and 'member_candidates' not in str(histories)
             assert 'qqbot_turn_reply' not in str(histories)
         else:assert manager.calls==0
+        if memory_enabled:
+            assert any(s['memory'] and s['memory']['records'] for s in effective_inputs)
+            assert not router.memory.live
         return dict(backend=backend,mode=mode,participation=participation,attention=attention,web=web_enabled,memes=memes,
-            cases=report,real_model_calls=0,real_qq_calls=0,real_run_agent=True,actual_runner=True,
+            memory_enabled=memory_enabled,cases=report,real_model_calls=0,real_qq_calls=0,real_run_agent=True,actual_runner=True,
             private_gate_http=True,actual_provider=True,original_event_ACK=True,production_eligible=False)
     finally:
         router.tasks.close();await provider.client.close();await server.cleanup();await private_server.cleanup()

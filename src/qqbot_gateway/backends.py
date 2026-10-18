@@ -31,6 +31,7 @@ class BackendResult:
     generation_performed: bool = True
     web_expired: bool = False
     response_to_seq: int | None = None
+    memory_proposals: tuple = ()
 
 
 def numeric_usage(value):

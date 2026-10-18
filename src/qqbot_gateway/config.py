@@ -30,6 +30,7 @@ def export_legacy_config(path):
         if isinstance(value.get('participation'),dict):value['participation'].pop('attention',None)
         value.pop('vision',None)
         value.pop('members',None)
+        value.pop('memory',None)
         content=yaml.safe_dump(value,allow_unicode=True,sort_keys=False).encode('utf-8')
         directory=root/'state/config-exports';directory.mkdir(parents=True,exist_ok=True)
         tag=uuid.uuid4().hex
@@ -55,7 +56,7 @@ def activate_legacy_config(path,review,source_digest,legacy_digest,confirmation)
         original=path.read_bytes();content=review.read_bytes()
         if hashlib.sha256(original).hexdigest()!=source_digest or hashlib.sha256(content).hexdigest()!=legacy_digest:raise ValueError('Configuration changed')
         data=yaml.safe_load(content);normalize_settings(data)
-        if 'attention' in data.get('participation',{}) or 'vision' in data or 'members' in data:raise ValueError('Not legacy compatible')
+        if 'attention' in data.get('participation',{}) or 'vision' in data or 'members' in data or 'memory' in data:raise ValueError('Not legacy compatible')
         backup=review.with_name(review.stem+'.activation-original.yaml')
         with backup.open('xb') as f:f.write(original)
         temporary=path.with_name(path.name+'.legacy-'+uuid.uuid4().hex+'.tmp')
@@ -120,6 +121,8 @@ def normalize_settings(raw):
     if type(version) is not int or version not in (1, 2, 3):
         raise ValueError('Unsupported schema_version')
     data['schema_version'] = 3
+    from .group_memory import validate_config as validate_memory
+    data['memory']=validate_memory(data.get('memory',{}))
     from .members import validate_config as validate_members
     data['members']=validate_members(data.get('members',{}))
     from .vision import validate_config

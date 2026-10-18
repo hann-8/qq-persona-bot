@@ -47,12 +47,14 @@ class QQRouter(Star):
         self.member_client=MemberClient(f"http://127.0.0.1:{settings['onebot']['port']}/context/members",context_token(self.root)) if self.members['enabled'] else None
         self.bot=settings['bot']['qq'];self.groups=set(settings['access']['allowed_groups']);self.admins=set(settings['access']['admin_users'])
         self.blocked=set(settings['access']['blocked_users'])
+        from qqbot_gateway.group_memory import MemoryStore
+        self.memory=MemoryStore(self.root,self.bot,self.groups,self.blocked,self.admins,settings['memory'])
         self.output=settings['output']
         self.web=settings['web']
         self.participation=settings['participation']
         from qqbot_gateway.meme_catalog import MemeCatalog
         self.memes=MemeCatalog(self.root,settings['memes'])
-        self.persona=compose_persona((self.root/'config/persona.md').read_text(encoding='utf-8'),self.output,self.web,self.participation,settings['memes'],settings.get('vision'),settings.get('members'))
+        self.persona=compose_persona((self.root/'config/persona.md').read_text(encoding='utf-8'),self.output,self.web,self.participation,settings['memes'],settings.get('vision'),settings.get('members'),settings['memory'])
         self.persona_id=session_version(self.persona+('\n'+self.memes.fingerprint() if self.memes.cfg['enabled'] else ''),settings)
         chat=settings.get('chat',{})
         self.budget=InputBudget.from_settings(settings,validate_model_settings(settings))
@@ -61,7 +63,7 @@ class QQRouter(Star):
         self.delivery=ReplyDelivery(self.tasks,self.output,self.delivery_allowed,catalog=self.memes,members=self.member_client)
         self.attention_effective=self.participation['mode']=='free' and self.participation['attention']['enabled']
         from qqbot_gateway.attention import Attention
-        self.group_turns=(Attention if self.attention_effective or self.vision['enabled'] or self.members['enabled'] else Participation)(self.participation,digest(self.persona_id+uuid.uuid4().hex),settings['llm']['queue_limit'],chat.get('session_queue_timeout_seconds',600))
+        self.group_turns=(Attention if self.attention_effective or self.vision['enabled'] or self.members['enabled'] or self.memory.cfg['enabled'] else Participation)(self.participation,digest(self.persona_id+uuid.uuid4().hex),settings['llm']['queue_limit'],chat.get('session_queue_timeout_seconds',600))
         self.group_turns.bot=self.bot
         self.connection_id=None
         self.connection_watcher=None
@@ -126,6 +128,7 @@ class QQRouter(Star):
                 event.set_extra('qq_group_response',raw.id)
                 event.set_extra('qq_group_metadata',raw.qqbot_group_plan)
                 event.set_extra('qq_delivery_plan',plan)
+                self.stage_memory(event,raw.qqbot_group_plan)
                 response.result_chain=MessageChain()
                 response.reasoning_content=None
                 if request['kind']=='member_turn':
@@ -223,6 +226,34 @@ class QQRouter(Star):
                 str(event.get_sender_id())!=self.bot and event.get_extra('qq_delivery_version')==self.persona_id and
                 event.get_extra('qq_delivery_identity')==(str(event.get_self_id()),str(event.get_group_id()),str(event.get_sender_id())))
 
+    def memory_allowed(self,event):
+        request=event.get_extra('qq_group_request')
+        return (request and request.get('version')==2 and not stopping(self.root) and str(event.get_self_id())==self.bot and
+            str(event.get_group_id()) in self.groups and str(event.get_sender_id()) not in self.blocked and
+            request['epoch']==self.group_turns.group_epoch(str(event.get_group_id())) and
+            event.get_extra('qq_connection')==self.connection() and event.get_extra('qq_delivery_version')==self.persona_id and
+            event.get_extra('qq_delivery_identity')==(self.bot,str(event.get_group_id()),str(event.get_sender_id())))
+
+    def prepare_memory(self,event,source,identities,events,request_key):
+        context=self.memory.prepare(str(event.get_group_id()),request_key,source,identities,events)
+        event.set_extra('qq_memory_context',context)
+
+    def stage_memory(self,event,metadata):
+        if not getattr(self,'memory',None) or not self.memory_allowed(event) or event.get_extra('qq_memory_staged'):return
+        event.set_extra('qq_memory_staged',True)
+        from copy import deepcopy
+        from qqbot_gateway.turn_v2 import close_refs
+        effective=deepcopy(event.get_extra('qq_v2_source'));manifest=metadata['manifest']
+        effective['messages']=[r for r in effective['messages'] if r['seq'] in manifest['seqs']]
+        close_refs(effective);effective['memory']=manifest.get('memory');effective['member_candidates']=manifest.get('member_candidates',[])
+        self.memory.stage(event.get_extra('qq_memory_context'),metadata.get('memory_proposals',[]),effective)
+
+    def close_memory(self,event):
+        context=event.get_extra('qq_memory_context')
+        if context:
+            acks=self.tasks.parts(event.get_extra('qq_delivery_key')) if self.memory_allowed(event) and not event.get_extra('qq_group_invalid') else ()
+            self.memory.close(context,acks)
+
     @filter.on_decorating_result()
     async def deliver_reply(self,event:AstrMessageEvent):
         guard=event.get_extra('qq_send_guard')
@@ -292,7 +323,7 @@ class QQRouter(Star):
         event.platform_meta=replace(event.platform_meta,support_proactive_message=False)
         event.set_extra('qq_delivery_version',self.persona_id)
         event.set_extra('qq_delivery_identity',(str(event.get_self_id()),str(event.get_group_id()),str(event.get_sender_id())))
-        if self.attention_effective or (self.vision['enabled'] or self.members['enabled']) and self.participation['mode']=='free':
+        if self.attention_effective or (self.vision['enabled'] or self.members['enabled'] or self.memory.cfg['enabled']) and self.participation['mode']=='free':
             async for item in self.on_attention_group(event):yield item
         elif self.participation['mode']=='free':
             async for item in self.on_free_group(event):yield item
@@ -356,7 +387,7 @@ class QQRouter(Star):
             history=self.budget.select_history(self.persona,prompt,history)
             await manager.update_conversation(umo,cid,history=history)
             conv.history=json.dumps(history,ensure_ascii=False)
-            if self.output['delivery_mode']=='adaptive' or self.memes.cfg['enabled'] or self.vision['enabled'] or self.members['enabled']:
+            if self.output['delivery_mode']=='adaptive' or self.memes.cfg['enabled'] or self.vision['enabled'] or self.members['enabled'] or self.memory.cfg['enabled']:
                 event.set_extra('qq_delivery_key',key)
                 event.set_extra('qq_delivery_cid',cid)
                 event.set_extra('qq_delivery_before',history)
@@ -364,12 +395,15 @@ class QQRouter(Star):
                 event.set_extra('qq_delivery_identity',(str(event.get_self_id()),str(event.get_group_id()),str(event.get_sender_id())))
             if self.memes.cfg['enabled']:event.set_extra('qq_media_turn',True)
             session_id='qqbot-media' if event.get_extra('qq_media_turn') else None
-            if self.vision['enabled'] or self.members['enabled']:
+            if self.vision['enabled'] or self.members['enabled'] or self.memory.cfg['enabled']:
                 from qqbot_gateway.vision import member_source,attach_image
                 from qqbot_gateway.turn_v2 import sha
                 from qqbot_gateway.attention import canonical
                 trace=uuid.uuid4().hex;event.set_extra('qq_router_trace',trace)
                 source=member_source(prompt,self.participation['attention']['aliases'])
+                ref=source['messages'][0]['member_ref']
+                self.prepare_memory(event,source,{ref:str(event.get_sender_id())},
+                    {1:(str(event.get_sender_id()),str(event.message_obj.message_id),time.time())},digest(key))
                 if image:attach_image(source,image)
                 from qqbot_gateway.web_policy import intent
                 if intent(prompt,self.web).kind!='none':source['web_anchor']=prompt
@@ -377,6 +411,12 @@ class QQRouter(Star):
                     config_version=digest(self.persona_id),source_digest=sha(source),addressing='mention',must_reply=True,target_seq=1,resource_caps=[image['cap']] if image else [])
                 member_cap=raw.get('qqbot_member_cap') if isinstance(raw,dict) and self.members['enabled'] else None
                 if member_cap:request['resource_caps'].append(member_cap)
+                from qqbot_gateway.turn_v2 import fit
+                history=self.budget.select_history(self.persona,canonical(source),history)
+                await manager.update_conversation(umo,cid,history=history)
+                conv.history=json.dumps(history,ensure_ascii=False);event.set_extra('qq_delivery_before',history)
+                source=json.loads(fit(source,request,self.persona,self.budget,history=history))
+                request['source_digest']=sha(source)
                 event.set_extra('qq_group_request',request);event.set_extra('qq_v2_source',source)
                 event.set_extra('qq_connection',self.connection());event.set_extra('qq_group_created',time.monotonic())
                 event.set_extra('qq_delivery_question',prompt);event.set_extra('qq_snapshot_range',[1,1])
@@ -410,7 +450,9 @@ class QQRouter(Star):
             self.tasks.set(key,'failed')
             LOG.error('QQ_ROUTER_ERROR trace=%s',trace)
             if not event.get_extra('qq_delivery_key') and not getattr(event,'_has_send_oper',False):yield event.plain_result('这条没处理好，请稍后再试。（追踪'+trace+'）')
-        finally:lease.release()
+        finally:
+            self.close_memory(event)
+            lease.release()
 
     async def on_attention_group(self,event):
         from qqbot_gateway.attention import DIRECT,canonical
@@ -444,6 +486,7 @@ class QQRouter(Star):
             self.tasks.set(key,'completed');event.stop_event();return
         row,addressing,required=self.group_turns.observe(group,sender,str(event.message_obj.message_id),
             getattr(event.message_obj.sender,'nickname',''),prompt or '[非文本未解析]',ats,reference)
+        row['memory_received_at']=time.time()
         if not self.attention_effective:
             addressing='mention' if mention else 'ambient';required={row['seq']}
         has_text=bool(prompt.replace('[非文本未解析]','').strip())
@@ -459,6 +502,7 @@ class QQRouter(Star):
                 (direct or time.monotonic()-created<=min(90,self.participation['max_ambient_age_seconds'])))
         try:
             ticket=self.group_turns.freeze(group,addressing,row,required,trace)
+            ticket.memory_event=(sender,str(event.message_obj.message_id),row['memory_received_at'])
             # Keep the cap with the frozen target, outside model material. Ambient
             # merging must replace both together, never reuse the carrier image.
             ticket.image=dict(image) if image else None
@@ -477,6 +521,7 @@ class QQRouter(Star):
                         pending.image=ticket.image
                         pending.member_cap=ticket.member_cap
                         pending.received=ticket.received
+                        pending.memory_event=ticket.memory_event
                         LOG.info('ATTENTION trace=%s stage=merged owner_trace=%s',trace,pending.trace)
                     return
                 if not await self.group_turns.batch(group,valid):return
@@ -493,6 +538,12 @@ class QQRouter(Star):
             if direct or self.participation['allow_ambient_web']:
                 source['web_anchor']=next((r['text'] for r in reversed(eligible) if intent(r['text'],self.web).kind!='none'),None)
             source['meme_question']=target['text']
+            rows={r['seq']:r for r in self.group_turns.window(group).rows}
+            now=time.time();mono=time.monotonic()
+            events={seq:(r['sender'],r['mid'],r.get('memory_received_at',now-(mono-r['at']))) for seq,r in rows.items() if r['sender']!='bot'}
+            # Frozen target can outlive the ordinary RAM window.
+            if target['seq'] not in events:events[target['seq']]=ticket.memory_event
+            self.prepare_memory(event,source,ticket.identities,events,digest(key))
             if image:
                 from qqbot_gateway.vision import attach_image
                 attach_image(source,image)
@@ -543,6 +594,7 @@ class QQRouter(Star):
                         int((time.monotonic()-ack_start)*1000) if ack_start is not None else 0)
                 else:self.tasks.set(key,'failed' if direct else 'completed')
             finally:
+                self.close_memory(event)
                 event.clear_result();event.should_call_llm(False);event.stop_event()
                 if ticket:self.group_turns.finish(ticket)
 

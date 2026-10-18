@@ -1,4 +1,4 @@
-"""Closed v2 wire contract; images/members use private resolution, memory stays empty."""
+"""Closed v2 wire contract, effective material manifest and isolated auxiliary data."""
 import copy
 import json
 import logging
@@ -61,7 +61,9 @@ def validate_source(text,request):
                 not integer(focus['received_age_ms'],0,900000) or not isinstance(focus['bot_seqs'],list) or
                 not 1<=len(focus['bot_seqs'])<=3 or len(set(focus['bot_seqs']))!=len(focus['bot_seqs']) or
                 any(not integer(s) or not any(r['seq']==s and r['member_ref']=='bot' for r in rows) for s in focus['bot_seqs'])):raise ValueError()
-        if obj['member_candidates']!=[] or obj['memory'] is not None:raise ValueError()
+        if obj['member_candidates']!=[]:raise ValueError()
+        from .group_memory import valid_memory
+        valid_memory(obj['memory'],refs-{'bot'})
         images=obj['images']
         if (not isinstance(images,list) or len(images)>1 or any(not isinstance(i,dict) or set(i)!={'image_ref'} or
             not isinstance(i['image_ref'],str) or not re.fullmatch(r'i_[a-f0-9]{32}',i['image_ref']) for i in images)):
@@ -84,6 +86,8 @@ def close_refs(obj):
         if integer(row['reply_seq']) and row['reply_seq'] not in seqs:row['reply_seq']='unresolved'
         row['at_refs']=[a if a in refs|{'bot','other_member'} else 'other_member' for a in row['at_refs']]
     if obj['focus'] and (not set(obj['focus']['bot_seqs'])<=seqs or obj['focus']['member_ref'] not in refs):obj['focus']=None
+    if obj['memory']:
+        obj['memory']['records']=[r for r in obj['memory']['records'] if r['subject_ref'] in refs|{'group'}]
     for key in ('web_anchor','meme_question'):
         if obj[key] is not None and not any(r['text']==obj[key] and r['seq'] in obj['eligible_seq'] for r in obj['messages']):obj[key]=None
 
@@ -101,12 +105,18 @@ def fit(obj,request,system,budget,suffix='',history=()):
     from .token_budget import dialog_text
     obj=copy.deepcopy(obj);required=required_seqs(obj,request)
     while True:
-        # Optional members share the 20%/2304-byte cap with future memory.
-        core=copy.deepcopy(obj);core['member_candidates']=[]
+        # Members and memory share the 20%/2304-byte cap after mandatory input.
+        core=copy.deepcopy(obj);core['member_candidates']=[];core['memory']=None
         core['messages']=[r for r in core['messages'] if r['seq'] in required];close_refs(core)
         extra_limit=min(2304,budget.limit//5,max(0,budget.limit-budget.usage(system+suffix,dialog_text(list(history)+[dict(role='user',content=canonical(core))]))))
-        while obj['member_candidates'] and (len(canonical(obj['member_candidates']).encode())>min(768,extra_limit)):
-            obj['member_candidates'].pop()
+        while True:
+            memory_size=len(canonical(obj['memory']).encode()) if obj['memory'] else 0
+            member_size=len(canonical(obj['member_candidates']).encode()) if obj['member_candidates'] else 0
+            if member_size<=768 and memory_size<=1536 and member_size+memory_size<=extra_limit:break
+            if obj['member_candidates']:obj['member_candidates'].pop()
+            elif obj['memory'] and obj['memory']['records']:obj['memory']['records'].pop()
+            elif obj['memory']:obj['memory']=None
+            else:break
         close_refs(obj);body=canonical(obj)
         try:
             budget.check(system+suffix,dialog_text(list(history)+[dict(role='user',content=body)]))
@@ -116,6 +126,8 @@ def fit(obj,request,system,budget,suffix='',history=()):
             index=next((i for i,r in enumerate(obj['messages']) if r['seq'] not in required),None)
             if index is not None:obj['messages'].pop(index)
             elif obj['member_candidates']:obj['member_candidates'].pop()
+            elif obj['memory'] and obj['memory']['records']:obj['memory']['records'].pop()
+            elif obj['memory']:obj['memory']=None
             else:raise
 
 def manifest(obj):
@@ -124,9 +136,12 @@ def manifest(obj):
     if obj['member_candidates']:
         value['member_candidates']=copy.deepcopy(obj['member_candidates'])
         value['member_refs']=sorted(set(value['member_refs'])|{c['member_ref'] for c in obj['member_candidates']})
+    if obj['memory'] is not None:
+        value['memory']=copy.deepcopy(obj['memory'])
+        value['fact_refs']=[r['fact_ref'] for r in obj['memory']['records']]
     return value
 
-def plan(raw,output,question,request,effective,catalog=None,candidates=()):
+def plan(raw,output,question,request,effective,catalog=None,candidates=(),memory_out=None):
     """Validate core first; aux never repairs broken core or carries future powers."""
     from .group_protocol import group_plan
     # LAP-25's bounded decoder handles complete fenced objects, prose and damaged
@@ -155,7 +170,9 @@ def plan(raw,output,question,request,effective,catalog=None,candidates=()):
         if obj.get('mention') is not None:
             from .members import attach_mention
             result=attach_mention(result,obj['mention'],obj['bubbles'],effective,output)
-        if obj.get('memory_proposals',[])!=[]:LOG.info('V2_AUX category=memory_unavailable')
+        if memory_out is not None and effective['memory'] is not None and decision in ('speak','silent'):
+            from .group_memory import wire_proposals
+            memory_out.extend(wire_proposals(obj.get('memory_proposals',[]),effective,obj['bubbles'],result))
         response=obj.get('response_to_seq')
         if request['must_reply']:response=request['target_seq']
         elif not integer(response) or response not in effective['eligible_seq']:
@@ -170,25 +187,44 @@ def plan(raw,output,question,request,effective,catalog=None,candidates=()):
         if result:result=ReplyPlan(result.kind,result.bubbles,result.canonical_text,result.limited,'v2_core_recovery')
         return decision,result,None
 
-def metadata(request,response_id,decision,result,effective,response_to=None,member_receipt=None):
+def metadata(request,response_id,decision,result,effective,response_to=None,member_receipt=None,memory_proposals=None):
     value=dict(request=request,response_id=response_id,decision=decision,plan=result.metadata(response_id) if result else None,
         effective_digest=sha(effective),manifest=manifest(effective),response_to_seq=response_to)
     if member_receipt is not None:value['member_receipt']=member_receipt
+    if memory_proposals:value['memory_proposals']=memory_proposals
     value['plan_hash']=sha(value)
     return value
 
 def verify(value,request,response_id,text,output,source):
     from .reply_plan import trusted_plan
-    if not isinstance(value,dict) or set(value)-{'member_receipt'}!={'request','response_id','decision','plan','effective_digest','manifest','response_to_seq','plan_hash'}:raise ValueError('Missing v2 identity')
+    if not isinstance(value,dict) or set(value)-{'member_receipt','memory_proposals'}!={'request','response_id','decision','plan','effective_digest','manifest','response_to_seq','plan_hash'}:raise ValueError('Missing v2 identity')
     if value['request']!=request or value['response_id']!=response_id or sha({k:v for k,v in value.items() if k!='plan_hash'})!=value['plan_hash']:raise ValueError('v2 identity mismatch')
     m=value['manifest']
-    if not isinstance(m,dict) or set(m)-{'member_candidates'}!={'seqs','member_refs','fact_refs','images','eligible_seq'}:raise ValueError('manifest')
+    if not isinstance(m,dict) or set(m)-{'member_candidates','memory'}!={'seqs','member_refs','fact_refs','images','eligible_seq'}:raise ValueError('manifest')
     if not isinstance(m['seqs'],list) or len(set(m['seqs']))!=len(m['seqs']) or any(not integer(s) for s in m['seqs']):raise ValueError('seqs')
     effective=copy.deepcopy(source);effective['messages']=[r for r in effective['messages'] if r['seq'] in m['seqs']];close_refs(effective)
+    if 'memory' in m:
+        from .group_memory import valid_memory
+        valid_memory(m['memory'],set(m['member_refs'])-{'bot'})
+        original=source['memory']
+        if original is None or any(m['memory'][k]!=original[k] for k in ('generation','base_revision')) or any(r not in original['records'] for r in m['memory']['records']):raise ValueError('Memory identity')
+        effective['memory']=copy.deepcopy(m['memory'])
+    else:effective['memory']=None
     if 'member_candidates' in m:
         from .members import valid_candidates
         if len(request['resource_caps'])!=len(source['images'])+1:raise ValueError('Unexpected member material')
         effective['member_candidates']=copy.deepcopy(valid_candidates(m['member_candidates']))
+    if 'memory_proposals' in value:
+        from .group_memory import proposals
+        items=value['memory_proposals']
+        if effective['memory'] is None or not isinstance(items,list) or len(items)>3:raise ValueError('Memory proposals')
+        indices=set()
+        for item in items:
+            if (not isinstance(item,dict) or set(item)!={'index','proposal','parts'} or not integer(item['index'],0,2) or item['index'] in indices or
+                not proposals([item['proposal']],effective) or not isinstance(item['parts'],list) or
+                len(set(item['parts']))!=len(item['parts']) or any(not integer(i,0,7) for i in item['parts'])):raise ValueError('Memory proposal identity')
+            indices.add(item['index'])
+            if value['decision']=='error' or item['proposal']['phase']=='inbound' and item['parts'] or item['proposal']['phase']=='acked_bot' and value['plan'] is None:raise ValueError('Memory phase identity')
     if 'member_receipt' in value and not hexa(value['member_receipt'],64):raise ValueError('Member receipt')
     if m['images']:
         from .vision import NORMALIZER,MAX_BLOB
@@ -215,6 +251,10 @@ def verify(value,request,response_id,text,output,source):
         return None
     result=trusted_plan(value['plan'],text,response_id,output)
     if result.fallback_reason=='metadata_missing_or_mismatch' or value['decision']=='silent':raise ValueError('plan')
+    for item in value.get('memory_proposals',[]):
+        if item['proposal']['phase']=='inbound':
+            if item['parts']:raise ValueError('Inbound ACK parts')
+        elif not item['parts'] or result.fallback_reason or result.limited or any(i>=len(result.parts) or result.parts[i].type!='text' for i in item['parts']):raise ValueError('Promise ACK parts')
     if any(p.mention_ref is not None for p in result.parts):
         candidates={c['member_ref'] for c in effective['member_candidates']}
         if not value.get('member_receipt') or any(p.mention_ref not in candidates for p in result.parts if p.mention_ref):raise ValueError('Mention identity')
