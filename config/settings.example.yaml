@@ -115,3 +115,14 @@ memes:
   allow_meme_only: true
   max_file_bytes: 8388608
   import_count: 48
+
+# LAP-29：生产人数新鲜度未证，配置工具拒绝启用；手改desired启动仅暂停本功能。
+# received_at不是人数观测时间；只允许1..49，50/未知/过期零list。
+members:
+  enabled: false
+  mentions_enabled: false
+  roster_member_count_lt: 50
+  count_ttl_seconds: 60
+  roster_ttl_seconds: 300
+  max_prompt_entries: 8
+  max_prompt_bytes: 768

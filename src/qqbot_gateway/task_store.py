@@ -40,6 +40,7 @@ class TaskStore:
         self.db.execute('''CREATE TABLE IF NOT EXISTS prepared_part (
             message_key TEXT, part INTEGER, part_type TEXT, digest TEXT, media_ref TEXT,
             semantic_label TEXT, PRIMARY KEY(message_key,part))''')
+        self.db.execute('CREATE TABLE IF NOT EXISTS mention_receipt (message_key TEXT, part INTEGER, applied INTEGER, PRIMARY KEY(message_key,part))')
         with self.db:self.db.execute("UPDATE tasks SET status='unknown' WHERE status IN ('accepted','running')")
 
     def accept(self,key,trace):
@@ -124,6 +125,10 @@ class TaskStore:
             self.db.execute("UPDATE delivery_part SET state=?,message_id=? WHERE message_key=? AND part=? AND state='sending'",
                             (state,str(message_id) if message_id is not None else None,key,index))
         return state
+
+    def mention_result(self,key,index,applied):
+        if applied is not None and type(applied) is not bool:raise ValueError('Mention ACK')
+        with self.db:self.db.execute('INSERT OR REPLACE INTO mention_receipt VALUES (?,?,?)',(key,index,None if applied is None else int(applied)))
 
     def finish_delivery(self,key,reason=None):
         parts=self.parts(key)

@@ -59,13 +59,17 @@ def media_plan(raw,output,question,catalog,candidates,*,group=False,must_reply=T
 
 def trusted_media_plan(meta,text,response_id,output):
     try:
-        if meta.get('version')!=2 or meta.get('plan_sha256')!=digest(json.dumps({k:v for k,v in meta.items() if k!='plan_sha256'},sort_keys=True,ensure_ascii=False,separators=(',',':'))):raise ValueError()
+        if type(meta.get('version')) is not int or meta.get('version') not in (2,3) or meta.get('plan_sha256')!=digest(json.dumps({k:v for k,v in meta.items() if k!='plan_sha256'},sort_keys=True,ensure_ascii=False,separators=(',',':'))):raise ValueError()
         if meta['response_id']!=response_id or meta['content_sha256']!=digest(text) or meta['kind'] not in ('chat','answer'):raise ValueError()
         parts=tuple(PreparedPart(**x) for x in meta['parts'])
         if not 1<=len(parts)<=output['max_bubbles'] or sum(x.type=='image' for x in parts)>1:raise ValueError()
+        mentions=[p for p in parts if p.mention_ref is not None]
+        if (len(mentions)>1 or bool(mentions)!=(meta['version']==3) or
+            any(p.type!='text' or not isinstance(p.mention_ref,str) or not re.fullmatch('p_[a-f0-9]{16}',p.mention_ref) for p in mentions)):
+            raise ValueError()
         for p in parts:
             if p.type=='text':
-                if p.digest!=digest(p.payload_ref) or p.payload_ref!=p.semantic_label or not p.payload_ref.strip():raise ValueError()
+                if p.digest!=digest(p.payload_ref) or p.payload_ref!=p.semantic_label or not p.payload_ref.strip() or '[CQ:' in p.payload_ref:raise ValueError()
             elif p.type=='image':
                 if p.payload_ref!='m_'+p.digest or not re.fullmatch('[a-f0-9]{64}',p.digest) or meta['kind']!='chat':raise ValueError()
             else:raise ValueError()

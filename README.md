@@ -1,5 +1,15 @@
 # QQ 人设文字 Bot（笔记本测试版）
 
+LAP-29 成员服务与受控@已实现/离线通过（355单元、52组合790框架及32专项末次补验）；**真实名册/@不可启用**，人数新鲜度仍为`capability_unverified`。见[交接](tracks/laptop-workbuddy/tasks/LAP-29/HANDOFF.md)和[报告](reports/lap-29-2026-10-18.md)。没有调用真实人数/名单/@或模型，没有启停/登录bot，本机配置未改。
+
+配置机器人.cmd → 7 → 21“小群成员与受控@”：`members.enabled / mentions_enabled`默认均false；开启请求会被拒绝。手改desired=true时gate/router/gateway及AstrBot配置生成仅暂停成员能力，文字聊天继续，不改变访问控制、模型或额度。保存须停机、正常重启加载；本轮不会自动启用。人数门槛固定1..49，50/51/未知/过期均零list；`received_at`只是收到响应的时间，不能证明人数刚观测。现锁定的NapCat缓存接口没有可信观测时间或最大陈旧度，不能通过重请求或手写status解锁；新人数来源须补规划。
+
+独立离线合同：人数TTL≤60秒且减去已知陈旧度、名册TTL≤300秒，两者同时有效；仅获准新消息驱动，入退群事件使缓存失效，不开定时查询。全量名册仅gate RAM，单人最多2个当前名字，不收集无限改名史。每轮仅当前/已知引用发言者及文字中唯一匹配的人，最多8候选/768 UTF-8序列化字节，再受共享20%/2304字节及最终输入预算裁剪；重名、bot、黑名单不猜。群友`get_group_member_list / get_group_member_info / get_stranger_info`不能由框架绕过；bot自身必要信息查询单独保留。
+
+固定私有接口`/context/members/bind|resolve|permit`复用gate回环监听和独立`context_service_token`，不接受任意action/QQ/群/URL/路径；凭据仍仅项目忽略secrets，本轮不创建。provider只带原turn sideband cap，gateway一次兑换，模型仅见不透明`member_ref/name`。typed v3最多1个@，需正常文字及最终manifest中的候选；由gate按同轮收据/plan hash/part index签发一次`mention.send`许可。许可不进入模型，发送前消费并剥除内部字段；@与文字同一条OneBot发送/ACK，不单独发@。人数/名单或@目标黑名单映射失效在同次发送中剥@；原发送者/群准入或连接失效整票拒发，gate回执`mention_applied=false`，账本不冒称已@；ACK未知不补发、不额外通知。普通回答默认直接文字，不自动@，禁止@all/任意QQ/CQ码。
+
+独立验证：`.venv/Scripts/python.exe -X utf8 scripts/verify_lap29.py`，只写`reports/lap-29-*`；自造成员/假人数观测/假OneBot、实际AstrBot/provider/run_agent及两runner底层替身，包含旧文字/表情回归。离线通过不能证明真实小群能力，LAP-28视觉与31B等旧门槛仍保留，不自动开始30。
+
 LAP-28 已交付原生图片适配与离线验证，**生产仍不可启用**；见[交接](tracks/laptop-workbuddy/tasks/LAP-28/HANDOFF.md)和[报告](reports/lap-28-2026-10-18.md)。没有执行真实识图、群图下载、QQ/模型调用或bot启停。
 
 `vision.enabled=false`为默认值；`vision.input_reserve_tokens=4096`仅为待验证假设。菜单7→20查看/关闭desired及设置1..65536的reserve；没有可编辑status，申请启用会被拒绝。手改true同样在gate/router/gateway启动前拒绝。保存不启停，正常重启加载；本次未改本机配置。
@@ -18,9 +28,9 @@ LAP-27新增free关注/指代与自然续聊，默认关闭，尚未真实验收
 
 启用关注后：真实@ > 可靠叫名/引用已ACK的bot文字 > 同人60秒且无插话的第二人称续聊 > 无主语续聊候选 > ambient。同级FIFO，不打断活动生成；不同direct消息各自排队，目标与必要引用冻结到投递/ACK结束。候选每群滚动60秒默认最多4次，同次模型可判断结束确认应沉默。只有已确认的正常模型文字ACK建立焦点，按真实回应对象归因，unknown/图片/本地错误不建焦点。队列/生成/ACK均可能增加等待，不承诺固定时延；新增随机trace关联固定类别日志，不含正文或QQ/群号。
 
-旧代码回滚前，先停止受管实例并保留所有pending/unknown/清理台账。菜单7→19或`.venv/Scripts/python.exe scripts/configure_bot.py export-legacy-config`生成`state/config-exports/`忽略目录内的原配置备份、移除attention与vision section的旧schema3审阅副本及两个摘要；保留其他扩展字段。**只导出不激活**。本机审阅后可显式运行`activate-legacy-config <review路径> <source_digest> <legacy_digest> 已核对`，同配置锁下复核停机与双摘要后原子激活，不重启；任一副本有变化须重新导出。旧版本不认识未决清理台账时保持停机，不能靠回旧代码抹掉unknown。
+旧代码回滚前，先停止受管实例并保留所有pending/unknown/清理台账。菜单7→19或`.venv/Scripts/python.exe scripts/configure_bot.py export-legacy-config`生成`state/config-exports/`忽略目录内的原配置备份、移除attention、vision与members section的旧schema3审阅副本及两个摘要；保留其他扩展字段。**只导出不激活**。本机审阅后可显式运行`activate-legacy-config <review路径> <source_digest> <legacy_digest> 已核对`，同配置锁下复核停机与双摘要后原子激活，不重启；任一副本有变化须重新导出。旧版本不认识未决清理台账时保持停机，不能靠回旧代码抹掉unknown。
 
-独立离线验证：`.venv/Scripts/python.exe -X utf8 scripts/verify_lap27.py`，只写`reports/lap-27-*`；实际run_agent/provider/原event ACK与两runner底层替身、自造群/图片夹具，不调用真实模型/QQ。上述27交付时图片/名册/记忆字段仅预留；28图片进展见本文顶部，29/30未实施，31B完整覆盖/恢复仍未交付。见[LAP-27交接](tracks/laptop-workbuddy/tasks/LAP-27/HANDOFF.md)。
+独立离线验证：`.venv/Scripts/python.exe -X utf8 scripts/verify_lap27.py`，只写`reports/lap-27-*`；实际run_agent/provider/原event ACK与两runner底层替身、自造群/图片夹具，不调用真实模型/QQ。上述27交付时图片/名册/记忆字段仅预留；28图片进展见本文顶部，29已独立实现但生产人数新鲜度未证，30未实施，31B完整覆盖/恢复仍未交付。见[LAP-27交接](tracks/laptop-workbuddy/tasks/LAP-27/HANDOFF.md)。
 
 LAP-24已实现/离线通过，尚未重启加载或真实验收：闲聊“最多三条”仅为上限，能一句接住就一句，有必要补充才两三条；认真回答完整单条，表情可不发、不占位凑数。single仍保留单条文字规则，不改操作者已有条数/间隔设置。真实模型的表达与QQ效果仍待另行验证。
 

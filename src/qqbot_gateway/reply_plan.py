@@ -36,8 +36,12 @@ class PreparedPart:
     digest: str
     payload_ref: str
     semantic_label: str
+    mention_ref: str | None = None
 
-    def metadata(self):return dict(type=self.type,digest=self.digest,payload_ref=self.payload_ref,semantic_label=self.semantic_label)
+    def metadata(self):
+        value=dict(type=self.type,digest=self.digest,payload_ref=self.payload_ref,semantic_label=self.semantic_label)
+        if self.mention_ref is not None:value["mention_ref"]=self.mention_ref
+        return value
 
 
 @dataclass(frozen=True)
@@ -54,7 +58,7 @@ class ReplyPlan:
         return self.prepared_parts or tuple(PreparedPart('text',digest(x),x,x) for x in self.bubbles)
 
     def metadata(self, response_id):
-        value=dict(version=2 if self.prepared_parts else 1, response_id=response_id, kind=self.kind, bubbles=list(self.bubbles),
+        value=dict(version=3 if any(p.mention_ref for p in self.parts) else 2 if self.prepared_parts else 1, response_id=response_id, kind=self.kind, bubbles=list(self.bubbles),
                     content_sha256=digest(self.canonical_text), limited=self.limited,
                     fallback_reason=self.fallback_reason)
         if self.prepared_parts:
@@ -136,7 +140,7 @@ def trusted_plan(metadata, text, response_id, output):
     fallback = ReplyPlan('answer', (text,), text, fallback_reason='metadata_missing_or_mismatch')
     if not isinstance(metadata, dict):
         return fallback
-    if metadata.get('version')==2:
+    if metadata.get('version') in (2,3):
         from .media_protocol import trusted_media_plan
         return trusted_media_plan(metadata,text,response_id,output)
     parts = metadata.get('bubbles')

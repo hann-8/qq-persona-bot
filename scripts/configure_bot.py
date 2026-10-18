@@ -48,6 +48,7 @@ def show(settings):
         print('当前模型可显式选强度：'+('/'.join(supported) or '未知，仅auto'))
     print(f"回复方式：{settings['output']['delivery_mode']}；闲聊最多{settings['output']['max_bubbles']}条/{settings['output']['casual_max_chars']}字符，认真问题单条；切换后新上下文，旧历史保留。")
     print(f"共用网页：{settings.get('web',{}).get('enabled',False)}；搜索候选未通过质量门槛，仅受控公共URL读取；不上传历史。")
+    print(f"小群成员：desired={settings['members']['enabled']}；capability_unverified，人数观测新鲜度未知，生产暂停；受控@默认关闭。")
     print(f"原生识图：desired={settings['vision']['enabled']}；生产不可启用（模板/视觉token上界与原生容量未验证）；reserve={settings['vision']['input_reserve_tokens']}仅假设。")
 
 
@@ -328,9 +329,11 @@ class ConfigMenu:
             for index,key in enumerate(keys,1):
                 bounds=f'{RANGES[key][0]}..{RANGES[key][1]}' if key in RANGES else ('mentions/free' if key=='mode' else 'true/false')
                 self.ui.write(f'{index} {key}: {settings["participation"][key]} ({bounds})')
-            self.ui.write('17 核对后解除本群未知发送隔离 / 18 关注与续聊 / 19 导出旧版配置审阅副本 / 20 原生识图 / 0 返回')
-            choice=self.ui.choose({'0','17','18','19','20'}|{str(i) for i in range(1,len(keys)+1)})
+            self.ui.write('17 核对后解除本群未知发送隔离 / 18 关注与续聊 / 19 导出旧版配置审阅副本 / 20 原生识图 / 21 小群成员与受控@ / 0 返回')
+            choice=self.ui.choose({'0','17','18','19','20','21'}|{str(i) for i in range(1,len(keys)+1)})
             if choice=='0':return
+            if choice=='21':
+                self.members_group();continue
             if choice=='20':
                 self.vision_group();continue
             if choice=='19':
@@ -367,6 +370,31 @@ class ConfigMenu:
                 self.ui.write('已保存，下次启动生效。没有启停/读取群消息/调用模型。')
             except (ValueError,OSError) as error:self.ui.write(operation_error(error)+' 请核对页面范围。')
             self.ui.pause()
+
+    def members_group(self):
+        from qqbot_gateway.members import DEFAULTS,validate_config,require_production
+        settings,digest=read_settings(self.path)
+        self.ui.page('小群成员与受控@（生产不可启用）')
+        self.ui.write('capability_unverified：NapCat缓存人数没有观测时间/最大陈旧度证明。received_at不是观测时间。手改desired时启动仅暂停成员功能，文字继续。')
+        self.ui.write('仅1..49可取名单；50/未知/过期不取。人数60秒/名单300秒同时有效；最多8人/768字节候选，禁止任意QQ/@all/CQ。正常重启加载，不自动启停或查询QQ。')
+        keys=list(DEFAULTS)
+        for i,key in enumerate(keys,1):self.ui.write(f'{i} {key}: {settings["members"][key]}')
+        choice=self.ui.choose({'0'}|{str(i) for i in range(1,len(keys)+1)})
+        if choice=='0':return
+        key=keys[int(choice)-1];value=self.ui.read('新值（回车保留）：').strip()
+        if not value:return
+        try:
+            if key in ('enabled','mentions_enabled'):
+                if value not in ('true','false'):raise ValueError('true/false required')
+                value=value=='true'
+            else:value=int(value)
+            settings['members'][key]=value
+            if key=='enabled' and value is False:settings['members']['mentions_enabled']=False
+            settings['members']=validate_config(settings['members']);require_production(settings)
+            save_settings(self.path,settings,digest)
+            self.ui.write('已保存，下次正常启动加载；没有查询人数/名单或发送。')
+        except (ValueError,OSError) as error:self.ui.write('未保存：'+operation_error(error))
+        self.ui.pause()
 
     def vision_group(self):
         from qqbot_gateway.vision import validate_config,require_production

@@ -270,7 +270,12 @@ def source_plan(raw,sources,output,question,partial=False):
         if room>=40:
             text,limited=truncate(plan.canonical_text,room)
             text+=suffix
-            return ReplyPlan('answer',(text,),text,limited or plan.limited)
+            result=ReplyPlan('answer',(text,),text,limited or plan.limited)
+            mentions=[p.mention_ref for p in plan.parts if p.mention_ref]
+            if mentions and not result.limited:
+                from .reply_plan import PreparedPart,digest
+                result=ReplyPlan('answer',(text,),text,prepared_parts=(PreparedPart('text',digest(text),text,text,mentions[0]),))
+            return result
         rows.pop()
     text='来源链接超出当前回复长度限制，请换个较短的公共链接。'
     return ReplyPlan('answer',(text,),text)
@@ -332,8 +337,10 @@ class WebRunner:
             from .errors import GatewayError
             raise GatewayError('UNSUPPORTED_REQUEST')
         if not question:return await self.guarded(self.runner.run(system,prompt,request_id))
-        if vision:
-            remaining=vision.prepare_deadline-time.monotonic()
+        from .members import PREPARE_DEADLINE
+        shared_deadline=PREPARE_DEADLINE.get()
+        if vision or shared_deadline:
+            remaining=(vision.prepare_deadline if vision else shared_deadline)-time.monotonic()
             if remaining<=0:return BackendResult(SILENT,generation_performed=False,web_expired=True)
             try:retrieval=await asyncio.wait_for(self.guarded(self.retriever.retrieve(question)),remaining)
             except TimeoutError:return BackendResult(SILENT,generation_performed=False,web_expired=True)

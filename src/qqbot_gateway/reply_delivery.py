@@ -51,9 +51,10 @@ class GroupDeliveryQueue:
 
 class EventReceiptProxy:
     """One event's bot reference is wrapped; shared CQHttp instance is untouched."""
-    def __init__(self,bot,group,image_uri=None,image_digest=None):
+    def __init__(self,bot,group,image_uri=None,image_digest=None,mention_permission=None,expected_text=None):
         self.original=bot;self.group=str(group);self.calls=0;self.message_id=None
         self.image_uri=image_uri;self.image_digest=image_digest
+        self.mention_permission=mention_permission;self.expected_text=expected_text;self.mention_applied=None
 
     def __getattr__(self,name):
         return getattr(self.original,name)
@@ -72,8 +73,12 @@ class EventReceiptProxy:
             except ValueError:raise DeliveryStopped('image_conversion_mismatch') from None
             if hashlib.sha256(data).hexdigest()!=self.image_digest:raise DeliveryStopped('image_conversion_mismatch')
             kwargs=dict(kwargs,message=[{'type':'image','data':{'file':self.image_uri}}])
+        if self.mention_permission:
+            if kwargs.get('message')!=[{'type':'text','data':{'text':self.expected_text}}]:raise DeliveryStopped('mention_conversion_mismatch')
+            kwargs=dict(kwargs,qqbot_mention_permission=self.mention_permission)
         result=await self.original.send_group_msg(**kwargs)
         if isinstance(result,dict):
+            if type(result.get('qqbot_mention_applied')) is bool:self.mention_applied=result['qqbot_mention_applied']
             mid=result.get('message_id')
             if type(mid) is int and mid!=0:
                 self.message_id=str(mid)
@@ -83,9 +88,10 @@ class EventReceiptProxy:
 
 
 class ReplyDelivery:
-    def __init__(self,store,output,allowed,timeout=3,catalog=None):
+    def __init__(self,store,output,allowed,timeout=3,catalog=None,members=None):
         self.store=store;self.output=output;self.allowed=allowed;self.timeout=timeout
         self.queue=GroupDeliveryQueue()
+        self.members=members
         self.catalog=catalog;self.image_times={};self.same_times={}
 
     async def send(self,event,key,plan):
@@ -101,7 +107,12 @@ class ReplyDelivery:
                         delay=random.uniform(self.output['bubble_delay_min_ms'],self.output['bubble_delay_max_ms'])/1000
                         await cancellable(asyncio.sleep(delay),lambda:self.allowed(event),6)
                     if not self.allowed(event):raise DeliveryStopped('stopped_or_invalidated')
-                    uri=None
+                    uri=None;permission=None
+                    if part.mention_ref:
+                        if self.members is None:raise DeliveryStopped('mention_service_missing')
+                        metadata=event.get_extra('qq_group_metadata')
+                        if not metadata or not metadata.get('member_receipt'):raise DeliveryStopped('mention_receipt_missing')
+                        permission=await cancellable(self.members.permit(metadata['member_receipt'],metadata,index),lambda:self.allowed(event),3)
                     if part.type=='image':
                         try:
                             if self.catalog is None:raise ValueError()
@@ -125,7 +136,7 @@ class ReplyDelivery:
                             continue
                     if not self.store.begin_part(key,index):raise DeliveryStopped('part_already_attempted')
                     original=event.bot
-                    proxy=EventReceiptProxy(original,event.get_group_id(),uri,part.digest if uri else None)
+                    proxy=EventReceiptProxy(original,event.get_group_id(),uri,part.digest if uri else None,permission,part.payload_ref if permission else None)
                     event.bot=proxy
                     try:
                         if uri:
@@ -137,14 +148,20 @@ class ReplyDelivery:
                         if uri and guard:
                             with guard.grant(image_uri=chain.chain[0].file):
                                 await cancellable(event.send(chain),lambda:self.allowed(event),self.timeout)
+                        elif permission and guard:
+                            with guard.grant(mention_text=part.payload_ref):
+                                await cancellable(event.send(chain),lambda:self.allowed(event),self.timeout)
                         else:await cancellable(event.send(chain),lambda:self.allowed(event),self.timeout)
                         state=self.store.part_result(key,index,'sent' if proxy.calls==1 and proxy.message_id else 'unknown',proxy.message_id)
+                        if part.mention_ref:
+                            self.store.mention_result(key,index,proxy.mention_applied if state=='sent' else None)
                         if uri and state=='sent':
                             self.image_times[group]=time.monotonic();self.same_times[(group,part.payload_ref)]=time.monotonic()
                     except BaseException:
                         # A correlated ACK already captured is evidence even if stop/cancel
                         # arrives while the framework finishes its local send bookkeeping.
                         self.store.part_result(key,index,'sent' if proxy.calls==1 and proxy.message_id else 'unknown',proxy.message_id)
+                        if part.mention_ref:self.store.mention_result(key,index,proxy.mention_applied if proxy.message_id else None)
                         raise
                     finally:event.bot=original
                     if state!='sent':raise DeliveryStopped('ack_unknown_or_duplicate')

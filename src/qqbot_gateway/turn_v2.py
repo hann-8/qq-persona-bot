@@ -1,4 +1,4 @@
-"""Closed v2 wire contract; images use private resolution, members/memory stay empty."""
+"""Closed v2 wire contract; images/members use private resolution, memory stays empty."""
 import copy
 import json
 import logging
@@ -23,8 +23,8 @@ def validate_header(obj):
         obj['addressing'] not in PRIORITY or type(obj['must_reply']) is not bool or obj['must_reply']!=(obj['addressing'] in DIRECT) or
         obj['mode']=='mentions' and obj['addressing']!='mention' or not integer(obj['target_seq']) or
         any(not hexa(obj[k],64) for k in ('request_key','epoch','config_version','source_digest')) or
-        not isinstance(obj['resource_caps'],list) or len(obj['resource_caps'])>1 or
-        any(not hexa(c,64) for c in obj['resource_caps'])):raise GatewayError('UNSUPPORTED_REQUEST')
+        not isinstance(obj['resource_caps'],list) or len(obj['resource_caps'])>2 or
+        any(not hexa(c,64) for c in obj['resource_caps']) or len(set(obj['resource_caps']))!=len(obj['resource_caps'])):raise GatewayError('UNSUPPORTED_REQUEST')
     return dict(obj)
 
 def validate_source(text,request):
@@ -67,7 +67,7 @@ def validate_source(text,request):
             not isinstance(i['image_ref'],str) or not re.fullmatch(r'i_[a-f0-9]{32}',i['image_ref']) for i in images)):
             raise ValueError()
         refs=[i['image_ref'] for i in images]
-        if bool(refs)!=bool(request['resource_caps']):raise ValueError()
+        if not len(refs)<=len(request['resource_caps'])<=len(refs)+1:raise ValueError()
         if any(r['images']!=(refs if r['seq']==obj['target_seq'] else []) for r in rows):raise ValueError()
         target=next(r for r in rows if r['seq']==obj['target_seq'])
         for key in ('web_anchor','meme_question'):
@@ -101,6 +101,12 @@ def fit(obj,request,system,budget,suffix='',history=()):
     from .token_budget import dialog_text
     obj=copy.deepcopy(obj);required=required_seqs(obj,request)
     while True:
+        # Optional members share the 20%/2304-byte cap with future memory.
+        core=copy.deepcopy(obj);core['member_candidates']=[]
+        core['messages']=[r for r in core['messages'] if r['seq'] in required];close_refs(core)
+        extra_limit=min(2304,budget.limit//5,max(0,budget.limit-budget.usage(system+suffix,dialog_text(list(history)+[dict(role='user',content=canonical(core))]))))
+        while obj['member_candidates'] and (len(canonical(obj['member_candidates']).encode())>min(768,extra_limit)):
+            obj['member_candidates'].pop()
         close_refs(obj);body=canonical(obj)
         try:
             budget.check(system+suffix,dialog_text(list(history)+[dict(role='user',content=body)]))
@@ -108,12 +114,17 @@ def fit(obj,request,system,budget,suffix='',history=()):
         except GatewayError as error:
             if error.code!='INPUT_TOO_LONG':raise
             index=next((i for i,r in enumerate(obj['messages']) if r['seq'] not in required),None)
-            if index is None:raise
-            obj['messages'].pop(index)
+            if index is not None:obj['messages'].pop(index)
+            elif obj['member_candidates']:obj['member_candidates'].pop()
+            else:raise
 
 def manifest(obj):
-    return dict(seqs=[r['seq'] for r in obj['messages']],member_refs=sorted({r['member_ref'] for r in obj['messages']}),
+    value=dict(seqs=[r['seq'] for r in obj['messages']],member_refs=sorted({r['member_ref'] for r in obj['messages']}),
         fact_refs=[],images=copy.deepcopy(obj['images']),eligible_seq=list(obj['eligible_seq']))
+    if obj['member_candidates']:
+        value['member_candidates']=copy.deepcopy(obj['member_candidates'])
+        value['member_refs']=sorted(set(value['member_refs'])|{c['member_ref'] for c in obj['member_candidates']})
+    return value
 
 def plan(raw,output,question,request,effective,catalog=None,candidates=()):
     """Validate core first; aux never repairs broken core or carries future powers."""
@@ -141,14 +152,16 @@ def plan(raw,output,question,request,effective,catalog=None,candidates=()):
         if decision=='error':return decision,result,None
         for key in ('response_to_seq','mention','memory_proposals'):
             if key not in obj:LOG.info('V2_AUX category=missing_%s',key)
-        if obj.get('mention') is not None:LOG.info('V2_AUX category=mention_unavailable')
+        if obj.get('mention') is not None:
+            from .members import attach_mention
+            result=attach_mention(result,obj['mention'],obj['bubbles'],effective,output)
         if obj.get('memory_proposals',[])!=[]:LOG.info('V2_AUX category=memory_unavailable')
         response=obj.get('response_to_seq')
         if request['must_reply']:response=request['target_seq']
         elif not integer(response) or response not in effective['eligible_seq']:
             if response is not None:LOG.info('V2_AUX category=invalid_response_object')
             response=None
-        # LAP-29/30 are not delivered: mention and proposals cannot escape v2.
+        # Only validated typed member refs survive; memory remains unavailable.
         if result and result.fallback_reason:response=None
         return decision,result,response
     except (ValueError,TypeError,KeyError):
@@ -157,20 +170,26 @@ def plan(raw,output,question,request,effective,catalog=None,candidates=()):
         if result:result=ReplyPlan(result.kind,result.bubbles,result.canonical_text,result.limited,'v2_core_recovery')
         return decision,result,None
 
-def metadata(request,response_id,decision,result,effective,response_to=None):
+def metadata(request,response_id,decision,result,effective,response_to=None,member_receipt=None):
     value=dict(request=request,response_id=response_id,decision=decision,plan=result.metadata(response_id) if result else None,
         effective_digest=sha(effective),manifest=manifest(effective),response_to_seq=response_to)
+    if member_receipt is not None:value['member_receipt']=member_receipt
     value['plan_hash']=sha(value)
     return value
 
 def verify(value,request,response_id,text,output,source):
     from .reply_plan import trusted_plan
-    if not isinstance(value,dict) or set(value)!={'request','response_id','decision','plan','effective_digest','manifest','response_to_seq','plan_hash'}:raise ValueError('Missing v2 identity')
+    if not isinstance(value,dict) or set(value)-{'member_receipt'}!={'request','response_id','decision','plan','effective_digest','manifest','response_to_seq','plan_hash'}:raise ValueError('Missing v2 identity')
     if value['request']!=request or value['response_id']!=response_id or sha({k:v for k,v in value.items() if k!='plan_hash'})!=value['plan_hash']:raise ValueError('v2 identity mismatch')
     m=value['manifest']
-    if not isinstance(m,dict) or set(m)!={'seqs','member_refs','fact_refs','images','eligible_seq'}:raise ValueError('manifest')
+    if not isinstance(m,dict) or set(m)-{'member_candidates'}!={'seqs','member_refs','fact_refs','images','eligible_seq'}:raise ValueError('manifest')
     if not isinstance(m['seqs'],list) or len(set(m['seqs']))!=len(m['seqs']) or any(not integer(s) for s in m['seqs']):raise ValueError('seqs')
     effective=copy.deepcopy(source);effective['messages']=[r for r in effective['messages'] if r['seq'] in m['seqs']];close_refs(effective)
+    if 'member_candidates' in m:
+        from .members import valid_candidates
+        if len(request['resource_caps'])!=len(source['images'])+1:raise ValueError('Unexpected member material')
+        effective['member_candidates']=copy.deepcopy(valid_candidates(m['member_candidates']))
+    if 'member_receipt' in value and not hexa(value['member_receipt'],64):raise ValueError('Member receipt')
     if m['images']:
         from .vision import NORMALIZER,MAX_BLOB
         if not isinstance(m['images'],list) or len(m['images'])!=1 or len(source['images'])!=1:raise ValueError('images')
@@ -196,4 +215,7 @@ def verify(value,request,response_id,text,output,source):
         return None
     result=trusted_plan(value['plan'],text,response_id,output)
     if result.fallback_reason=='metadata_missing_or_mismatch' or value['decision']=='silent':raise ValueError('plan')
+    if any(p.mention_ref is not None for p in result.parts):
+        candidates={c['member_ref'] for c in effective['member_candidates']}
+        if not value.get('member_receipt') or any(p.mention_ref not in candidates for p in result.parts if p.mention_ref):raise ValueError('Mention identity')
     return result

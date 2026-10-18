@@ -29,7 +29,9 @@ async def configure():
         'identifier':False,'group_name_display':False,'datetime_system_prompt':False})
     config['provider_settings']['proactive_capability']['add_cron_tools']=False
     config['provider_settings']['file_extract']['enable']=False
-    persona=compose_persona((ROOT/'config/persona.md').read_text(encoding='utf-8'),settings['output'],settings['web'],settings['participation'],settings['memes'])
+    from qqbot_gateway.members import suspend_unverified
+    settings['members']=suspend_unverified(settings)
+    persona=compose_persona((ROOT/'config/persona.md').read_text(encoding='utf-8'),settings['output'],settings['web'],settings['participation'],settings['memes'],settings.get('vision'),settings.get('members'))
     from qqbot_gateway.meme_catalog import MemeCatalog
     catalog=MemeCatalog(ROOT,settings['memes'])
     persona_id=session_version(persona+('\n'+catalog.fingerprint() if settings['memes']['enabled'] else ''),settings)

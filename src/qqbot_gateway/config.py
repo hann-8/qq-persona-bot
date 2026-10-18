@@ -29,6 +29,7 @@ def export_legacy_config(path):
         if hashlib.sha256(original).hexdigest()!=source_digest:raise ValueError('Configuration changed')
         if isinstance(value.get('participation'),dict):value['participation'].pop('attention',None)
         value.pop('vision',None)
+        value.pop('members',None)
         content=yaml.safe_dump(value,allow_unicode=True,sort_keys=False).encode('utf-8')
         directory=root/'state/config-exports';directory.mkdir(parents=True,exist_ok=True)
         tag=uuid.uuid4().hex
@@ -54,7 +55,7 @@ def activate_legacy_config(path,review,source_digest,legacy_digest,confirmation)
         original=path.read_bytes();content=review.read_bytes()
         if hashlib.sha256(original).hexdigest()!=source_digest or hashlib.sha256(content).hexdigest()!=legacy_digest:raise ValueError('Configuration changed')
         data=yaml.safe_load(content);normalize_settings(data)
-        if 'attention' in data.get('participation',{}) or 'vision' in data:raise ValueError('Not legacy compatible')
+        if 'attention' in data.get('participation',{}) or 'vision' in data or 'members' in data:raise ValueError('Not legacy compatible')
         backup=review.with_name(review.stem+'.activation-original.yaml')
         with backup.open('xb') as f:f.write(original)
         temporary=path.with_name(path.name+'.legacy-'+uuid.uuid4().hex+'.tmp')
@@ -91,6 +92,8 @@ class GateConfig:
     attention_enabled: bool = False
     media_catalog: object = None
     vision_enabled: bool = False
+    members_enabled: bool = False
+    members_config: object = None
 
     def __post_init__(self):
         if self.participation_mode not in ('mentions','free'):raise ValueError('Invalid participation mode')
@@ -117,6 +120,8 @@ def normalize_settings(raw):
     if type(version) is not int or version not in (1, 2, 3):
         raise ValueError('Unsupported schema_version')
     data['schema_version'] = 3
+    from .members import validate_config as validate_members
+    data['members']=validate_members(data.get('members',{}))
     from .vision import validate_config
     data['vision']=validate_config(data.get('vision',{}))
     from .web_policy import validate_web
@@ -283,6 +288,7 @@ def load_gate_config(path):
     if not isinstance(groups, list) or not isinstance(admins, list):
         raise ValueError('Groups/admins must be explicit lists')
     from .meme_catalog import MemeCatalog
+    from .members import suspend_unverified
     return GateConfig(
         bot_qq=data['bot']['qq'], allowed_groups=frozenset(groups), admin_users=frozenset(admins),
         inbound_token=tokens['onebot_inbound'], upstream_token=tokens['onebot_upstream'],
@@ -291,6 +297,8 @@ def load_gate_config(path):
         blocked_users=frozenset(data['access']['blocked_users']),
         participation_mode=data['participation']['mode'],
         vision_enabled=data['vision']['enabled'],
+        members_enabled=False,
+        members_config=suspend_unverified(data),
         attention_enabled=data['participation']['mode']=='free' and data['participation']['attention']['enabled'],
         media_catalog=MemeCatalog(root,data['memes']) if data['memes']['enabled'] else None,
     )
@@ -356,6 +364,8 @@ def save_settings(path, data, expected_digest):
         if digest != expected_digest:
             raise ValueError('Configuration changed; reload before saving')
         normalized = normalize_settings(data)
+        from .members import require_production as require_members
+        require_members(normalized)
         from .ssh_transport import secrets_path
         secrets_path(root,normalized['llm']['profiles']['ollama_ssh']['access_file'])
         if not (root / normalized['secrets_file']).resolve().is_relative_to(root / 'secrets'):

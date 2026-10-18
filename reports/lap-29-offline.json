@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "unit_tests": 355,
+  "framework_combinations": 52,
+  "framework_cases": 790,
+  "member_combinations": 32,
+  "real_model_calls": 0,
+  "real_qq_calls": 0,
+  "real_bot_operations": 0,
+  "production_eligible": false,
+  "count_freshness_verified": false,
+  "capability_state": "offline_passed",
+  "activation_error": "capability_unverified"
+}

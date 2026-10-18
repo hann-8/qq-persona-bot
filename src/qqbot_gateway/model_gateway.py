@@ -39,6 +39,7 @@ class Job:
     future: asyncio.Future
     group_request: dict | None = None
     vision: object = None
+    prepare_deadline: float | None = None
     started: asyncio.Event = field(default_factory=asyncio.Event)
     cancelled: asyncio.Event = field(default_factory=asyncio.Event)
 
@@ -97,7 +98,7 @@ class ModelQueue:
             self.release_image(job)
             if not job.future.done():job.future.set_exception(GatewayError('BACKEND_UNAVAILABLE'))
 
-    async def submit(self,system,prompt,request_id,group_request=None,vision=None):
+    async def submit(self,system,prompt,request_id,group_request=None,vision=None,prepare_deadline=None):
         if self.close_task is not None:raise GatewayError('SHUTTING_DOWN')
         await self.cleanup_admission()
         if self.state in ('AUTH_REQUIRED','QUOTA_EXHAUSTED','CLEANUP_FAILED','REMOTE_RESULT_UNKNOWN'):
@@ -106,6 +107,7 @@ class ModelQueue:
         job=Job(system,prompt,request_id,time.monotonic()+self.wait,asyncio.get_running_loop().create_future())
         job.group_request=group_request
         job.vision=vision
+        job.prepare_deadline=prepare_deadline
         try:self.queue.put_nowait(job)
         except asyncio.QueueFull:raise GatewayError('QUEUE_FULL') from None
         if vision and vision.lease:vision.lease.owned=True
@@ -137,8 +139,11 @@ class ModelQueue:
             else:call=self.runner.run(job.system,job.prompt,job.request_id)
             from .vision import CURRENT
             image_token=CURRENT.set(job.vision)
+            from .members import PREPARE_DEADLINE
+            prep_token=PREPARE_DEADLINE.set(job.prepare_deadline)
             try:task=asyncio.create_task(call)
-            finally:CURRENT.reset(image_token)
+            finally:
+                CURRENT.reset(image_token);PREPARE_DEADLINE.reset(prep_token)
             cancel=asyncio.create_task(job.cancelled.wait())
             try:
                 done,_=await asyncio.wait((task,cancel),return_when=asyncio.FIRST_COMPLETED)
@@ -172,7 +177,7 @@ class ModelQueue:
                 self.active=False
 
 
-def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,root=None,output=None,memes=None,v2=None,materials=None):
+def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,root=None,output=None,memes=None,v2=None,materials=None,members=None):
     budget=budget or InputBudget()
     vision_bytes=0
     output=DEFAULTS | {'max_reply_chars':max_reply_chars} | (output or {})
@@ -299,14 +304,32 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
         if is_media and (memes is None or not memes.cfg['enabled']):raise GatewayError('UNSUPPORTED_REQUEST')
         candidates=[]
         native_image=None
+        member_receipt=None;prepare_deadline=None
         question=json.loads(prompt)[-1]['content']
         if is_group:
             snapshot=json.loads(question)
+            if group_request['version']==2 and len(group_request['resource_caps'])>len(snapshot['images']):
+                prepare_deadline=time.monotonic()+15
+                try:
+                    if members is None:raise ValueError('Member service unavailable')
+                    resolved=await members.resolve(group_request,request[V2_SOURCE],prepare_deadline)
+                    snapshot['member_candidates']=resolved['candidates']
+                    member_receipt=resolved['receipt']
+                except (ValueError,TypeError,TimeoutError,OSError,aiohttp.ClientError):
+                    snapshot['member_candidates']=[]
+                from .members import POLICY as MEMBER_POLICY
+                system=system.replace('mention必须null、memory_proposals必须[]','memory_proposals必须[]')+MEMBER_POLICY
+                if not (v2 or {}).get('mentions_enabled',False):system+='本轮受控@关闭，mention必须null。\n'
+                from .turn_v2 import fit
+                dialog=json.loads(prompt);dialog[-1]['content']=fit(snapshot,group_request,system,budget,suffix,dialog[:-1])
+                prompt=json.dumps(dialog,ensure_ascii=False,separators=(',',':'))
+                snapshot=json.loads(dialog[-1]['content'])
             if group_request['version']==2 and snapshot['images']:
                 from .vision import POLICY,NOTICE,CURRENT,text_budget
                 from .turn_v2 import fit
                 from .attention import canonical
-                deadline=time.monotonic()+15
+                deadline=prepare_deadline or time.monotonic()+15
+                prepare_deadline=deadline
                 try:
                     if materials is None:raise ValueError('MATERIAL_UNAVAILABLE')
                     native_image,descriptor=await asyncio.wait_for(materials.resolve(group_request,snapshot,deadline),max(.001,deadline-time.monotonic()))
@@ -374,7 +397,7 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
                 candidates.pop()
             system+=instruction
         started=time.monotonic()
-        result=await queue.submit(system,prompt,request[TRACE],group_request,vision=native_image)
+        result=await queue.submit(system,prompt,request[TRACE],group_request,vision=native_image,prepare_deadline=prepare_deadline)
         backend_result=result if isinstance(result,BackendResult) else BackendResult(result)
         result=backend_result.text
         response_id='chatcmpl-'+request[TRACE]
@@ -402,7 +425,10 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
             limited=plan.limited if plan else False
             if group_request['version']==2:
                 from .turn_v2 import metadata as v2_metadata
-                metadata['qqbot_group_plan']=v2_metadata(group_request,response_id,decision,plan,snapshot,response_to)
+                if plan and not (v2 or {}).get('mentions_enabled',False):
+                    from dataclasses import replace
+                    plan=replace(plan,prepared_parts=tuple(replace(p,mention_ref=None) for p in plan.parts)) if any(p.mention_ref for p in plan.parts) else plan
+                metadata['qqbot_group_plan']=v2_metadata(group_request,response_id,decision,plan,snapshot,response_to,member_receipt)
                 LOG.info('ATTENTION trace=%s stage=model_done decision=%s elapsed_ms=%s',request[TRACE],decision,int((time.monotonic()-started)*1000))
             else:metadata['qqbot_group_plan']=group_metadata(group_request,response_id,decision,plan)
             queue.last_usage=dict(queue.last_usage,trigger=group_request.get('addressing',group_request.get('trigger')),decision=decision)
@@ -468,16 +494,19 @@ def main():
     runner.memes=memes
     queue=ModelQueue(runner,llm['queue_limit'],llm['queue_wait_seconds'])
     logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(message)s')
+    from .members import suspend_unverified,MemberClient
+    settings['members']=suspend_unverified(settings)
     v2=None
-    if settings['participation']['mode']=='free' and settings['participation']['attention']['enabled'] or settings['vision']['enabled']:
+    if settings['participation']['mode']=='free' and settings['participation']['attention']['enabled'] or settings['vision']['enabled'] or settings['members']['enabled']:
         from .persona import compose_persona,session_version
         from .reply_plan import digest
-        persona=compose_persona((root/'config/persona.md').read_text(encoding='utf-8'),settings['output'],settings['web'],settings['participation'],settings['memes'],settings.get('vision'))
+        persona=compose_persona((root/'config/persona.md').read_text(encoding='utf-8'),settings['output'],settings['web'],settings['participation'],settings['memes'],settings.get('vision'),settings['members'])
         persona_id=session_version(persona+('\n'+memes.fingerprint() if memes.cfg['enabled'] else ''),settings)
-        v2=dict(mode=settings['participation']['mode'],config_version=digest(persona_id),aliases=settings['participation']['attention']['aliases'])
+        v2=dict(mode=settings['participation']['mode'],config_version=digest(persona_id),aliases=settings['participation']['attention']['aliases'],mentions_enabled=settings['members']['mentions_enabled'])
     from .vision import MaterialClient,context_token
     materials=MaterialClient(f"http://127.0.0.1:{settings['onebot']['port']}/context/vision/resolve",context_token(root),settings['vision']['input_reserve_tokens']) if settings['vision']['enabled'] else None
-    web.run_app(application(queue,tokens['model_gateway'],root/'state/router-ready.json',budget,settings['output']['max_reply_chars'],root,settings['output'],memes,v2,materials),host=llm['host'],port=llm['port'],
+    member_client=MemberClient(f"http://127.0.0.1:{settings['onebot']['port']}/context/members",context_token(root)) if settings['members']['enabled'] else None
+    web.run_app(application(queue,tokens['model_gateway'],root/'state/router-ready.json',budget,settings['output']['max_reply_chars'],root,settings['output'],memes,v2,materials,member_client),host=llm['host'],port=llm['port'],
                 access_log=None,handler_cancellation=True)
 
 

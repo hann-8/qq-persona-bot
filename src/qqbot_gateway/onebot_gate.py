@@ -53,7 +53,10 @@ def allowed_action(event, config):
         return qq_id(params.get('user_id')) == config.bot_qq
     if action in ('get_login_info', 'get_version_info', 'get_status', 'get_group_list'):
         return True
-    if action in ('get_group_info', 'get_group_member_info', 'get_group_member_list', 'send_group_msg'):
+    if action=='get_group_member_info':
+        return qq_id(params.get('group_id')) in config.allowed_groups and qq_id(params.get('user_id'))==config.bot_qq
+    if action=='get_group_member_list':return False
+    if action in ('get_group_info', 'send_group_msg'):
         return qq_id(params.get('group_id')) in config.allowed_groups and (action!='send_group_msg' or allowed_segments(params.get('message'),config))
     if action == 'send_msg':
         return params.get('message_type') == 'group' and qq_id(params.get('group_id')) in config.allowed_groups and allowed_segments(params.get('message'),config)
@@ -132,7 +135,10 @@ class OneBotGate:
         self.connection_id=secrets.token_hex(32)
         from .vision import Materials,context_token
         self.materials=Materials()
-        self.context_token=context_token(root) if root and config.vision_enabled else None
+        from .members import Members
+        self.members=Members(config.members_config or {'enabled':config.members_enabled})
+        self.mention_pending={}
+        self.context_token=context_token(root) if root and (config.vision_enabled or config.members_enabled) else None
         if self.context_token and self.context_token in (config.inbound_token,config.upstream_token,self.admin_token):
             raise ValueError('Independent context token required')
 
@@ -173,7 +179,7 @@ class OneBotGate:
         self.online = data.get('online') if isinstance(data, dict) and type(data.get('online')) is bool else None
         self.online_at = time.time()
         if self.online is not True and previous is True:self.connection_id=secrets.token_hex(32)
-        if self.online is not True:self.materials.clear()
+        if self.online is not True:self.materials.clear();self.members.clear();self.mention_pending.clear()
         self.publish_connection()
 
     async def _status_loop(self, downstream):
@@ -217,7 +223,7 @@ class OneBotGate:
                     self.failures = 0
                     self.connected = True
                     self.connection_id=secrets.token_hex(32);self.publish_connection()
-                    self.materials.clear()
+                    self.materials.clear();self.members.clear();self.mention_pending.clear()
                     self.ever_connected = True
                     LOG.info('CHANNEL_CONNECTED_SELF_ID_VERIFIED')
                     pending = set()
@@ -240,7 +246,7 @@ class OneBotGate:
             # metadata error itself is why the channel is closing.
             self.active = None
             self.connected = False
-            self.materials.clear()
+            self.materials.clear();self.members.clear();self.mention_pending.clear()
             self.online = None
             self.online_at = None
             self.health_pending.clear()
@@ -271,7 +277,7 @@ class OneBotGate:
             if admitted_message(event, self.config):
                 if self.root and stopping(self.root):continue
                 if self.store.reserve(event):
-                    if (self.config.participation_mode=='mentions' and not self.config.vision_enabled and
+                    if (self.config.participation_mode=='mentions' and not self.config.vision_enabled and not self.config.members_enabled and
                         all(s['type'] in ('text','at') for s in event['message']) and
                         not any(k.startswith('qqbot_') for k in event)):
                         # Unchanged legacy text-only frame. Attachments and
@@ -289,14 +295,19 @@ class OneBotGate:
                         elif kind=='reply':reference=str(data.get('id',''))[:128]
                         elif kind!='at':media=True;safe.append({'type':'text','data':{'text':'[非文本未解析]'}})
                     at_ids=[qq_id(s['data'].get('qq')) or 'other_member' for s in event['message'] if s['type']=='at'][:8] if self.config.attention_enabled else []
+                    member_cap=self.members.issue(event,self.connection_id) if self.config.members_enabled else None
                     image=self.materials.issue(event,self.connection_id) if self.config.vision_enabled else None
                     image_text=''.join(s['data'].get('text','') for s in event['message'] if s['type']=='text' and isinstance(s['data'].get('text'),str))
                     event={k:v for k,v in event.items() if k in ('post_type','message_type','sub_type','self_id','group_id','user_id','message_id','time','font','sender')}
                     event=dict(event,message=safe,raw_message='',qqbot_reference=reference,qqbot_media=media,
                                qqbot_connection=self.connection_id)
+                    if member_cap:event['qqbot_member_cap']=member_cap
                     if image:event['qqbot_image']=image;event['qqbot_text']=image_text
                     if self.config.attention_enabled:event['qqbot_at_ids']=at_ids
                     await upstream.send_json(event)
+            elif (event.get('post_type')=='notice' and event.get('notice_type') in ('group_increase','group_decrease') and
+                  qq_id(event.get('self_id'))==self.config.bot_qq and qq_id(event.get('group_id')) in self.config.allowed_groups):
+                self.members.invalidate(qq_id(event['group_id']))
             elif (event.get('post_type') == 'meta_event' and
                   event.get('meta_event_type') in ('heartbeat', 'lifecycle') and
                   qq_id(event.get('self_id')) == self.config.bot_qq):
@@ -317,7 +328,12 @@ class OneBotGate:
                     if not future.done():future.set_result(None)
                 elif key in pending:
                     pending.remove(key)
-                    await upstream.send_str(frame.data)
+                    # Strip any transport-supplied claim; only this gate can attest @.
+                    applied=self.mention_pending.pop(key,None)
+                    if isinstance(event.get('data'),dict):
+                        event['data'].pop('qqbot_mention_applied',None)
+                        if applied is not None:event['data']['qqbot_mention_applied']=applied
+                    await upstream.send_json(event)
 
     async def _outgoing(self, upstream, downstream, pending):
         async for frame in upstream:
@@ -330,9 +346,23 @@ class OneBotGate:
             if not isinstance(event, dict):
                 continue
             key = echo_key(event['echo']) if 'echo' in event else None
-            if allowed_action(event, self.config) and key is not None and key not in self.health_pending and key not in self.admin_pending and len(pending) < 128:
+            authorized=False
+            params=event.get('params',{})
+            if isinstance(params,dict) and 'qqbot_mention_permission' in params:
+                try:
+                    if event.get('action')!='send_group_msg' or set(params)!={'group_id','message','qqbot_mention_permission'}:raise ValueError()
+                    message,applied=self.members.consume(params['qqbot_mention_permission'],qq_id(params.get('group_id')),params['message'],self.connection_id,self.member_allowed)
+                    if key is None or key in pending or len(pending)>=128:raise ValueError()
+                    event=dict(event,params=dict(group_id=params['group_id'],message=message))
+                    authorized=True
+                except (ValueError,TypeError,KeyError):
+                    await upstream.send_json(dict(status='failed',retcode=1403,message='MENTION_PERMISSION_DENIED',data=None,echo=event.get('echo')))
+                    continue
+            if (authorized or allowed_action(event, self.config)) and key is not None and key not in self.health_pending and key not in self.admin_pending and len(pending) < 128:
                 pending.add(key)
-                await downstream.send_str(frame.data)
+                if authorized:self.mention_pending[key]=applied
+                elif event.get('action') in ('send_msg','send_group_msg'):self.mention_pending[key]=False
+                await downstream.send_json(event)
             else:
                 await upstream.send_json({'status': 'failed', 'retcode': 1403,
                                           'message': 'SCOPE_DENIED_OR_PENDING_LIMIT',
@@ -344,6 +374,8 @@ class OneBotGate:
         async def health(request):return web.json_response(self.status())
         app.router.add_get('/health', health)
         app.router.add_post('/admin/memes/favorites',self.favorites)
+        for operation in ('bind','resolve','permit'):
+            app.router.add_post('/context/members/'+operation,self.resolve_members)
         app.router.add_post('/context/vision/resolve',self.resolve_vision)
         app.router.add_post('/context/vision/bind',self.resolve_vision)
 
@@ -351,10 +383,49 @@ class OneBotGate:
             if self.active is not None:
                 await self.active.close(code=1001, message=b'SHUTDOWN')
             self.store.close()
-            self.materials.clear()
+            self.materials.clear();self.members.clear();self.mention_pending.clear()
 
         app.on_cleanup.append(cleanup)
         return app
+
+    def member_allowed(self,identity):
+        bot,group,sender,_=identity
+        return (self.config.members_enabled and self.connected and self.online is True and
+            not (self.root and stopping(self.root)) and bot==self.config.bot_qq and
+            group in self.config.allowed_groups and sender not in self.config.blocked_users and sender!=bot)
+
+    async def member_rpc(self,action,params):
+        # This private method is never exposed as an action-param HTTP proxy.
+        if action not in ('get_group_info','get_group_member_list') or self.active is None:raise ValueError('Fixed member RPC')
+        echo='gate-members-'+secrets.token_hex(32);key=echo_key(echo)
+        future=asyncio.get_running_loop().create_future();self.admin_pending[key]=future
+        try:
+            await self.active.send_json(dict(action=action,params=params,echo=echo))
+            result=await asyncio.wait_for(future,3)
+            if result.get('status')!='ok' or result.get('retcode')!=0:raise ValueError('Member RPC failed')
+            return result.get('data')
+        finally:self.admin_pending.pop(key,None)
+
+    async def resolve_members(self,request):
+        if (request.remote!='127.0.0.1' or not self.context_token or len(request.headers.getall('Authorization',[]))!=1 or
+            not secrets.compare_digest(request.headers.get('Authorization',''),'Bearer '+self.context_token)):
+            raise web.HTTPUnauthorized(text='AUTH_FAILED')
+        if not self.config.members_enabled or not self.connected or self.online is not True or self.root and stopping(self.root):
+            raise web.HTTPServiceUnavailable(text='MEMBERS_CAPABILITY_UNVERIFIED')
+        from .reply_plan import _pairs
+        try:
+            if request.content_length is None or request.content_length>131072:raise ValueError()
+            body=json.loads(await request.text(),object_pairs_hook=_pairs)
+            if request.path.endswith('/bind'):
+                self.members.bind(body,self.connection_id,self.member_allowed);result={'bound':True}
+            elif request.path.endswith('/permit'):
+                result={'permit':self.members.permit(body,self.connection_id,self.member_allowed)}
+            else:
+                async with asyncio.timeout(15):
+                    result=await self.members.resolve(body,self.connection_id,self.member_allowed,self.member_rpc)
+            return web.json_response(result)
+        except (ValueError,TypeError,KeyError,TimeoutError,ConnectionError):
+            raise web.HTTPBadRequest(text='MEMBER_MATERIAL_UNAVAILABLE') from None
 
     async def resolve_vision(self,request):
         if (request.remote!='127.0.0.1' or not self.context_token or
