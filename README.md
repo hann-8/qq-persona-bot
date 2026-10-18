@@ -172,3 +172,16 @@ web设置进入会话版本，重启加载后新建当前上下文，旧历史�
 模型输出允许完整JSON围栏、缺省可选字段、单字符串bubbles等偏差；真实@的安全普通文字可降级为单条，坏表情选择不丢弃可用文字。工具标记、重复键、损坏内部JSON、请求/响应身份不匹配仍拒绝。ambient不会因普通文字降级扩大自动发言；只发送登记表情，不开放模型任意图片路径。
 
 本轮未改本机配置或接管运行实例，需正常关闭/启动加载代码。离线验证与已知限制见[修复报告](reports/lap-25-2026-10-18.md)和[任务交接](tracks/laptop-workbuddy/tasks/LAP-25/HANDOFF.md)，真实QQ与模型效果待试用确认。
+
+
+## LAP-31：CLI 清理诊断与未决保护
+
+31A已实现：原生成结果与清理结果分开记录；每次请求只有一个受持有的cleanup task，取消和关闭接管同一任务。`llm.cleanup_seconds`仍默认5秒、范围1..60，现在表示整次kill、等待及落盘的总deadline。个别身份无权访问不会跳过其他已知身份；PID复用的新进程不操作。超时线程仍在运行时保持阻断，旧答案不迟发、不重试。
+
+零推理本机诊断：在项目目录运行 `.venv/Scripts/python.exe scripts/manage.py cleanup status` 或 `cleanup check`。check只核对已登记的PID+创建身份，不kill、不调用模型、不补发；每5秒最多一次检查、最多等待2秒。`/health`的`cli_cleanup`仅含固定分类、数量、耗时和随机trace。正常legacy成功仍允许下一请求；`observed_empty/observed_only`只证明已知观察集合退出，不能解除已经发生的清理故障阻断。
+
+忽略的`state/cli-cleanup/`保留最多1个未决请求、128个创建身份及32份已解决摘要；单文件不超过32KiB，模块不超过2MiB。坏账本、超限、磁盘失败或覆盖不明均拒绝新CLI；不删除unknown腾位置，不保存argv/env/提示词/群消息。重启重读未决状态，历史`job_complete`标签不能直接解锁。不要通过删台账、切后端或回旧代码绕过阻断。回滚前确认cleanup task结束并保留未决身份；旧版不认识此保护时须保持停机，直到独立确认完整退出。
+
+31B仍有实现/验收差额：Windows自造进程的执行前Job归属、归零、失败回收与句柄关闭有离线证据，但强化试验发现breakaway创建请求仍被接受，尚未证明该子进程是否仍属目标Job；禁止breakaway/完整覆盖门槛未通过。生产CLI仍走原asyncio启动路径，未接入执行前Job容器，也未授权真实CLI组合验证；因此没有完整自动恢复能力，不能称清理问题完整解决。后续需按[LAP-31交接](tracks/laptop-workbuddy/tasks/LAP-31/HANDOFF.md)补生产创建/管道适配和验证；本轮不自动启用。Ollama远端未知解除合同不变。
+
+独立验证入口 `.venv/Scripts/python.exe -X utf8 scripts/verify_lap31.py` 只用替身/自造受管进程，自动使用既有框架Python执行实际run_agent/两runner底层替身回归，只写`reports/lap-31-*`，不运行旧verify主程序。[报告](reports/lap-31-2026-10-18.md)区分31A与31B。本轮没有改本机配置、启停或登录真实bot，也没有真实模型/QQ调用。

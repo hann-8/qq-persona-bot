@@ -14,6 +14,8 @@ def safe_line(component,line):
         match=re.search(r'\bCHANNEL_METADATA_WRITE_FAILED code=(?:ACCESS_DENIED|SHARING_VIOLATION|LOCK_VIOLATION|IO_ERROR)$',line.rstrip())
         if match:return match.group(0)
     if component=='model':
+        match=re.search(r'\bCLI_CLEANUP trace=[a-f0-9]{10} generation=(?:pending|success|cancelled|BACKEND_UNAVAILABLE|AUTH_REQUIRED|QUOTA_EXHAUSTED|RATE_LIMITED|INPUT_TOO_LONG|MODEL_CONFIG_UNSUPPORTED|TOOL_ISOLATION_FAILED|MODEL_TIMEOUT|PROTOCOL_ERROR|CLEANUP_FAILED) outcome=(?:active|observed_empty|owned_alive|identity_unknown) coverage=(?:observed_only|job_complete) reason=(?:none|access_denied|wait_timeout|identity_changed|observation_incomplete|cleanup_in_progress|ledger_error|capacity_exceeded) count=(?:[0-9]|[1-9][0-9]|1[01][0-9]|12[0-8]) elapsed_ms=[0-9]{1,10}$',line.rstrip())
+        if match:return match.group(0)
         match=re.search(r'\b(CLI_START|REQUEST_ACCEPTED|REQUEST_FAILED) request_id=([a-z0-9]{10})(?: (attempt=1|code=[A-Z_]+))?$',line.rstrip())
         if match:return match.group(0)
     return None

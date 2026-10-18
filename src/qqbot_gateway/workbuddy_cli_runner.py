@@ -10,6 +10,7 @@ import tempfile
 
 import psutil
 
+from .cleanup_identity import CleanupOwner
 from .backends import BackendResult, numeric_usage
 from .errors import GatewayError, classify_error
 from .text_safety import has_tool_markup
@@ -121,6 +122,24 @@ class CLIRunner:
         if not self.node.is_file() or hashlib.sha256(bundle.read_bytes()).hexdigest() != lock['cli']['headless_sha256']:
             raise GatewayError('BACKEND_UNAVAILABLE')
 
+    def cleanup_owner(self):
+        owner = getattr(self, '_cleanup_owner', None)
+        # Offline harnesses replace root after construction; initialize lazily.
+        if owner is None:
+            owner = self._cleanup_owner = CleanupOwner(self.root)
+        return owner
+
+    def cleanup_status(self):
+        return self.cleanup_owner().status()
+
+    async def cleanup_check(self):
+        return await self.cleanup_owner().check()
+
+    async def cleanup_close(self):
+        owner = self.cleanup_owner()
+        if owner.task is not None:
+            await owner.join()
+
     async def run(self, system, prompt, request_id):
         self.budget.check(system, prompt)
         parent = self.root/'runtime/requests'
@@ -157,6 +176,8 @@ class CLIRunner:
                 'CODEBUDDY_MEMORY_EXTRACTION_DISABLED':'1',
                 'CODEBUDDY_MEMORY_RELEVANCE_DISABLED':'1',
             })
+            owner = self.cleanup_owner()
+            owner.reserve(request_id)
             self.attempts += 1
             LOG.info('CLI_START request_id=%s attempt=1',request_id)
             try:
@@ -164,7 +185,14 @@ class CLIRunner:
                     stdin=asyncio.subprocess.PIPE,stdout=asyncio.subprocess.PIPE,stderr=asyncio.subprocess.PIPE,
                     limit=512*1024,
                     creationflags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0)
-            except OSError:
+            except BaseException as error:
+                # A cancelled spawn has no provable root identity: retain unknown.
+                if not isinstance(error, OSError):owner.reason('observation_incomplete')
+                empty = asyncio.create_task(asyncio.sleep(0))
+                owner.begin(None, [], empty, None,
+                            'cancelled' if isinstance(error, asyncio.CancelledError) else 'BACKEND_UNAVAILABLE', self.cleanup_seconds)
+                clean = await owner.join()
+                if not clean:raise GatewayError('CLEANUP_FAILED') from None
                 raise GatewayError('BACKEND_UNAVAILABLE') from None
             parser = ResultParser(self.model)
             self.last_parameters = {'model':self.model,'effort_requested':self.reasoning_effort,
@@ -173,20 +201,17 @@ class CLIRunner:
             self.last_parameters['effort_evidence']='auto_default' if self.reasoning_effort=='auto' else 'awaiting_current_capabilities'
             exchange = ControlExchange('get_available_models') if self.reasoning_effort != 'auto' else None
             acknowledged = asyncio.Event()
-            tracked = {}
+            owned_root = None
             try:
                 owned_root = psutil.Process(process.pid)
-                owned_root.create_time()
+                owner.add(owned_root, root=True)
             except psutil.NoSuchProcess:
-                owned_root = None
+                pass
+            except psutil.Error:
+                owner.reason('observation_incomplete')
 
             def capture():
-                try:
-                    if owned_root is None or not owned_root.is_running():return
-                    for child in owned_root.children(recursive=True):
-                        tracked[(child.pid,child.create_time())] = child
-                except psutil.NoSuchProcess:
-                    pass
+                owner.observe(owned_root)
 
             async def monitor():
                 while True:
@@ -240,6 +265,9 @@ class CLIRunner:
                     payload = (json.dumps(user_message(prompt),ensure_ascii=False,separators=(',',':'))+'\n').encode('utf-8')
                 else:
                     payload = prompt.encode('utf-8')
+                # Identity/ledger overflow must fail before the only user input.
+                if owner.record['reasons'] or owner.io_failed:
+                    raise GatewayError('CLEANUP_FAILED')
                 self.user_messages_sent += 1
                 process.stdin.write(payload)
                 await process.stdin.drain()
@@ -247,31 +275,34 @@ class CLIRunner:
 
             watcher = asyncio.create_task(monitor())
             io = [asyncio.create_task(coro()) for coro in (read_stdout,read_stderr,write_stdin)]
+            generation = 'pending'
             try:
                 async with asyncio.timeout(self.timeout):
                     await asyncio.gather(*io,process.wait())
-                return BackendResult(parser.finish(process.returncode),parser.usage,self.last_parameters,'stop')
+                result = BackendResult(parser.finish(process.returncode),parser.usage,self.last_parameters,'stop')
+                generation = 'success'
+                return result
             except TimeoutError:
+                generation = 'MODEL_TIMEOUT'
                 raise GatewayError('MODEL_TIMEOUT') from None
+            except GatewayError as error:
+                generation = error.code
+                raise
+            except asyncio.CancelledError:
+                generation = 'cancelled'
+                raise
             except (ValueError,UnicodeError,BrokenPipeError,ConnectionResetError):
+                generation = 'PROTOCOL_ERROR'
                 raise GatewayError('PROTOCOL_ERROR') from None
+            except Exception:
+                generation = 'BACKEND_UNAVAILABLE'
+                raise GatewayError('BACKEND_UNAVAILABLE') from None
             finally:
-                capture()
-                watcher.cancel()
-                await asyncio.gather(watcher,return_exceptions=True)
-                for task in io:task.cancel()
-                await asyncio.gather(*io,return_exceptions=True)
                 self.last_protocol = parser.events
-                def cleanup():
-                    if owned_root is not None:
-                        tracked[(owned_root.pid,owned_root.create_time())] = owned_root
-                    for child in reversed(list(tracked.values())):
-                        try:
-                            if child.is_running():child.kill()
-                        except psutil.NoSuchProcess:pass
-                        except psutil.AccessDenied:return False
-                    _,alive = psutil.wait_procs(list(tracked.values()),timeout=max(.1,self.cleanup_seconds-1))
-                    return not alive
-                clean = await asyncio.shield(asyncio.to_thread(cleanup))
-                if not clean:raise GatewayError('CLEANUP_FAILED')
-                await asyncio.wait_for(process.wait(),timeout=1)
+                owner.begin(process, io, watcher, owned_root, generation, self.cleanup_seconds)
+                clean = await owner.join()
+                if not clean:
+                    # Keep original generation metadata; withhold any late answer.
+                    raise GatewayError('CLEANUP_FAILED')
+                if asyncio.current_task().cancelling():
+                    raise asyncio.CancelledError

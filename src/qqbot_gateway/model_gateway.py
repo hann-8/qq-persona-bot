@@ -52,19 +52,42 @@ class ModelQueue:
         self.last_error=None
         self.last_usage={}
         self.group_usage={}
+        self.close_task=None
+        if self.cleanup_status().get('blocked'):
+            self.state='CLEANUP_FAILED'
+
+    def cleanup_status(self):
+        method=getattr(self.runner,'cleanup_status',None)
+        return method() if method else {}
+
+    async def cleanup_admission(self):
+        if self.state=='CLEANUP_FAILED' or not self.active and self.cleanup_status().get('blocked'):
+            check=getattr(self.runner,'cleanup_check',None)
+            status=await check() if check else {'blocked':True}
+            self.state='CLEANUP_FAILED' if status.get('blocked',True) else 'not_probed'
 
     async def start(self):
         self.worker=asyncio.create_task(self._work())
 
     async def close(self):
+        if self.close_task is None:
+            self.close_task=asyncio.create_task(self._close())
+        await asyncio.shield(self.close_task)
+
+    async def _close(self):
         if self.worker:
             self.worker.cancel()
             await asyncio.gather(self.worker,return_exceptions=True)
+        close=getattr(self.runner,'cleanup_close',None)
+        if close:await close()
+        if self.cleanup_status().get('blocked'):self.state='CLEANUP_FAILED'
         while not self.queue.empty():
             job=self.queue.get_nowait()
             if not job.future.done():job.future.set_exception(GatewayError('BACKEND_UNAVAILABLE'))
 
     async def submit(self,system,prompt,request_id,group_request=None):
+        if self.close_task is not None:raise GatewayError('SHUTTING_DOWN')
+        await self.cleanup_admission()
         if self.state in ('AUTH_REQUIRED','QUOTA_EXHAUSTED','CLEANUP_FAILED','REMOTE_RESULT_UNKNOWN'):
             raise GatewayError(self.state)
         if self.queue.qsize()>=self.limit+(0 if self.active else 1):raise GatewayError('QUEUE_FULL')
@@ -89,6 +112,7 @@ class ModelQueue:
             if job.future.cancelled() or job.cancelled.is_set():continue
             if time.monotonic()>job.deadline:
                 job.future.set_exception(GatewayError('QUEUE_TIMEOUT'));continue
+            await self.cleanup_admission()
             if self.state in ('AUTH_REQUIRED','QUOTA_EXHAUSTED','CLEANUP_FAILED','REMOTE_RESULT_UNKNOWN'):
                 job.future.set_exception(GatewayError(self.state));continue
             self.active=True
@@ -107,6 +131,7 @@ class ModelQueue:
                     if any(isinstance(e,GatewayError) and e.code in ('CLEANUP_FAILED','REMOTE_RESULT_UNKNOWN') for e in outcomes):self.state=next(e.code for e in outcomes if isinstance(e,GatewayError) and e.code in ('CLEANUP_FAILED','REMOTE_RESULT_UNKNOWN'))
                     continue
                 result=await task
+                if self.cleanup_status().get('blocked'):raise GatewayError('CLEANUP_FAILED')
                 self.state='ready'
                 if not isinstance(result,BackendResult) or result.generation_performed:
                     self.last_success=time.time()
@@ -118,6 +143,7 @@ class ModelQueue:
                 if not job.future.done():job.future.set_exception(error)
             except asyncio.CancelledError:
                 task.cancel();await asyncio.gather(task,return_exceptions=True)
+                if self.cleanup_status().get('blocked'):self.state='CLEANUP_FAILED'
                 if not job.future.done():job.future.cancel()
                 raise
             except Exception:
@@ -179,6 +205,7 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
         return web.json_response({'alive':True,'backend_state':queue.state,'queue':queue.queue.qsize(),
                                   'stopping':bool(root and stopping(root)),
                                   'current_error':current_error,
+                                  'cli_cleanup':queue.cleanup_status(),
                                   'input_budget':budget.limit,'budget_counting':'utf8_visible_bytes_with_envelope',
                                   'overhead_reserve':budget.overhead,'output_reserve':budget.output,
                                   'native_window':'unverified','parameters':getattr(queue.runner,'last_parameters',{}),

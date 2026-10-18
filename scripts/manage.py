@@ -354,7 +354,8 @@ def _start_channel(full=False, paused=False):
 
 def main():
     parser=argparse.ArgumentParser()
-    parser.add_argument('command',choices=['start-channel','start-text','stop','status','test'])
+    parser.add_argument('command',choices=['start-channel','start-text','stop','status','test','cleanup'])
+    parser.add_argument('cleanup_action',nargs='?',choices=['status','check'])
     parser.add_argument('--no-pause',action='store_true',help=argparse.SUPPRESS)
     parser.add_argument('--json',action='store_true',help='metadata status as JSON')
     args=parser.parse_args()
@@ -365,6 +366,13 @@ def main():
         elif args.command=='status':
             report=status_report()
             print(json.dumps(report,ensure_ascii=False,indent=2)) if args.json else show_status(report)
+        elif args.command=='cleanup':
+            # Local fixed read-only identity path. Never starts/stops the bot.
+            import asyncio
+            from qqbot_gateway.cleanup_identity import CleanupOwner
+            owner=CleanupOwner(ROOT)
+            report=asyncio.run(owner.check()) if args.cleanup_action=='check' else owner.status()
+            print(json.dumps(report,ensure_ascii=False,indent=2))
         else:
             return subprocess.call([sys.executable,'-m','unittest','discover','-s','tests','-v'],cwd=ROOT)
         return 0
