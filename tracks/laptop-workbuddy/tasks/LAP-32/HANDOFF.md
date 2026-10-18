@@ -19,6 +19,8 @@
 
 验证：专项命令`.venv/Scripts/python.exe -X utf8 -m unittest discover -s tests -p test_lap32.py -v`；最终聚合通过test_lap32（10项）、test_lap31、test_cli_runner、test_model_gateway、test_lifecycle、test_process_host、test_local_backend，共95项、0失败/0错误。聚合方式为同一unittest.TestSuite装载上述7个模块；控制台详细结果在忽略的`state/lap32-regression.log`。包括原生Windows句柄、临时失败后下个假runner请求成功、永久失败后重启0模型尝试、PID复用、取消/关闭接管和总deadline回归。没有运行旧verify主入口/覆盖旧报告。源码/文档差异、链接与隐私检查另在Git交付前核对。
 
-下一步：交付本任务8文件并核对origin/main SHA；正常加载新代码后可处理已复现的临时I/O冲突、保留更精确诊断。现有真实未决台账仍blocked，不能靠重启、删除文件或observed_only自动恢复；若继续处理现场恢复，须在LAP-31B合同下补完整退出证据，不把本轮标为真实恢复通过。
+下一步：若继续处理现场恢复，先补足完整退出证据；正常加载新代码后可处理已复现的临时I/O冲突、保留更精确诊断。现有真实未决台账仍blocked，不能靠重启、删除文件或observed_only自动恢复；若继续处理现场恢复，须在LAP-31B合同下补完整退出证据，不把本轮标为真实恢复通过。
 
 边界：不读取凭据/聊天正文，不启停或登录真实bot，不调用真实CLI/Ollama/QQ，不删除或改写真实未决台账，不用observed_only解锁。31B完整退出证明缺口仍保留。
+
+Git交付：内容提交`33f767b82cb4d4b3a32db2a929b1c0712b9c3ce8`已推送origin/main，rev-parse与ls-remote完整SHA一致，内容检查点工作区干净。恰8份本任务文件，无LAP-29/本机配置/凭据/原始私密消息夹带；共享三文件各仅32前缀。2份新文档8个链接/围栏、暂存diff --check通过，无根HANDOFF。忽略的真实状态/日志及测试日志保留，本轮未操作真实bot；此记录另提交推送，最终SHA见回执。
