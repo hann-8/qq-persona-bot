@@ -1,3 +1,5 @@
+2026-10-18 23:58（Asia/Shanghai）：[LAP-32清理台账调试](tracks/laptop-workbuddy/tasks/LAP-32/HANDOFF.md)已修复已复现的临时I/O冲突与摘要文件名覆盖，95项相关离线回归通过；新增根[目录与日志说明](项目目录与日志说明.md)。现场23:00:52生成success但ledger_error，原OS错误未留存；真实未决仍blocked、未恢复，31B完整退出证据差额保留。0真实启停/模型/QQ/台账修改；保留LAP-29全部差异，Git交付以32交接为准。
+
 2026-10-18 23:50（Asia/Shanghai）：[LAP-29](tracks/laptop-workbuddy/tasks/LAP-29/HANDOFF.md)已实现/离线通过：gate固定成员服务、双TTL/1..49、受限候选、RPC防旁路、v3 typed@/一次许可/同链ACK及失效同次剥@交付。355单元/52组合790实际框架（成员32组合288例）及32专项末次补验通过；人数新鲜度未证，生产capability_unverified、拒激活。0本机配置/凭据/真实bot/模型/QQ操作，28/31B与旧差额保留，不开始30。见[报告](reports/lap-29-2026-10-18.md)。
 
 2026-10-18 19:52（Asia/Shanghai）：[LAP-28](tracks/laptop-workbuddy/tasks/LAP-28/HANDOFF.md)已实现/离线通过：gate唯一材料/独立认证/一次cap、第一图RAM规范化/hash、两runner原生输入和最终预算、派生证明及受控验证命令交付。323单元/56组合900实际框架通过（图片28组合152例），22专项补验通过；无真实识图，4096/容量/上界未证，生产硬阻断。0本机配置/凭据/真实bot/模型/QQ操作，31B与旧差额保留，不开始29/30。

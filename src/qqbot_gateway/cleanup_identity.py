@@ -4,6 +4,7 @@ Observed descendants are not a containment proof. In particular a persisted
 job_complete label is never accepted as a live Job handle after a restart.
 """
 import asyncio
+import errno
 import json
 import logging
 import math
@@ -100,22 +101,49 @@ class CleanupLedger:
             if len(files) > 34 or sum(p.stat().st_size for p in files if p.is_file()) > 2 * 1024 * 1024 - 65536:
                 raise ValueError('ledger capacity')
 
-    def write(self, value):
-        if not valid_record(value) or len(json.dumps(value).encode('utf-8')) > 30000:
-            raise ValueError('ledger capacity')
-        self.capacity()
-        atomic_json(self.path, value)
+    def io(self, operation, trace, action, deadline=None):
+        # Windows readers can briefly deny replace/delete. Retry only these
+        # errors, with both a fixed attempt bound and the cleanup's remaining
+        # deadline. Never log exception text, paths or process identities.
+        if not isinstance(trace, str) or len(trace) != 10 or any(c not in '0123456789abcdef' for c in trace):
+            trace = '0000000000'
+        retry_until = min(time.monotonic() + .06, deadline) if deadline is not None else time.monotonic() + .06
+        for attempt in range(1, 4):
+            try:
+                return action()
+            except (OSError, ValueError) as error:
+                winerror = getattr(error, 'winerror', None)
+                category = {5: 'ACCESS_DENIED', 32: 'SHARING_VIOLATION', 33: 'LOCK_VIOLATION'}.get(winerror)
+                if category is None:
+                    category = 'INVALID_DATA' if isinstance(error, ValueError) else 'DISK_FULL' if error.errno == errno.ENOSPC else 'IO_ERROR'
+                LOG.warning('CLI_CLEANUP_IO trace=%s operation=%s error=%s attempt=%d', trace, operation, category, attempt)
+                delay = attempt * .01
+                if winerror not in (5, 32, 33) or attempt == 3 or time.monotonic() + delay >= retry_until:
+                    raise
+                time.sleep(delay)
+                if time.monotonic() >= retry_until:
+                    raise
+
+    def write(self, value, deadline=None):
+        def write():
+            if not valid_record(value) or len(json.dumps(value).encode('utf-8')) > 30000:
+                raise ValueError('ledger capacity')
+            self.capacity()
+            atomic_json(self.path, value)
+        self.io('write_unresolved', value.get('trace', '0000000000') if isinstance(value, dict) else '0000000000', write, deadline)
 
     def resolve(self, value, deadline):
         # Unknown is never evicted to make space. Only resolved summaries rotate.
         summaries = sorted(self.directory.glob('resolved-*.json'), key=lambda p: p.name)
         while len(summaries) >= 32:
-            summaries.pop(0).unlink()
+            path = summaries.pop(0)
+            self.io('rotate_summary', value['trace'], path.unlink, deadline)
         summary = {k: value[k] for k in ('version', 'trace', 'generation_outcome', 'cleanup_outcome', 'coverage', 'reasons', 'updated')}
-        atomic_json(self.directory / ('resolved-' + str(time.time_ns()) + '-' + value['trace'] + '.json'), summary)
+        path = self.directory / ('resolved-' + str(time.time_ns()) + '-' + value['trace'] + '-' + uuid.uuid4().hex[:10] + '.json')
+        self.io('write_summary', value['trace'], lambda: atomic_json(path, summary), deadline)
         if time.monotonic() >= deadline or value['blocked']:
             raise TimeoutError('cleanup deadline')
-        self.path.unlink()
+        self.io('remove_unresolved', value['trace'], self.path.unlink, deadline)
 
 
 class CleanupOwner:
@@ -146,6 +174,7 @@ class CleanupOwner:
                 if self.task and not self.task.done() or self.ledger.read() is not None or self.io_failed or self.record and self.record['blocked']:
                     raise GatewayError('CLEANUP_FAILED')
                 self.ledger.capacity()
+                self.deadline = None
                 trace = request_id if isinstance(request_id, str) and len(request_id) == 10 and all(c in '0123456789abcdef' for c in request_id) else uuid.uuid4().hex[:10]
                 self.record = dict(version=1, trace=trace, instance=self.instance,
                     owner=identity(psutil.Process()), identities=[], generation_outcome='pending',
@@ -175,7 +204,7 @@ class CleanupOwner:
     def save(self):
         self.record['updated'] = time.time()
         try:
-            self.ledger.write(self.record)
+            self.ledger.write(self.record, self.deadline)
         except (OSError, ValueError):
             self.io_failed = True
             self.reason('ledger_error')
