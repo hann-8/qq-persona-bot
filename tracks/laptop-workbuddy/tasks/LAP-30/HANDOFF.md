@@ -10,7 +10,7 @@
 
 验收：M01—12、组合预算/协议/实际AstrBot原event ACK与两实际runner底层替身；独立verify_lap30与reports/lap-30-*。仅自造夹具，不改忽略本机配置/凭据/真实记忆，不启停/登录真实bot，不调用真实模型/QQ/群发，不使用私密附件。31B/视觉/人数与旧差额保留。
 
-下一步：交付本任务commit/push并核对远端；不部署，不自动开启记忆，不推进其他任务。后续真实语义/召回质量/QQ ACK需用户另定范围。
+下一步：等待用户后续指定真实语义/召回质量/QQ ACK范围；不部署，不自动开启记忆，不推进其他任务。
 
 稳定命名空间为bot HMAC前缀+群HMAC（各128位），主体key以完整命名空间派生；黑名单能净化同bot撤销授权群的本机库，不碰另一个bot的namespace。来源首次received_at保留，原message hash有界去重；同源/旧时间不续TTL。自述采取保守明确句式+事实字面来源，不能宣称通用语义理解。只读MD不回导；缺key/损坏/主库缺失但副本仍在均禁读，不空库替换。
 
@@ -24,3 +24,6 @@
 修改归属：src/qqbot_gateway/{group_memory,turn_v2,config,persona,model_gateway,backends,web_retrieval}.py；plugins/qq_router/main.py；scripts/{configure_bot,configure_astrbot,verify_lap30,verify_lap30_framework,verify_lap28_framework,verify_lap29_framework}.py（28/29仅30组合默认false扩展）；config/settings.example.yaml；tests/test_lap30.py；README；reports/lap-30-*；本交接、PROGRESS、工作线HANDOFF/TASKS。未覆盖旧报告，未改其他任务HANDOFF/计划。
 
 回滚：停受管实例后保留key/主库/purge/ACK/pending/unknown/清理台账，7→19导出移除memory/members/vision/attention的旧schema3审阅副本，双摘要核对后显式激活，不启停。旧版不能尊重未决清理时保持停机。真实/完整验收、28视觉/29人数/31B与18/24及全部旧差额保留。当前真实bot状态/加载版本未知，本机配置/凭据/人设/真实记忆未读取修改，0真实启停/登录/模型/QQ/群发/私密附件操作。
+
+
+Git交付：内容提交`56560a99c81b6386ef49fc119b4e4d7620d60a47`已push origin/main，git rev-parse HEAD与git ls-remote origin refs/heads/main完整SHA一致，内容检查点工作区无非忽略差异。恰25份本任务文件；265本地链接/围栏、15源码摘要、AST/JSON及暂存diff检查通过。没有旧报告/其他任务文档/本机配置/凭据/真实记忆夹带。自造探针根data工件已精确清理，仅忽略state/lap30-*测试日志及既有忽略运行文件保留；没有用户/其他session未提交差异。本Git记录单独提交并再次push核对，最终记录SHA见回执。Git不等于部署或真实/完整验收。
