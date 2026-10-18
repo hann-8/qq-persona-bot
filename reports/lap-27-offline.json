@@ -1,0 +1,7 @@
+{
+  "unit_tests": 301,
+  "framework_report": "lap-27-framework-offline.json",
+  "real_model_calls": 0,
+  "real_qq_calls": 0,
+  "real_bot_operations": 0
+}

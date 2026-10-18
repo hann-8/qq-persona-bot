@@ -1,0 +1,139 @@
+{
+  "backend": "codebuddy_cli",
+  "mode": "single",
+  "memes": false,
+  "web": false,
+  "cases": [
+    {
+      "case": "unsupported_media_zero_generation",
+      "generations": 0,
+      "sends": 1
+    },
+    {
+      "case": "mention",
+      "generations": 1,
+      "sends": 1,
+      "original_ack": true
+    },
+    {
+      "case": "focused_followup",
+      "generations": 1,
+      "sends": 1,
+      "original_ack": true
+    },
+    {
+      "case": "focused_candidate",
+      "generations": 1,
+      "sends": 1,
+      "original_ack": true
+    },
+    {
+      "case": "focused_candidate",
+      "generations": 1,
+      "sends": 0,
+      "original_ack": true
+    },
+    {
+      "case": "direct_name",
+      "generations": 1,
+      "sends": 1,
+      "original_ack": true
+    },
+    {
+      "case": "web_disabled_zero_generation",
+      "generations": 0,
+      "sends": 1
+    },
+    {
+      "case": "mention",
+      "generations": 1,
+      "sends": 1,
+      "original_ack": true
+    },
+    {
+      "case": "reply_bot",
+      "generations": 1,
+      "sends": 1,
+      "original_ack": true
+    },
+    {
+      "case": "mention",
+      "generations": 1,
+      "sends": 1,
+      "original_ack": true
+    },
+    {
+      "case": "ambient",
+      "generations": 1,
+      "sends": 1,
+      "original_ack": true
+    },
+    {
+      "case": "ambient",
+      "generations": 1,
+      "sends": 0,
+      "original_ack": true
+    },
+    {
+      "case": "ambient",
+      "generations": 1,
+      "sends": 0,
+      "original_ack": true
+    },
+    {
+      "case": "mention",
+      "generations": 1,
+      "sends": 1,
+      "original_ack": true
+    },
+    {
+      "case": "effective_subset_framework_system",
+      "generations": 1,
+      "sends": 1
+    },
+    {
+      "case": "mention",
+      "generations": 1,
+      "sends": 1,
+      "original_ack": true
+    },
+    {
+      "case": "mention",
+      "generations": 1,
+      "sends": 1,
+      "original_ack": true
+    },
+    {
+      "case": "mention",
+      "generations": 1,
+      "sends": 1,
+      "original_ack": true
+    },
+    {
+      "case": "mention",
+      "generations": 1,
+      "sends": 1,
+      "original_ack": true
+    },
+    {
+      "case": "priority_frozen_target_original_ACK_lease",
+      "generations": 3,
+      "sends": 3
+    },
+    {
+      "case": "ambient_merge_object_not_carrier",
+      "generations": 2,
+      "sends": 2
+    },
+    {
+      "case": "bound_business_error",
+      "generations": 0,
+      "sends": 1
+    }
+  ],
+  "real_model_calls": 0,
+  "real_qq_calls": 0,
+  "real_run_agent": true,
+  "actual_runner": true,
+  "original_event_ACK": true
+}

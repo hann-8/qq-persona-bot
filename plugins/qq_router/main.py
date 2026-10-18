@@ -52,7 +52,10 @@ class QQRouter(Star):
         self.coordinator=SessionCoordinator(chat.get('user_cooldown_seconds',5),chat.get('session_queue_limit',2),chat.get('session_queue_timeout_seconds',600))
         self.tasks=TaskStore(self.root/'state/tasks.sqlite')
         self.delivery=ReplyDelivery(self.tasks,self.output,self.delivery_allowed,catalog=self.memes)
-        self.group_turns=Participation(self.participation,digest(self.persona_id+uuid.uuid4().hex),settings['llm']['queue_limit'],chat.get('session_queue_timeout_seconds',600))
+        self.attention_effective=self.participation['mode']=='free' and self.participation['attention']['enabled']
+        from qqbot_gateway.attention import Attention
+        self.group_turns=(Attention if self.attention_effective else Participation)(self.participation,digest(self.persona_id+uuid.uuid4().hex),settings['llm']['queue_limit'],chat.get('session_queue_timeout_seconds',600))
+        self.group_turns.bot=self.bot
         self.connection_id=None
         self.connection_watcher=None
 
@@ -112,7 +115,7 @@ class QQRouter(Star):
                 if raw.model!='workbuddy-local' or not raw.id.startswith('chatcmpl-') or len(raw.choices)!=1:raise ValueError()
                 text=raw.choices[0].message.content
                 request=event.get_extra('qq_group_request')
-                plan=verify_metadata(getattr(raw,'qqbot_group_plan',None),request,raw.id,text,self.output)
+                plan=verify_metadata(getattr(raw,'qqbot_group_plan',None),request,raw.id,text,self.output,event.get_extra('qq_v2_source'))
                 event.set_extra('qq_group_response',raw.id)
                 event.set_extra('qq_group_metadata',raw.qqbot_group_plan)
                 event.set_extra('qq_delivery_plan',plan)
@@ -122,7 +125,7 @@ class QQRouter(Star):
                 if plan:
                     key=event.get_extra('qq_delivery_key')
                     self.tasks.prepare_group_delivery(key,str(event.get_group_id()),request['epoch'],
-                        raw.id,plan,request['snapshot_digest'],event.get_extra('qq_snapshot_range'))
+                        raw.id,plan,request.get('source_digest',request.get('snapshot_digest')),event.get_extra('qq_snapshot_range'))
                     row=self.tasks.delivery(key)
                     if row['response_id']!=raw.id or row['content_sha256']!=digest(plan.canonical_text) or tuple(json.loads(row['bubbles']))!=plan.bubbles:
                         raise ValueError('Group response changed during hook reentry')
@@ -195,7 +198,7 @@ class QQRouter(Star):
         group_ok=(not group_request or (group_request['epoch']==self.group_turns.group_epoch(str(event.get_group_id())) and
             not self.tasks.group_blocked(str(event.get_group_id())) and
             event.get_extra('qq_connection')==self.connection() and
-            (group_request['must_reply'] or (time.monotonic()-event.get_extra('qq_group_created')<=self.participation['max_ambient_age_seconds'] and self.group_turns.may_speak(str(event.get_group_id()))))))
+            (group_request['must_reply'] or (time.monotonic()-event.get_extra('qq_group_created')<=self.participation['max_ambient_age_seconds'] and (group_request.get('addressing')=='focused_candidate' or self.group_turns.may_speak(str(event.get_group_id())))))))
         return (group_ok and not stopping(self.root) and str(event.get_self_id())==self.bot and
                 str(event.get_group_id()) in self.groups and str(event.get_sender_id()) not in self.blocked and
                 str(event.get_sender_id())!=self.bot and event.get_extra('qq_delivery_version')==self.persona_id and
@@ -209,9 +212,10 @@ class QQRouter(Star):
             if event.get_extra('qq_delivery_handled'):return
             request=event.get_extra('qq_group_request');plan=event.get_extra('qq_delivery_plan');key=event.get_extra('qq_delivery_key')
             if plan:
-                try:verify_metadata(event.get_extra('qq_group_metadata'),request,event.get_extra('qq_group_response'),plan.canonical_text,self.output)
+                try:verify_metadata(event.get_extra('qq_group_metadata'),request,event.get_extra('qq_group_response'),plan.canonical_text,self.output,event.get_extra('qq_v2_source'))
                 except Exception:plan=None;event.set_extra('qq_group_invalid',True)
             if plan and self.delivery_allowed(event):
+                if request['version']==2:event.set_extra('qq_v2_delivery_started',time.monotonic())
                 with guard.grant():await self.delivery.send(event,key,plan)
                 await self.failed_image_notice(event,key,plan)
             else:
@@ -269,7 +273,9 @@ class QQRouter(Star):
         event.platform_meta=replace(event.platform_meta,support_proactive_message=False)
         event.set_extra('qq_delivery_version',self.persona_id)
         event.set_extra('qq_delivery_identity',(str(event.get_self_id()),str(event.get_group_id()),str(event.get_sender_id())))
-        if self.participation['mode']=='free':
+        if self.attention_effective:
+            async for item in self.on_attention_group(event):yield item
+        elif self.participation['mode']=='free':
             async for item in self.on_free_group(event):yield item
         else:
             async for item in self.on_mentions(event):yield item
@@ -359,6 +365,120 @@ class QQRouter(Star):
             LOG.error('QQ_ROUTER_ERROR trace=%s',trace)
             if not event.get_extra('qq_delivery_key') and not getattr(event,'_has_send_oper',False):yield event.plain_result('这条没处理好，请稍后再试。（追踪'+trace+'）')
         finally:lease.release()
+
+    async def on_attention_group(self,event):
+        from qqbot_gateway.attention import DIRECT,canonical
+        from qqbot_gateway.turn_v2 import sha,fit
+        event.should_call_llm(False)
+        components=event.get_messages();group=str(event.get_group_id());sender=str(event.get_sender_id())
+        connection=self.connection()
+        if connection!=self.connection_id:
+            self.group_turns.invalidate();self.connection_id=connection
+        raw=getattr(event.message_obj,'raw_message',None)
+        get=raw.get if hasattr(raw,'get') else lambda k,d=None:d
+        if connection is None or get('qqbot_connection',connection)!=connection:event.stop_event();return
+        trace=uuid.uuid4().hex;key=self.bot+':'+group+':'+str(event.message_obj.message_id)
+        if not self.tasks.accept(key,trace):event.stop_event();return
+        event.set_extra('qq_router_trace',trace);event.set_extra('qq_connection',connection)
+        created=time.monotonic();event.set_extra('qq_group_created',created)
+        LOG.info('ATTENTION trace=%s stage=received config=%s',trace,self.persona_id)
+        prompt=''.join(c.text for c in components if isinstance(c,Plain)).strip()
+        ats=get('qqbot_at_ids') or [str(c.qq) for c in components if isinstance(c,At)]
+        if any(isinstance(c,At) and str(c.qq)==self.bot for c in components) and self.bot not in ats:ats=[self.bot]+ats
+        reference=get('qqbot_reference') or next((str(c.id) for c in components if isinstance(c,Reply)),None)
+        event.message_obj.message=[c for c in components if isinstance(c,Plain)]
+        event.message_obj.raw_message=None
+        mention=self.bot in ats
+        if mention and prompt=='重置本群上下文':
+            if sender in self.admins:self.group_turns.reset(group);await self.local_notice(event,'本群当前上下文已重置。')
+            else:await self.local_notice(event,'当前只允许管理员重置本群上下文。')
+            self.tasks.set(key,'completed');event.stop_event();return
+        row,addressing,required=self.group_turns.observe(group,sender,str(event.message_obj.message_id),
+            getattr(event.message_obj.sender,'nickname',''),prompt or '[非文本未解析]',ats,reference)
+        has_text=bool(prompt.replace('[非文本未解析]','').strip())
+        if not has_text or len(prompt)>self.participation['message_max_chars']:
+            LOG.info('ATTENTION trace=%s stage=filtered reason=unsupported_or_oversized_text',trace)
+            if mention:await self.local_notice(event,MESSAGES['INPUT_TOO_LONG'] if has_text else '我在，目前只接通文字聊天。')
+            self.tasks.set(key,'failed');event.stop_event();return
+        epoch=self.group_turns.group_epoch(group);direct=addressing in DIRECT;ticket=None;lease=None
+        LOG.info('ATTENTION trace=%s stage=attention_reason addressing=%s',trace,addressing)
+        def valid():
+            return (not stopping(self.root) and self.connection()==connection and self.group_turns.group_epoch(group)==epoch and
+                group in self.groups and sender not in self.blocked and
+                (direct or time.monotonic()-created<=min(90,self.participation['max_ambient_age_seconds'])))
+        try:
+            ticket=self.group_turns.freeze(group,addressing,row,required,trace)
+            if addressing=='ambient':
+                pending=next((t for t in self.group_turns.pending if t.group==group and t.addressing=='ambient' and not t.cancelled),None)
+                if pending:
+                    # The original owner will dispatch the merged newest ambient target.
+                    if sum(t.size for t in self.group_turns.pending)-pending.size+ticket.size<=262144:
+                        pending.source=ticket.source;pending.required=ticket.required;pending.size=ticket.size
+                        pending.identities=ticket.identities
+                        pending.received=ticket.received
+                        LOG.info('ATTENTION trace=%s stage=merged owner_trace=%s',trace,pending.trace)
+                    return
+                if not await self.group_turns.batch(group,valid):return
+            lease=await self.group_turns.dispatch(ticket,valid)
+            if not valid() or self.tasks.group_blocked(group):return
+            if addressing=='ambient':self.group_turns.window(group).evaluations.append(time.monotonic())
+            source=self.group_turns.rebuild(ticket)
+            # One concrete allowed anchor, never a serialized window/history.
+            target=next(r for r in source['messages'] if r['seq']==source['target_seq'])
+            state=self.group_turns.state(group)
+            eligible=[target] if direct else [r for r in source['messages'] if r['seq'] in source['eligible_seq'] and r['seq']>state.web_evaluated_seq]
+            from qqbot_gateway.web_policy import intent
+            if direct or self.participation['allow_ambient_web']:
+                source['web_anchor']=next((r['text'] for r in reversed(eligible) if intent(r['text'],self.web).kind!='none'),None)
+            source['meme_question']=target['text']
+            if eligible:state.web_evaluated_seq=max(state.web_evaluated_seq,max(r['seq'] for r in eligible))
+            request=dict(version=2,kind='group_turn',mode='free',request_key=digest(key),epoch=epoch,
+                config_version=digest(self.persona_id),source_digest=sha(source),addressing=addressing,must_reply=direct,
+                target_seq=target['seq'],resource_caps=[])
+            from qqbot_gateway.turn_budget import candidate_instruction
+            suffix=candidate_instruction([]) if self.memes.cfg['enabled'] else ''
+            body=fit(source,request,self.persona,self.budget,suffix)
+            source=json.loads(body);request['source_digest']=sha(source)
+            ticket.source=source
+            event.set_extra('qq_v2_source',source);event.set_extra('qq_group_request',request)
+            event.set_extra('qq_delivery_key',key);event.set_extra('qq_meme_question',source['meme_question'] or '')
+            event.set_extra('qq_snapshot_range',[source['messages'][0]['seq'],source['messages'][-1]['seq']])
+            self.tasks.set(key,'running');event.should_call_llm(True)
+            yield event.request_llm(prompt=body,contexts=[],system_prompt=self.persona,conversation=None,tool_set=None,
+                session_id='qqbot-v2:'+canonical(dict(request=request,trace=trace)))
+            if direct and not event.get_extra('qq_delivery_handled'):await self.local_notice(event,'这条没处理好，请稍后再试。')
+        except (SessionError,GatewayError) as error:
+            LOG.info('ATTENTION trace=%s stage=filtered reason=%s',trace,error.code)
+            if direct and getattr(error,'notify',True):await self.local_notice(event,'这条排队已满、超时或超过输入限制，请稍后再问。')
+        except asyncio.CancelledError:
+            LOG.info('ATTENTION trace=%s stage=filtered reason=cancelled',trace)
+            raise
+        except Exception:
+            LOG.error('ATTENTION trace=%s stage=filtered reason=framework_error',trace)
+            raise
+        finally:
+            try:
+                delivery=self.tasks.delivery(key)
+                if delivery:
+                    self.tasks.finish_group(key)
+                    metadata=event.get_extra('qq_group_metadata');plan=event.get_extra('qq_delivery_plan')
+                    if (lease and plan and metadata and metadata['decision']=='speak' and not plan.fallback_reason and
+                        self.group_turns.group_epoch(group)==epoch):
+                        # Reverify identity even on abnormal framework exit before ACK attribution.
+                        verify_metadata(metadata,event.get_extra('qq_group_request'),event.get_extra('qq_group_response'),
+                            plan.canonical_text,self.output,event.get_extra('qq_v2_source'))
+                        confirmed=[(plan.parts[i].payload_ref,mid) for i,state,mid in self.tasks.parts(key)
+                            if state=='sent' and mid and plan.parts[i].type=='text']
+                        ticket.source=event.get_extra('qq_v2_source')
+                        self.group_turns.acknowledge(ticket,confirmed,metadata['response_to_seq'])
+                        if confirmed and not direct:self.group_turns.window(group).spoken.append(time.monotonic())
+                    ack_start=event.get_extra('qq_v2_delivery_started')
+                    LOG.info('ATTENTION trace=%s stage=delivery status=%s ack_ms=%s',trace,delivery['state'],
+                        int((time.monotonic()-ack_start)*1000) if ack_start is not None else 0)
+                else:self.tasks.set(key,'failed' if direct else 'completed')
+            finally:
+                event.clear_result();event.should_call_llm(False);event.stop_event()
+                if ticket:self.group_turns.finish(ticket)
 
     async def on_free_group(self,event):
         event.should_call_llm(False)

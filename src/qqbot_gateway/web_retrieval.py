@@ -282,6 +282,7 @@ class WebRunner:
         self.runner=runner;self.retriever=retriever;self.budget=budget;self.output=output;self.root=root
     def __getattr__(self,name):return getattr(self.runner,name)
     async def run_group(self,system,prompt,request_id,request):
+        if request.get('version')==2:return await self.run_v2(system,prompt,request_id,request)
         from .backends import BackendResult
         from .group_protocol import group_plan,SILENT
         self.check_stopping()
@@ -311,6 +312,35 @@ class WebRunner:
             except WebFailure:
                 return BackendResult(SILENT,result.usage,result.parameters,result.finish_reason,web_expired=True)
             return BackendResult(plan.canonical_text,result.usage,result.parameters,result.finish_reason,plan)
+        return result
+    async def run_v2(self,system,prompt,request_id,request):
+        from .backends import BackendResult
+        from .turn_v2 import plan
+        from .group_protocol import SILENT
+        self.check_stopping()
+        source=json.loads(json.loads(prompt)[-1]['content'])
+        question=source['web_anchor'] if request['must_reply'] or getattr(self,'allow_ambient_web',True) else None
+        if question and not any(r['text']==question and r['seq'] in source['eligible_seq'] and
+            (not request['must_reply'] or r['seq']==source['target_seq']) for r in source['messages']):
+            from .errors import GatewayError
+            raise GatewayError('UNSUPPORTED_REQUEST')
+        if not question:return await self.guarded(self.runner.run(system,prompt,request_id))
+        retrieval=await self.guarded(self.retriever.retrieve(question))
+        if retrieval.expired or retrieval.notice:
+            if not request['must_reply']:return BackendResult(SILENT,generation_performed=False,web_expired=True)
+            notice=retrieval.notice or '本次网页读取超时，请稍后再试。'
+            return BackendResult(notice,prepared_plan=ReplyPlan('answer',(notice,),notice,fallback_reason='local_web_notice'),generation_performed=False)
+        if retrieval.kind=='none':return await self.guarded(self.runner.run(system,prompt,request_id))
+        enriched,sources=evidence_prompt(system,prompt,retrieval,self.budget,self.retriever.cfg)
+        if not sources:return BackendResult(SILENT,generation_performed=False,web_expired=True)
+        self.budget.check(system,enriched)
+        result=await self.guarded(self.runner.run(system,enriched,request_id))
+        result=result if isinstance(result,BackendResult) else BackendResult(result)
+        decision,reply,response=plan(result.text,self.output,question,request,source)
+        if reply and decision=='speak':
+            try:reply=source_plan(reply,sources,self.output,question,retrieval.partial)
+            except WebFailure:return BackendResult(SILENT,web_expired=True)
+            return BackendResult(reply.canonical_text,result.usage,result.parameters,result.finish_reason,reply,response_to_seq=response)
         return result
     def check_stopping(self):
         from .lifecycle import stopping

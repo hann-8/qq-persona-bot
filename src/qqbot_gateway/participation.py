@@ -18,10 +18,29 @@ RANGES=dict(debounce_seconds=(.5,5),max_batch_wait_seconds=(2,10),min_evaluation
     context_messages=(10,200),context_ttl_seconds=(60,3600),context_max_bytes=(4096,131072),
     message_max_chars=(200,4000),mention_queue_limit=(1,32),max_ambient_age_seconds=(10,180))
 
+ATTENTION_DEFAULTS=dict(enabled=False,aliases=['肥鱼','大肥鱼','鱼鱼','鲸鱼娘','小鲸鱼','DSH'],
+    focus_ttl_seconds=60,max_intervening_messages=0,direct_queue_limit=4,
+    focus_candidate_evaluations_per_minute=4)
+
+def validate_attention(raw):
+    if not isinstance(raw,dict) or set(raw)-set(ATTENTION_DEFAULTS):raise ValueError('Invalid attention fields')
+    cfg=ATTENTION_DEFAULTS|raw
+    if type(cfg['enabled']) is not bool:raise ValueError('Invalid attention.enabled')
+    names=cfg['aliases']
+    if (not isinstance(names,list) or not 1<=len(names)<=16 or
+        any(not isinstance(n,str) or not 1<=len(n)<=16 or not n.strip() or clean(n)!=n for n in names) or
+        len({unicodedata.normalize('NFKC',n).strip().casefold() for n in names})!=len(names)):
+        raise ValueError('Invalid attention.aliases')
+    for key,lo,hi in [('focus_ttl_seconds',15,180),('max_intervening_messages',0,0),
+                       ('direct_queue_limit',1,8),('focus_candidate_evaluations_per_minute',1,8)]:
+        if type(cfg[key]) is not int or not lo<=cfg[key]<=hi:raise ValueError('Invalid attention.'+key)
+    return dict(cfg,aliases=list(names))
+
 
 def validate_participation(raw):
-    if not isinstance(raw,dict) or set(raw)-set(DEFAULTS):raise ValueError('Invalid participation fields')
+    if not isinstance(raw,dict) or set(raw)-set(DEFAULTS)-{'attention'}:raise ValueError('Invalid participation fields')
     cfg=DEFAULTS|raw
+    cfg['attention']=validate_attention(raw.get('attention',{}))
     if cfg['mode'] not in ('mentions','free') or type(cfg['allow_ambient_web']) is not bool:raise ValueError('Invalid participation mode/web')
     for k,(lo,hi) in RANGES.items():
         value=cfg[k]
@@ -70,15 +89,17 @@ class Participation:
         w=self.window(group);self.trim(w);w.seq+=1
         if sender not in w.aliases:w.aliases[sender]='bot' if sender=='bot' else 'u'+str(w.seq)
         reference=next((r['seq'] for r in w.rows if r['mid']==reply),None) if reply else None
-        w.rows.append(dict(seq=w.seq,at=self.clock(),sender=sender,mid=mid,speaker=w.aliases[sender],
-                           name=clean(name)[:40],text=text if sender=='bot' else clean(text)[:self.cfg['message_max_chars']],reply=reference if reference else ('引用未解析' if reply else None)))
+        row=dict(seq=w.seq,at=self.clock(),sender=sender,mid=mid,speaker=w.aliases[sender],
+                           name=clean(name)[:40],text=text if sender=='bot' else clean(text)[:self.cfg['message_max_chars']],reply=reference if reference else ('引用未解析' if reply else None))
+        w.rows.append(row)
         self.trim(w)
+        return row
 
     def snapshot(self,group):
         w=self.window(group);self.trim(w)
         return [dict(seq=r['seq'],speaker=r['speaker'],name=r['name'],text=r['text'],reply=r['reply']) for r in w.rows]
 
-    def confirm(self,group,text,mid):self.append(group,'bot',mid,'bot',text)
+    def confirm(self,group,text,mid):return self.append(group,'bot',mid,'bot',text)
 
     def preempt(self,group):
         w=self.window(group)

@@ -11,6 +11,9 @@ LOG=logging.getLogger(__name__)
 
 
 def validate_request(value):
+    if isinstance(value,dict) and type(value.get('version')) is int and value['version']==2:
+        from .turn_v2 import validate_header
+        return validate_header(value)
     if (not isinstance(value,dict) or set(value)!=FIELDS or type(value['version']) is not int or
         value['version']!=1 or value['kind']!='group_turn' or value['trigger'] not in ('mention','ambient') or
         type(value['must_reply']) is not bool or value['must_reply']!=(value['trigger']=='mention') or
@@ -74,7 +77,10 @@ def metadata(request,response_id,decision,plan):
     return value
 
 
-def verify_metadata(value,request,response_id,text,output):
+def verify_metadata(value,request,response_id,text,output,source=None):
+    if request.get('version')==2:
+        from .turn_v2 import verify
+        return verify(value,request,response_id,text,output,source)
     from .reply_plan import trusted_plan
     if not isinstance(value,dict) or set(value)!={'request','response_id','decision','plan','plan_hash'}:raise ValueError('Missing group metadata')
     body={k:v for k,v in value.items() if k!='plan_hash'}

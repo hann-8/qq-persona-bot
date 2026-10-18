@@ -15,6 +15,58 @@ import yaml
 import psutil
 
 
+def export_legacy_config(path):
+    """Stopped, locked review artifact only. Never activates or restarts anything.
+
+    Return both digests so a later operator can detect edits to either snapshot.
+    Unknown extensions and all legacy settings are preserved verbatim in meaning.
+    """
+    path=Path(path);root=path.parent.parent
+    with configuration_lock(root):
+        require_stopped(root)
+        value,source_digest=read_settings(path)
+        original=path.read_bytes()
+        if hashlib.sha256(original).hexdigest()!=source_digest:raise ValueError('Configuration changed')
+        if isinstance(value.get('participation'),dict):value['participation'].pop('attention',None)
+        content=yaml.safe_dump(value,allow_unicode=True,sort_keys=False).encode('utf-8')
+        directory=root/'state/config-exports';directory.mkdir(parents=True,exist_ok=True)
+        tag=uuid.uuid4().hex
+        backup=directory/(tag+'.original.yaml');review=directory/(tag+'.legacy.yaml')
+        with backup.open('xb') as f:f.write(original)
+        with review.open('xb') as f:f.write(content)
+        copy_digest=hashlib.sha256(content).hexdigest()
+        if (hashlib.sha256(path.read_bytes()).hexdigest()!=source_digest or
+            hashlib.sha256(review.read_bytes()).hexdigest()!=copy_digest):raise ValueError('Export changed')
+        return dict(source_digest=source_digest,legacy_digest=copy_digest,backup=str(backup),review=str(review),activated=False)
+
+
+def activate_legacy_config(path,review,source_digest,legacy_digest,confirmation):
+    """Explicit operator-confirmed activation, stopped + lock + both digests.
+
+    Does not roll back code, erase unresolved markers, or start any service.
+    """
+    path=Path(path);root=path.parent.parent;review=Path(review).resolve()
+    if confirmation!='已核对' or review.parent!=(root/'state/config-exports').resolve():raise ValueError('Review required')
+    if not all(isinstance(v,str) and re.fullmatch('[a-f0-9]{64}',v) for v in (source_digest,legacy_digest)):raise ValueError('Both digests required')
+    with configuration_lock(root):
+        require_stopped(root)
+        original=path.read_bytes();content=review.read_bytes()
+        if hashlib.sha256(original).hexdigest()!=source_digest or hashlib.sha256(content).hexdigest()!=legacy_digest:raise ValueError('Configuration changed')
+        data=yaml.safe_load(content);normalize_settings(data)
+        if 'attention' in data.get('participation',{}):raise ValueError('Not legacy compatible')
+        backup=review.with_name(review.stem+'.activation-original.yaml')
+        with backup.open('xb') as f:f.write(original)
+        temporary=path.with_name(path.name+'.legacy-'+uuid.uuid4().hex+'.tmp')
+        try:
+            with temporary.open('xb') as f:f.write(content)
+            if (hashlib.sha256(path.read_bytes()).hexdigest()!=source_digest or
+                hashlib.sha256(review.read_bytes()).hexdigest()!=legacy_digest):raise ValueError('Configuration changed')
+            os.replace(temporary,path)
+        finally:
+            if temporary.exists():temporary.unlink()
+        return dict(activated=True,legacy_digest=legacy_digest,restarted=False)
+
+
 def qq_id(value):
     if isinstance(value, bool) or not isinstance(value, (str, int)):
         return None
@@ -35,6 +87,7 @@ class GateConfig:
     port: int = 6200
     blocked_users: frozenset[str] = frozenset()
     participation_mode: str = 'mentions'
+    attention_enabled: bool = False
     media_catalog: object = None
 
     def __post_init__(self):
@@ -228,6 +281,7 @@ def load_gate_config(path):
         host=data['onebot']['host'], port=data['onebot']['port'],
         blocked_users=frozenset(data['access']['blocked_users']),
         participation_mode=data['participation']['mode'],
+        attention_enabled=data['participation']['mode']=='free' and data['participation']['attention']['enabled'],
         media_catalog=MemeCatalog(root,data['memes']) if data['memes']['enabled'] else None,
     )
 

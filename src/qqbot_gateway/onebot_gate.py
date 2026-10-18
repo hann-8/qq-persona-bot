@@ -274,8 +274,10 @@ class OneBotGate:
                             elif kind=='at' and qq_id(data.get('qq'))==self.config.bot_qq:safe.append({'type':'at','data':{'qq':self.config.bot_qq}})
                             elif kind=='reply':reference=str(data.get('id',''))[:128]
                             elif kind!='at':media=True;safe.append({'type':'text','data':{'text':'[非文本未解析]'}})
+                        at_ids=[qq_id(s['data'].get('qq')) or 'other_member' for s in event['message'] if s['type']=='at'][:8] if self.config.attention_enabled else []
                         event=dict(event,message=safe,raw_message='',qqbot_reference=reference,qqbot_media=media,
                                    qqbot_connection=self.connection_id)
+                        if self.config.attention_enabled:event['qqbot_at_ids']=at_ids
                         await upstream.send_json(event)
                     else:await upstream.send_str(frame.data)
             elif (event.get('post_type') == 'meta_event' and

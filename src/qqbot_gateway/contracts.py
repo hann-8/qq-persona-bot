@@ -52,7 +52,14 @@ def normalize_request(payload, char_limit=None, budget=None, group_suffix=''):
     if any(m['role'] != ('user' if index%2 == 0 else 'assistant') for index,m in enumerate(dialog)):
         raise fail()
     prompt = dialog_text(dialog)
-    if 'qqbot_request' in payload and payload['qqbot_request'].get('kind')=='group_turn':
+    if payload.get('qqbot_request',{}).get('version')==2:
+        from .turn_v2 import validate_source,fit
+        request=payload['qqbot_request']
+        if request['mode']=='free' and len(dialog)!=1:raise fail()
+        source=validate_source(dialog[-1]['content'],request)
+        dialog[-1]=dict(role='user',content=fit(source,request,system,budget,group_suffix,dialog[:-1]))
+        prompt=dialog_text(dialog)
+    elif 'qqbot_request' in payload and payload['qqbot_request'].get('kind')=='group_turn':
         from .reply_plan import digest
         if len(dialog)!=1 or payload['qqbot_request']['snapshot_digest']!=digest(dialog[0]['content']):raise fail()
         from .group_protocol import validate_snapshot

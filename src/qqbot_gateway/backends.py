@@ -30,6 +30,7 @@ class BackendResult:
     prepared_plan: object = None
     generation_performed: bool = True
     web_expired: bool = False
+    response_to_seq: int | None = None
 
 
 def numeric_usage(value):

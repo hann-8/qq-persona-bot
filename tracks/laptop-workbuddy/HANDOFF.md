@@ -1,3 +1,5 @@
+2026-10-18（Asia/Shanghai）：[LAP-27](tasks/LAP-27/HANDOFF.md)已实现/离线通过，301单元、28组合732实际框架及22边界复验通过。可信身份/每票随机ref、v2/source-effective核验、Q/R dispatcher/冻结目标、叫名/引用/焦点/候选、原event ACK归因和随机trace落地；attention默认false，mentions及全关v1保持。配置菜单/旧配置审阅导出及双摘要显式激活同步，本机配置未改；0真实bot/模型/QQ/私密附件操作，真实效果未验；31B及旧差额保留，不推进28—30。[报告](../../reports/lap-27-2026-10-18.md)。
+
 # 笔记本 WorkBuddy 工作线交接
 
 2026-10-18 18:34（Asia/Shanghai）：[LAP-31](tasks/LAP-31/HANDOFF.md)的31A独立实现/离线通过，283单元、12组合384实际框架用例及旧生命周期/ModelQueue回归通过；原结果/清理状态分离、单task接管、总deadline/有界台账/零推理检查与脱敏诊断落地。31B强化探针发现breakaway请求被接受且目标成员证据不足，完整覆盖门槛未过；生产Job/完整恢复未交付、unknown继续阻断。0本机配置/真实bot/模型/QQ操作；仅31，不自动推进27—30。见[报告](../../reports/lap-31-2026-10-18.md)。

@@ -1,5 +1,13 @@
 # QQ 人设文字 Bot（笔记本测试版）
 
+LAP-27新增free关注/指代与自然续聊，默认关闭，尚未真实验收或自动加载。配置机器人.cmd → 7 群聊参与与活跃度 → 18 关注与续聊：仅`participation.mode=free`且`attention.enabled=true`生效，停机保存、正常重启加载；mentions仍仅真实@并沿用原群+用户历史。所有新能力关闭时保留原v1协议、工具隔离及single/adaptive、web/memes行为。
+
+启用关注后：真实@ > 可靠叫名/引用已ACK的bot文字 > 同人60秒且无插话的第二人称续聊 > 无主语续聊候选 > ambient。同级FIFO，不打断活动生成；不同direct消息各自排队，目标与必要引用冻结到投递/ACK结束。候选每群滚动60秒默认最多4次，同次模型可判断结束确认应沉默。只有已确认的正常模型文字ACK建立焦点，按真实回应对象归因，unknown/图片/本地错误不建焦点。队列/生成/ACK均可能增加等待，不承诺固定时延；新增随机trace关联固定类别日志，不含正文或QQ/群号。
+
+旧代码回滚前，先停止受管实例并保留所有pending/unknown/清理台账。菜单7→19或`.venv/Scripts/python.exe scripts/configure_bot.py export-legacy-config`生成`state/config-exports/`忽略目录内的原配置备份、移除本任务attention键的旧schema3审阅副本及两个摘要；保留其他扩展字段。**只导出不激活**。本机审阅后可显式运行`activate-legacy-config <review路径> <source_digest> <legacy_digest> 已核对`，同配置锁下复核停机与双摘要后原子激活，不重启；任一副本有变化须重新导出。旧版本不认识未决清理台账时保持停机，不能靠回旧代码抹掉unknown。
+
+独立离线验证：`.venv/Scripts/python.exe -X utf8 scripts/verify_lap27.py`，只写`reports/lap-27-*`；实际run_agent/provider/原event ACK与两runner底层替身、自造群/图片夹具，不调用真实模型/QQ。图片下载、名册RPC/受控@与长期记忆属于28/29/30，v2本轮仅预留空字段；31B完整覆盖/恢复仍未交付。见[LAP-27交接](tracks/laptop-workbuddy/tasks/LAP-27/HANDOFF.md)。
+
 LAP-24已实现/离线通过，尚未重启加载或真实验收：闲聊“最多三条”仅为上限，能一句接住就一句，有必要补充才两三条；认真回答完整单条，表情可不发、不占位凑数。single仍保留单条文字规则，不改操作者已有条数/间隔设置。真实模型的表达与QQ效果仍待另行验证。
 
 新增“配置机器人.cmd → 5 后端与连接 → 7 NapCat登录”，原1—6编号保留。也可用项目Python运行`scripts/configure_bot.py napcat-login status / set-password / clear-password`（三选一动作）。status只读本机状态，不解密或认证；set-password须停机并在本机TTY通过两次无回显输入分别录入QQ密码和项目WebUI token，回车/取消保留原凭据；不支持命令行密码或重定向输入。密文仅存忽略的`secrets/napcat-login.local.json`，CurrentUser DPAPI绑定当前Windows身份，清除只移除本项目回退凭据，不登出或删除设备/尝试账本。

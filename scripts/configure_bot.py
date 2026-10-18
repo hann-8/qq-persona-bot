@@ -101,6 +101,11 @@ def execute(path, section, action, identifier=None, *, expected_digest=None):
             from qqbot_gateway.token_budget import InputBudget
             print(json.dumps(asyncio.run(OllamaSSHRunner(root,local,InputBudget()).preflight(require_digest=False)),ensure_ascii=False))
         return
+    if section == 'export-legacy-config':
+        from qqbot_gateway.config import export_legacy_config
+        import json
+        print(json.dumps(export_legacy_config(path),ensure_ascii=False))
+        return
     if section == 'show':
         show(settings)
         return
@@ -322,9 +327,15 @@ class ConfigMenu:
             for index,key in enumerate(keys,1):
                 bounds=f'{RANGES[key][0]}..{RANGES[key][1]}' if key in RANGES else ('mentions/free' if key=='mode' else 'true/false')
                 self.ui.write(f'{index} {key}: {settings["participation"][key]} ({bounds})')
-            self.ui.write('17 核对后解除本群未知发送隔离 / 0 返回')
-            choice=self.ui.choose({'0','17'}|{str(i) for i in range(1,len(keys)+1)})
+            self.ui.write('17 核对后解除本群未知发送隔离 / 18 关注与续聊 / 19 导出旧版配置审阅副本 / 0 返回')
+            choice=self.ui.choose({'0','17','18','19'}|{str(i) for i in range(1,len(keys)+1)})
             if choice=='0':return
+            if choice=='19':
+                try:execute(self.path,'export-legacy-config',None)
+                except (ValueError,OSError) as error:self.ui.write(operation_error(error))
+                self.ui.pause();continue
+            if choice=='18':
+                self.attention_group();continue
             if choice=='17':
                 from qqbot_gateway.task_store import TaskStore
                 group=self.ui.read('已在QQ核对发送结果的授权群号：').strip()
@@ -352,6 +363,31 @@ class ConfigMenu:
                 save_settings(self.path,settings,digest)
                 self.ui.write('已保存，下次启动生效。没有启停/读取群消息/调用模型。')
             except (ValueError,OSError) as error:self.ui.write(operation_error(error)+' 请核对页面范围。')
+            self.ui.pause()
+
+    def attention_group(self):
+        from qqbot_gateway.participation import ATTENTION_DEFAULTS
+        keys=list(ATTENTION_DEFAULTS)
+        while True:
+            settings,digest=read_settings(self.path)
+            self.ui.page('关注与自然续聊（默认关闭）')
+            self.ui.write('仅free且enabled=true生效；mentions仍仅真实@。重启加载，不自动启停。焦点默认60秒/零插话；候选可沉默。')
+            self.ui.write('enabled: true/false；aliases: 逗号分隔1..16个/每名1..16字符；focus_ttl_seconds:15..180；max_intervening_messages:固定0；direct_queue_limit及focus_candidate_evaluations_per_minute:1..8。')
+            for i,key in enumerate(keys,1):self.ui.write(f'{i} {key}: {settings["participation"]["attention"][key]}')
+            choice=self.ui.choose({'0'}|{str(i) for i in range(1,len(keys)+1)})
+            if choice=='0':return
+            key=keys[int(choice)-1];value=self.ui.read('新值（回车保留）：').strip()
+            if not value:continue
+            try:
+                if key=='enabled':
+                    if value not in ('true','false'):raise ValueError('Expected true/false')
+                    value=value=='true'
+                elif key=='aliases':value=[v.strip() for v in re.split('[,，]',value)]
+                else:value=int(value)
+                settings['participation']['attention'][key]=value
+                save_settings(self.path,settings,digest)
+                self.ui.write('已校验保存，下次启动生效；没有真实调用。')
+            except (ValueError,OSError) as error:self.ui.write(operation_error(error))
             self.ui.pause()
 
     def web_group(self):
@@ -559,6 +595,7 @@ def main():
     parser = argparse.ArgumentParser(description='本机授权群/黑名单配置，停止后保存、下次启动生效')
     commands = parser.add_subparsers(dest='section')
     commands.add_parser('show')
+    commands.add_parser('export-legacy-config')
     commands.add_parser('connection-init')
     commands.add_parser('connection-check')
     commands.add_parser('clear-remote-unknown').add_argument('identifier')
@@ -572,10 +609,16 @@ def main():
         actions.add_parser('list')
         for action in ('add', 'remove'):
             actions.add_parser(action).add_argument('identifier')
+    legacy=commands.add_parser('activate-legacy-config')
+    legacy.add_argument('review');legacy.add_argument('source_digest');legacy.add_argument('legacy_digest');legacy.add_argument('confirmation',choices=['已核对'])
     args = parser.parse_args()
     path = ROOT / 'config/settings.local.yaml'
     try:
-        if args.section is None:
+        if args.section=='activate-legacy-config':
+            from qqbot_gateway.config import activate_legacy_config
+            import json
+            print(json.dumps(activate_legacy_config(path,args.review,args.source_digest,args.legacy_digest,args.confirmation)))
+        elif args.section is None:
             menu(path)
         else:
             execute(path, args.section, getattr(args, 'action', None), getattr(args, 'identifier', None))

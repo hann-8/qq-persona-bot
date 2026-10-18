@@ -7,6 +7,7 @@ from pathlib import Path
 import secrets
 import time
 import uuid
+import re
 import psutil
 
 from aiohttp import web
@@ -23,6 +24,8 @@ from .lifecycle import stopping
 LOG = logging.getLogger(__name__)
 TRACE = web.RequestKey('qqbot_trace',str)
 GROUP_REQUEST = web.RequestKey('qqbot_group_request',dict)
+V2_SOURCE = web.RequestKey('qqbot_v2_source',dict)
+V2_EFFECTIVE = web.RequestKey('qqbot_v2_effective',dict)
 
 
 @dataclass
@@ -116,7 +119,7 @@ class ModelQueue:
             if self.state in ('AUTH_REQUIRED','QUOTA_EXHAUSTED','CLEANUP_FAILED','REMOTE_RESULT_UNKNOWN'):
                 job.future.set_exception(GatewayError(self.state));continue
             self.active=True
-            if job.group_request and job.group_request.get('kind')=='group_turn' and hasattr(self.runner,'run_group'):
+            if job.group_request and job.group_request.get('kind') in ('group_turn','member_turn') and hasattr(self.runner,'run_group'):
                 call=self.runner.run_group(job.system,job.prompt,job.request_id,job.group_request)
             elif job.group_request=={'version':1,'kind':'media_turn'} and hasattr(self.runner,'run_media'):
                 call=self.runner.run_media(job.system,job.prompt,job.request_id)
@@ -154,7 +157,7 @@ class ModelQueue:
                 self.active=False
 
 
-def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,root=None,output=None,memes=None):
+def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,root=None,output=None,memes=None,v2=None):
     budget=budget or InputBudget()
     output=DEFAULTS | {'max_reply_chars':max_reply_chars} | (output or {})
     if not isinstance(token,str) or len(token)<32:raise ValueError('Local bearer token required')
@@ -174,7 +177,7 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
             trace=request.get(TRACE,'unknown')
             queue.last_error={'trace':trace,'code':error.code,'time':time.time()}
             if GROUP_REQUEST in request:
-                usage_key=request[GROUP_REQUEST]['trigger']+':error'
+                usage_key=request[GROUP_REQUEST].get('addressing',request[GROUP_REQUEST].get('trigger'))+':error'
                 queue.group_usage[usage_key]=queue.group_usage.get(usage_key,0)+1
             LOG.warning('REQUEST_FAILED request_id=%s code=%s',trace,error.code)
             if GROUP_REQUEST in request and error.code in MESSAGES and error.code!='UNSUPPORTED_REQUEST':
@@ -184,11 +187,15 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
                 text=MESSAGES[error.code] if group['must_reply'] else SILENT
                 plan=ReplyPlan('answer',(text,),text,fallback_reason='gateway_'+error.code.lower()) if group['must_reply'] else None
                 response_id='chatcmpl-'+trace
+                if group['version']==2:
+                    from .turn_v2 import metadata as v2_metadata
+                    bound=v2_metadata(group,response_id,'error',plan,request.get(V2_EFFECTIVE,request[V2_SOURCE]))
+                else:bound=group_metadata(group,response_id,'error',plan)
                 # Keep local errors on the same authenticated result path. No
                 # generation/retry, no raw exception text, no missing metadata.
                 return web.json_response({'id':response_id,'object':'chat.completion','created':int(time.time()),
                     'model':'workbuddy-local','qqbot_credits':None,'qqbot_gateway_error':error.code,
-                    'qqbot_group_plan':group_metadata(group,response_id,'error',plan),
+                    'qqbot_group_plan':bound,
                     'choices':[{'index':0,'message':{'role':'assistant','content':text},'finish_reason':'stop'}]})
             status={'UNSUPPORTED_REQUEST':422,'QUOTA_EXHAUSTED':429,'RATE_LIMITED':429,'QUEUE_FULL':429,
                     'INPUT_TOO_LONG':422,'MODEL_CONFIG_UNSUPPORTED':422,
@@ -232,12 +239,31 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
     async def chat(request):
         request[TRACE]=uuid.uuid4().hex[:10]
         if root and stopping(root):raise GatewayError('SHUTTING_DOWN')
-        try:payload=await request.json()
+        try:
+            from .reply_plan import _pairs
+            payload=json.loads(await request.text(),object_pairs_hook=_pairs)
         except (ValueError,UnicodeError):raise GatewayError('UNSUPPORTED_REQUEST') from None
         from .turn_budget import candidate_instruction
-        if isinstance(payload,dict) and isinstance(payload.get('qqbot_request'),dict) and payload['qqbot_request'].get('kind')=='group_turn':
+        if isinstance(payload,dict) and isinstance(payload.get('qqbot_request'),dict) and payload['qqbot_request'].get('kind') in ('group_turn','member_turn'):
             from .group_protocol import validate_request
-            request[GROUP_REQUEST]=validate_request(payload['qqbot_request'])
+            header=validate_request(payload['qqbot_request'])
+            if header['version']==2:
+                trace=request.headers.get('X-QQBot-Trace','')
+                if not re.fullmatch(r'[a-f0-9]{32}',trace):raise GatewayError('UNSUPPORTED_REQUEST')
+                request[TRACE]=trace
+                if not v2 or header['mode']!=v2['mode'] or header['config_version']!=v2['config_version']:
+                    raise GatewayError('UNSUPPORTED_REQUEST')
+                from .turn_v2 import validate_source
+                try:
+                    content=payload['messages'][-1]['content']
+                    if isinstance(content,list):
+                        if any(not isinstance(p,dict) or set(p)!={'type','text'} or p['type']!='text' or not isinstance(p['text'],str) for p in content):raise ValueError()
+                        content=''.join(p['text'] for p in content)
+                    source=validate_source(content,header)
+                except (KeyError,IndexError,TypeError,ValueError):raise GatewayError('UNSUPPORTED_REQUEST') from None
+                if source['self']['names']!=v2['aliases']:raise GatewayError('UNSUPPORTED_REQUEST')
+                request[V2_SOURCE]=source
+            request[GROUP_REQUEST]=header
         suffix=candidate_instruction([]) if memes is not None and memes.cfg['enabled'] else ''
         system,prompt=normalize_request(payload,budget=budget,group_suffix=suffix)
         if payload.get('qqbot_request',{}).get('kind')=='group_turn':request[GROUP_REQUEST]=payload['qqbot_request']
@@ -245,22 +271,30 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
         queue.last_shape=contract_shape(payload)
         LOG.info('REQUEST_ACCEPTED request_id=%s',request[TRACE])
         group_request=payload.get('qqbot_request')
-        is_group=bool(group_request and group_request.get('kind')=='group_turn')
+        is_group=bool(group_request and group_request.get('kind') in ('group_turn','member_turn'))
         is_media=group_request=={'version':1,'kind':'media_turn'}
         if is_media and (memes is None or not memes.cfg['enabled']):raise GatewayError('UNSUPPORTED_REQUEST')
         candidates=[]
         question=json.loads(prompt)[-1]['content']
         if is_group:
             snapshot=json.loads(question)
+            if group_request['version']==2:request[V2_EFFECTIVE]=snapshot
             question=next((r['text'] for r in snapshot['messages'] if r['seq']==snapshot.get('target_seq')),snapshot['messages'][-1]['text'])
+            if group_request['version']==2:
+                from .attention import canonical
+                LOG.info('ATTENTION trace=%s stage=snapshot config=%s seq_first=%s seq_last=%s target=%s trimmed_bytes=%s backend=%s model=%s',
+                    request[TRACE],group_request['config_version'],snapshot['messages'][0]['seq'],snapshot['messages'][-1]['seq'],snapshot['target_seq'],
+                    max(0,len(canonical(request[V2_SOURCE]).encode())-len(json.loads(prompt)[-1]['content'].encode())),
+                    getattr(queue.runner,'backend','codebuddy_cli'),getattr(queue.runner,'model',getattr(queue.runner,'profile',{}).get('model','unknown')))
         if memes is not None and memes.cfg['enabled'] and (is_group or is_media):
-            candidates=memes.candidates(question)
+            candidates=memes.candidates((snapshot.get('meme_question') or '') if is_group and group_request['version']==2 else question)
             while True:
                 instruction=candidate_instruction(candidates)
                 if budget.usage(system+instruction,prompt)<=budget.limit:break
                 if not candidates:raise GatewayError('INPUT_TOO_LONG')
                 candidates.pop()
             system+=instruction
+        started=time.monotonic()
         result=await queue.submit(system,prompt,request[TRACE],group_request)
         backend_result=result if isinstance(result,BackendResult) else BackendResult(result)
         result=backend_result.text
@@ -270,24 +304,33 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
             from .group_protocol import group_plan,metadata as group_metadata,SILENT
             snapshot=json.loads(json.loads(prompt)[-1]['content'])
             question=next((row['text'] for row in snapshot['messages'] if row['seq']==snapshot.get('target_seq')),snapshot['messages'][-1]['text'])
+            response_to=None
             if backend_result.prepared_plan is not None:
                 plan=backend_result.prepared_plan
+                response_to=backend_result.response_to_seq
                 decision='speak'
             elif backend_result.web_expired:
                 decision,plan=group_plan('',output,'',group_request['must_reply'])
             else:
-                if memes is not None and memes.cfg['enabled']:
+                if group_request['version']==2:
+                    from .turn_v2 import plan as v2_plan
+                    decision,plan,response_to=v2_plan(result,output,question,group_request,snapshot,memes,candidates)
+                elif memes is not None and memes.cfg['enabled']:
                     from .media_protocol import media_plan
                     decision,plan=media_plan(result,output,question,memes,candidates,group=True,must_reply=group_request['must_reply'])
                 else:decision,plan=group_plan(result,output,question,group_request['must_reply'])
             result=plan.canonical_text if plan else SILENT
             limited=plan.limited if plan else False
-            metadata['qqbot_group_plan']=group_metadata(group_request,response_id,decision,plan)
-            queue.last_usage=dict(queue.last_usage,trigger=group_request['trigger'],decision=decision)
-            usage_key=group_request['trigger']+':'+decision
+            if group_request['version']==2:
+                from .turn_v2 import metadata as v2_metadata
+                metadata['qqbot_group_plan']=v2_metadata(group_request,response_id,decision,plan,snapshot,response_to)
+                LOG.info('ATTENTION trace=%s stage=model_done decision=%s elapsed_ms=%s',request[TRACE],decision,int((time.monotonic()-started)*1000))
+            else:metadata['qqbot_group_plan']=group_metadata(group_request,response_id,decision,plan)
+            queue.last_usage=dict(queue.last_usage,trigger=group_request.get('addressing',group_request.get('trigger')),decision=decision)
+            usage_key=group_request.get('addressing',group_request.get('trigger'))+':'+decision
             queue.group_usage[usage_key]=queue.group_usage.get(usage_key,0)+1
             if backend_result.generation_performed:
-                generated_key=group_request['trigger']+':generations'
+                generated_key=group_request.get('addressing',group_request.get('trigger'))+':generations'
                 queue.group_usage[generated_key]=queue.group_usage.get(generated_key,0)+1
         elif is_media and not backend_result.web_expired:
             from .media_protocol import media_plan
@@ -344,7 +387,14 @@ def main():
     runner.memes=memes
     queue=ModelQueue(runner,llm['queue_limit'],llm['queue_wait_seconds'])
     logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(message)s')
-    web.run_app(application(queue,tokens['model_gateway'],root/'state/router-ready.json',budget,settings['output']['max_reply_chars'],root,settings['output'],memes),host=llm['host'],port=llm['port'],
+    v2=None
+    if settings['participation']['mode']=='free' and settings['participation']['attention']['enabled']:
+        from .persona import compose_persona,session_version
+        from .reply_plan import digest
+        persona=compose_persona((root/'config/persona.md').read_text(encoding='utf-8'),settings['output'],settings['web'],settings['participation'],settings['memes'])
+        persona_id=session_version(persona+('\n'+memes.fingerprint() if memes.cfg['enabled'] else ''),settings)
+        v2=dict(mode='free',config_version=digest(persona_id),aliases=settings['participation']['attention']['aliases'])
+    web.run_app(application(queue,tokens['model_gateway'],root/'state/router-ready.json',budget,settings['output']['max_reply_chars'],root,settings['output'],memes,v2),host=llm['host'],port=llm['port'],
                 access_log=None,handler_cancellation=True)
 
 

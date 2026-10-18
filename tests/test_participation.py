@@ -29,7 +29,8 @@ def reply(decision='speak',**kwargs):
 
 class ProtocolTests(unittest.TestCase):
     def test_defaults_and_rejected_ranges_types(self):
-        self.assertEqual(validate_participation({}),DEFAULTS)
+        self.assertEqual({k:v for k,v in validate_participation({}).items() if k!='attention'},DEFAULTS)
+        self.assertIs(validate_participation({})['attention']['enabled'],False)
         for value in ({'mode':'auto'},{'context_messages':True},{'context_messages':201},{'debounce_seconds':0},
                       {'max_batch_wait_seconds':2,'debounce_seconds':3},{'allow_ambient_web':'true'},{'probability':.3}):
             with self.subTest(value=value),self.assertRaises(ValueError):validate_participation(value)

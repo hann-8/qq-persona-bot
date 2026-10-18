@@ -2,6 +2,14 @@
 # Budget fields count visible UTF-8 bytes and envelope, not exact model tokens.
 schema_version: 3
 participation:
+  # LAP-27仅free显式开启生效，mentions保留真实@；保存须停机/重启加载
+  attention:
+    enabled: false
+    aliases: [肥鱼, 大肥鱼, 鱼鱼, 鲸鱼娘, 小鲸鱼, DSH]
+    focus_ttl_seconds: 60
+    max_intervening_messages: 0
+    direct_queue_limit: 4
+    focus_candidate_evaluations_per_minute: 4
   mode: mentions
   debounce_seconds: 2
   max_batch_wait_seconds: 5
