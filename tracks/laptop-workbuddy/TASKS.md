@@ -1,3 +1,5 @@
+2026-10-19 20:06（Asia/Shanghai）：[LAP-33人工恢复](tasks/LAP-33/HANDOFF.md)已完成一次现场状态维护，session LAP-33-manual-cleanup-recovery；用户要求降低轻微故障影响并自行关闭bot，锁内核验owner/41登记身份全退出、五端口关闭后完整备份并归档旧记录，独立cleanup status确认blocked=false。仅observed_only人工判断，不是31B完整退出证明；0代码/配置/真实模型/群操作，bot保持停止。长期分级/自动恢复未实现，真实启动效果待用户验证；归属4份文档，原记录/说明留本机忽略目录。
+
 2026-10-19（Asia/Shanghai）：[LAP-30](tasks/LAP-30/HANDOFF.md)已实现/离线通过，session LAP-30-group-memory；396单元、68组合926实际框架（含31专项及成员/视觉+记忆组合）。稳定有界群记忆/同轮协议/文字ACK/持久purge与菜单7→22交付；默认读取/学习均关闭。0本机配置/凭据/真实记忆或真实bot/模型/QQ操作，真实/完整未验，旧差额保留；Git检查点见交接。
 
 2026-10-18 23:58（Asia/Shanghai）：[LAP-32清理台账调试](tasks/LAP-32/HANDOFF.md)已修复已复现的临时I/O冲突与摘要文件名覆盖，95项相关离线回归通过；新增根[目录与日志说明](../../项目目录与日志说明.md)。现场23:00:52生成success但ledger_error，原OS错误未留存；真实未决仍blocked、未恢复，31B完整退出证据差额保留。0真实启停/模型/QQ/台账修改；保留LAP-29全部差异，Git交付以32交接为准。
