@@ -1,144 +1,144 @@
 # 旧单文件兼容模板；新入口见config/README.md与config/examples五文件。
 # schema1/2 are migrated in memory; saving writes schema3 with a full backup.
 # Budget fields count visible UTF-8 bytes and envelope, not exact model tokens.
-schema_version: 3
-memory:
-  enabled: false
-  learning_enabled: false
-  max_records: 64
-  max_fact_bytes: 16384
-  max_group_file_bytes: 65536
-  max_groups: 16
-  max_total_bytes: 8388608
-  max_prompt_records: 8
-  max_prompt_bytes: 1536
-  max_proposals_per_turn: 3
-  max_record_bytes: 240
-vision:
-  enabled: false  # production_eligible未证明；true会在启动时拒绝，不自动调用验证
-  input_reserve_tokens: 4096  # 待验证假设，不能当视觉token/patch上界
-participation:
+schema_version: 3  # 内部配置版本固定3
+memory:  # 配置节，子字段见下方；保留既有校验约束
+  enabled: false  # 读取本群长期记忆的开关，不等于开启学习
+  learning_enabled: false  # 记忆学习开关，必须同时开启记忆读取，不新增推理调用
+  max_records: 64  # 每群记忆记录数上限
+  max_fact_bytes: 16384  # 每群记忆事实总字节上限
+  max_group_file_bytes: 65536  # 单群记忆文件字节上限
+  max_groups: 16  # 可持久化群数上限
+  max_total_bytes: 8388608  # 记忆总字节上限
+  max_prompt_records: 8  # 单次记忆提示记录数上限
+  max_prompt_bytes: 1536  # 记忆/成员提示UTF-8字节上限
+  max_proposals_per_turn: 3  # 单轮学习提议数上限
+  max_record_bytes: 240  # 单条记忆UTF-8字节上限
+vision:  # 配置节，子字段见下方；保留既有校验约束
+  enabled: false  # production_eligible未证明；true会在启动时拒绝，不自动调用验证；原生识图desired开关；生产能力未验证，true仍拒绝启动
+  input_reserve_tokens: 4096  # 待验证假设，不能当视觉token/patch上界；视觉预留4096仅假设，容量/上界未证，true仍拒启动
+participation:  # 配置节，子字段见下方；保留既有校验约束
   # 临时停言默认开启；普通成员明确要求后本群静默，下一条真实@恢复；重启复位，无超时解除。
-  silence:
-    enabled: true  # 下次正常启动生效；false关闭此能力，省略仍默认true
+  silence:  # 每群RAM临时停言；真实@恢复，gate重启复位，重连保持；默认enabled=true
+    enabled: true  # 下次正常启动生效；false关闭此能力，省略仍默认true；临时停言开关；明确停言后本群静默，新真实@恢复，gate重启复位
   # LAP-27仅free显式开启生效，mentions保留真实@；保存须停机/重启加载
-  attention:
-    enabled: false
-    aliases: [肥鱼, 大肥鱼, 鱼鱼, 鲸鱼娘, 小鲸鱼, DSH]
-    focus_ttl_seconds: 60
-    max_intervening_messages: 0
-    direct_queue_limit: 4
-    focus_candidate_evaluations_per_minute: 4
-  mode: mentions
-  debounce_seconds: 2
-  max_batch_wait_seconds: 5
-  min_evaluation_interval_seconds: 5
-  max_evaluations_per_minute: 12
-  unsolicited_cooldown_seconds: 15
-  max_unsolicited_per_minute: 4
-  context_messages: 60
-  context_ttl_seconds: 900
-  context_max_bytes: 32768
-  message_max_chars: 2000
-  mention_queue_limit: 8
-  max_ambient_age_seconds: 90
-  allow_ambient_web: true
-web:
-  enabled: false
-  trigger: auto
-  provider: bing_rss
-  max_searches: 1
-  max_results: 5
-  max_pages: 2
-  timeout_seconds: 15
-  max_redirects: 2
-  max_response_bytes: 1048576
-  max_page_text_bytes: 4000
-  max_evidence_bytes: 6000
-  max_sources: 2
-bot:
-  qq: REQUIRED_PERSONAL_BOT_QQ
-access:
-  allowed_groups:
+  attention:  # 配置节，子字段见下方；保留既有校验约束
+    enabled: false  # free中的叫名/指代与自然续聊开关，mentions不生效
+    aliases: [肥鱼, 大肥鱼, 鱼鱼, 鲸鱼娘, 小鲸鱼, DSH]  # 关注别名1..16个，每名1..16字符，不当作真实@
+    focus_ttl_seconds: 60  # 焦点保持秒15..180
+    max_intervening_messages: 0  # 允许插入条数固定0
+    direct_queue_limit: 4  # 关注直接队列数1..8
+    focus_candidate_evaluations_per_minute: 4  # 焦点候选每分钟评估次数1..8
+  mode: mentions  # mentions只回应真实@；free可参与授权群新消息，仍受黑名单和频率约束
+  debounce_seconds: 2  # 新群消息合批等待秒
+  max_batch_wait_seconds: 5  # 合批最长等待秒
+  min_evaluation_interval_seconds: 5  # 候选评估最小间隔秒
+  max_evaluations_per_minute: 12  # 每分钟候选评估次数上限
+  unsolicited_cooldown_seconds: 15  # 自发回应冷却秒，真实@绕过自发沉默/冷却
+  max_unsolicited_per_minute: 4  # 每分钟自发回应轮数上限
+  context_messages: 60  # RAM窗口消息条数上限
+  context_ttl_seconds: 900  # RAM窗口有效秒数
+  context_max_bytes: 32768  # RAM窗口UTF-8字节上限
+  message_max_chars: 2000  # 单条消息字符上限
+  mention_queue_limit: 8  # 真实@排队条数
+  max_ambient_age_seconds: 90  # 普通候选最大年龄秒
+  allow_ambient_web: true  # 普通候选可用联网，还必须开启web；不上传历史
+web:  # 配置节，子字段见下方；保留既有校验约束
+  enabled: false  # 共用网页读取开关；搜索质量门槛仍关闭，不代表完整搜索可用
+  trigger: auto  # 联网触发auto/explicit
+  provider: bing_rss  # 搜索提供方固定bing_rss，当前搜索质量门槛关闭
+  max_searches: 1  # 搜索最多1次
+  max_results: 5  # 搜索结果1..5条
+  max_pages: 2  # 正文1..2页
+  timeout_seconds: 15  # 联网总超时秒5..15
+  max_redirects: 2  # 重定向0..2次
+  max_response_bytes: 1048576  # 响应上限65536..1048576字节
+  max_page_text_bytes: 4000  # 单页正文1000..8000字节
+  max_evidence_bytes: 6000  # 联网材料1000..12000字节
+  max_sources: 2  # 来源1..2项
+bot:  # 配置节，子字段见下方；保留既有校验约束
+  qq: REQUIRED_PERSONAL_BOT_QQ  # 机器人个人QQ，必填正整数字符串，占位不能启动
+access:  # 配置节，子字段见下方；保留既有校验约束
+  allowed_groups:  # 授权群，必填非空正整数列表，不自动加群
   - REQUIRED_TEST_GROUP
-  blocked_users: []
-  admin_users:
+  blocked_users: []  # 全群前置屏蔽QQ列表，不进入框架/模型/新增记忆
+  admin_users:  # bot管理员QQ，通常填你自己的QQ，非QQ群管理员；可真实@重置上下文，不豁免授权群/黑名单
   - REQUIRED_ADMIN_QQ
-  private_enabled: false
-onebot:
-  host: 127.0.0.1
-  port: 6200
-  upstream: ws://127.0.0.1:6199/ws
-secrets_file: secrets/local-tokens.json
-llm:
-  backend: codebuddy_cli
-  host: 127.0.0.1
-  port: 8765
-  max_concurrency: 1
-  queue_limit: 5
-  queue_wait_seconds: 30
-  cleanup_seconds: 5
-  profiles:
-    codebuddy_cli:
-      model: deepseek-v4.1-flash
-      reasoning_effort: auto
-      context_window_tokens: null
-      run_timeout_seconds: 90
-      input_budget:
-        context_input_limit_tokens: 16384
-        context_overhead_reserve_tokens: 2048
-        output_reserve_tokens: 2048
-    ollama_ssh:
-      model: qwen3.5:9b-q4_K_M
-      expected_digest: null
-      access_file: secrets/home-5070-runtime.local.json
-      num_ctx: 16384
-      think: false
-      num_predict: 1024
-      keep_alive_seconds: 300
-      temperature: 0.7
-      top_p: 0.8
-      top_k: 20
-      run_timeout_seconds: 120
-      input_budget:
-        context_input_limit_tokens: 12288
-        context_overhead_reserve_tokens: 2048
-        output_reserve_tokens: 2048
-chat:
-  history_turns: 8
-output:
-  quote_reply: false
-  mode: plain_chat
-  max_reply_chars: 1200
-  delivery_mode: single
-  max_bubbles: 3
-  casual_max_chars: 80
-  bubble_max_chars: 40
-  bubble_delay_min_ms: 800
-  bubble_delay_max_ms: 1600
+  private_enabled: false  # 私聊固定false，不能手工开启
+onebot:  # 配置节，子字段见下方；保留既有校验约束
+  host: 127.0.0.1  # 高级监听地址固定127.0.0.1
+  port: 6200  # 高级回环端口1..65535
+  upstream: ws://127.0.0.1:6199/ws  # 固定回环WS /ws端点，不允许认证信息/查询/片段
+secrets_file: secrets/local-tokens.json  # 项目secrets内token文件引用，check不读凭据
+llm:  # 配置节，子字段见下方；保留既有校验约束
+  backend: codebuddy_cli  # 显式选择codebuddy_cli或ollama_ssh，不自动换模型/账号/额度
+  host: 127.0.0.1  # 高级监听地址固定127.0.0.1
+  port: 8765  # 高级回环端口1..65535
+  max_concurrency: 1  # 高级模型并发固定1，单次尝试不保证CLI上游只请求一次
+  queue_limit: 5  # 高级模型排队数0..100
+  queue_wait_seconds: 30  # 高级排队等待秒1..3600，受180秒总预算限制
+  cleanup_seconds: 5  # 高级清理等待秒1..60，原unknown/清理门槛保持
+  profiles:  # 配置节，子字段见下方；保留既有校验约束
+    codebuddy_cli:  # 配置节，子字段见下方；保留既有校验约束
+      model: deepseek-v4.1-flash  # CLI模型ID或已安装本地精确tag，不自动下载，不保证免费
+      reasoning_effort: auto  # auto/minimal/low/medium/high/xhigh/max，受已有模型能力元数据约束
+      context_window_tokens: null  # CLI原生窗口仅null/auto口径，实际窗口未证
+      run_timeout_seconds: 90  # 单次运行期限秒；排队+所选运行期限+25秒不得超过180秒
+      input_budget:  # 配置节，子字段见下方；保留既有校验约束
+        context_input_limit_tokens: 16384  # 可见UTF-8字节保守输入预算，非精确token/积分
+        context_overhead_reserve_tokens: 2048  # 输入开销预留，保守计数，非精确token
+        output_reserve_tokens: 2048  # 输出预留；本地输入加输出不超过num_ctx，预留不少于num_predict
+    ollama_ssh:  # 配置节，子字段见下方；保留既有校验约束
+      model: qwen3.5:9b-q4_K_M  # CLI模型ID或已安装本地精确tag，不自动下载，不保证免费
+      expected_digest: null  # 本地模型SHA256，启用ollama_ssh前须明确核对，不能填已验证标记
+      access_file: secrets/home-5070-runtime.local.json  # 仅项目secrets内连接资料引用，不内联凭据
+      num_ctx: 16384  # 本地请求上下文4096..32768，不保证精确token上界
+      think: false  # 本地请求固定false；不映射CLI推理档位
+      num_predict: 1024  # 本地输出上限128..4096，须不大于输出预算预留
+      keep_alive_seconds: 300  # 本地模型保温秒数0..1800
+      temperature: 0.7  # 本地采样温度0..2
+      top_p: 0.8  # 本地采样累计概率(0,1]
+      top_k: 20  # 本地采样候选数1..100
+      run_timeout_seconds: 120  # 单次运行期限秒；排队+所选运行期限+25秒不得超过180秒
+      input_budget:  # 配置节，子字段见下方；保留既有校验约束
+        context_input_limit_tokens: 12288  # 可见UTF-8字节保守输入预算，非精确token/积分
+        context_overhead_reserve_tokens: 2048  # 输入开销预留，保守计数，非精确token
+        output_reserve_tokens: 2048  # 输出预留；本地输入加输出不超过num_ctx，预留不少于num_predict
+chat:  # 配置节，子字段见下方；保留既有校验约束
+  history_turns: 8  # 历史轮数1..64，保留旧历史并受预算裁剪
+output:  # 配置节，子字段见下方；保留既有校验约束
+  quote_reply: false  # 固定false，直接群发
+  mode: plain_chat  # QQ正文固定plain_chat自然纯文本
+  max_reply_chars: 1200  # 正文字符上限200..8000
+  delivery_mode: single  # single/adaptive，adaptive自然分条，不强制凑条
+  max_bubbles: 3  # 最多气泡1..3，认真问题仍单条
+  casual_max_chars: 80  # 闲聊总字符20..120
+  bubble_max_chars: 40  # 单气泡字符10..60，不超过闲聊总长
+  bubble_delay_min_ms: 800  # 分条间隔下限毫秒0..5000
+  bubble_delay_max_ms: 1600  # 分条间隔上限毫秒0..5000，不小于下限
 
 # 受控表情；默认关闭，扫描/标签/目录激活须停机，重启生效
-memes:
-  enabled: false
-  inbox_dir: assets/memes/inbox
-  library_dir: assets/memes/library
-  catalog_file: config/memes.local.yaml
-  max_candidates: 16
-  catalog_prompt_max_bytes: 2000
-  max_images_per_turn: 1
-  cooldown_seconds: 60
-  same_meme_cooldown_seconds: 300
-  allow_meme_only: true
-  max_file_bytes: 8388608
-  import_count: 48
+memes:  # 配置节，子字段见下方；保留既有校验约束
+  enabled: false  # 发送已登记表情图片的开关，不开放任意媒体
+  inbox_dir: assets/memes/inbox  # 固定项目assets/memes/inbox，本机素材不提交
+  library_dir: assets/memes/library  # 固定项目assets/memes/library
+  catalog_file: config/memes.local.yaml  # 固定config/memes.local.yaml，是图库数据而非发送开关
+  max_candidates: 16  # 表情候选数1..32
+  catalog_prompt_max_bytes: 2000  # 表情提示500..4000字节
+  max_images_per_turn: 1  # 单轮固定最多1图
+  cooldown_seconds: 60  # 表情冷却秒0..600
+  same_meme_cooldown_seconds: 300  # 同图冷却秒0..3600
+  allow_meme_only: true  # 允许仅发送已登记表情，不开放任意媒体
+  max_file_bytes: 8388608  # 表情单文件1048576..8388608字节
+  import_count: 48  # 显式导入数量1..48
 
 # LAP-29：生产人数新鲜度未证，配置工具拒绝启用；手改desired启动仅暂停本功能。
 # received_at不是人数观测时间；只允许1..49，50/未知/过期零list。
-members:
-  enabled: false
-  mentions_enabled: false
-  roster_member_count_lt: 50
-  count_ttl_seconds: 60
-  roster_ttl_seconds: 300
-  max_prompt_entries: 8
-  max_prompt_bytes: 768
+members:  # 配置节，子字段见下方；保留既有校验约束
+  enabled: false  # 小群成员desired开关；人数新鲜度未证，生产仍暂停
+  mentions_enabled: false  # 受控成员@开关，仍受成员生产暂停门槛限制
+  roster_member_count_lt: 50  # 人数必须小于50；未知/过期暂停，不以收到时间假冒观测时间
+  count_ttl_seconds: 60  # 人数有效秒数
+  roster_ttl_seconds: 300  # 名册有效秒数
+  max_prompt_entries: 8  # 成员提示条目上限
+  max_prompt_bytes: 768  # 记忆/成员提示UTF-8字节上限

@@ -1,19 +1,12 @@
 # bot.yaml：机器人身份、授权群、管理员与前置黑名单
 # 同目录五文件共同组成配置；其他文件见config/README.md。
 # 本机config/local不提交；保存后下次正常启动生效，不热更新。
-# bot：配置节，子字段见下方；保留既有校验约束
-# bot.qq：机器人个人QQ，必填正整数字符串，占位不能启动；新装默认 "REQUIRED_PERSONAL_BOT_QQ"
-# access：配置节，子字段见下方；保留既有校验约束
-# access.allowed_groups：授权群，必填非空正整数列表，不自动加群；新装默认 ["REQUIRED_TEST_GROUP"]
-# access.blocked_users：全群前置屏蔽QQ列表，不进入框架/模型/新增记忆；新装默认 []
-# access.admin_users：管理员，必填非空正整数列表，不豁免黑名单；新装默认 ["REQUIRED_ADMIN_QQ"]
-# access.private_enabled：私聊固定false，不能手工开启；新装默认 false
-bot:
-  qq: REQUIRED_PERSONAL_BOT_QQ
-access:
-  allowed_groups:
+bot:  # 配置节，子字段见下方；保留既有校验约束
+  qq: REQUIRED_PERSONAL_BOT_QQ  # 机器人个人QQ，必填正整数字符串，占位不能启动；新装默认 "REQUIRED_PERSONAL_BOT_QQ"
+access:  # 配置节，子字段见下方；保留既有校验约束
+  allowed_groups:  # 授权群，必填非空正整数列表，不自动加群；新装默认 ["REQUIRED_TEST_GROUP"]
   - REQUIRED_TEST_GROUP
-  blocked_users: []
-  admin_users:
+  blocked_users: []  # 全群前置屏蔽QQ列表，不进入框架/模型/新增记忆；新装默认 []
+  admin_users:  # bot管理员QQ，通常填你自己的QQ，非QQ群管理员；可真实@重置上下文，不豁免授权群/黑名单；新装默认 ["REQUIRED_ADMIN_QQ"]
   - REQUIRED_ADMIN_QQ
-  private_enabled: false
+  private_enabled: false  # 私聊固定false，不能手工开启；新装默认 false

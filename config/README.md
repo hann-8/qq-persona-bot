@@ -1,5 +1,7 @@
 # 配置文件索引
 
+模板和本机文件均在每个参数旁写中文注释，列表参数在列表名旁说明。注释中的“新装默认”只供参考，不会覆盖右侧当前值；既有用户备注保留。`participation.mode`控制mentions/free，`output.mode`固定plain_chat，分条方式另由`output.delivery_mode`控制。
+
 日常流程：关闭机器人 → 编辑对应文件 → 保存 → 使用根目录“启动机器人.cmd”正常启动。没有apply步骤，不热更新。可选先运行 `.venv/Scripts/python.exe scripts/config_files.py check`。当前实例继续用启动时快照；状态页将已加载快照与磁盘候选分开显示。
 
 | 想修改什么 | 本机文件 | 根字段 / 模板 |

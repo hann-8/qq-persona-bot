@@ -84,3 +84,111 @@ COMMENT_KEYS = frozenset(DESCRIPTIONS) | frozenset(('bot','access','llm','profil
 
 def comment(key, value=None):
     return DESCRIPTIONS.get(key, '配置节，子字段见下方；保留既有校验约束')
+
+
+PATH_DESCRIPTIONS = {
+    ('access', 'admin_users'): 'bot管理员QQ，通常填你自己的QQ，非QQ群管理员；可真实@重置上下文，不豁免授权群/黑名单',
+    ('participation', 'mode'): 'mentions只回应真实@；free可参与授权群新消息，仍受黑名单和频率约束',
+    ('participation', 'attention', 'enabled'): 'free中的叫名/指代与自然续聊开关，mentions不生效',
+    ('participation', 'silence', 'enabled'): '临时停言开关；明确停言后本群静默，新真实@恢复，gate重启复位',
+    ('output', 'mode'): 'QQ正文固定plain_chat自然纯文本',
+    ('web', 'enabled'): '共用网页读取开关；搜索质量门槛仍关闭，不代表完整搜索可用',
+    ('memes', 'enabled'): '发送已登记表情图片的开关，不开放任意媒体',
+    ('memory', 'enabled'): '读取本群长期记忆的开关，不等于开启学习',
+    ('vision', 'enabled'): '原生识图desired开关；生产能力未验证，true仍拒绝启动',
+    ('members', 'enabled'): '小群成员desired开关；人数新鲜度未证，生产仍暂停',
+}
+
+
+def comment_for_path(path):
+    return PATH_DESCRIPTIONS.get(tuple(path), comment(path[-1]))
+
+
+def annotate_yaml(text):
+    """Move generated notes beside keys without reserializing any YAML value.
+
+    Keep existing user comments, ordering, quoting, BOM and line endings. New
+    annotations use only the fixed vocabulary, never configuration values.
+    """
+    import re
+    import yaml
+
+    def nodes(source):
+        try:
+            for event in yaml.parse(source, Loader=yaml.SafeLoader):
+                if isinstance(event, yaml.AliasEvent) or getattr(event, 'anchor', None):
+                    raise ValueError('注释更新不接受锚点或别名')
+            root = yaml.compose(source, Loader=yaml.SafeLoader)
+            if not isinstance(root, yaml.MappingNode):raise ValueError('注释更新要求YAML映射')
+            fields = []
+            def walk(node, path=()):
+                if not isinstance(node, yaml.MappingNode):return
+                for key, value in node.value:
+                    if not isinstance(key, yaml.ScalarNode) or key.tag != 'tag:yaml.org,2002:str':
+                        raise ValueError('注释更新要求字符串字段名')
+                    if key.start_mark.line != key.end_mark.line:
+                        raise ValueError('注释更新不支持跨行字段名')
+                    field = path + (key.value,)
+                    fields.append((field, key, value))
+                    walk(value, field)
+            walk(root)
+            return fields
+        except (yaml.YAMLError, RecursionError):
+            raise ValueError('YAML格式无效，未更新注释') from None
+
+    original_fields = nodes(text)
+    paths = {'.'.join(path) for path, _, _ in original_fields}
+    notes = {}
+    retained = []
+    for line in text.splitlines(keepends=True):
+        match = re.fullmatch(r'# ([A-Za-z_][A-Za-z0-9_.]*)：([^\r\n]*)(?:\r?\n)?', line)
+        if match and match[1] in paths and all(key in COMMENT_KEYS for key in match[1].split('.')):
+            path = tuple(match[1].split('.'))
+            note = match[2]
+            base = comment(path[-1])
+            if path in PATH_DESCRIPTIONS and note.startswith(base):
+                note = comment_for_path(path) + note[len(base):]
+            notes[path] = notes[path] + '；' + note if path in notes else note
+        else:retained.append(line)
+    source = ''.join(retained)
+    fields = nodes(source)
+    lines = source.splitlines(keepends=True)
+    additions = {}
+    for path, key, value in fields:
+        line = key.start_mark.line
+        if ((isinstance(value, yaml.ScalarNode) and value.style not in ('|', '>') and value.value) or
+                getattr(value, 'flow_style', False)) and value.end_mark.line > line:
+            line = value.end_mark.line
+        line = min(line, len(lines) - 1)
+        note = notes.get(path, comment_for_path(path) if path[-1] in COMMENT_KEYS else '兼容扩展字段，保留原值，不保证有运行功能')
+        additions.setdefault(line, []).append((path, note))
+    # Locate real comments outside scalar tokens; quoted '#' and block content
+    # must remain literal values. Block header comments are outside the body.
+    scalars = [token for token in yaml.scan(source, Loader=yaml.SafeLoader) if isinstance(token, yaml.ScalarToken)]
+    offsets = [];offset = 0
+    for line in lines:offsets.append(offset);offset += len(line)
+    for index, entries in additions.items():
+        original = lines[index]
+        body = original.rstrip('\r\n');ending = original[len(body):]
+        start_comment = None
+        for column, char in enumerate(body):
+            if char != '#':continue
+            position = offsets[index] + column
+            if not any(token.start_mark.index <= position < token.end_mark.index and not
+                       (token.style in ('|', '>') and token.start_mark.line == index) for token in scalars):
+                start_comment = column;break
+        existing = body[start_comment + 1:] if start_comment is not None else ''
+        wanted = []
+        for path, note in entries:
+            if note in existing:continue
+            label = '.'.join(path) + '：' if len(entries) > 1 else ''
+            wanted.append(label + note)
+        if wanted:
+            body += ('；' if start_comment is not None else '  # ') + '；'.join(wanted)
+        lines[index] = body + ending
+    result = ''.join(lines)
+    try:
+        if yaml.safe_load(text) != yaml.safe_load(result):raise ValueError('注释更新改变了YAML语义，已拒绝')
+    except yaml.YAMLError:
+        raise ValueError('注释更新无法安全保持YAML语义，已拒绝') from None
+    return result

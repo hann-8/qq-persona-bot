@@ -1,86 +1,49 @@
 # chat.yaml：群参与、关注续聊、回复与历史；只由授权群新消息驱动
 # 同目录五文件共同组成配置；其他文件见config/README.md。
 # 本机config/local不提交；保存后下次正常启动生效，不热更新。
-# chat：配置节，子字段见下方；保留既有校验约束
-# chat.history_turns：历史轮数1..64，保留旧历史并受预算裁剪；新装默认 8
-# chat.user_cooldown_seconds：同人冷却秒0..3600；新装默认 5
-# chat.session_queue_limit：会话排队数0..100；新装默认 2
-# chat.session_queue_timeout_seconds：会话排队超时秒1..3600；新装默认 600
-# participation：配置节，子字段见下方；保留既有校验约束
-# participation.mode：participation可选mentions/free；output固定plain_chat；新装默认 "mentions"
-# participation.debounce_seconds：新群消息合批等待秒；新装默认 2
-# participation.max_batch_wait_seconds：合批最长等待秒；新装默认 5
-# participation.min_evaluation_interval_seconds：候选评估最小间隔秒；新装默认 5
-# participation.max_evaluations_per_minute：每分钟候选评估次数上限；新装默认 12
-# participation.unsolicited_cooldown_seconds：自发回应冷却秒，真实@绕过自发沉默/冷却；新装默认 15
-# participation.max_unsolicited_per_minute：每分钟自发回应轮数上限；新装默认 4
-# participation.context_messages：RAM窗口消息条数上限；新装默认 60
-# participation.context_ttl_seconds：RAM窗口有效秒数；新装默认 900
-# participation.context_max_bytes：RAM窗口UTF-8字节上限；新装默认 32768
-# participation.message_max_chars：单条消息字符上限；新装默认 2000
-# participation.mention_queue_limit：真实@排队条数；新装默认 8
-# participation.max_ambient_age_seconds：普通候选最大年龄秒；新装默认 90
-# participation.allow_ambient_web：普通候选可用联网，还必须开启web；不上传历史；新装默认 true
-# participation.attention：配置节，子字段见下方；保留既有校验约束
-# participation.attention.enabled：显式布尔开关；true不等于能力已验证，关注仅free有效；新装默认 false
-# participation.attention.aliases：关注别名1..16个，每名1..16字符，不当作真实@；新装默认 ["肥鱼", "大肥鱼", "鱼鱼", "鲸鱼娘", "小鲸鱼", "DSH"]
-# participation.attention.focus_ttl_seconds：焦点保持秒15..180；新装默认 60
-# participation.attention.max_intervening_messages：允许插入条数固定0；新装默认 0
-# participation.attention.direct_queue_limit：关注直接队列数1..8；新装默认 4
-# participation.attention.focus_candidate_evaluations_per_minute：焦点候选每分钟评估次数1..8；新装默认 4
-# output：配置节，子字段见下方；保留既有校验约束
-# output.quote_reply：固定false，直接群发；新装默认 false
-# output.mode：participation可选mentions/free；output固定plain_chat；新装默认 "plain_chat"
-# output.max_reply_chars：正文字符上限200..8000；新装默认 1200
-# output.delivery_mode：single/adaptive，adaptive自然分条，不强制凑条；新装默认 "single"
-# output.max_bubbles：最多气泡1..3，认真问题仍单条；新装默认 3
-# output.casual_max_chars：闲聊总字符20..120；新装默认 80
-# output.bubble_max_chars：单气泡字符10..60，不超过闲聊总长；新装默认 40
-# output.bubble_delay_min_ms：分条间隔下限毫秒0..5000；新装默认 800
-# output.bubble_delay_max_ms：分条间隔上限毫秒0..5000，不小于下限；新装默认 1600
-chat:
-  history_turns: 8
-  user_cooldown_seconds: 5
-  session_queue_limit: 2
-  session_queue_timeout_seconds: 600
-participation:
+chat:  # 配置节，子字段见下方；保留既有校验约束
+  history_turns: 8  # 历史轮数1..64，保留旧历史并受预算裁剪；新装默认 8
+  user_cooldown_seconds: 5  # 同人冷却秒0..3600；新装默认 5
+  session_queue_limit: 2  # 会话排队数0..100；新装默认 2
+  session_queue_timeout_seconds: 600  # 会话排队超时秒1..3600；新装默认 600
+participation:  # 配置节，子字段见下方；保留既有校验约束
   # 临时停言默认开启；普通成员明确要求后本群静默，下一条真实@恢复；重启复位，无超时解除。
-  silence:
-    enabled: true  # 下次正常启动生效；false关闭此能力，省略仍默认true
-  mode: mentions
-  debounce_seconds: 2
-  max_batch_wait_seconds: 5
-  min_evaluation_interval_seconds: 5
-  max_evaluations_per_minute: 12
-  unsolicited_cooldown_seconds: 15
-  max_unsolicited_per_minute: 4
-  context_messages: 60
-  context_ttl_seconds: 900
-  context_max_bytes: 32768
-  message_max_chars: 2000
-  mention_queue_limit: 8
-  max_ambient_age_seconds: 90
-  allow_ambient_web: true
-  attention:
-    enabled: false
-    aliases:
+  silence:  # 每群RAM临时停言；真实@恢复，gate重启复位，重连保持；默认enabled=true
+    enabled: true  # 下次正常启动生效；false关闭此能力，省略仍默认true；临时停言开关；明确停言后本群静默，新真实@恢复，gate重启复位
+  mode: mentions  # mentions只回应真实@；free可参与授权群新消息，仍受黑名单和频率约束；新装默认 "mentions"
+  debounce_seconds: 2  # 新群消息合批等待秒；新装默认 2
+  max_batch_wait_seconds: 5  # 合批最长等待秒；新装默认 5
+  min_evaluation_interval_seconds: 5  # 候选评估最小间隔秒；新装默认 5
+  max_evaluations_per_minute: 12  # 每分钟候选评估次数上限；新装默认 12
+  unsolicited_cooldown_seconds: 15  # 自发回应冷却秒，真实@绕过自发沉默/冷却；新装默认 15
+  max_unsolicited_per_minute: 4  # 每分钟自发回应轮数上限；新装默认 4
+  context_messages: 60  # RAM窗口消息条数上限；新装默认 60
+  context_ttl_seconds: 900  # RAM窗口有效秒数；新装默认 900
+  context_max_bytes: 32768  # RAM窗口UTF-8字节上限；新装默认 32768
+  message_max_chars: 2000  # 单条消息字符上限；新装默认 2000
+  mention_queue_limit: 8  # 真实@排队条数；新装默认 8
+  max_ambient_age_seconds: 90  # 普通候选最大年龄秒；新装默认 90
+  allow_ambient_web: true  # 普通候选可用联网，还必须开启web；不上传历史；新装默认 true
+  attention:  # 配置节，子字段见下方；保留既有校验约束
+    enabled: false  # free中的叫名/指代与自然续聊开关，mentions不生效；新装默认 false
+    aliases:  # 关注别名1..16个，每名1..16字符，不当作真实@；新装默认 ["肥鱼", "大肥鱼", "鱼鱼", "鲸鱼娘", "小鲸鱼", "DSH"]
     - 肥鱼
     - 大肥鱼
     - 鱼鱼
     - 鲸鱼娘
     - 小鲸鱼
     - DSH
-    focus_ttl_seconds: 60
-    max_intervening_messages: 0
-    direct_queue_limit: 4
-    focus_candidate_evaluations_per_minute: 4
-output:
-  quote_reply: false
-  mode: plain_chat
-  max_reply_chars: 1200
-  delivery_mode: single
-  max_bubbles: 3
-  casual_max_chars: 80
-  bubble_max_chars: 40
-  bubble_delay_min_ms: 800
-  bubble_delay_max_ms: 1600
+    focus_ttl_seconds: 60  # 焦点保持秒15..180；新装默认 60
+    max_intervening_messages: 0  # 允许插入条数固定0；新装默认 0
+    direct_queue_limit: 4  # 关注直接队列数1..8；新装默认 4
+    focus_candidate_evaluations_per_minute: 4  # 焦点候选每分钟评估次数1..8；新装默认 4
+output:  # 配置节，子字段见下方；保留既有校验约束
+  quote_reply: false  # 固定false，直接群发；新装默认 false
+  mode: plain_chat  # QQ正文固定plain_chat自然纯文本；新装默认 "plain_chat"
+  max_reply_chars: 1200  # 正文字符上限200..8000；新装默认 1200
+  delivery_mode: single  # single/adaptive，adaptive自然分条，不强制凑条；新装默认 "single"
+  max_bubbles: 3  # 最多气泡1..3，认真问题仍单条；新装默认 3
+  casual_max_chars: 80  # 闲聊总字符20..120；新装默认 80
+  bubble_max_chars: 40  # 单气泡字符10..60，不超过闲聊总长；新装默认 40
+  bubble_delay_min_ms: 800  # 分条间隔下限毫秒0..5000；新装默认 800
+  bubble_delay_max_ms: 1600  # 分条间隔上限毫秒0..5000，不小于下限；新装默认 1600

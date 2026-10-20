@@ -2,7 +2,15 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md)。继承[AGENTS](../../../../AGENTS.md)，合同见[PLAN](PLAN.md) / [IMPLEMENTATION_GUIDE](IMPLEMENTATION_GUIDE.md)。
 
-## 当前状态
+## 最新续作：逐参数旁注与本机定向恢复
+
+2026-10-20 22:31（Asia/Shanghai）：LAP-34旁注续作已完成，session LAP-34-inline-comments-followup（22:19领取）；6份模板/生成器改为逐参数同行注释，68项配置相关回归通过。按用户后续明确授权为已有local补旁注，并保留手改项、定向恢复旧源未改项与纠正已确认误填；原字节备份/源摘要/候选整体校验/原子写入通过，旧源不改。未运行迁移或启停/登录/探活/SSH/模型/QQ，不触及凭据/图库/记忆/人设；本机解析通过不等于进程已加载。仅归属代码/模板/文档提交，local/备份忽略，persona差异保留。 详情见[续作报告](../../../../reports/lap-34-inline-comments-2026-10-20.md)。
+
+续作归属：config_comments.py/config_layout_ops.py、五份examples及settings.example.yaml、config/README.md、tests/test_config_comments.py、本报告与进度台账/本交接。用户明确允许忽略的config/local五文件补旁注、恢复未手改的旧值；按与模板的差异判断保护手改项，输出模式误填经用户单独确认后纠正。10个用户字段保留，9个旧字段恢复、1处确认纠正；具体值/原字节备份及阶段摘要仅留本机忽略文件，不提交。旧单文件与persona不修改，不自动迁移/启动。
+
+验证命令：`.venv/Scripts/python.exe -X utf8 -m unittest discover -s tests -p 'test_config*.py'`，68项通过；模板/本机格式化幂等与语义保持检查，恢复候选及最终local read_split正式整体验证通过。注释函数包含多行/引号/井号/块标量与BOM边界测试；无需因纯排版重复真实框架或真实bot验收。后续只需由操作者正常启动另验进程加载；local已存在，不重复init/migrate。Git交付结果待下节同步。
+
+## 初次交付检查点（历史）
 
 2026-10-20 19:53（Asia/Shanghai）实施领取，session `LAP-34-config-files-implementation` / “分层配置实施”；20:25交接检查点。C34-01→06已实现/离线通过；本机未迁移/未正常启动加载，真实/完整验收均未做。会话模型和档位由用户设置，不声称自动检测或切换。仅本任务，无子代理或其他任务实施。
 

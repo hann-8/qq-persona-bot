@@ -29,20 +29,11 @@ def partition(data):
 
 def render(name, data):
     """Safe serialization, fixed field comments; never interpolate values as YAML."""
-    from .config_comments import comment
+    from .config_comments import comment, annotate_yaml
     lines = [f'# {name}：{comment(name)}',
              '# 同目录五文件共同组成配置；其他文件见config/README.md。',
              '# 本机config/local不提交；保存后下次正常启动生效，不热更新。']
-    def walk(value, prefix=()):
-        if isinstance(value, dict):
-            for key, item in value.items():
-                # Comments derive only from fixed vocabulary, never unknown values.
-                if key not in COMMENT_KEYS:continue
-                lines.append('# ' + '.'.join(prefix + (key,)) + '：' + comment(key, item))
-                if key != 'legacy_extensions':walk(item, prefix + (key,))
-    from .config_comments import COMMENT_KEYS
-    walk(data)
-    return '\n'.join(lines) + '\n' + dump_settings(data)
+    return annotate_yaml('\n'.join(lines) + '\n' + dump_settings(data))
 
 
 def backup_dir(root, action):

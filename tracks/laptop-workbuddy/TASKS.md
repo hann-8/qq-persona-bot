@@ -1,3 +1,5 @@
+2026-10-20 22:31（Asia/Shanghai）：LAP-34旁注续作已完成，session LAP-34-inline-comments-followup（22:19领取）；6份模板/生成器改为逐参数同行注释，68项配置相关回归通过。按用户后续明确授权为已有local补旁注，并保留手改项、定向恢复旧源未改项与纠正已确认误填；原字节备份/源摘要/候选整体校验/原子写入通过，旧源不改。未运行迁移或启停/登录/探活/SSH/模型/QQ，不触及凭据/图库/记忆/人设；本机解析通过不等于进程已加载。仅归属代码/模板/文档提交，local/备份忽略，persona差异保留。 [续作报告](../../reports/lap-34-inline-comments-2026-10-20.md)；Git见34交接。
+
 2026-10-20 20:25（Asia/Shanghai）：[LAP-34分层配置](tasks/LAP-34/HANDOFF.md)已实现/离线通过，session LAP-34-config-files-implementation；五文件/中文注释索引、安全loader/双摘要、无损迁移回滚、统一实例快照与管理动作保留、配置cmd退役完成。426单元、20组合460实际框架合成及末次30项补验通过；[报告](../../reports/lap-34-2026-10-20.md)。本机未迁移/加载，0真实bot/登录/SSH/模型/群及真实凭据/图库/记忆操作；persona差异保留不提交，人设测试用已提交基线，真实/完整未验，旧差额保留，不推进35。Git见任务交接。
 
 2026-10-19 20:06（Asia/Shanghai）：[LAP-33人工恢复](tasks/LAP-33/HANDOFF.md)已完成一次现场状态维护，session LAP-33-manual-cleanup-recovery；用户要求降低轻微故障影响并自行关闭bot，锁内核验owner/41登记身份全退出、五端口关闭后完整备份并归档旧记录，独立cleanup status确认blocked=false。仅observed_only人工判断，不是31B完整退出证明；0代码/配置/真实模型/群操作，bot保持停止。长期分级/自动恢复未实现，真实启动效果待用户验证；归属4份文档，原记录/说明留本机忽略目录。
@@ -61,7 +63,7 @@ LAP-15内容提交`632fdc5`已推送origin/main，2026-10-17 11:09用ls-remote�
 | ID | 单一任务 | 状态与已有证据 | 依赖/推荐顺序 | 执行session | 下一步/完成出口 |
 | --- | --- | --- | --- | --- | --- |
 | LAP-35 | 群临时停言、真实@恢复与重启复位 | 已实现/离线通过；[HANDOFF](tasks/LAP-35/HANDOFF.md)/[报告](../../reports/lap-35-2026-10-20.md) | 34已实现；原触发/ACK/清理门槛保持 | LAP-35-group-silence-implementation，2026-10-20 20:35领取、20:58交接；文件归属见HANDOFF | S35-01—05/SM-01—12离线完成；440单元/44组合918框架、20组合460关闭兼容；本机未改/未加载，真实/完整未验 |
-| LAP-34 | 分层配置文件取代日常配置菜单 | 已实现/离线通过；[HANDOFF](tasks/LAP-34/HANDOFF.md)/[报告](../../reports/lap-34-2026-10-20.md) | schema3与既有能力门槛不变 | LAP-34-config-files-implementation，2026-10-20 19:53领取、20:25交接；文件归属见任务HANDOFF | C34-01—06完成；426单元/20组合460框架、末次30补验；本机未迁移/加载、真实/完整未验；不推进35 |
+| LAP-34 | 分层配置文件取代日常配置菜单 | 已交付；旁注续作/本机定向配置修复完成，[HANDOFF](tasks/LAP-34/HANDOFF.md) | schema3与既有能力门槛不变 | LAP-34-inline-comments-followup，2026-10-20 22:19领取；源/模板/自造测试/索引与交接归属，local仅按用户新授权处理 | 68配置回归；local正式解析通过、未启停/正常加载，真实/完整未验，persona保留 |
 | LAP-26 | 清理可靠性、图片理解、free关注、成员与群记忆规划 | completed，仅规划；[HANDOFF](tasks/LAP-26/HANDOFF.md) | 24登录暂缓，25加载未知、18搜索/旧真人差额保留 | LAP-26-group-understanding-plan，13:14领取、13:47续审/13:57完成；7份文档 | 精确协议/调度/证明/记忆事务/回滚及五项独立指令完成；31→27—30待用户实施指令 |
 | LAP-31 | 请求模型进程清理、阻断诊断与有证据恢复 | 部分完成：31A已实现/离线通过；31B门槛未过，见[交接](tasks/LAP-31/HANDOFF.md)；[合同](tasks/LAP-26/PLAN.md)第13节 | 新反馈反复全局拒单，建议先于27—30 | LAP-31-cleanup-reliability，18:16领取、18:34验证；文件归属见交接 | 31A的283单元/384框架通过；31B breakaway/目标Job成员缺口回规划，生产创建/管道/恢复未交付；unknown不解锁 |
 | LAP-27 | free关注/第二人称与脱敏阶段trace | 已实现/离线通过；[HANDOFF](tasks/LAP-27/HANDOFF.md) | ATT-01—12；301单元/732矩阵+22边界复验；[报告](../../reports/lap-27-2026-10-18.md) | LAP-27-attention-v2；2026-10-18 18:37；文件归属见HANDOFF；根session独占 | 31A交付/31B差额保留；无真实操作，不推进28—30 |
