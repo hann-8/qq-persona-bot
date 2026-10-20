@@ -8,7 +8,7 @@
 
 续作归属：config_comments.py/config_layout_ops.py、五份examples及settings.example.yaml、config/README.md、tests/test_config_comments.py、本报告与进度台账/本交接。用户明确允许忽略的config/local五文件补旁注、恢复未手改的旧值；按与模板的差异判断保护手改项，输出模式误填经用户单独确认后纠正。10个用户字段保留，9个旧字段恢复、1处确认纠正；具体值/原字节备份及阶段摘要仅留本机忽略文件，不提交。旧单文件与persona不修改，不自动迁移/启动。
 
-验证命令：`.venv/Scripts/python.exe -X utf8 -m unittest discover -s tests -p 'test_config*.py'`，68项通过；模板/本机格式化幂等与语义保持检查，恢复候选及最终local read_split正式整体验证通过。注释函数包含多行/引号/井号/块标量与BOM边界测试；无需因纯排版重复真实框架或真实bot验收。后续只需由操作者正常启动另验进程加载；local已存在，不重复init/migrate。Git交付结果待下节同步。
+验证命令：`.venv/Scripts/python.exe -X utf8 -m unittest discover -s tests -p 'test_config*.py'`，68项通过；模板/本机格式化幂等与语义保持检查，恢复候选及最终local read_split正式整体验证通过。注释函数包含多行/引号/井号/块标量与BOM边界测试；无需因纯排版重复真实框架或真实bot验收。后续只需由操作者正常启动另验进程加载；local已存在，不重复init/migrate。续作内容提交`9272986db4fe8dabb4f87f7b16b51737bb26a5db`已推送origin/main，2026-10-20 22:32（Asia/Shanghai）核对远端完整SHA一致；15份归属文件，68配置回归/279本地链接/围栏/差异检查通过。local与备份仍忽略，推送后仅persona用户差异；随后仅同步记录，最终记录SHA见git log/答复。
 
 ## 初次交付检查点（历史）
 
