@@ -26,6 +26,8 @@ LAP-13实现提交`ee7f2d4`已成功推送origin/main；随后仅同步交付检
 
 ## 当前任务
 
+LAP-34分层配置详细规划已完成，未实施：session `LAP-34-config-files-plan` / “分层配置文件规划”，2026-10-20 19:06（Asia/Shanghai）领取、19:12交接；起点`main/003f04e`，保留用户`config/persona.md`未提交差异。本轮归属为PROGRESS、工作线HANDOFF/TASKS、[34交接](tasks/LAP-34/HANDOFF.md)/[PLAN](tasks/LAP-34/PLAN.md)/[IMPLEMENTATION_GUIDE](tasks/LAP-34/IMPLEMENTATION_GUIDE.md)共6份文档；5文件职责/字段/统一快照/迁移回滚与C34/CF合同已定，文档检查通过，Git交付见交接。不改实现/运行配置，不启停/登录/模型/群操作。后续实施需用户新指令。
+
 LAP-24实施续作独立部分已实现/离线通过：session `LAP-24-natural-login-implementation` / “LAP-24自然分条与登录独立部分实施”，2026-10-18 00:20（Asia/Shanghai）领取、00:35交接；开始main/d319811、工作区干净。归属persona.py/persona.md、napcat_login*.py、manage.py/configure_bot.py/verify_lap24.py、相关tests/verify_lap20/21合成场景、README/24报告/24 HANDOFF及进度索引。248单元/324框架用例通过；未证实原生目录/报告能力，生产回退禁用；未操作真实bot/本机配置/凭据/模型/群。详情见[24交接](tasks/LAP-24/HANDOFF.md)。
 
 LAP-24于2026-10-18 00:05续领max详规复审，2026-10-18 00:15交接：用户明确规划/后续medium实施分工；[PLAN](tasks/LAP-24/PLAN.md)与[medium指引/复制命令](tasks/LAP-24/IMPLEMENTATION_GUIDE.md)完成。同一session仅6份文档，基线cf69570且干净。明确Worker环境继承、固定WebUI单次回退/DPAPI/实例账本与数据目录门槛；未实施/认证/启停/真实生成，17日8单元/3合成仅历史基线。
@@ -50,6 +52,7 @@ LAP-15内容提交`632fdc5`已推送origin/main，2026-10-17 11:09用ls-remote�
 
 | ID | 单一任务 | 状态与已有证据 | 依赖/推荐顺序 | 执行session | 下一步/完成出口 |
 | --- | --- | --- | --- | --- | --- |
+| LAP-34 | 分层配置文件取代日常配置菜单 | completed，仅详细规划；[HANDOFF](tasks/LAP-34/HANDOFF.md)/[PLAN](tasks/LAP-34/PLAN.md) | 现有schema3/生命周期/能力门槛保持 | LAP-34-config-files-plan，2026-10-20 19:06领取、19:12交接；6份文档独占 | 五份YAML/注释索引/统一快照/迁移回滚/管理保留与6步骤10验收项已定；实施待用户后续指令 |
 | LAP-26 | 清理可靠性、图片理解、free关注、成员与群记忆规划 | completed，仅规划；[HANDOFF](tasks/LAP-26/HANDOFF.md) | 24登录暂缓，25加载未知、18搜索/旧真人差额保留 | LAP-26-group-understanding-plan，13:14领取、13:47续审/13:57完成；7份文档 | 精确协议/调度/证明/记忆事务/回滚及五项独立指令完成；31→27—30待用户实施指令 |
 | LAP-31 | 请求模型进程清理、阻断诊断与有证据恢复 | 部分完成：31A已实现/离线通过；31B门槛未过，见[交接](tasks/LAP-31/HANDOFF.md)；[合同](tasks/LAP-26/PLAN.md)第13节 | 新反馈反复全局拒单，建议先于27—30 | LAP-31-cleanup-reliability，18:16领取、18:34验证；文件归属见交接 | 31A的283单元/384框架通过；31B breakaway/目标Job成员缺口回规划，生产创建/管道/恢复未交付；unknown不解锁 |
 | LAP-27 | free关注/第二人称与脱敏阶段trace | 已实现/离线通过；[HANDOFF](tasks/LAP-27/HANDOFF.md) | ATT-01—12；301单元/732矩阵+22边界复验；[报告](../../reports/lap-27-2026-10-18.md) | LAP-27-attention-v2；2026-10-18 18:37；文件归属见HANDOFF；根session独占 | 31A交付/31B差额保留；无真实操作，不推进28—30 |

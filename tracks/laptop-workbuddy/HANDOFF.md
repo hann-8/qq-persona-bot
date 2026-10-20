@@ -1,3 +1,5 @@
+2026-10-20 19:12（Asia/Shanghai）：[LAP-34分层配置](tasks/LAP-34/HANDOFF.md)详细[规划](tasks/LAP-34/PLAN.md)/[medium指引](tasks/LAP-34/IMPLEMENTATION_GUIDE.md)完成，未实施；五份YAML、中文注释/索引、原默认值与下次启动生效、统一快照/无损迁移回滚及cmd退役/管理动作保留合同已定。6份文档链接/围栏/差异检查通过，Git见34交接；保留用户persona差异，0代码/本机配置/真实bot/模型/QQ操作。实施待后续指令。
+
 2026-10-19 20:06（Asia/Shanghai）：[LAP-33人工恢复](tasks/LAP-33/HANDOFF.md)已完成一次现场状态维护，session LAP-33-manual-cleanup-recovery；用户要求降低轻微故障影响并自行关闭bot，锁内核验owner/41登记身份全退出、五端口关闭后完整备份并归档旧记录，独立cleanup status确认blocked=false。仅observed_only人工判断，不是31B完整退出证明；0代码/配置/真实模型/群操作，bot保持停止。长期分级/自动恢复未实现，真实启动效果待用户验证；归属4份文档，原记录/说明留本机忽略目录。
 
 2026-10-19（Asia/Shanghai）：[LAP-30](tasks/LAP-30/HANDOFF.md)已实现/离线通过，session LAP-30-group-memory；396单元、68组合926实际框架（含31专项及成员/视觉+记忆组合）。稳定有界群记忆/同轮协议/文字ACK/持久purge与菜单7→22交付；默认读取/学习均关闭。0本机配置/凭据/真实记忆或真实bot/模型/QQ操作，真实/完整未验，旧差额保留；Git检查点见交接。
