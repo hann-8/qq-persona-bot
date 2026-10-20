@@ -1,6 +1,6 @@
 # LAP-34 medium实施指引
 
-返回[PROGRESS](../../../../PROGRESS.md) / [HANDOFF](HANDOFF.md) / [PLAN](PLAN.md)。本文件是后续执行合同，本轮未实施。操作者按[AGENTS](../../../../AGENTS.md)将会话设为gpt-6.1-sol/medium；agent不得声称自动切换/检测。
+返回[PROGRESS](../../../../PROGRESS.md) / [HANDOFF](HANDOFF.md) / [PLAN](PLAN.md)。本文件保留实施合同；现已实现/离线通过，交付证据与下一步见[HANDOFF](HANDOFF.md)。本机迁移/正常加载仍待后续明确授权。操作者按[AGENTS](../../../../AGENTS.md)将会话设为gpt-6.1-sol/medium；agent不得声称自动切换/检测。
 
 ## 可复制实施指令
 

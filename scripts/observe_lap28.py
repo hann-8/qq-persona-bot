@@ -66,7 +66,8 @@ async def observe(root,settings,sample,case,expected,bound):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--config',type=Path,default=ROOT/'config/settings.local.yaml')
+    parser.add_argument('--root',type=Path,default=ROOT)
+    parser.add_argument('--config',type=Path)
     parser.add_argument('--backend',choices=('codebuddy_cli','ollama_ssh'),required=True)
     parser.add_argument('--inspect',action='store_true',help='local binding only; zero network/generations')
     parser.add_argument('--sample',type=Path)
@@ -79,8 +80,9 @@ def main():
     from qqbot_gateway.config import read_settings,configuration_lock,require_stopped
     from qqbot_gateway.backends import resolve_backend
     from qqbot_gateway.vision import binding,adapter_signature,capability
-    settings,_=read_settings(args.config)
-    root=args.config.resolve().parent.parent
+    from qqbot_gateway.config_files import read_project
+    root=args.root.resolve()
+    settings=read_settings(args.config,root=root)[0] if args.config else read_project(root).settings
     if settings['vision']['enabled'] or resolve_backend(settings)['backend']!=args.backend:
         parser.error('Production vision must remain false; selected backend must match (no switching)')
     with configuration_lock(root):

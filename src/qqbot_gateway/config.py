@@ -21,8 +21,10 @@ def export_legacy_config(path):
     Return both digests so a later operator can detect edits to either snapshot.
     Unknown extensions and all legacy settings are preserved verbatim in meaning.
     """
-    path=Path(path);root=path.parent.parent
+    from .config_files import reject_legacy_write
+    path=Path(path);root=reject_legacy_write(path)
     with configuration_lock(root):
+        reject_legacy_write(path)
         require_stopped(root)
         value,source_digest=read_settings(path)
         original=path.read_bytes()
@@ -48,10 +50,12 @@ def activate_legacy_config(path,review,source_digest,legacy_digest,confirmation)
 
     Does not roll back code, erase unresolved markers, or start any service.
     """
-    path=Path(path);root=path.parent.parent;review=Path(review).resolve()
+    from .config_files import reject_legacy_write
+    path=Path(path);root=reject_legacy_write(path);review=Path(review).resolve()
     if confirmation!='已核对' or review.parent!=(root/'state/config-exports').resolve():raise ValueError('Review required')
     if not all(isinstance(v,str) and re.fullmatch('[a-f0-9]{64}',v) for v in (source_digest,legacy_digest)):raise ValueError('Both digests required')
     with configuration_lock(root):
+        reject_legacy_write(path)
         require_stopped(root)
         original=path.read_bytes();content=review.read_bytes()
         if hashlib.sha256(original).hexdigest()!=source_digest or hashlib.sha256(content).hexdigest()!=legacy_digest:raise ValueError('Configuration changed')
@@ -249,7 +253,7 @@ def normalize_settings(raw):
     return data
 
 
-def read_settings(path):
+def read_settings(path, *, root=None):
     path = Path(path).resolve()
     content = path.read_bytes()
     try:
@@ -257,7 +261,7 @@ def read_settings(path):
     except (yaml.YAMLError, UnicodeError):
         raise ValueError('Invalid UTF-8 YAML configuration') from None
     data = normalize_settings(raw)
-    root = path.parent.parent
+    root = Path(root).resolve() if root is not None else path.parent.parent
     from .ssh_transport import secrets_path
     secrets_path(root,data['llm']['profiles']['ollama_ssh']['access_file'])
     if not (root / data['secrets_file']).resolve().is_relative_to(root / 'secrets'):
@@ -269,10 +273,10 @@ def load_settings(path):
     return read_settings(path)[0]
 
 
-def load_gate_config(path):
-    path = Path(path).resolve()
-    root = path.parent.parent
-    data = load_settings(path)
+def load_gate_config(path=None, *, root=None, settings=None):
+    from .config_files import load_consumer, management_root
+    root = Path(root).resolve() if root is not None else management_root(path)
+    data = deepcopy(settings) if settings is not None else load_consumer(root, path)
     from .vision import require_production
     require_production(data)
     token_path = (root / data['secrets_file']).resolve()
@@ -310,8 +314,11 @@ def load_gate_config(path):
 @contextmanager
 def configuration_lock(root):
     """OS lock shared by configuration writes and project startup; crashes release it."""
+    from .config_files import safe_mkdir, plain_path, exists
+    root = Path(root).resolve()
     lock = Path(root) / 'state/configuration.lock'
-    lock.parent.mkdir(parents=True, exist_ok=True)
+    safe_mkdir(root, lock.parent)
+    if exists(lock):plain_path(root, lock)
     with lock.open('a+b') as stream:
         stream.seek(0, 2)
         if stream.tell() == 0:
@@ -359,9 +366,12 @@ def require_stopped(root):
 
 
 def save_settings(path, data, expected_digest):
+    from .config_files import reject_legacy_write
+    reject_legacy_write(path)
     path = Path(path).resolve()
     root = path.parent.parent
     with configuration_lock(root):
+        reject_legacy_write(path)
         require_stopped(root)
         _, digest = read_settings(path)
         if digest != expected_digest:
@@ -386,6 +396,7 @@ def save_settings(path, data, expected_digest):
                 yaml.safe_dump(normalized, stream, allow_unicode=True, sort_keys=False)
                 stream.flush(); os.fsync(stream.fileno())
             require_stopped(root)
+            reject_legacy_write(path)
             if hashlib.sha256(path.read_bytes()).hexdigest() != expected_digest:
                 raise ValueError('Configuration changed; reload before saving')
             os.replace(temporary, path)

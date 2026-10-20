@@ -157,12 +157,12 @@ def attempt_status(root):
     except (OSError,ValueError,AttributeError,TypeError):return 'unavailable'
 
 
-def configure_credentials(settings_path, action, *, prompt=None, confirm=None):
+def configure_credentials(settings_path, action, *, prompt=None, confirm=None, root=None):
     """No secret arguments, redirected input, or plaintext fallback."""
-    from .config import read_settings
+    from .config_files import read_management, management_root
     settings_path = Path(settings_path)
-    root = settings_path.resolve().parent.parent
-    settings, config_digest = read_settings(settings_path)
+    root = management_root(settings_path, root)
+    settings, config_digest = read_management(settings_path,root=root)
     account = settings['bot']['qq']
     if action == 'status':return credential_status(root, account)
     if action not in ('set-password','clear-password'):raise ValueError('LOGIN_INVALID')
@@ -173,7 +173,7 @@ def configure_credentials(settings_path, action, *, prompt=None, confirm=None):
         def unchanged():
             require_stopped(root)
             if (secrets_path(root, SECRET_FILE) != target or
-                    read_settings(settings_path)[1] != config_digest or file_digest(target) != previous):
+                    read_management(settings_path,root=root)[1] != config_digest or file_digest(target) != previous):
                 raise ValueError('LOGIN_CONFLICT')
         if action == 'clear-password':
             unchanged()

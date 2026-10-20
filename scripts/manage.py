@@ -21,6 +21,7 @@ NAPCAT = ROOT / 'runtime/napcat/installer/NapCat.52230.Shell'
 NAPCAT_URL = 'http://127.0.0.1:6099'
 sys.path.insert(0, str(ROOT / 'src'))
 from qqbot_gateway.config import load_settings, load_gate_config, configuration_lock
+from qqbot_gateway.config_files import (read_project, create_snapshot, snapshot_environment, load_consumer, prune_snapshots)
 from qqbot_gateway.lifecycle import atomic_json
 from qqbot_gateway.napcat_login import child_environment
 
@@ -136,7 +137,7 @@ def port_open(port):
         return sock.connect_ex(('127.0.0.1',port))==0
 
 
-def status_report():
+def status_report(*,disk_config=None):
     entries=read_state()
     counts={name:sum(1 for e in entries if e['component']==name and alive(e) is not None)
             for name in ('astrbot','model','gate','napcat')}
@@ -155,16 +156,30 @@ def status_report():
     if phase=='stopped':channel='disconnected'
     try:
         from qqbot_gateway.backends import resolve_backend
-        settings=load_settings(ROOT/'config/settings.local.yaml')
+        if disk_config is None:disk_config=read_project(ROOT)
+        settings=disk_config.settings
         cfg=resolve_backend(settings)
         configured={'backend':cfg['backend'],'model':cfg['model']}
         from qqbot_gateway.napcat_login import credential_status
         login_status=credential_status(ROOT,settings['bot']['qq'])
-    except (ValueError,OSError):configured={'state':'unavailable'};login_status={'state':'unavailable'}
+    except (ValueError,OSError):configured={'state':'unavailable'};login_status={'state':'unavailable'};disk_config=False
     return {'process_state':phase,'mode':mode,'processes':counts,'channel':gate,'channel_state':channel,
             'can_receive_group_messages':bool(complete and gate.get('connected') is True and
                  gate.get('self_id_verified') is True and gate.get('online') is True and not gate.get('stopping')),
+            'configuration':configuration_status(mode_state,disk_config=disk_config,running=phase!='stopped'),
             'model':model,'configured_profile':configured,'task_counts':task_counts(),'napcat_login':login_status}
+
+
+def configuration_status(mode_state,*,disk_config=None,running=True):
+    loaded=mode_state.get('configuration') if running else None
+    try:
+        if disk_config is False:raise ValueError()
+        disk=read_project(ROOT) if disk_config is None else disk_config
+        return dict(loaded=loaded, disk=dict(layout=disk.layout,source_digest=disk.source_digest,
+                    semantic_digest=disk.semantic_digest,files=list(disk.files)),
+                    pending_restart=bool(loaded and loaded['semantic_digest']!=disk.semantic_digest),
+                    source_changed=bool(loaded and loaded['source_digest']!=disk.source_digest))
+    except (ValueError,OSError):return dict(loaded=loaded,disk='invalid',pending_restart=None)
 
 
 def task_counts():
@@ -198,6 +213,10 @@ def show_status(report=None):
         else:print('模型：本次启动未推理（not_probed）')
         old=model.get('last_error')
         if old and old.get('historical'):print('历史模型错误：'+old.get('code','UNKNOWN')+'（后来已有成功，不代表当前故障）')
+    configuration=report.get('configuration',{})
+    if configuration.get('loaded'):print('当前实例配置快照：'+configuration['loaded']['snapshot_digest'])
+    if configuration.get('pending_restart'):print('磁盘配置已改变，待关闭后正常启动加载。')
+    if configuration.get('disk')=='invalid':print('磁盘配置无效；当前实例继续使用已加载快照。')
     print('任务状态计数：'+json.dumps(report['task_counts'],ensure_ascii=False))
     if report['process_state']!='stopped' and report['channel_state']!='connected':
         print(f'请在本机 {NAPCAT_URL} 完成登录，再查看状态；不会自动重启或调用模型。')
@@ -257,7 +276,17 @@ def _start_channel(full=False, paused=False):
         if report['process_state']=='running' and (not full or report['mode']=='text'):
             print('已运行，无需重复启动。');show_status(report);return
         raise RuntimeError('PARTIAL_RUNNING: 组件不完整或运行模式不同，请先关闭再启动')
-    gate=load_gate_config(ROOT/'config/settings.local.yaml')
+    project_config=read_project(ROOT)
+    if project_config.extensions:print('已保留旧顶层扩展字段；不保证扩展具有运行功能。')
+    from qqbot_gateway.vision import require_production
+    require_production(project_config.settings)
+    instance_id=uuid.uuid4().hex
+    prune_snapshots(ROOT,keep=2)
+    snapshot,metadata=create_snapshot(project_config,instance_id)
+    config_env=snapshot_environment(ROOT,snapshot,metadata)
+    env=child_environment(os.environ);env.update(config_env)
+    env['PYTHONPATH']=str(ROOT/'src');env['PYTHONUTF8']='1'
+    gate=load_gate_config(root=ROOT,settings=project_config.settings)
     for port in ((6185,6199,6200,6099,8765) if full else (6185,6199,6200,6099)):check_port(port)
     backup=ROOT/'state/config-backups'/('startup-'+str(time.time_ns()))
     backup.mkdir(parents=True,exist_ok=True)
@@ -265,10 +294,11 @@ def _start_channel(full=False, paused=False):
     if config_before.exists():(backup/'astrbot-cmd-config.json').write_bytes(config_before.read_bytes())
     if full:
         result=subprocess.run([str(ROOT/'runtime/astrbot-tool/astrbot/Scripts/python.exe'),str(ROOT/'scripts/configure_astrbot.py')],
-                              cwd=ROOT/'runtime/astrbot',capture_output=True,env=child_environment(os.environ))
+                              cwd=ROOT/'runtime/astrbot',capture_output=True,env=env)
         if result.returncode:
             (ROOT/'runtime/astrbot/configure-error.log').write_bytes(result.stdout+result.stderr)
             raise RuntimeError('CONFIG_PREPARE_FAILED; local runtime/astrbot/configure-error.log')
+    load_consumer(ROOT,snapshot,environ=env)
     config_path=ROOT/'runtime/astrbot/data/cmd_config.json'
     config=json.loads(config_path.read_text(encoding='utf-8-sig'))
     config['platform']=[{'id':'qqbot','type':'aiocqhttp','enable':True,'ws_reverse_host':'127.0.0.1',
@@ -293,22 +323,21 @@ def _start_channel(full=False, paused=False):
         (napcat_config/name).write_text(json.dumps(logging),encoding='utf-8')
     entries=[]
     logs=ROOT/'logs';logs.mkdir(exist_ok=True)
-    instance_id=uuid.uuid4().hex
     mode_record={'mode':'text' if full else 'channel_only','started':time.time(),'instance_id':instance_id,
-                 'phase':'starting','owner':{'pid':os.getpid(),'created':psutil.Process().create_time()}}
+                 'configuration':metadata,'phase':'starting','owner':{'pid':os.getpid(),'created':psutil.Process().create_time()}}
     atomic_json(ROOT/'state/service-mode.json',mode_record)
     if paused:
         # Verification uses the ordinary stop marker from the first child onward.
         atomic_json(ROOT/'state/stop-request.json',{'instance_id':instance_id,'time':time.time()})
     else:
         (ROOT/'state/stop-request.json').unlink(missing_ok=True)
-    env=child_environment(os.environ);env['QQBOT_INSTANCE_ID']=instance_id;env['PYTHONPATH']=str(ROOT/'src');env['PYTHONUTF8']='1';env['QQBOT_ROOT']=str(ROOT)
     specs=[('astrbot',[str(ROOT/'runtime/astrbot-bin/astrbot.exe'),'run'],ROOT/'runtime/astrbot',(6185,6199),25),
-           ('gate',[str(ROOT/'.venv/Scripts/python.exe'),'-m','qqbot_gateway.onebot_gate','--config',str(ROOT/'config/settings.local.yaml')],ROOT,(6200,),10),
+           ('gate',[str(ROOT/'.venv/Scripts/python.exe'),'-m','qqbot_gateway.onebot_gate','--root',str(ROOT),'--config',str(snapshot)],ROOT,(6200,),10),
            ('napcat',[str(NAPCAT/'NapCatWinBootMain.exe'),gate.bot_qq],NAPCAT,(6099,),30)]
-    if full:specs.insert(1,('model',[str(ROOT/'.venv/Scripts/python.exe'),'-m','qqbot_gateway.model_gateway','--config',str(ROOT/'config/settings.local.yaml')],ROOT,(8765,),30 if load_settings(ROOT/'config/settings.local.yaml')['llm']['backend']=='ollama_ssh' else 10))
+    if full:specs.insert(1,('model',[str(ROOT/'.venv/Scripts/python.exe'),'-m','qqbot_gateway.model_gateway','--root',str(ROOT),'--config',str(snapshot)],ROOT,(8765,),30 if project_config.settings['llm']['backend']=='ollama_ssh' else 10))
     try:
         for component,args,cwd,ports,timeout in specs:
+            load_consumer(ROOT,snapshot,environ=env)
             started=time.time()
             with (logs/(component+'.log')).open('ab') as output:
                 hosted=[str(ROOT/'.venv/Scripts/python.exe'),str(ROOT/'scripts/process_host.py'),component,'--',*args]
@@ -326,7 +355,8 @@ def _start_channel(full=False, paused=False):
                     ready_file=ROOT/'state/router-ready.json'
                     try:
                         identity=json.loads(ready_file.read_text(encoding='utf-8'))
-                        plugin_ready=identity.get('instance_id')==instance_id and alive(identity) is not None
+                        plugin_ready=(identity.get('instance_id')==instance_id and
+                                      identity.get('config_digest')==metadata['snapshot_digest'] and alive(identity) is not None)
                     except (OSError,ValueError,KeyError):plugin_ready=False
                 if all(results) and plugin_ready:ready=True;break
                 time.sleep(.2)
@@ -348,7 +378,7 @@ def _start_channel(full=False, paused=False):
                     value.get('online') is True and not value.get('stopping'))
         reason=startup_fallback(ROOT,NAPCAT,instance_id,gate.bot_qq,entries=read_state,channel_ready=ready_channel)
         print('NAPCAT_LOGIN_FALLBACK '+reason,flush=True)
-    show_status()
+    show_status(status_report(disk_config=project_config))
     print('关闭此启动窗口不会停止后台bot；请使用关闭机器人.cmd。')
 
 

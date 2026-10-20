@@ -8,8 +8,9 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT / 'src'), str(ROOT)]
-from qqbot_gateway.config import (read_settings, save_settings, qq_id,
+from qqbot_gateway.config import (save_settings, qq_id,
                                   configuration_lock, require_stopped)
+from qqbot_gateway.config_files import (read_management as read_settings, management_root, reject_legacy_write, ConfigError)
 from qqbot_gateway.token_budget import known_models
 from qqbot_gateway.backends import resolve_backend
 from qqbot_gateway.errors import GatewayError, MESSAGES
@@ -89,22 +90,26 @@ def execute(path, section, action, identifier=None, *, expected_digest=None):
         print(json.dumps(configure_credentials(path,action),ensure_ascii=False))
         return
     if section in ('connection-check','connection-init','clear-remote-unknown'):
-        root=path.parent.parent
+        root=management_root(path)
+        def unchanged():
+            if read_settings(path)[1]!=digest:raise ValueError('Configuration changed')
         local=resolve_backend(settings,'ollama_ssh')
         if section=='connection-init':
             from qqbot_gateway.ssh_transport import initialize_access
-            initialize_access(root,local['access_file'])
+            initialize_access(root,local['access_file'],config_guard=unchanged)
             print('已初始化项目内DPAPI连接资料，未切换后端。')
         elif section=='clear-remote-unknown':
             from qqbot_gateway.ollama_ssh_runner import clear_unknown
-            clear_unknown(root,identifier);print('已按操作者确认解除；未推理/重启。')
+            clear_unknown(root,identifier,config_guard=unchanged);print('已按操作者确认解除；未推理/重启。')
         else:
             import asyncio,json
             from qqbot_gateway.ollama_ssh_runner import OllamaSSHRunner
             from qqbot_gateway.token_budget import InputBudget
+            unchanged()
             print(json.dumps(asyncio.run(OllamaSSHRunner(root,local,InputBudget()).preflight(require_digest=False)),ensure_ascii=False))
         return
     if section == 'export-legacy-config':
+        reject_legacy_write(path)
         from qqbot_gateway.config import export_legacy_config
         import json
         print(json.dumps(export_legacy_config(path),ensure_ascii=False))
@@ -113,6 +118,7 @@ def execute(path, section, action, identifier=None, *, expected_digest=None):
         show(settings)
         return
     if section in OUTPUT_FIELDS or section in ('backend','model','context','context-window','effort','history','overhead','output-reserve'):
+        reject_legacy_write(path)
         parameter(settings,section,identifier)
         save_settings(path,settings,digest)
         print('参数已校验保存，下次启动生效；账号/站点不变。')
@@ -122,14 +128,15 @@ def execute(path, section, action, identifier=None, *, expected_digest=None):
     if action == 'list':
         print('本机列表：' + ('、'.join(values) or '空'))
         return
+    reject_legacy_write(path)
     identifier = qq_id(identifier)
     if identifier is None:
         raise ValueError('群号/QQ号必须是规范的正整数')
     # Even no-op writes are rejected while the project is running.
     if action == 'add':
         if identifier in values:
-            with configuration_lock(path.parent.parent):
-                require_stopped(path.parent.parent)
+            with configuration_lock(management_root(path)):
+                require_stopped(management_root(path))
             print('该ID已存在，无需重复保存。')
             return
         values.append(identifier)
@@ -147,8 +154,8 @@ def memory_action(path,group,action,*,config_digest=None,**fields):
     """Stopped + config digest + memory digest; same OS/JSON locks as runtime."""
     from qqbot_gateway.group_memory import MemoryStore
     global _MEMORY_MANAGER
-    with configuration_lock(path.parent.parent):
-        require_stopped(path.parent.parent)
+    with configuration_lock(management_root(path)):
+        require_stopped(management_root(path))
         settings,current=read_settings(path)
         if config_digest is not None and config_digest!=current:raise ValueError('Configuration changed')
         if group not in settings['access']['allowed_groups']:raise ValueError('Unauthorized group')
@@ -158,7 +165,7 @@ def memory_action(path,group,action,*,config_digest=None,**fields):
         # startup blacklist purge between inspect and confirm would otherwise
         # rotate generation and invalidate every reviewed memory digest.
         if _MEMORY_MANAGER is None or _MEMORY_MANAGER[0]!=identity:
-            _MEMORY_MANAGER=(identity,MemoryStore(path.parent.parent,settings['bot']['qq'],settings['access']['allowed_groups'],settings['access']['blocked_users'],settings['access']['admin_users'],settings['memory']))
+            _MEMORY_MANAGER=(identity,MemoryStore(management_root(path),settings['bot']['qq'],settings['access']['allowed_groups'],settings['access']['blocked_users'],settings['access']['admin_users'],settings['memory']))
         store=_MEMORY_MANAGER[1]
         return store.manage(group,action,**fields)
 
@@ -174,6 +181,7 @@ def effort_options(settings):
 
 def operation_error(error):
     """Translate known validation categories, never display arbitrary exception payloads."""
+    if isinstance(error,ConfigError):return str(error)
     if isinstance(error,GatewayError):return MESSAGES[error.code]
     if isinstance(error, ValueError):
         text = str(error)
@@ -216,7 +224,8 @@ class ConfigMenu:
     PARAMETERS = {'1':('model','set'), '2':('context','set'), '3':('effort','set'), '4':('history','set')}
 
     def __init__(self, path, console=None):
-        self.path = path
+        self.path = Path(path)
+        self.root = management_root(self.path)
         self.ui = console or Console()
 
     def run(self):
@@ -246,31 +255,33 @@ class ConfigMenu:
                 self.ui.pause()
             else:self.group(choice)
 
-    def memes_group(self):
+    def memes_group(self, *, admin_only=False):
         from qqbot_gateway.meme_catalog import MemeCatalog,DEFAULTS,controlled_path
         from qqbot_gateway.meme_import import favorites,admin_token
         import asyncio,os,aiohttp
-        root=self.path.parent.parent
+        root=self.root
         while True:
             settings,digest=read_settings(self.path)
             self.ui.page('表情包')
             self.ui.write('默认关闭；扫描/标签/激活须停机，重启生效。收藏仅在现有机器人连接可用时显式读取，绝不启动或登录。导入暂存后须停机激活并确认标签。真实收藏/显示未验。')
-            self.ui.write('1 打开本地inbox / 2 扫描本地表情 / 3 初始化独立管理token / 4 从机器人QQ收藏详情导入 / 5 基础接口导入（仅显式选择） / 6 停机激活暂存 / 7 看图填写标签 / 8 表情参数 / 0 返回')
-            choice=self.ui.choose({str(i) for i in range(9)})
+            self.ui.write('1 打开本地inbox / 2 扫描本地表情 / 3 初始化独立管理token / 4 从机器人QQ收藏详情导入 / 5 基础接口导入（仅显式选择） / 6 停机激活暂存 / 7 看图填写标签 / 0 返回'+('' if admin_only else ' / 8 表情参数'))
+            if admin_only:self.ui.write('维护模式：参数请编辑config/local/features.yaml；8不可用。')
+            choice=self.ui.choose({str(i) for i in range(8 if admin_only else 9)})
             if choice=='0':return
             try:
-                catalog=MemeCatalog(root,settings['memes'])
+                guard=self.config_guard(digest)
+                catalog=MemeCatalog(root,settings['memes'],config_guard=guard)
                 if choice=='1':
                     folder=controlled_path(root,settings['memes']['inbox_dir']);folder.mkdir(parents=True,exist_ok=True);os.startfile(folder)
                 elif choice=='2':self.ui.write('扫描接收/拒绝数量：'+str(catalog.scan()))
                 elif choice=='3':
                     admin_token(root,create=True);self.ui.write('独立管理token已准备在项目secrets内；下次正常启动gate时加载。未显示token、未启停。')
                 elif choice in ('4','5'):
-                    result=asyncio.run(favorites(root,settings['memes'],settings['onebot']['port'],basic=choice=='5'))
+                    result=asyncio.run(favorites(root,settings['memes'],settings['onebot']['port'],basic=choice=='5',config_guard=guard))
                     self.ui.write('暂存接收/失败数量：'+str(result)+'；停机激活后再填写标签，未启用memes。')
                 elif choice=='6':catalog.activate_pending();self.ui.write('已停机激活；请确认名称/标签后重启。')
                 elif choice=='7':
-                    self.label_memes(settings['memes'])
+                    self.label_memes(settings['memes'],config_digest=digest)
                 elif choice=='8':
                     keys=list(DEFAULTS)
                     for i,key in enumerate(keys,1):self.ui.write(f'{i} {key}: {settings["memes"][key]}')
@@ -287,11 +298,16 @@ class ConfigMenu:
             except (ValueError,OSError,IndexError,TimeoutError,aiohttp.ClientError):self.ui.write('操作未完成：检查连接、停机状态、目录、标签和参数；未自动重试/登录/扩域。')
             self.ui.pause()
 
-    def label_memes(self,cfg):
+    def config_guard(self,digest):
+        def unchanged():
+            if read_settings(self.path)[1]!=digest:raise ValueError('Configuration changed')
+        return unchanged
+
+    def label_memes(self,cfg,*,config_digest=None):
         from qqbot_gateway.meme_catalog import MemeCatalog
         import os
         while True:
-            catalog=MemeCatalog(self.path.parent.parent,cfg)
+            catalog=MemeCatalog(self.root,cfg,config_guard=self.config_guard(config_digest) if config_digest is not None else None)
             if not catalog.rows:
                 self.ui.write('图库为空，请先扫描本地图片或激活收藏导入暂存。');return
             self.ui.page('看图填写表情标签')
@@ -374,9 +390,9 @@ class ConfigMenu:
                     self.ui.write('必须选择授权群。');self.ui.pause();continue
                 if self.ui.read('不会重发任何旧内容；输入“已核对”继续：').strip()!='已核对':continue
                 try:
-                    with configuration_lock(self.path.parent.parent):
-                        require_stopped(self.path.parent.parent)
-                        store=TaskStore(self.path.parent.parent/'state/tasks.sqlite')
+                    with configuration_lock(self.root):
+                        require_stopped(self.root)
+                        store=TaskStore(self.root/'state/tasks.sqlite')
                         try:store.review_group(group)
                         finally:store.close()
                     self.ui.write('已解除；原未知ACK证据保留，没有重发。')
@@ -396,12 +412,13 @@ class ConfigMenu:
             except (ValueError,OSError) as error:self.ui.write(operation_error(error)+' 请核对页面范围。')
             self.ui.pause()
 
-    def memory_group(self):
+    def memory_group(self, *, admin_only=False):
         settings,digest=read_settings(self.path)
         self.ui.page('本群长期记忆（默认关闭）')
         self.ui.write('有限JSON主库/MD只读视图；学习不增加模型调用。保存/管理须停机，下次启动加载。删除同时净化副本；失败不代表删除完成。')
-        self.ui.write(f"1 enabled={settings['memory']['enabled']} / 2 learning_enabled={settings['memory']['learning_enabled']} / 3 本机查看与管理 / 0 返回")
-        choice=self.ui.choose({'0','1','2','3'})
+        self.ui.write('3 本机查看与管理 / 0 返回' if admin_only else f"1 enabled={settings['memory']['enabled']} / 2 learning_enabled={settings['memory']['learning_enabled']} / 3 本机查看与管理 / 0 返回")
+        if admin_only:self.ui.write('维护模式：开关请编辑config/local/features.yaml；仅3和0可用。')
+        choice=self.ui.choose({'0','3'} if admin_only else {'0','1','2','3'})
         if choice=='0':return
         try:
             if choice in ('1','2'):
@@ -706,6 +723,8 @@ def main():
     parser = argparse.ArgumentParser(description='本机授权群/黑名单配置，停止后保存、下次启动生效')
     commands = parser.add_subparsers(dest='section')
     commands.add_parser('show')
+    commands.add_parser('memes-admin',help='图库导入、预览、标签与目录激活（不编辑参数）')
+    commands.add_parser('memory-admin',help='授权群记忆查看、导出与确认CRUD（不编辑开关）')
     commands.add_parser('export-legacy-config')
     commands.add_parser('connection-init')
     commands.add_parser('connection-check')
@@ -730,7 +749,11 @@ def main():
             import json
             print(json.dumps(activate_legacy_config(path,args.review,args.source_digest,args.legacy_digest,args.confirmation)))
         elif args.section is None:
-            menu(path)
+            print('日常配置：config/README.md；config/local/bot.yaml、models.yaml、chat.yaml、features.yaml、runtime.yaml。')
+            print('关闭→编辑→正常启动；旧单文件未迁移时仍兼容。角色正文：config/persona.md。')
+            print('管理动作：memes-admin / memory-admin / napcat-login / connection-init / connection-check / clear-remote-unknown；见--help。')
+        elif args.section=='memes-admin':ConfigMenu(path).memes_group(admin_only=True)
+        elif args.section=='memory-admin':ConfigMenu(path).memory_group(admin_only=True)
         else:
             execute(path, args.section, getattr(args, 'action', None), getattr(args, 'identifier', None))
     except (ValueError, OSError, GatewayError) as error:

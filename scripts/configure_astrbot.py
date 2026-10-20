@@ -1,23 +1,26 @@
 """Configure only the isolated project instance, using upstream APIs for preferences."""
 import asyncio
 import json
+import os
 from pathlib import Path
 import shutil
 import sys
 
-ROOT=Path(__file__).resolve().parents[1]
+ROOT=Path(os.environ.get('QQBOT_ROOT',Path(__file__).resolve().parents[1])).resolve()
 sys.path.insert(0,str(ROOT/'src'))
-from qqbot_gateway.config import load_settings
+from qqbot_gateway.config_files import load_consumer
 from qqbot_gateway.backends import resolve_backend
 from qqbot_gateway.persona import compose_persona, session_version
 
 
 async def configure():
-    settings=load_settings(ROOT/'config/settings.local.yaml')
+    settings=load_consumer(ROOT)
+    from qqbot_gateway.vision import require_production
+    require_production(settings)
     budget=resolve_backend(settings)['input_budget']
     path=ROOT/'runtime/astrbot/data/cmd_config.json'
     config=json.loads(path.read_text(encoding='utf-8-sig'))
-    tokens=json.loads((ROOT/'secrets/local-tokens.json').read_text(encoding='utf-8'))
+    tokens=json.loads((ROOT/settings['secrets_file']).read_text(encoding='utf-8'))
     config['provider_sources']=[]
     config['provider']=[{'id':'workbuddy-local','type':'qqbot_openai','provider':'openai',
         'provider_type':'chat_completion','enable':True,'key':[tokens['model_gateway']],
@@ -75,4 +78,9 @@ async def configure():
     print('Isolated AstrBot text profile configured; builtin command plugins disabled.')
 
 
-if __name__=='__main__':asyncio.run(configure())
+if __name__=='__main__':
+    from qqbot_gateway.config_files import ConfigError
+    try:asyncio.run(configure())
+    except ConfigError as error:
+        print(str(error),file=sys.stderr)
+        raise SystemExit(1) from None

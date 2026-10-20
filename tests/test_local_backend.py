@@ -60,11 +60,10 @@ class ProfileTests(unittest.TestCase):
                 self.assertIn('家庭SSH连接不可用',ui.text)
                 self.assertEqual(path.read_bytes(),original)
 
-    @unittest.skipUnless(os.name=='nt','Windows cmd launcher')
-    def test_actual_cmd_chinese_space_path_and_external_cwd(self):
+    def test_management_python_chinese_space_path_and_external_cwd(self):
         with tempfile.TemporaryDirectory(prefix='机器人 LAP17 ') as temp:
             root=Path(temp);(root/'config').mkdir();(root/'scripts').mkdir();(root/'.venv/Scripts').mkdir(parents=True)
-            shutil.copy2(ROOT/'配置机器人.cmd',root/'配置机器人.cmd')
+            self.assertFalse((ROOT/'配置机器人.cmd').exists())
             for filename in ('configure_bot.py','console_ui.py'):shutil.copy2(ROOT/'scripts'/filename,root/'scripts'/filename)
             shutil.copytree(ROOT/'src',root/'src',ignore=shutil.ignore_patterns('__pycache__'))
             shutil.copy2(sys.executable,root/'.venv/Scripts/python.exe')
@@ -73,7 +72,7 @@ class ProfileTests(unittest.TestCase):
             path=root/'config/settings.local.yaml';path.write_text(yaml.safe_dump(data),encoding='utf-8')
             env=os.environ.copy();env['PYTHONPATH']=str(ROOT/'.venv/Lib/site-packages');env['PYTHONUTF8']='1'
             for backend in ('ollama_ssh','codebuddy_cli'):
-                command=f'"{os.environ["COMSPEC"]}" /d /s /c ""{root / "配置机器人.cmd"}" backend set {backend}"'
+                command=[sys.executable,str(root/'scripts/configure_bot.py'),'backend','set',backend]
                 result=subprocess.run(command,cwd=ROOT.parent,env=env,capture_output=True,timeout=10)
                 self.assertEqual(result.returncode,0,result.stderr.decode('utf-8',errors='replace'))
                 self.assertEqual(read_settings(path)[0]['llm']['backend'],backend)

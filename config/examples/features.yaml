@@ -1,0 +1,101 @@
+# features.yaml：联网、表情、记忆、视觉与成员；视觉生产拒启，成员生产暂停，搜索门槛关闭
+# 同目录五文件共同组成配置；其他文件见config/README.md。
+# 本机config/local不提交；保存后下次正常启动生效，不热更新。
+# web：配置节，子字段见下方；保留既有校验约束
+# web.enabled：显式布尔开关；true不等于能力已验证，关注仅free有效；新装默认 false
+# web.trigger：联网触发auto/explicit；新装默认 "auto"
+# web.provider：搜索提供方固定bing_rss，当前搜索质量门槛关闭；新装默认 "bing_rss"
+# web.max_searches：搜索最多1次；新装默认 1
+# web.max_results：搜索结果1..5条；新装默认 5
+# web.max_pages：正文1..2页；新装默认 2
+# web.timeout_seconds：联网总超时秒5..15；新装默认 15
+# web.max_redirects：重定向0..2次；新装默认 2
+# web.max_response_bytes：响应上限65536..1048576字节；新装默认 1048576
+# web.max_page_text_bytes：单页正文1000..8000字节；新装默认 4000
+# web.max_evidence_bytes：联网材料1000..12000字节；新装默认 6000
+# web.max_sources：来源1..2项；新装默认 2
+# memes：配置节，子字段见下方；保留既有校验约束
+# memes.enabled：显式布尔开关；true不等于能力已验证，关注仅free有效；新装默认 false
+# memes.inbox_dir：固定项目assets/memes/inbox，本机素材不提交；新装默认 "assets/memes/inbox"
+# memes.library_dir：固定项目assets/memes/library；新装默认 "assets/memes/library"
+# memes.catalog_file：固定config/memes.local.yaml，是图库数据而非发送开关；新装默认 "config/memes.local.yaml"
+# memes.max_candidates：表情候选数1..32；新装默认 16
+# memes.catalog_prompt_max_bytes：表情提示500..4000字节；新装默认 2000
+# memes.max_images_per_turn：单轮固定最多1图；新装默认 1
+# memes.cooldown_seconds：表情冷却秒0..600；新装默认 60
+# memes.same_meme_cooldown_seconds：同图冷却秒0..3600；新装默认 300
+# memes.allow_meme_only：允许仅发送已登记表情，不开放任意媒体；新装默认 true
+# memes.max_file_bytes：表情单文件1048576..8388608字节；新装默认 8388608
+# memes.import_count：显式导入数量1..48；新装默认 48
+# memory：配置节，子字段见下方；保留既有校验约束
+# memory.enabled：显式布尔开关；true不等于能力已验证，关注仅free有效；新装默认 false
+# memory.learning_enabled：记忆学习开关，必须同时开启记忆读取，不新增推理调用；新装默认 false
+# memory.max_records：每群记忆记录数上限；新装默认 64
+# memory.max_fact_bytes：每群记忆事实总字节上限；新装默认 16384
+# memory.max_group_file_bytes：单群记忆文件字节上限；新装默认 65536
+# memory.max_groups：可持久化群数上限；新装默认 16
+# memory.max_total_bytes：记忆总字节上限；新装默认 8388608
+# memory.max_prompt_records：单次记忆提示记录数上限；新装默认 8
+# memory.max_prompt_bytes：记忆/成员提示UTF-8字节上限；新装默认 1536
+# memory.max_proposals_per_turn：单轮学习提议数上限；新装默认 3
+# memory.max_record_bytes：单条记忆UTF-8字节上限；新装默认 240
+# vision：配置节，子字段见下方；保留既有校验约束
+# vision.enabled：显式布尔开关；true不等于能力已验证，关注仅free有效；新装默认 false
+# vision.input_reserve_tokens：视觉预留4096仅假设，容量/上界未证，true仍拒启动；新装默认 4096
+# members：配置节，子字段见下方；保留既有校验约束
+# members.enabled：显式布尔开关；true不等于能力已验证，关注仅free有效；新装默认 false
+# members.mentions_enabled：受控成员@开关，仍受成员生产暂停门槛限制；新装默认 false
+# members.roster_member_count_lt：人数必须小于50；未知/过期暂停，不以收到时间假冒观测时间；新装默认 50
+# members.count_ttl_seconds：人数有效秒数；新装默认 60
+# members.roster_ttl_seconds：名册有效秒数；新装默认 300
+# members.max_prompt_entries：成员提示条目上限；新装默认 8
+# members.max_prompt_bytes：记忆/成员提示UTF-8字节上限；新装默认 768
+web:
+  enabled: false
+  trigger: auto
+  provider: bing_rss
+  max_searches: 1
+  max_results: 5
+  max_pages: 2
+  timeout_seconds: 15
+  max_redirects: 2
+  max_response_bytes: 1048576
+  max_page_text_bytes: 4000
+  max_evidence_bytes: 6000
+  max_sources: 2
+memes:
+  enabled: false
+  inbox_dir: assets/memes/inbox
+  library_dir: assets/memes/library
+  catalog_file: config/memes.local.yaml
+  max_candidates: 16
+  catalog_prompt_max_bytes: 2000
+  max_images_per_turn: 1
+  cooldown_seconds: 60
+  same_meme_cooldown_seconds: 300
+  allow_meme_only: true
+  max_file_bytes: 8388608
+  import_count: 48
+memory:
+  enabled: false
+  learning_enabled: false
+  max_records: 64
+  max_fact_bytes: 16384
+  max_group_file_bytes: 65536
+  max_groups: 16
+  max_total_bytes: 8388608
+  max_prompt_records: 8
+  max_prompt_bytes: 1536
+  max_proposals_per_turn: 3
+  max_record_bytes: 240
+vision:
+  enabled: false
+  input_reserve_tokens: 4096
+members:
+  enabled: false
+  mentions_enabled: false
+  roster_member_count_lt: 50
+  count_ttl_seconds: 60
+  roster_ttl_seconds: 300
+  max_prompt_entries: 8
+  max_prompt_bytes: 768

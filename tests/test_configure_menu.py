@@ -254,7 +254,7 @@ class MenuTests(unittest.TestCase):
             with patch('scripts.configure_bot.ROOT',self.root),patch('scripts.configure_bot.Console',return_value=ui), \
                  patch.object(sys,'argv',['configure_bot.py']),redirect_stdout(output):
                 self.assertEqual(main(),0)
-            self.assertIn('已退出',output.getvalue())
+            self.assertIn('config/README.md',output.getvalue())
         self.assertEqual(self.path.read_bytes(),self.original)
 
     def test_reply_mode_menu_save_cancel_and_limits(self):

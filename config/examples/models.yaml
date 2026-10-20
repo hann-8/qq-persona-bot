@@ -1,0 +1,71 @@
+# models.yaml：当前后端与独立双profile；连接/队列为高级项，无失败自动切换
+# 同目录五文件共同组成配置；其他文件见config/README.md。
+# 本机config/local不提交；保存后下次正常启动生效，不热更新。
+# llm：配置节，子字段见下方；保留既有校验约束
+# llm.backend：显式选择codebuddy_cli或ollama_ssh，不自动换模型/账号/额度；新装默认 "codebuddy_cli"
+# llm.profiles：配置节，子字段见下方；保留既有校验约束
+# llm.profiles.codebuddy_cli：配置节，子字段见下方；保留既有校验约束
+# llm.profiles.codebuddy_cli.model：CLI模型ID或已安装本地精确tag，不自动下载，不保证免费；新装默认 "deepseek-v4.1-flash"
+# llm.profiles.codebuddy_cli.reasoning_effort：auto/minimal/low/medium/high/xhigh/max，受已有模型能力元数据约束；新装默认 "auto"
+# llm.profiles.codebuddy_cli.context_window_tokens：CLI原生窗口仅null/auto口径，实际窗口未证；新装默认 null
+# llm.profiles.codebuddy_cli.run_timeout_seconds：单次运行期限秒；排队+所选运行期限+25秒不得超过180秒；新装默认 90
+# llm.profiles.codebuddy_cli.input_budget：配置节，子字段见下方；保留既有校验约束
+# llm.profiles.codebuddy_cli.input_budget.context_input_limit_tokens：可见UTF-8字节保守输入预算，非精确token/积分；新装默认 16384
+# llm.profiles.codebuddy_cli.input_budget.context_overhead_reserve_tokens：输入开销预留，保守计数，非精确token；新装默认 2048
+# llm.profiles.codebuddy_cli.input_budget.output_reserve_tokens：输出预留；本地输入加输出不超过num_ctx，预留不少于num_predict；新装默认 2048
+# llm.profiles.ollama_ssh：配置节，子字段见下方；保留既有校验约束
+# llm.profiles.ollama_ssh.model：CLI模型ID或已安装本地精确tag，不自动下载，不保证免费；新装默认 "qwen3.5:9b-q4_K_M"
+# llm.profiles.ollama_ssh.expected_digest：本地模型SHA256，启用ollama_ssh前须明确核对，不能填已验证标记；新装默认 null
+# llm.profiles.ollama_ssh.access_file：仅项目secrets内连接资料引用，不内联凭据；新装默认 "secrets/home-5070-runtime.local.json"
+# llm.profiles.ollama_ssh.num_ctx：本地请求上下文4096..32768，不保证精确token上界；新装默认 16384
+# llm.profiles.ollama_ssh.think：本地请求固定false；不映射CLI推理档位；新装默认 false
+# llm.profiles.ollama_ssh.num_predict：本地输出上限128..4096，须不大于输出预算预留；新装默认 1024
+# llm.profiles.ollama_ssh.keep_alive_seconds：本地模型保温秒数0..1800；新装默认 300
+# llm.profiles.ollama_ssh.temperature：本地采样温度0..2；新装默认 0.7
+# llm.profiles.ollama_ssh.top_p：本地采样累计概率(0,1]；新装默认 0.8
+# llm.profiles.ollama_ssh.top_k：本地采样候选数1..100；新装默认 20
+# llm.profiles.ollama_ssh.run_timeout_seconds：单次运行期限秒；排队+所选运行期限+25秒不得超过180秒；新装默认 120
+# llm.profiles.ollama_ssh.input_budget：配置节，子字段见下方；保留既有校验约束
+# llm.profiles.ollama_ssh.input_budget.context_input_limit_tokens：可见UTF-8字节保守输入预算，非精确token/积分；新装默认 12288
+# llm.profiles.ollama_ssh.input_budget.context_overhead_reserve_tokens：输入开销预留，保守计数，非精确token；新装默认 2048
+# llm.profiles.ollama_ssh.input_budget.output_reserve_tokens：输出预留；本地输入加输出不超过num_ctx，预留不少于num_predict；新装默认 2048
+# llm.host：高级监听地址固定127.0.0.1；新装默认 "127.0.0.1"
+# llm.port：高级回环端口1..65535；新装默认 8765
+# llm.max_concurrency：高级模型并发固定1，单次尝试不保证CLI上游只请求一次；新装默认 1
+# llm.queue_limit：高级模型排队数0..100；新装默认 5
+# llm.queue_wait_seconds：高级排队等待秒1..3600，受180秒总预算限制；新装默认 30
+# llm.cleanup_seconds：高级清理等待秒1..60，原unknown/清理门槛保持；新装默认 5
+llm:
+  backend: codebuddy_cli
+  profiles:
+    codebuddy_cli:
+      model: deepseek-v4.1-flash
+      reasoning_effort: auto
+      context_window_tokens: null
+      run_timeout_seconds: 90
+      input_budget:
+        context_input_limit_tokens: 16384
+        context_overhead_reserve_tokens: 2048
+        output_reserve_tokens: 2048
+    ollama_ssh:
+      model: qwen3.5:9b-q4_K_M
+      expected_digest: null
+      access_file: secrets/home-5070-runtime.local.json
+      num_ctx: 16384
+      think: false
+      num_predict: 1024
+      keep_alive_seconds: 300
+      temperature: 0.7
+      top_p: 0.8
+      top_k: 20
+      run_timeout_seconds: 120
+      input_budget:
+        context_input_limit_tokens: 12288
+        context_overhead_reserve_tokens: 2048
+        output_reserve_tokens: 2048
+  host: 127.0.0.1
+  port: 8765
+  max_concurrency: 1
+  queue_limit: 5
+  queue_wait_seconds: 30
+  cleanup_seconds: 5

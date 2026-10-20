@@ -1,0 +1,19 @@
+# runtime.yaml：高级连接、版本与秘密引用；layout_version=1独立于内部schema3
+# 同目录五文件共同组成配置；其他文件见config/README.md。
+# 本机config/local不提交；保存后下次正常启动生效，不热更新。
+# schema_version：内部配置版本固定3；新装默认 3
+# onebot：配置节，子字段见下方；保留既有校验约束
+# onebot.host：高级监听地址固定127.0.0.1；新装默认 "127.0.0.1"
+# onebot.port：高级回环端口1..65535；新装默认 6200
+# onebot.upstream：固定回环WS /ws端点，不允许认证信息/查询/片段；新装默认 "ws://127.0.0.1:6199/ws"
+# secrets_file：项目secrets内token文件引用，check不读凭据；新装默认 "secrets/local-tokens.json"
+# layout_version：磁盘布局版本固定1，组装时移除；新装默认 1
+# legacy_extensions：仅迁移保留的未知顶层字段，不保证功能，不得冲突已知字段
+schema_version: 3
+onebot:
+  host: 127.0.0.1
+  port: 6200
+  upstream: ws://127.0.0.1:6199/ws
+secrets_file: secrets/local-tokens.json
+layout_version: 1
+legacy_extensions: {}

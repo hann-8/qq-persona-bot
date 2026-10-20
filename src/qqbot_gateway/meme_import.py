@@ -55,8 +55,9 @@ async def download(url,maximum,budget=None):
     raise ValueError('Media unavailable')
 
 
-async def favorites(root,cfg,port,*,basic=False,fetch=download):
-    catalog=MemeCatalog(root,cfg);cfg=catalog.cfg;token=admin_token(root)
+async def favorites(root,cfg,port,*,basic=False,fetch=download,config_guard=None):
+    if config_guard:config_guard()
+    catalog=MemeCatalog(root,cfg,config_guard=config_guard);cfg=catalog.cfg;token=admin_token(root)
     if not token:raise ValueError('Initialize admin token, then next gate startup loads it')
     accepted=failed=total=0
     wire_budget={'bytes':0}

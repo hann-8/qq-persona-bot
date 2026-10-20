@@ -12,3 +12,7 @@ assets/memes/inbox/*
 assets/memes/library/*
 !assets/memes/library/README.md
 config/memes.local.yaml
+
+config/local/
+config/.local-*/
+config/.rollback-*.tmp

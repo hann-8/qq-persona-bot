@@ -1,41 +1,46 @@
 # LAP-34 分层配置文件取代日常配置菜单
 
-返回[PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md)。继承[AGENTS](../../../../AGENTS.md)。
+返回[PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md)。继承[AGENTS](../../../../AGENTS.md)，合同见[PLAN](PLAN.md) / [IMPLEMENTATION_GUIDE](IMPLEMENTATION_GUIDE.md)。
 
 ## 当前状态
 
-2026-10-20 19:06（Asia/Shanghai）领取；session `LAP-34-config-files-plan`，标题“分层配置文件规划”。19:12详细规划完成，见[PLAN](PLAN.md)与[medium实施指引](IMPLEMENTATION_GUIDE.md)。仅已规划；未实现/未迁移/未做真实验收，实施等待用户后续指令。会话模型/档位由操作者按AGENTS设置，本session不声称已自动检测或切换。
+2026-10-20 19:53（Asia/Shanghai）实施领取，session `LAP-34-config-files-implementation` / “分层配置实施”；20:25交接检查点。C34-01→06已实现/离线通过；本机未迁移/未正常启动加载，真实/完整验收均未做。会话模型和档位由用户设置，不声称自动检测或切换。仅本任务，无子代理或其他任务实施。
 
-用户会直接编辑YAML/JSON/TOML，希望取消对配置bot的cmd菜单的依赖，并清楚知道各文件对应哪些设置。先基于现有YAML设计，不引入多种并行格式。
+起点`main/6d31a4f`，唯一既有未提交差异为用户`config/persona.md`，保留原文件，不修改/格式化/暂存/提交；没有其他实现session冲突。已先读入口、工作线、台账与34三文件，登记19:53归属后重读，再开始代码。使用codex-handoff技能同步阶段证据，未建立根HANDOFF。
 
-开始检查点：`main/003f04e`，已跟踪未提交差异只有用户的`config/persona.md`；完整保留，不读取正文、不修改、不纳入提交。本任务独占下面6份规划文档；未发现这些文件已有未提交修改。不领取其他实现任务，不启停bot、不登录、不调用真实模型/群/SSH、不读写运行配置或凭据。
+## 已完成
+
+- C34-01：固定五文件、安全解析/整体验证/稳定读取、source/semantic摘要、显式root与单文件兼容。
+- C34-02：中文注释模板/配置索引/忽略；无副作用check、无损init/migrate及原字节备份/不可覆盖目录发布。
+- C34-03：启动一次解析、实例快照；实际框架准备/gate/model/router一致绑定与摘要ready；无热更新，磁盘候选/已加载状态分开，保守快照保留。
+- C34-04：管理source digest适配、split底层与旧参数/名单/功能激活拒写；图库/记忆/凭据/连接动作保留，维护页去掉参数编辑。
+- C34-05：删除根配置cmd；保留启动/关闭/状态cmd；无参索引、README/目录与日志说明同步。
+- C34-06：完整export-legacy/双摘要有序rollback-layout、30新单元与426单元全套/20组合460实际框架合成通过；详见[报告](../../../../reports/lap-34-2026-10-20.md)/[摘要](../../../../reports/lap-34-offline.json)。
+
+内部schema3/layout_version1；默认沿用旧示例，迁移保留实际free/profile/开关与扩展。web/vision/members门槛、私聊关闭、前置黑名单、工具隔离、单次尝试、账号/模型/额度边界不变。
 
 ## 文件归属
 
-- 本目录`HANDOFF.md`、`PLAN.md`、`IMPLEMENTATION_GUIDE.md`。
-- 根`PROGRESS.md`、工作线`HANDOFF.md`与`TASKS.md`的本任务索引/状态。
-- 后续代码、配置模板、现有cmd与README本轮均只读。
+- `src/qqbot_gateway/config_files.py`、`config_layout_ops.py`、`config_comments.py`、`config.py`。
+- `config/examples/{bot,models,chat,features,runtime}.yaml`、`config/README.md`、旧示例首部说明与`.gitignore`。
+- `scripts/config_files.py`、`manage.py`、`configure_astrbot.py`、`configure_bot.py`、`observe_lap28.py`。
+- gate/model/napcat_login与router；meme_catalog/meme_import、ssh_transport/ollama_ssh_runner仅管理source guard等本任务适配。
+- 新`tests/test_config_files.py`、`scripts/verify_lap34.py`、lap-34三份报告；旧configure_menu/lifecycle/local_backend/lap24夹具适配。
+- 根README、目录与日志说明、删除配置cmd；PROGRESS、工作线HANDOFF/TASKS、本交接与34计划/指引的当前状态同步。
+- 用户persona、其他任务文档、真实本机配置/秘密/图库/记忆/状态均不纳入。
 
-## 已完成与证据
+## 验证与修复
 
-- 已按入口读取PROGRESS、AGENTS、活动线HANDOFF/TASKS及codex-handoff技能。
-- 已只读核对`config.py`、配置菜单、启动/框架准备/插件加载入口、示例YAML与忽略规则：已有单文件YAML；菜单写回单文件，多入口硬编码路径，部分函数以`parent.parent`推断项目根。
-- 已区分配置值与管理动作：收藏导入、群记忆维护、凭据保护/远端unknown解除不能伪装成设置开关或在加载配置时执行。
-- 已完成5文件职责/字段默认值、固定归属/受限解析、统一实例快照/明确root、注释保持、无损迁移/回滚、cmd退役与管理动作保留合同。
-- 6个实施步骤C34-01—06、10个验收项CF-01—10与medium复制指令已落盘；现有默认值/行为/未验证门槛均保留。
+`.venv/Scripts/python.exe -X utf8 scripts/verify_lap34.py`：426单元通过，20组合/460实际框架用例通过；两runner底层替身、mentions/free、single/adaptive、memory/media/v1文字，actual prepare/gate/model/router额外一致性检查。末次`unittest discover -s tests -p test_config_files.py`补验30项通过；`test_lap31.py`专项23项通过。CF-01—10逐项证据、命令/边界见报告。
+
+首轮直接单元的LAP-24旧固定人设长度断言受用户persona差异影响；最终verifier明确使用Git已提交人设基线，不读取/修改工作区正文作验收，不将该通过当作用户人设已接受。旧cmd/ready夹具已适配；安全建目录的新独立清理root兼容回归已修复，未更改31B合同。真实启停/登录/SSH/模型/群消息均0；健康或配置检查未在现场运行。
 
 ## 剩余与下一步
 
-规划内容已完成并Git交付。下一步由用户设置gpt-6.1-sol/medium并另行下达实施指令，按[指引](IMPLEMENTATION_GUIDE.md)执行；本机迁移/加载另行明确授权，不能把文档提交当启用。实施时重新核对git status/归属与现场状态，不沿用本轮快照。
-
-## 验证状态
-
-19:10文档初检：6份文档256个本地链接均存在、围栏配对、C34/CF编号集合完整；19:12同步索引后最终268个链接、围栏/文件映射/编号集合与隐私模式检查均通过，git diff --check通过。只运行文档检查，没有跑bot功能测试；源码取证不等于离线实现通过。
-
-LAP-18搜索、24登录、28视觉、29成员、31B清理覆盖及所有旧真人差额保留。当前bot状态未知；不沿用19日“停机”推断20日状态。
+代码/模板/文档交付完成；仅在用户后续明确授权后，按config索引持锁确认停机，执行真实迁移并另验正常启动加载。不能因本轮Git或离线通过标“已启用/完整验收”。运行状态未知，不从旧停机记录推断当前状态；LAP-18/24/28/29/31B及旧真人差额保留。不自动推进LAP-35。
 
 ## Git交付
 
-2026-10-20 19:13（Asia/Shanghai）：内容提交`7b5c58d195d6f26cd0839b7321fa0fbaecd1d524`已推送`origin/main`；`git ls-remote --exit-code origin refs/heads/main`与本地完整SHA一致。内容提交仅6份归属文档，268本地链接/围栏/映射/编号与隐私模式检查、暂存差异检查通过；没有功能测试或真实运行操作。
+交付前检查仅提交本任务归属文件，排除用户persona。commit/push与远端完整SHA核对结果将在本节同步；最终记录提交自身SHA以git log和最终答复为准。
 
-推送后仅保留用户`config/persona.md`未提交差异。随后只同步本交付记录，记录提交最终SHA见本文件git log及本次最终答复；Git交付不等于已实现、已迁移或已加载。
+历史规划：19:06领取`LAP-34-config-files-plan`，19:12规划完成；内容`7b5c58d195d6f26cd0839b7321fa0fbaecd1d524`与记录`29f75ff`已于规划轮推送。该历史交付没有迁移或启停授权。

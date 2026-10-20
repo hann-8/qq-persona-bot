@@ -89,11 +89,12 @@ def load_access(root, filename):
     except Exception:raise GatewayError('SSH_ACCESS_INVALID') from None
 
 
-def initialize_access(root, filename):
+def initialize_access(root, filename, *, config_guard=None):
     """Explicit local action only: copy existing DPAPI ciphertext and recorded pin."""
     from .config import configuration_lock, require_stopped
     with configuration_lock(root):
         require_stopped(root)
+        if config_guard:config_guard()
         target = secrets_path(root,filename)
         if target.exists():raise ValueError('Access file already exists; preserve it')
         note = secrets_path(root,'secrets/home-5070-access.local.md').read_text(encoding='utf-8')
@@ -105,6 +106,7 @@ def initialize_access(root, filename):
             password_dpapi=note.split('<!-- DPAPI_PASSWORD_BEGIN -->',1)[1].split('<!-- DPAPI_PASSWORD_END -->',1)[0].strip())
         validate_access(root,access)
         target.parent.mkdir(parents=True,exist_ok=True)
+        if config_guard:config_guard()
         with target.open('x',encoding='utf-8') as stream:json.dump(access,stream)
         load_access(root,filename)
 

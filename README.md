@@ -1,8 +1,10 @@
+配置入口见[config/README.md](config/README.md)。LAP-34已实现的日常流程为关闭→编辑config/local五文件→正常启动；未迁移时继续兼容旧单文件。本机迁移/加载待另行明确授权。根配置cmd退役，无参configure_bot只打印索引；图库/记忆/凭据/连接管理动作保留。以下历史能力的真实验收差额均保留。
+
 # QQ 人设文字 Bot（笔记本测试版）
 
 LAP-30 群长期记忆已实现，离线验证见[报告](reports/lap-30-2026-10-19.md)与[交接](tracks/laptop-workbuddy/tasks/LAP-30/HANDOFF.md)。`memory.enabled`、`memory.learning_enabled`默认均false，本机配置未改，真实效果和完整验收未做。无需启用members/vision，大群也只从当前获准sender学习；mentions仍仅真实@，旧个人history不能成为群共享事实。没有新增模型调用、embedding或后台任务。
 
-“配置机器人.cmd → 7 → 22 本群长期记忆”可分别开启读取/学习；关闭读取会同时关闭学习。保存须停机，正常重启加载，不自动启停。可先开启读取后通过本机管理添加/固定少量非敏感事实，再决定是否学习。该页提供授权群计数/字节、只读MD导出（查看record ID）、新增、确认candidate、固定/取消固定、纠正、删除记录/成员和清空群；写操作核对配置与JSON摘要，共用OS排他锁/校验/原子替换。群内“重置本人会话/本群上下文”保持原语义，不删除持久记忆。
+`config/local/features.yaml`中的memory可分别开启读取/学习；关闭读取会同时关闭学习。保存须停机，正常重启加载，不自动启停。可先开启读取后通过本机管理添加/固定少量非敏感事实，再决定是否学习。`scripts/configure_bot.py memory-admin`提供授权群计数/字节、只读MD导出（查看record ID）、新增、确认candidate、固定/取消固定、纠正、删除记录/成员和清空群；写操作核对配置与JSON摘要，共用OS排他锁/校验/原子替换。群内“重置本人会话/本群上下文”保持原语义，不删除持久记忆。
 
 主库仅在忽略的`state/group-memory/<本机HMAC命名空间>/memory.json`，按bot/group/user隔离，不随连接epoch/后端切换改变。持久key仅在忽略的`secrets/group-memory-key.local.json`；已有库而key丢失时禁用记忆，需本机恢复原key，不能重新生成空命名空间。`memory.md`仅本机只读视图，不支持回导；普通诊断不输出事实。最多16群/全部文件与key共8MiB（含MD/备份/坏副本/pending/tmp），每群全JSON64KiB、64事实/16KiB文本/32主体、固定最多4条/1KiB，预留2KiB删除intent及原子替换空间；配额可调小，不能突破上限。
 
@@ -12,11 +14,11 @@ LAP-30 群长期记忆已实现，离线验证见[报告](reports/lap-30-2026-10
 
 请求绑定固定base_revision/generation/phase和原proposal编号，CAS只做本地校验、不重调模型；每群128已应用marker、8待处理turn/24提议/16KiB/10分钟，重启丢未提交pending，不追发或补ACK。成员/群删除、黑名单加载先轮换generation并持久写purge intent，再清主库派生记录、pending、MD及所有该群副本/tmp；已撤销授权群的同bot本机库也覆盖。失败禁用该群记忆，文字继续；重启优先续净化，不从备份恢复，迟到ACK不复活。若第一份intent都写不进去，删除未完成且意图未持久化，须排除本机存储错误后重试；不宣称磁盘安全擦除。
 
-独立验证：`.venv/Scripts/python.exe -X utf8 scripts/verify_lap30.py`，只写`reports/lap-30-*`，使用临时自造数据、实际AstrBot/provider/run_agent和两runner底层替身。回滚前先停受管实例并保留key/记忆/ACK/pending/unknown/清理台账；7→19导出移除memory/members/vision/attention的旧schema3审阅副本，核对双摘要后显式激活，再回旧代码。旧版不能尊重未决清理时保持停机；不通过删除记忆或台账解除unknown。本轮没有部署或真实操作。
+独立验证：`.venv/Scripts/python.exe -X utf8 scripts/verify_lap30.py`，只写`reports/lap-30-*`，使用临时自造数据、实际AstrBot/provider/run_agent和两runner底层替身。回滚前先停受管实例并保留key/记忆/ACK/pending/unknown/清理台账；旧单文件布局下export-legacy-config导出移除memory/members/vision/attention的旧schema3审阅副本，核对双摘要后显式激活，再回旧代码。旧版不能尊重未决清理时保持停机；不通过删除记忆或台账解除unknown。本轮没有部署或真实操作。
 
 LAP-29 成员服务与受控@已实现/离线通过（355单元、52组合790框架及32专项末次补验）；**真实名册/@不可启用**，人数新鲜度仍为`capability_unverified`。见[交接](tracks/laptop-workbuddy/tasks/LAP-29/HANDOFF.md)和[报告](reports/lap-29-2026-10-18.md)。没有调用真实人数/名单/@或模型，没有启停/登录bot，本机配置未改。
 
-配置机器人.cmd → 7 → 21“小群成员与受控@”：`members.enabled / mentions_enabled`默认均false；开启请求会被拒绝。手改desired=true时gate/router/gateway及AstrBot配置生成仅暂停成员能力，文字聊天继续，不改变访问控制、模型或额度。保存须停机、正常重启加载；本轮不会自动启用。人数门槛固定1..49，50/51/未知/过期均零list；`received_at`只是收到响应的时间，不能证明人数刚观测。现锁定的NapCat缓存接口没有可信观测时间或最大陈旧度，不能通过重请求或手写status解锁；新人数来源须补规划。
+`config/local/features.yaml`中的members：`members.enabled / mentions_enabled`默认均false；开启请求会被拒绝。手改desired=true时gate/router/gateway及AstrBot配置生成仅暂停成员能力，文字聊天继续，不改变访问控制、模型或额度。保存须停机、正常重启加载；本轮不会自动启用。人数门槛固定1..49，50/51/未知/过期均零list；`received_at`只是收到响应的时间，不能证明人数刚观测。现锁定的NapCat缓存接口没有可信观测时间或最大陈旧度，不能通过重请求或手写status解锁；新人数来源须补规划。
 
 独立离线合同：人数TTL≤60秒且减去已知陈旧度、名册TTL≤300秒，两者同时有效；仅获准新消息驱动，入退群事件使缓存失效，不开定时查询。全量名册仅gate RAM，单人最多2个当前名字，不收集无限改名史。每轮仅当前/已知引用发言者及文字中唯一匹配的人，最多8候选/768 UTF-8序列化字节，再受共享20%/2304字节及最终输入预算裁剪；重名、bot、黑名单不猜。群友`get_group_member_list / get_group_member_info / get_stranger_info`不能由框架绕过；bot自身必要信息查询单独保留。
 
@@ -26,7 +28,7 @@ LAP-29 成员服务与受控@已实现/离线通过（355单元、52组合790框
 
 LAP-28 已交付原生图片适配与离线验证，**生产仍不可启用**；见[交接](tracks/laptop-workbuddy/tasks/LAP-28/HANDOFF.md)和[报告](reports/lap-28-2026-10-18.md)。没有执行真实识图、群图下载、QQ/模型调用或bot启停。
 
-`vision.enabled=false`为默认值；`vision.input_reserve_tokens=4096`仅为待验证假设。菜单7→20查看/关闭desired及设置1..65536的reserve；没有可编辑status，申请启用会被拒绝。手改true同样在gate/router/gateway启动前拒绝。保存不启停，正常重启加载；本次未改本机配置。
+`vision.enabled=false`为默认值；`vision.input_reserve_tokens=4096`仅为待验证假设。在`config/local/features.yaml`编辑desired及1..65536的reserve；没有可编辑status，申请启用会被拒绝。手改true同样在gate/router/gateway启动前拒绝。保存不启停，正常重启加载；本次未改本机配置。
 
 图片入口仅在准入/黑名单后给当前新消息第一张图签发cap，原URL/路径/附件从送往框架的事件剥离，框架不自动下载。gate在现有loopback端口提供固定`/context/vision/bind`、`/context/vision/resolve`，独立`context_service_token`只从项目忽略的`secrets/context-service.local.json`读取（随机至少32字节的64位hex；不复用其他token），当前不创建凭据。provider只转sideband，gateway绑定request/target/source/epoch后一次兑换；失败/并发/重放/过期均不能再下载。重连、失联清理cap；运行配置变更须停机重启。ambient合并会同时替换目标与其cap，不读取承载event的旧图。
 
@@ -38,17 +40,17 @@ LAP-28 已交付原生图片适配与离线验证，**生产仍不可启用**；
 
 独立离线入口：`.venv/Scripts/python.exe -X utf8 scripts/verify_lap28.py`，仅写`reports/lap-28-*`。真实观察命令为`scripts/observe_lap28.py`，本次只检查`--help`。后续必须由用户明确现有选定后端、样图、用例和整轮调用总上限，再在停机状态先运行`--backend <已选后端> --inspect`取得本机binding（纯本机、零网络/推理）；单用例须同时提供`--sample <文件> --case known_content|screenshot|max_normalized --expected-visible-text <已知可见内容> --expected-binding <摘要> --max-calls 1 --authorize-native ONE_NATIVE_IMAGE_CALL`。命令不切后端，每次最多一个原生生成且无重试，另保持用户整轮预算；先写一次尝试账本，失败/未知也保留。仅记录脱敏版本/尺寸/hash/观察结果到忽略的`state/vision-evidence/`，不记录样图/回答/路径，不自动启用。最大尺寸用例需规范化≥990000像素；预期内容匹配只形成观察值，不能证明4096上界。
 
-LAP-27新增free关注/指代与自然续聊，默认关闭，尚未真实验收或自动加载。配置机器人.cmd → 7 群聊参与与活跃度 → 18 关注与续聊：仅`participation.mode=free`且`attention.enabled=true`生效，停机保存、正常重启加载；mentions仍仅真实@并沿用原群+用户历史。所有新能力关闭时保留原v1协议、工具隔离及single/adaptive、web/memes行为。
+LAP-27新增free关注/指代与自然续聊，默认关闭，尚未真实验收或自动加载。编辑`config/local/chat.yaml`中的participation.attention：仅`participation.mode=free`且`attention.enabled=true`生效，停机保存、正常重启加载；mentions仍仅真实@并沿用原群+用户历史。所有新能力关闭时保留原v1协议、工具隔离及single/adaptive、web/memes行为。
 
 启用关注后：真实@ > 可靠叫名/引用已ACK的bot文字 > 同人60秒且无插话的第二人称续聊 > 无主语续聊候选 > ambient。同级FIFO，不打断活动生成；不同direct消息各自排队，目标与必要引用冻结到投递/ACK结束。候选每群滚动60秒默认最多4次，同次模型可判断结束确认应沉默。只有已确认的正常模型文字ACK建立焦点，按真实回应对象归因，unknown/图片/本地错误不建焦点。队列/生成/ACK均可能增加等待，不承诺固定时延；新增随机trace关联固定类别日志，不含正文或QQ/群号。
 
-旧代码回滚前，先停止受管实例并保留所有pending/unknown/清理台账。菜单7→19或`.venv/Scripts/python.exe scripts/configure_bot.py export-legacy-config`生成`state/config-exports/`忽略目录内的原配置备份、移除attention、vision与members section的旧schema3审阅副本及两个摘要；保留其他扩展字段。**只导出不激活**。本机审阅后可显式运行`activate-legacy-config <review路径> <source_digest> <legacy_digest> 已核对`，同配置锁下复核停机与双摘要后原子激活，不重启；任一副本有变化须重新导出。旧版本不认识未决清理台账时保持停机，不能靠回旧代码抹掉unknown。
+旧代码回滚前，先停止受管实例并保留所有pending/unknown/清理台账。旧单文件布局下使用`.venv/Scripts/python.exe scripts/configure_bot.py export-legacy-config`生成`state/config-exports/`忽略目录内的原配置备份、移除attention、vision与members section的旧schema3审阅副本及两个摘要；保留其他扩展字段。**只导出不激活**。本机审阅后可显式运行`activate-legacy-config <review路径> <source_digest> <legacy_digest> 已核对`，同配置锁下复核停机与双摘要后原子激活，不重启；任一副本有变化须重新导出。旧版本不认识未决清理台账时保持停机，不能靠回旧代码抹掉unknown。
 
 独立离线验证：`.venv/Scripts/python.exe -X utf8 scripts/verify_lap27.py`，只写`reports/lap-27-*`；实际run_agent/provider/原event ACK与两runner底层替身、自造群/图片夹具，不调用真实模型/QQ。上述27交付时图片/名册/记忆字段仅预留；28图片进展见本文顶部，29已独立实现但生产人数新鲜度未证，30已独立实现（见顶部），31B完整覆盖/恢复仍未交付。见[LAP-27交接](tracks/laptop-workbuddy/tasks/LAP-27/HANDOFF.md)。
 
 LAP-24已实现/离线通过，尚未重启加载或真实验收：闲聊“最多三条”仅为上限，能一句接住就一句，有必要补充才两三条；认真回答完整单条，表情可不发、不占位凑数。single仍保留单条文字规则，不改操作者已有条数/间隔设置。真实模型的表达与QQ效果仍待另行验证。
 
-新增“配置机器人.cmd → 5 后端与连接 → 7 NapCat登录”，原1—6编号保留。也可用项目Python运行`scripts/configure_bot.py napcat-login status / set-password / clear-password`（三选一动作）。status只读本机状态，不解密或认证；set-password须停机并在本机TTY通过两次无回显输入分别录入QQ密码和项目WebUI token，回车/取消保留原凭据；不支持命令行密码或重定向输入。密文仅存忽略的`secrets/napcat-login.local.json`，CurrentUser DPAPI绑定当前Windows身份，清除只移除本项目回退凭据，不登出或删除设备/尝试账本。
+用项目Python运行`scripts/configure_bot.py napcat-login status / set-password / clear-password`（三选一动作）。status只读本机状态，不解密或认证；set-password须停机并在本机TTY通过两次无回显输入分别录入QQ密码和项目WebUI token，回车/取消保留原凭据；不支持命令行密码或重定向输入。密文仅存忽略的`secrets/napcat-login.local.json`，CurrentUser DPAPI绑定当前Windows身份，清除只移除本项目回退凭据，不登出或删除设备/尝试账本。
 
 **登录目录能力仍未证实，当前保存入口只能保存为关闭，不能据此保证免扫码。** 固定安装目录不等于QQ数据隔离；缺少原生数据根目录证据时保留快登/人工扫码，不迁移日常QQ、不重置GUID。单次回退客户端与实例账本已离线实现，但生产入口保持unverified，手写project_only记录也不会启用。未来补齐可信原生路径读取后，才可按明确授权接入并验证：新实例、目标匹配、受管6099监听、连续两次稳定未登录、先记账再密码POST；同实例最多一次，超时/中断unknown不重放，Worker重启不带密码环境。状态/健康/幂等启动不会认证。详见[LAP-24报告](reports/lap-24-2026-10-18.md)及[剩余差额](tracks/laptop-workbuddy/tasks/LAP-24/HANDOFF.md)。
 
@@ -81,9 +83,9 @@ cmd入口定位自身目录，支持外部工作目录及中文/空格路径，�
 
 缺省mentions仅处理授权群的QQ真实@；普通文字、仅@全体、引用或手打“@昵称”不强制触发。mentions保留每用户5秒冷却、群+用户隔离的最多8轮本人历史与管理员真实@“重置会话”。LAP-20新增显式free，见下文；私聊、未授权群和黑名单仍不处理。
 
-人设在 `config/persona.md`，已按LAP-15整理为“大肥鱼/鱼鱼”鲸鱼娘唯一精简正文，日常通常1—3短句、总体15—60字为表达目标，认真问题按需要答清楚；single发一条QQ纯文本，可显式启用下文LAP-16有限分条。原文完整备份仅在本机忽略的state/persona-backups，新版本组合3618 UTF-8字节，见[LAP-15报告](reports/lap-15-2026-10-17.md)。本轮仅离线验证，未加载真实实例，风格/P01待接受；固定访问/能力政策由代码优先组合，角色正文不能扩大触发权限。修改后停止并重新启动，新的设定版本会在下次请求建立新会话。本机账号、群、模型及队列参数在被忽略的 `config/settings.local.yaml`，格式参考 `config/settings.example.yaml`。已确定的账号、模型、额度来源及触发规则应保持原决定，禁止自动切换模型或另接收费API。
+角色正文独立编辑`config/persona.md`，保存后正常重启按原session_version合同加载；访问控制与能力政策始终由代码约束。LAP-15风格/字节数与备份为历史证据，见[LAP-15报告](reports/lap-15-2026-10-17.md)，不能代表操作者当前修改的正文已接受或已加载。LAP-34保留该文件已有差异，不修改/格式化/提交。账号、授权群、模型和队列按[配置索引](config/README.md)编辑；尚未迁移的旧`config/settings.local.yaml`仍兼容。不自动改变模型、额度来源或触发规则。
 
-授权群和全局用户黑名单可双击根目录 `配置机器人.cmd` 维护。首页按“群与黑名单”“模型与对话”“详细设置与能力说明”分组，切页清屏；列表/保存结果按回车后返回。每项编辑页会说明格式、范围和用途，空回车取消；首页0退出、子菜单0返回。推理强度可输入页面编号或英文值，编号只用于选择，保存的仍是auto/low/high/max等支持值；未知模型能力只允许auto。菜单读取当前值，不把你已保存的预算或轮数重置为默认。
+授权群和全局黑名单编辑`config/local/bot.yaml`。保存后下次正常启动生效；旧CLI写命令只对未迁移的单文件兼容，分层布局会拒写。
 
 启动/重复启动始终显示 `NapCat 登录/管理：http://127.0.0.1:6099`；启动失败时也给地址并提示可能暂不可访问，不自动打开浏览器。直接脚本命令和重定向输出不清屏、不额外暂停，原命令仍可使用：
 
@@ -101,7 +103,7 @@ cmd入口定位自身目录，支持外部工作目录及中文/空格路径，�
 
 管理员同样受授权群和黑名单约束。被屏蔽发送者的新消息在转发给AstrBot前静默拒绝；直接到达插件也不进入任务、冷却、模型或新会话。拉黑不删除旧历史，解除后可继续原会话；仍需真实@才触发。配置授权群后，账号是否入群需由你手工确认，工具不会自动加群。LAP-11纯文本/人设v2已实现并通过离线验证，已在本次暂停准入启动中加载验证，最终已关闭。
 
-LAP-10已增加参数菜单及下列命令。LAP-12曾暂停准入加载验证并关闭，这是历史检查点，当前运行状态未探测；原生窗口和CLI强制恢复能力缺口尚未解决，整体未完成验收，不据本机启动结果宣称能力缺口已解决：
+下列参数写命令仅供未迁移的旧单文件兼容；分层布局编辑对应YAML。LAP-12曾暂停准入加载验证并关闭，这是历史检查点，当前运行状态未探测；原生窗口和CLI强制恢复能力缺口尚未解决，整体未完成验收，不据本机启动结果宣称能力缺口已解决：
 
 ```powershell
 .\.venv\Scripts\python.exe scripts/configure_bot.py model set <模型ID>
@@ -121,11 +123,11 @@ CLI的`context-window`当前仅接受auto（YAML为null）。设置收到ACK不�
 
 `runtime`、`state`、`cache`、`logs`及`secrets`为本机数据；会话数据库可能含聊天内容，分享项目时不要附带这些目录。暂未配置开机自启；电脑睡眠时不承诺在线。
 
-LAP-11由网关一次将模型最终Markdown转为聊天纯文本：保留正文、可见链接、代码字面量和缩进，表格改成字段/值。single缺省仍为单条消息；可显式选adaptive，具体行为见下段，超长明确提示未展示完；格式转换后为空则本次失败，不自动重试。`output.mode`仅支持`plain_chat`，`output.max_reply_chars`可在停止后手工编辑本机YAML为200—8000，默认1200，下次完整启动生效；原max_reply_chars仍可手工设置；配置菜单已新增回复方式分组。新部署会因组合政策/人设版本变化使下一次请求开启新上下文，旧历史保留。LAP-12已暂停准入启动验证后关闭；真实QQ ACK和P01人设接受仍待用户参与，见[LAP-11报告](reports/lap-11-2026-10-16.md)。
+LAP-11由网关一次将模型最终Markdown转为聊天纯文本：保留正文、可见链接、代码字面量和缩进，表格改成字段/值。single缺省仍为单条消息；可显式选adaptive，具体行为见下段，超长明确提示未展示完；格式转换后为空则本次失败，不自动重试。`output.mode`仅支持`plain_chat`，`output.max_reply_chars`可在停止后手工编辑本机YAML为200—8000，默认1200，下次完整启动生效；原max_reply_chars仍可手工设置；回复方式见chat.yaml的output。新部署会因组合政策/人设版本变化使下一次请求开启新上下文，旧历史保留。LAP-12已暂停准入启动验证后关闭；真实QQ ACK和P01人设接受仍待用户参与，见[LAP-11报告](reports/lap-11-2026-10-16.md)。
 
 ## 有限分条（LAP-16，需显式启用）
 
-缺项仍是single；本轮只实现/离线验证，没有改本机配置或加载真实bot。协调关闭当前实例后，双击“配置机器人.cmd”，进入“4 回复方式”，将delivery-mode设为adaptive，再按既有入口启动；具体实例启用与真实试用须由当前负责人协调。也可运行`.venv/Scripts/python.exe scripts/configure_bot.py delivery-mode set adaptive`，仍受停止身份守卫限制。切回single使用同一菜单或命令。
+缺项仍是single；本轮只实现/离线验证，没有改本机配置或加载真实bot。关闭当前实例后，在`config/local/chat.yaml`将output.delivery_mode设为adaptive，再正常启动；切回single编辑同一字段。
 
 adaptive在一次生成内决定日常chat和认真answer。闲聊最多3条、合计80字符、每条40字符，首条后间隔800—1600毫秒；不凑条数，不按标点硬拆。认真问题、代码/字面量保守合成一条；超闲聊限额合成一条且保留尾段，原max_reply_chars总上限和未展示完提示仍有效。进阶项可调整条数/字符/间隔，页面标明范围与单位；保存后下次启动生效。模式/生成限额改变会建立新当前上下文，间隔调整不改人设版本，旧会话保留。
 
@@ -138,7 +140,7 @@ adaptive在一次生成内决定日常chat和认真answer。闲聊最多3条、�
 
 已实现、离线及实际框架合成回归通过；真实本地生成、think:false效果、实际窗口/显存/速度、adaptive遵循和远端取消后停止均未验证。黑名单前置、私聊关闭和LAP-16发送账本继续保留。联网独立进展见下节；free已由LAP-20实现但未启用，LAP-21受控表情已实现/离线通过，默认关闭，真实收藏/发图未验。
 
-配置机器人.cmd → 5 后端与连接，手动选择CodeBuddy或家庭PC；模型与对话页编辑当前profile，本地参数页可在CLI仍活动时预先编辑本地profile。两套模型、强度/原生选项、超时和输入预算各自保留，历史轮数共用。所有保存须先关闭机器人，下次启动生效；保存不生成、不重启、不自动fallback。本轮没有修改本机settings或初始化长期运行连接文件。
+编辑`config/local/models.yaml`中的llm.backend，手动选择CodeBuddy或家庭PC；两套profile可分别编辑。两套模型、强度/原生选项、超时和输入预算各自保留，历史轮数共用。所有保存须先关闭机器人，下次启动生效；保存不生成、不重启、不自动fallback。本轮没有修改本机settings或初始化长期运行连接文件。
 
 后续由操作者显式初始化：在后端与连接页选3，只从项目secrets内既有家庭资料复制DPAPI密文及旧盘点固定指纹到`secrets/home-5070-runtime.local.json`，保留原文件，不打印密码，不认证探测密码。运行时只读JSON，不解析旧Markdown，不读全局SSH/QQ/WorkBuddy资料。也支持在该JSON显式设置项目secrets内专用`key_file`替代`password_dpapi`；二者只能选一个，字段为host（既有家庭IPv4/IPv6字面地址，避免DNS超时不受控）/port/user/fingerprint和凭据引用，禁止明文password。既有资料不全时停止，不自动接受网络上新指纹。
 
@@ -146,13 +148,14 @@ adaptive在一次生成内决定日常chat和认真answer。闲聊最多3条、�
 
 本地请求级初值：num_ctx=16384、think=false、num_predict=1024、keep_alive=300秒、temperature=0.7/top_p=0.8/top_k=20；不改PC全局参数。输入预算12288、开销2048、输出预留2048，完整原生JSON请求纳入UTF-8字节计数；输入预算+输出预留<=num_ctx且输出预留>=num_predict。这是保守预算，不能代替精确分词或有效原生窗口实测。CLI默认仍deepseek-v4.1-flash/auto及原预算；旧schema1/2逐值迁移到CLI profile，未知扩展保留，有冲突拒绝。schema3不再有可写的顶层llm.model或chat预算影子。
 
-网关启动本地后端时先完成<=25秒元数据预检再监听，model等待30秒；失败由既有创建身份回收本次启动组件。每条请求先复核tag/digest，再只POST一次原生chat，复用system、本人裁剪历史和同一输出/ACK路径，不提供tools/MCP/图片。超时、取消、半响应或断线未确认完成时，持久记`state/ollama-remote-result-unknown.json`并返回REMOTE_RESULT_UNKNOWN，已排队和重启后生成都阻断；不远程杀进程、不据ps已加载认定请求已结束。操作者独立确认远端请求结束、停机后，可在菜单6输入REMOTE_CHECKED_STOPPED显式解除；禁止为了重试直接删标记。
+网关启动本地后端时先完成<=25秒元数据预检再监听，model等待30秒；失败由既有创建身份回收本次启动组件。每条请求先复核tag/digest，再只POST一次原生chat，复用system、本人裁剪历史和同一输出/ACK路径，不提供tools/MCP/图片。超时、取消、半响应或断线未确认完成时，持久记`state/ollama-remote-result-unknown.json`并返回REMOTE_RESULT_UNKNOWN，已排队和重启后生成都阻断；不远程杀进程、不据ps已加载认定请求已结束。操作者独立确认远端请求结束、停机后，可通过clear-remote-unknown命令输入REMOTE_CHECKED_STOPPED显式解除；禁止为了重试直接删标记。
 
 可用命令（均不自动启停）：
 
 ```powershell
 .\.venv\Scripts\python.exe scripts/configure_bot.py connection-init
 .\.venv\Scripts\python.exe scripts/configure_bot.py connection-check
+# 下两条backend set仅适用于旧单文件；分层布局请编辑models.yaml
 .\.venv\Scripts\python.exe scripts/configure_bot.py backend set ollama_ssh
 .\.venv\Scripts\python.exe scripts/configure_bot.py backend set codebuddy_cli
 .\.venv\Scripts\python.exe scripts/configure_bot.py clear-remote-unknown REMOTE_CHECKED_STOPPED
@@ -160,19 +163,19 @@ adaptive在一次生成内决定日常chat和认真answer。闲聊最多3条、�
 
 状态区分保存的下次启动profile、当前运行backend/model、元数据检查、最近真实生成、CLI尝试/本地POST/总backend尝试及数值usage；计数为当前网关进程内，credits仍null/unknown，不把token或占位0当积分。连接检查成功不能标真实推理通过。选定后端/模型/digest/原生生成参数/预算进入共用会话版本；非活动profile修改不影响当前版本。首次加载新版本合同或切换会建立新当前上下文，旧会话原样保留，不自动恢复为旧current。
 
-回滚到保留的CLI：停机→后端菜单选CLI→重新启动，不删模型、凭据或历史；远端未知状态仍需独立确认，不因切CLI而宣称远端已停。回退schema2代码前，先停机处理/隔离pending发送账本和远端未知请求，恢复同一检查点的配置备份并保留schema3/新历史备份；旧代码不能直接读schema3。部署依赖由pyproject.toml及uv.lock锁定（Paramiko5.0.0）；仅在项目虚拟环境安装，不修改系统Python。
+回滚到保留的CLI：停机→models.yaml选择CLI→正常启动，不删模型、凭据或历史；远端未知状态仍需独立确认，不因切CLI而宣称远端已停。回退schema2代码前，先停机处理/隔离pending发送账本和远端未知请求，恢复同一检查点的配置备份并保留schema3/新历史备份；旧代码不能直接读schema3。部署依赖由pyproject.toml及uv.lock锁定（Paramiko5.0.0）；仅在项目虚拟环境安装，不修改系统Python。
 
 本轮验证与限制见[LAP-17报告](reports/lap-17-2026-10-17.md) / [任务交接](tracks/laptop-workbuddy/tasks/LAP-17/HANDOFF.md)。
 
 ## LAP-20：显式自由群聊（已离线验证，尚未启用）
 
-停机后在“配置机器人.cmd → 7 群聊参与与活跃度”选择participation.mode=free，保存后重启生效；缺省仍mentions。本轮没有改本机配置、启停或真实试用。free只观察授权群启动后的新消息，先过滤黑名单/自身/私聊；不会导入旧个人历史、回拉QQ历史或理解收到的图片/视频。机器人输出在所有模式均为直接群发，single/adaptive都没有引用和自动@，output.quote_reply仅允许false。
+停机后在`config/local/chat.yaml`选择participation.mode=free，保存后重启生效；缺省仍mentions。本轮没有改本机配置、启停或真实试用。free只观察授权群启动后的新消息，先过滤黑名单/自身/私聊；不会导入旧个人历史、回拉QQ历史或理解收到的图片/视频。机器人输出在所有模式均为直接群发，single/adaptive都没有引用和自动@，output.quote_reply仅允许false。
 
-free使用每群独立RAM窗口，缺省60条/15分钟/32768 UTF-8字节；重启/断连/模式切换清空，管理员真实@“重置本群上下文”仅重置当前群。普通文字2秒合批，持续发言首条最多等5秒，每群每5秒至多评估一次、每分钟最多12次；一次生成决定说/不说，沉默也可能消耗模型额度。默认自发发言至少间隔15秒、每分钟最多4轮；无新消息不生成，不设定时冷场发言。高级参数的单位/范围显示在菜单，完整合同见[配置表](tracks/laptop-workbuddy/tasks/LAP-19/GROUP_CHAT_PLAN.md#5-lap-20配置默认值与生效)。
+free使用每群独立RAM窗口，缺省60条/15分钟/32768 UTF-8字节；重启/断连/模式切换清空，管理员真实@“重置本群上下文”仅重置当前群。普通文字2秒合批，持续发言首条最多等5秒，每群每5秒至多评估一次、每分钟最多12次；一次生成决定说/不说，沉默也可能消耗模型额度。默认自发发言至少间隔15秒、每分钟最多4轮；无新消息不生成，不设定时冷场发言。高级参数的单位/范围见五份中文注释模板与配置索引，完整合同见[配置表](tracks/laptop-workbuddy/tasks/LAP-19/GROUP_CHAT_PLAN.md#5-lap-20配置默认值与生效)。
 
 真实@独立优先排队，绕过自发沉默/冷却/频率限制。队列满、超时、无文字/能力不支持或后端异常给一次简短状态；不保证故障时模型完整回答或QQ必达，不自动重试/切模型。纯媒体非@只记占位。收到新@时取消未开始的自发任务，已开始生成只完成一次，若有@等待则丢弃自发输出；过期/断连/停止结果不发送。
 
-free的所有模型输出经统一逐条ACK投递，只把确认的bot输出加回RAM，原群快照不入个人conversation或持久发送账本。任一未知ACK会暂停本群继续接龙，真实@只给本机核对提示；操作者在QQ核对后，停机进入菜单7→17解除隔离，未知证据保留，旧内容不会重发。连接元数据监视仅清理失效RAM，不调用模型/搜索或主动发言。
+free的所有模型输出经统一逐条ACK投递，只把确认的bot输出加回RAM，原群快照不入个人conversation或持久发送账本。LAP-25已将未知ACK改为仅结束当轮，后续新消息可继续；未知证据保留，旧内容不会重发，不需要进入旧菜单解除。连接元数据监视仅清理失效RAM，不调用模型/搜索或主动发言。
 
 联网复用LAP-18，最多从本批新消息选择一个查找问题/公共URL，其他群聊与旧问题不外发搜索；allow_ambient_web仅与web.enabled同时开启时生效。搜索质量门槛仍未通过，不能称联网已可用。health的group_usage分mention/ambient、speak/silent/error与generations记录数值，credits仍unknown。两后端自然参与、真实QQ/ACK/多人/恢复/关闭中行为与旧真人缺项均未验；[离线报告](reports/lap-20-2026-10-17.md)与[交接](tracks/laptop-workbuddy/tasks/LAP-20/HANDOFF.md)列明证据。回滚先停机设mentions再重启，旧个人历史保留；回退旧代码前核对/隔离pending和unknown账本并保留配对备份。LAP-21后续独立交付见下节，仍不自动启用。
 
@@ -180,7 +183,7 @@ free的所有模型输出经统一逐条ACK投递，只把确认的bot输出加�
 
 两后端共用受控读取、确定性按需规则、预算/来源和原发送路径，已实现并通过离线/实际框架合成回归。本轮未启用或部署，没有真实联网生成或群验收。Bing RSS候选的三类最终公共查询均被非全局DNS地址检查拦截，未满足至少2/3相关且可读、含时效日期核对的门槛；不能判断候选质量合格。搜索有代码内关闭门槛，配置不能绕过；明确搜索/时效问题会给一次本地缺口提示，0次搜索HTTP、0次模型生成。需先回规划处理网络条件/搜索提供方，不能自行改账号、部署服务或开CLI WebSearch/MCP。
 
-后续由操作者停机，在“配置机器人.cmd → 6 联网搜索”显式设置web.enabled=true，保存后重启生效；本轮没有操作这些步骤。默认false，旧配置只在内存补齐，保存沿用锁/hash/备份/原子替换。trigger=auto采用明确查找/时效事实/公共URL规则；explicit仅明确查找或URL。当前可用独立分支为用户直接提供的公共HTTP(S)静态HTML/text，最多2页。当前问题明确“不要联网/只根据这段文字/只凭记忆”优先；闲聊不联网，不外发人设或历史。视频/评论、PDF/文件、登录/付费/验证码/JS空壳不支持。
+后续由操作者停机，在`config/local/features.yaml`显式设置web.enabled=true，保存后重启生效；本轮没有操作这些步骤。默认false，旧配置只在内存补齐，分层布局读取不写回文件，正常启动统一加载。trigger=auto采用明确查找/时效事实/公共URL规则；explicit仅明确查找或URL。当前可用独立分支为用户直接提供的公共HTTP(S)静态HTML/text，最多2页。当前问题明确“不要联网/只根据这段文字/只凭记忆”优先；闲聊不联网，不外发人设或历史。视频/评论、PDF/文件、登录/付费/验证码/JS空壳不支持。
 
 web预算缺省：max_searches=1（固定，当前搜索关闭）、max_results=5（1..5）、max_pages=2（1..2）、timeout_seconds=15（5..15）、max_redirects=2（0..2）、max_response_bytes=1048576（65536..1048576，压缩前后各限）、max_page_text_bytes=4000（1000..8000）、max_evidence_bytes=6000（1000..12000）、max_sources=2（1..2）。单次连接最多3秒，读取空闲最多6秒，全部读取共用硬期限；只允许80/443，每跳解析/绑定已检查全局IP并核对peer、TLS校验开启，无环境代理/Cookie/登录态。当前系统DNS对测试公共域名给出非全局地址，现实现会拒绝，不能保证当前网络下可实际读取；不调整系统网络或绕过安全门槛。
 
@@ -191,9 +194,9 @@ web设置进入会话版本，重启加载后新建当前上下文，旧历史�
 
 ## LAP-21：受控表情（已实现/离线通过，默认关闭）
 
-认图与标签：重新打开“配置机器人.cmd → 8 表情包 → 7 看图填写标签”。按 `P` 在默认浏览器打开带编号的本机缩略图总览，回配置窗口选相同编号；输入编号也会用系统图片查看器打开该张原图，确认后输入 `E` 再填写名称/语境/标签，不是目标图片就回车重选。列表显示名称或“未命名”、格式及启用状态，不要求靠哈希认图。空回车保留已有字段；首次启用必须有名称和至少一个标签，使用语境不能代替标签。若标签留空后输入YES，会保留名称/语境并提示补填（0取消编辑），支持中英文逗号分隔；输入YES才确认启用该图。保存失败会单独说明校验/停机等原因，可按R保留当前输入重试，不再统称预览失败。预览不修改目录或启用发送，未启用图片也可预览；保存标签仍须停机、重启后生效。总览仅引用通过路径/格式/hash校验的本机文件，无脚本或外部资源，生成页在忽略的state/meme-preview内；打开失败可检查系统默认图片/HTML关联。
+认图与标签：重新打开“`scripts/configure_bot.py memes-admin` → 7 看图填写标签”。按 `P` 在默认浏览器打开带编号的本机缩略图总览，回配置窗口选相同编号；输入编号也会用系统图片查看器打开该张原图，确认后输入 `E` 再填写名称/语境/标签，不是目标图片就回车重选。列表显示名称或“未命名”、格式及启用状态，不要求靠哈希认图。空回车保留已有字段；首次启用必须有名称和至少一个标签，使用语境不能代替标签。若标签留空后输入YES，会保留名称/语境并提示补填（0取消编辑），支持中英文逗号分隔；输入YES才确认启用该图。保存失败会单独说明校验/停机等原因，可按R保留当前输入重试，不再统称预览失败。预览不修改目录或启用发送，未启用图片也可预览；保存标签仍须停机、重启后生效。总览仅引用通过路径/格式/hash校验的本机文件，无脚本或外部资源，生成页在忽略的state/meme-preview内；打开失败可检查系统默认图片/HTML关联。
 
-本地入口为`assets/memes/inbox`，支持PNG/JPEG/WEBP/GIF。在“配置机器人.cmd → 8 表情包”打开目录、扫描本地文件，再填写简短名称、使用语境、逗号分隔标签并输入YES确认登记。扫描/标签/目录激活须停止项目，保存后重启生效；菜单不会启停或登录。图片按SHA256去重存入`assets/memes/library`，目录表为`config/memes.local.yaml`；未命名/未确认图片不进入候选。用户图片、标签、QQ来源与临时工件全部忽略；Git仅保留模板和自造测试。目录位置固定为项目预留的忽略路径。
+本地入口为`assets/memes/inbox`，支持PNG/JPEG/WEBP/GIF。在“`scripts/configure_bot.py memes-admin`”打开目录、扫描本地文件，再填写简短名称、使用语境、逗号分隔标签并输入YES确认登记。扫描/标签/目录激活须停止项目，保存后重启生效；管理页不会启停或登录。图片按SHA256去重存入`assets/memes/library`，目录表为`config/memes.local.yaml`；未命名/未确认图片不进入候选。用户图片、标签、QQ来源与临时工件全部忽略；Git仅保留模板和自造测试。目录位置固定为项目预留的忽略路径。
 
 从机器人QQ收藏导入是显式管理操作：先在表情页初始化独立管理token（仅存项目secrets，不显示）；下次正常启动gate时加载。机器人现有连接可用时选择“收藏详情导入”；基础接口仅由操作者显式另选，无自动回退。导入只读取当前机器人账号收藏，不修改QQ收藏、不查询其他账号/凭据或群历史。没有连接就报不可用，不代为登录/启动。运行中下载只准备`state/memes-pending.local.yaml`及受控库，之后由操作者停机激活目录、填写标签并重启；活动目录不会热替换。激活使用配置锁与目录hash复核，竞争时拒绝覆盖。
 
@@ -211,7 +214,7 @@ web设置进入会话版本，重启加载后新建当前上下文，旧历史�
 
 ## LAP-25：群发送容错与“没接住”修复
 
-娱乐群发送中断或ACK未知只结束当轮，不再持续锁住该群；既有unknown也无需删库或人工解除即可处理新的群消息。确认已发部分可进RAM，未确认部分不进上下文，不重发、不补调模型。仅group RAM采用这项宽松策略，个人历史冲突及远端生成是否结束未知的保护仍保留；原“核对后解除”菜单作为旧证据标记入口兼容保留。
+娱乐群发送中断或ACK未知只结束当轮，不再持续锁住该群；既有unknown也无需删库或人工解除即可处理新的群消息。确认已发部分可进RAM，未确认部分不进上下文，不重发、不补调模型。仅group RAM采用这项宽松策略，个人历史冲突及远端生成是否结束未知的保护仍保留；旧“核对后解除”仅为历史证据处理，日常不再依赖该菜单。
 
 群上下文按最终完整system和固定表情候选说明重新核算预算，必要时删除最旧群行，保留当前@目标；候选列表再在剩余预算内裁剪。预算计数仍是UTF-8字节及信封的保守估算，不代表原生token窗口。目标与固定设定本身仍过长时明确显示输入预算原因，限流等业务错误也保留具体固定提示；ambient错误保持沉默，无额外模型调用。
 

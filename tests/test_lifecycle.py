@@ -67,6 +67,10 @@ class LifecycleTests(unittest.TestCase):
         self.assertEqual(manage.read_state(),[entry])
 
     def test_start_failure_cleans_only_newly_created_identities(self):
+        from test_config_files import synthetic
+        import yaml
+        (self.root/'config').mkdir()
+        (self.root/'config/settings.local.yaml').write_text(yaml.safe_dump(synthetic()),encoding='utf-8')
         napcat=self.root/'napcat'
         (napcat/'versions/9.9.33-52230/resources/app/napcat/config').mkdir(parents=True)
         path=self.root/'runtime/astrbot/data/cmd_config.json';path.parent.mkdir(parents=True)

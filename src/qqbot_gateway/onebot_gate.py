@@ -481,12 +481,19 @@ class OneBotGate:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', required=True)
+    parser.add_argument('--root')
     args = parser.parse_args()
-    config = load_gate_config(args.config)
+    from .config_files import management_root
+    root=management_root(args.config,args.root or os.environ.get('QQBOT_ROOT'))
+    config = load_gate_config(args.config,root=root)
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
-    root=Path(args.config).resolve().parent.parent
     web.run_app(OneBotGate(config,root).application(), host=config.host, port=config.port, access_log=None)
 
 
 if __name__ == '__main__':
-    main()
+    from .config_files import ConfigError
+    import sys
+    try:main()
+    except ConfigError as error:
+        print(str(error),file=sys.stderr)
+        raise SystemExit(1) from None

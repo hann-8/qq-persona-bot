@@ -17,7 +17,7 @@ from astrbot.core.message.message_event_result import MessageChain
 
 from qqbot_gateway.session_queue import SessionCoordinator, SessionError
 from qqbot_gateway.task_store import TaskStore
-from qqbot_gateway.config import load_settings
+from qqbot_gateway.config_files import load_consumer
 from qqbot_gateway.token_budget import InputBudget, validate_model_settings
 from qqbot_gateway.errors import GatewayError, MESSAGES
 from qqbot_gateway.persona import compose_persona, session_version
@@ -37,7 +37,7 @@ class QQRouter(Star):
     def __init__(self,context:Context):
         super().__init__(context)
         self.root=Path(os.environ['QQBOT_ROOT']).resolve()
-        settings=load_settings(self.root/'config/settings.local.yaml')
+        settings=load_consumer(self.root)
         from qqbot_gateway.vision import require_production
         require_production(settings)
         self.vision=settings['vision']
@@ -102,7 +102,7 @@ class QQRouter(Star):
             await manager.create_persona(self.persona_id,self.persona,tools=[],skills=[])
         else:
             await manager.update_persona(self.persona_id,system_prompt=self.persona,tools=[],skills=[])
-        (self.root/'state/router-ready.json').write_text(json.dumps({'pid':os.getpid(),'created':psutil.Process().create_time(),'time':time.time(),'persona_id':self.persona_id,'instance_id':os.environ.get('QQBOT_INSTANCE_ID')}),encoding='utf-8')
+        (self.root/'state/router-ready.json').write_text(json.dumps({'pid':os.getpid(),'created':psutil.Process().create_time(),'time':time.time(),'persona_id':self.persona_id,'instance_id':os.environ.get('QQBOT_INSTANCE_ID'),'config_digest':os.environ.get('QQBOT_CONFIG_DIGEST')}),encoding='utf-8')
         LOG.warning('QQ_ROUTER_READY persona_version=%s',self.persona_id)
 
     @filter.on_llm_response()

@@ -1,4 +1,5 @@
 import argparse
+import os
 import asyncio
 from dataclasses import dataclass, field
 import json
@@ -481,9 +482,10 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
 
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--config',required=True);args=parser.parse_args()
-    path=Path(args.config).resolve();root=path.parent.parent
-    settings=load_settings(path)
+    parser=argparse.ArgumentParser();parser.add_argument('--config',required=True);parser.add_argument('--root');args=parser.parse_args()
+    from .config_files import load_consumer,management_root
+    path=Path(args.config).absolute();root=management_root(path,args.root or os.environ.get('QQBOT_ROOT'))
+    settings=load_consumer(root,path)
     llm=settings['llm']
     if llm['host']!='127.0.0.1' or llm['max_concurrency']!=1:
         raise ValueError('Restricted local CLI configuration required')
@@ -517,4 +519,10 @@ def main():
                 access_log=None,handler_cancellation=True)
 
 
-if __name__=='__main__':main()
+if __name__ == '__main__':
+    from .config_files import ConfigError
+    import sys
+    try:main()
+    except ConfigError as error:
+        print(str(error),file=sys.stderr)
+        raise SystemExit(1) from None

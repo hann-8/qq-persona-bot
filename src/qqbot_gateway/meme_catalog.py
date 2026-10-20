@@ -83,7 +83,8 @@ def read_catalog_yaml(path):
 
 
 class MemeCatalog:
-    def __init__(self,root,cfg=None):
+    def __init__(self,root,cfg=None,*,config_guard=None):
+        self.config_guard=config_guard
         self.root=Path(root).resolve();self.cfg=validate_memes(cfg or {});self.rows=[]
         self.path=controlled_path(self.root,self.cfg['catalog_file'])
         if self.path.exists():
@@ -128,6 +129,7 @@ class MemeCatalog:
             self._save_locked()
 
     def _save_locked(self):
+        if self.config_guard:self.config_guard()
         current=MemeCatalog(self.root,self.cfg)
         if self.loaded_hash!=current.fingerprint():raise ValueError('Catalog changed; reload')
         for row in self.rows:self.validate_row(row)
@@ -140,6 +142,7 @@ class MemeCatalog:
     def stage(self):
         from .config import configuration_lock
         with configuration_lock(self.root):
+            if self.config_guard:self.config_guard()
             if MemeCatalog(self.root,self.cfg).fingerprint()!=self.loaded_hash:raise ValueError('Active catalog changed')
             path=controlled_path(self.root,'state/memes-pending.local.yaml')
             if path.exists():
@@ -156,6 +159,7 @@ class MemeCatalog:
         from .config import configuration_lock,require_stopped
         with configuration_lock(self.root):
             require_stopped(self.root)
+            if self.config_guard:self.config_guard()
             path=controlled_path(self.root,'state/memes-pending.local.yaml')
             if path.stat().st_size>1048576:raise ValueError('Staged catalog too large')
             obj=read_catalog_yaml(path)

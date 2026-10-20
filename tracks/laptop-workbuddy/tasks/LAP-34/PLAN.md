@@ -2,7 +2,7 @@
 
 返回[任务交接](HANDOFF.md) / [实施指引](IMPLEMENTATION_GUIDE.md) / [PROGRESS](../../../../PROGRESS.md)。
 
-状态：详细规划；未实施、未迁移本机配置。2026-10-20（Asia/Shanghai）。继承[AGENTS](../../../../AGENTS.md)的模型/档位、先规划后实施及隐私边界；会话设置由操作者选择，本文件不宣称已检测或切换模型。
+状态：本合同已实施/离线通过，证据见[HANDOFF](HANDOFF.md)与[报告](../../../../reports/lap-34-2026-10-20.md)；未迁移/加载本机，真实与完整验收待后续明确指令。下文保留规划时证据与合同。2026-10-20（Asia/Shanghai）。继承[AGENTS](../../../../AGENTS.md)的模型/档位、先规划后实施及隐私边界；会话设置由操作者选择，本文件不宣称已检测或切换模型。
 
 ## 1. 需求与非目标
 
@@ -20,7 +20,7 @@
 | --- | --- |
 | [示例](../../../../config/settings.example.yaml)、[配置加载](../../../../src/qqbot_gateway/config.py)的`normalize_settings/read_settings` | 已有schema1/2内存迁移到schema3及大量字段校验；实际设置集中在单文件，`read_settings`返回单文件原始字节摘要 |
 | 同文件`save_settings` | 停机/配置锁/原摘要复核/完整备份/原子替换；YAML写回不保留原注释，不能直接用来重写多份手工维护文件 |
-| [配置脚本](../../../../scripts/configure_bot.py)、[配置cmd](../../../../配置机器人.cmd) | cmd仅包装Python菜单；日常参数与图库/记忆/凭据等管理动作混在同一入口 |
+| [配置脚本](../../../../scripts/configure_bot.py)、`配置机器人.cmd`（实施后已退役） | cmd仅包装Python菜单；日常参数与图库/记忆/凭据等管理动作混在同一入口 |
 | [生命周期](../../../../scripts/manage.py)、[框架准备](../../../../scripts/configure_astrbot.py)、[插件](../../../../plugins/qq_router/main.py) | 多次硬编码读取`config/settings.local.yaml`；只改一个加载点不足以保证一致 |
 | [model入口](../../../../src/qqbot_gateway/model_gateway.py)、[gate入口](../../../../src/qqbot_gateway/onebot_gate.py)、[登录管理](../../../../src/qqbot_gateway/napcat_login.py)、[视觉观察](../../../../scripts/observe_lap28.py) | 存在通过配置路径`parent.parent`推断项目根的代码；把配置搬到更深目录会误算根路径，必须显式传项目根 |
 | [会话版本](../../../../src/qqbot_gateway/persona.py)的`session_version` | 仅所选模型profile等语义字段影响版本；文件拆分、注释和未激活profile编辑不应制造新会话 |
@@ -180,7 +180,7 @@ LAP-27等旧`export-legacy-config/activate-legacy-config`不能直接套在分�
 
 实施通过出口为“已实现/离线通过”；本机迁移、正常启动加载、文件层级人工接受分别记录。只有操作者后续真实使用产生证据才能标对应真实通过；本任务不能顺手关掉其他任务差额。
 
-## 11. 本轮交付与未验证项
+## 11. 规划轮交付与当时未验证项（历史）
 
 本轮仅6份规划/交接/索引文档，按长期Git授权commit并push，核对本地与对应远端完整SHA；保留用户persona差异。未创建5份活动配置或模板、未删除cmd、未改变任何功能默认值或运行行为。
 

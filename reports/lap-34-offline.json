@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "unit_tests": 426,
+  "persona_fixture": "committed HEAD baseline; workspace untouched",
+  "framework_combinations": 20,
+  "framework_cases": 460,
+  "real_model_calls": 0,
+  "real_qq_calls": 0,
+  "real_bot_operations": 0,
+  "local_migrated": false,
+  "real_acceptance": false,
+  "complete_acceptance": false
+}

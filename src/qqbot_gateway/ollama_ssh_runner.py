@@ -129,9 +129,10 @@ class OllamaSSHRunner:
         finally:self.transport.close();self.transport=None
 
 
-def clear_unknown(root,confirmed):
+def clear_unknown(root,confirmed,*,config_guard=None):
     from .config import configuration_lock,require_stopped
     if confirmed != 'REMOTE_CHECKED_STOPPED':raise ValueError('Explicit remote completion confirmation required')
     with configuration_lock(root):
         require_stopped(root)
+        if config_guard:config_guard()
         (Path(root)/'state/ollama-remote-result-unknown.json').unlink(missing_ok=True)

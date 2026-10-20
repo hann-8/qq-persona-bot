@@ -184,7 +184,6 @@ class LoginStorage(unittest.TestCase):
             for name,value in (('ROOT',root),('STATE',root/'state/managed-processes.json'),('NAPCAT',napcat)):
                 stack.enter_context(patch.object(manage,name,value))
             stack.enter_context(patch.object(manage,'load_gate_config',return_value=gate))
-            stack.enter_context(patch.object(manage,'load_settings',return_value={'llm':{'backend':'codebuddy_cli'}}))
             stack.enter_context(patch.object(manage,'check_port'))
             stack.enter_context(patch.object(manage.socket.socket,'connect_ex',return_value=0))
             stack.enter_context(patch.object(manage,'capture'))
@@ -192,7 +191,10 @@ class LoginStorage(unittest.TestCase):
             stack.enter_context(patch.object(manage.uuid,'uuid4',return_value=SimpleNamespace(hex='a'*32)))
             stack.enter_context(patch.object(manage,'show_status'))
             env=stack.enter_context(patch.dict(os.environ,{'NAPCAT_QUICK_PASSWORD':'synthetic','NAPCAT_QUICK_ACCOUNT':'222','NAPCAT_QUICK_PASSWORD_MD5':'synthetic'}))
-            prepare=stack.enter_context(patch.object(manage.subprocess,'run',return_value=SimpleNamespace(returncode=0)))
+            def prepared(*args,**kwargs):
+                atomic_json(root/'state/router-ready.json',{'instance_id':'a'*32,'config_digest':kwargs['env']['QQBOT_CONFIG_DIGEST']})
+                return SimpleNamespace(returncode=0)
+            prepare=stack.enter_context(patch.object(manage.subprocess,'run',side_effect=prepared))
             spawn=stack.enter_context(patch.object(manage.psutil,'Popen'))
             fallback=stack.enter_context(patch.object(client,'startup_fallback',return_value='disabled'))
             manage.start_channel(full=True)
