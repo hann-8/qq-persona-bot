@@ -1,3 +1,5 @@
+2026-10-20 19:26（Asia/Shanghai）：[LAP-35临时停言](tasks/LAP-35/HANDOFF.md)详细[规划](tasks/LAP-35/PLAN.md)/[medium指引](tasks/LAP-35/IMPLEMENTATION_GUIDE.md)完成，未实施；普通/哑巴、明确停言/非黑名单新真实@、同条停言优先、全输出代际票/ACK及重启复位/重连保持合同已定，本地识别0额外推理。与34配置层级衔接、两项分别会话34→35实施。6份文档检查/Git见交接；用户persona保留，0代码/运行配置/真实bot/模型/QQ操作，旧差额不变。
+
 2026-10-20 19:12（Asia/Shanghai）：[LAP-34分层配置](tasks/LAP-34/HANDOFF.md)详细[规划](tasks/LAP-34/PLAN.md)/[medium指引](tasks/LAP-34/IMPLEMENTATION_GUIDE.md)完成，未实施；五份YAML、中文注释/索引、原默认值与下次启动生效、统一快照/无损迁移回滚及cmd退役/管理动作保留合同已定。6份文档链接/围栏/差异检查通过，Git见34交接；保留用户persona差异，0代码/本机配置/真实bot/模型/QQ操作。实施待后续指令。
 
 2026-10-19 20:06（Asia/Shanghai）：[LAP-33人工恢复](tasks/LAP-33/HANDOFF.md)已完成一次现场状态维护，session LAP-33-manual-cleanup-recovery；用户要求降低轻微故障影响并自行关闭bot，锁内核验owner/41登记身份全退出、五端口关闭后完整备份并归档旧记录，独立cleanup status确认blocked=false。仅observed_only人工判断，不是31B完整退出证明；0代码/配置/真实模型/群操作，bot保持停止。长期分级/自动恢复未实现，真实启动效果待用户验证；归属4份文档，原记录/说明留本机忽略目录。
