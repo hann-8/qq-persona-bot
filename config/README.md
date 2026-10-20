@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | QQ、授权群、管理员、前置黑名单 | `local/bot.yaml` | bot、access；[模板](examples/bot.yaml) |
 | 显式选择后端、模型、双profile、预算；高级队列 | `local/models.yaml` | llm；[模板](examples/models.yaml) |
-| mentions/free、关注别名、合批/频率、自然分条、历史 | `local/chat.yaml` | chat、participation、output；[模板](examples/chat.yaml) |
+| mentions/free、临时停言、关注别名、合批/频率、自然分条、历史 | `local/chat.yaml` | chat、participation、output；[模板](examples/chat.yaml) |
 | 联网、表情发送、群记忆、识图、成员/@ | `local/features.yaml` | web、memes、memory、vision、members；[模板](examples/features.yaml) |
 | 高级回环连接、版本、秘密文件引用 | `local/runtime.yaml` | layout_version、schema_version、onebot、secrets_file、legacy_extensions；[模板](examples/runtime.yaml) |
 | 角色正文 | `persona.md` | 独立文件，保持原路径 |
@@ -64,3 +64,13 @@
 导出位于项目备份目录，不激活。回滚在同一锁内核对停机、源/导出双摘要并备份旧文件和五文件；先写最新单文件，最后把完整local归档至本次备份。中断于两者之间仍以local为准，保留阶段记录，可修复故障后用同一导出与摘要重试。归档后旧入口才生效；不自动启动、不删除pending/unknown/图库/记忆/清理状态。回滚目录布局不等于降级功能；更旧代码不支持某功能时，须先完成布局回滚，再按原`export-legacy-config/activate-legacy-config`审阅合同降级；不直接checkout旧代码配过期单文件启动。
 
 正常启动只解析一次磁盘候选，在配置锁内校验和生产门槛检查后生成`state/config-runtime/<instance_id>/settings.yaml`与source.json。框架准备、gate、model、router核对同一实例路径/摘要，显式root，失败不悄悄重读。快照不内联秘密；程序仅在可证明无活动/未知归属引用时保留最近3份，其余状态仍由原机制维护。local、快照、备份、秘密均不提交。
+
+## 群临时停言（LAP-35）
+
+`local/chat.yaml` 中唯一新增设置为 `participation.silence.enabled: true`，缺省true。开启只表示接受控制，各授权群启动时仍为普通。普通成员明确指向bot要求停言（例如“肥鱼先别参与讨论了”）后，本群不确认、不发表情，直到非黑名单群友下一条原始真实@恢复；同条@并要求停言时停言优先。别名复用 `participation.attention.aliases`，不因此开启叫名回复。模糊、否定、引用/转述或超长表达不保证识别，不额外调用分类模型。
+
+状态只在gate内存中。gate/完整bot/电脑重启回普通；WS、QQ离线、插件或模型重连不解除，没有自动超时。恢复后继续原有free/mentions合同；不补答哑巴期间消息、不清历史/记忆，不解除真实unknown/清理阻断。已经提交到QQ的消息可能晚到，无法撤回；旧结果不能借唤醒后的新状态发送。
+
+配置下次正常启动生效；关闭能力须显式设false，省略仍为true。运行态、门票不进人设、模型输入或session_version。状态页只显示开关/静默群数；`state/gate-connection.json` 是散列群标识的诊断镜像，禁止手编，也不用于重启恢复。
+
+LAP-34的 `config_files.py export-legacy` 导出完整schema3（包含silence）。退回35之前的代码时，先完成受控布局回滚，再用 `configure_bot.py export-legacy-config` 做功能兼容审阅导出；后者剥除silence及原attention/vision/members/memory节，须核对源/副本双摘要并备份后显式激活。两种导出用途不同，不直接修改启动快照。本轮仅离线交付，本机配置未改、未加载；真实QQ验收另行授权。

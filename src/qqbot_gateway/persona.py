@@ -96,6 +96,7 @@ def session_version(prompt, settings):
     parameters['web']=settings.get('web',{})
     from copy import deepcopy
     parameters['participation']=deepcopy(settings.get('participation',{}))
+    parameters['participation'].pop('silence',None)
     if not parameters['participation'].get('attention',{}).get('enabled') or parameters['participation'].get('mode')!='free':
         parameters['participation'].pop('attention',None)
     parameters['memes']=settings.get('memes',{})

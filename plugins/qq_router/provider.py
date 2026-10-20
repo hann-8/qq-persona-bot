@@ -9,12 +9,19 @@ from qqbot_gateway.group_protocol import validate_request
 
 @register_provider_adapter('qqbot_openai','Project authenticated group-turn adapter')
 class QQBotProvider(ProviderOpenAIOfficial):
+    _output_gate=ContextVar('qqbot_output_gate',default=None)
     _group_request=ContextVar('qqbot_provider_request',default=None)
     _group_trace=ContextVar('qqbot_provider_trace',default=None)
 
     def _create_http_client(self,provider_config):
         client=super()._create_http_client(provider_config)
         async def trace_header(request):
+            gate=self._output_gate.get()
+            if gate and not gate['submitted']:
+                if not gate['valid']():raise ValueError('GROUP_MUTED_OR_STALE_OUTPUT')
+                # From here this HTTP may have reached the gateway queue. Never
+                # cancel it on silence; runner and cleanup complete naturally.
+                gate['submitted']=True
             trace=self._group_trace.get()
             if trace is not None:request.headers['X-QQBot-Trace']=trace
         client.event_hooks.setdefault('request',[]).append(trace_header)

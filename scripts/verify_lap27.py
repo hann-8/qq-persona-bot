@@ -53,6 +53,7 @@ async def verify(root,backend,mode,memes=False,web_enabled=True):
             if self.ack=='missing':return {}
             return {'message_id':10000+serial*10+len(self.sent)}
     settings=yaml.safe_load((ROOT/'config/settings.example.yaml').read_text(encoding='utf-8'))
+    settings['participation']['silence']={'enabled':False}  # legacy-disabled regression
     settings['bot']['qq']='222';settings['access'].update(allowed_groups=['111','444'],admin_users=['333'],blocked_users=['999'])
     settings['llm']['backend']=backend
     settings['participation'].update(mode='free',debounce_seconds=.5,max_batch_wait_seconds=2)

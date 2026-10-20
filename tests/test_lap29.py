@@ -264,7 +264,7 @@ class MemberTests(unittest.IsolatedAsyncioTestCase):
 class ConfigAndRPCTests(unittest.TestCase):
     def test_MEMB04_rpc_scope_always_blocks_list_peer_and_stranger(self):
         with tempfile.TemporaryDirectory() as directory:
-            cfg=GateConfig('222',frozenset({'111'}),frozenset({'333'}),'a'*40,'b'*40,Path(directory)/'db')
+            cfg=GateConfig('222',frozenset({'111'}),frozenset({'333'}),'a'*40,'b'*40,Path(directory)/'db',silence_enabled=False)
             for action,params in [('get_group_member_list',{'group_id':111}),('get_group_member_info',{'group_id':111,'user_id':333}),('get_stranger_info',{'user_id':333})]:
                 self.assertFalse(allowed_action(dict(action=action,params=params),cfg))
             self.assertTrue(allowed_action(dict(action='get_group_member_info',params={'group_id':111,'user_id':222}),cfg))
@@ -382,14 +382,14 @@ class BoundaryTests(unittest.IsolatedAsyncioTestCase):
         import aiohttp
         from aiohttp.test_utils import TestServer,TestClient
         with tempfile.TemporaryDirectory() as directory:
-            cfg=GateConfig('222',frozenset({'111'}),frozenset({'333'}),'a'*40,'b'*40,Path(directory)/'db',members_enabled=True,members_config=CFG)
+            cfg=GateConfig('222',frozenset({'111'}),frozenset({'333'}),'a'*40,'b'*40,Path(directory)/'db',members_enabled=True,members_config=CFG,silence_enabled=False)
             gate=OneBotGate(cfg);gate.context_token='c'*64;gate.connected=True;gate.online=True
             client=TestClient(TestServer(gate.application()));await client.start_server()
             try:
                 for token,status in (('a'*40,401),('b'*40,401),('bad',401),('c'*64,400)):
                     response=await client.post('/context/members/resolve',json={'action':'get_group_member_list','group_id':111},headers={'Authorization':'Bearer '+token})
                     self.assertEqual(response.status,status);await response.read()
-                gate.config=GateConfig('222',frozenset({'111'}),frozenset({'333'}),'a'*40,'b'*40,Path(directory)/'db2')
+                gate.config=GateConfig('222',frozenset({'111'}),frozenset({'333'}),'a'*40,'b'*40,Path(directory)/'db2',silence_enabled=False)
                 response=await client.post('/context/members/resolve',json={},headers={'Authorization':'Bearer '+'c'*64})
                 self.assertEqual(response.status,503);await response.read()
                 self.assertEqual(gate.members.rosters,{})
@@ -398,7 +398,7 @@ class BoundaryTests(unittest.IsolatedAsyncioTestCase):
     async def test_gate_only_admitted_events_get_caps_and_notice_invalidates(self):
         from aiohttp import WSMsgType
         with tempfile.TemporaryDirectory() as directory:
-            gate=OneBotGate(GateConfig('222',frozenset({'111'}),frozenset({'333'}),'a'*40,'b'*40,Path(directory)/'db',participation_mode='free',blocked_users=frozenset({'999'}),members_enabled=True,members_config=CFG))
+            gate=OneBotGate(GateConfig('222',frozenset({'111'}),frozenset({'333'}),'a'*40,'b'*40,Path(directory)/'db',participation_mode='free',blocked_users=frozenset({'999'}),members_enabled=True,members_config=CFG,silence_enabled=False))
             rows=[]
             class Up:
                 async def send_json(self,value):rows.append(value)

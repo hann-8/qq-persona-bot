@@ -28,7 +28,11 @@ LAP-13实现提交`ee7f2d4`已成功推送origin/main；随后仅同步交付检
 
 ## 当前任务
 
-LAP-35临时停言详细规划完成，未实施：session `LAP-35-group-silence-plan` / “群临时停言/真实@恢复规划”，2026-10-20 19:18（Asia/Shanghai）领取、19:26交接；起点`main/29f75ff`，保留用户persona差异。本轮归属本台账/PROGRESS/工作线HANDOFF及[35交接](tasks/LAP-35/HANDOFF.md)/[PLAN](tasks/LAP-35/PLAN.md)/[IMPLEMENTATION_GUIDE](tasks/LAP-35/IMPLEMENTATION_GUIDE.md)共6份文档；状态/识别/全输出代际/重启重连/回滚/5步骤12验收项已定，文档检查/Git见交接。34规划不改；0代码/配置/启停/模型/群操作。两项待用户medium分别实施34→35。
+2026-10-20 20:58（Asia/Shanghai）：[LAP-35群临时停言](tasks/LAP-35/HANDOFF.md)已实现/离线通过，session LAP-35-group-silence-implementation；本地明确停言/真实@恢复、gate唯一RAM状态与签名群代际票、全输出最终栅栏/ACK、router提交边界与重启复位交付。440单元、44组合918实际框架及20组合460关闭兼容通过；[报告](../../reports/lap-35-2026-10-20.md)。本机配置/人设未改、未加载；0真实bot启停/登录/SSH/模型/QQ，真实/完整未验，旧差额保留。Git见任务交接。
+
+文件归属见35交接；20:35登记后重读，结束20:58；用户persona保留。
+
+LAP-35历史规划（实施状态以上段为准）：session `LAP-35-group-silence-plan` / “群临时停言/真实@恢复规划”，2026-10-20 19:18（Asia/Shanghai）领取、19:26交接；起点`main/29f75ff`，保留用户persona差异。本轮归属本台账/PROGRESS/工作线HANDOFF及[35交接](tasks/LAP-35/HANDOFF.md)/[PLAN](tasks/LAP-35/PLAN.md)/[IMPLEMENTATION_GUIDE](tasks/LAP-35/IMPLEMENTATION_GUIDE.md)共6份文档；状态/识别/全输出代际/重启重连/回滚/5步骤12验收项已定，文档检查/Git见交接。34规划不改；0代码/配置/启停/模型/群操作。两项待用户medium分别实施34→35。
 
 LAP-34分层配置详细规划已完成，未实施：session `LAP-34-config-files-plan` / “分层配置文件规划”，2026-10-20 19:06（Asia/Shanghai）领取、19:12交接；起点`main/003f04e`，保留用户`config/persona.md`未提交差异。本轮归属为PROGRESS、工作线HANDOFF/TASKS、[34交接](tasks/LAP-34/HANDOFF.md)/[PLAN](tasks/LAP-34/PLAN.md)/[IMPLEMENTATION_GUIDE](tasks/LAP-34/IMPLEMENTATION_GUIDE.md)共6份文档；5文件职责/字段/统一快照/迁移回滚与C34/CF合同已定，文档检查通过，Git交付见交接。不改实现/运行配置，不启停/登录/模型/群操作。后续实施需用户新指令。
 
@@ -56,7 +60,7 @@ LAP-15内容提交`632fdc5`已推送origin/main，2026-10-17 11:09用ls-remote�
 
 | ID | 单一任务 | 状态与已有证据 | 依赖/推荐顺序 | 执行session | 下一步/完成出口 |
 | --- | --- | --- | --- | --- | --- |
-| LAP-35 | 群临时停言、真实@恢复与重启复位 | completed，仅详细规划；[HANDOFF](tasks/LAP-35/HANDOFF.md)/[PLAN](tasks/LAP-35/PLAN.md) | 推荐34之后独立实施；既有触发/ACK/清理合同保持 | LAP-35-group-silence-plan，2026-10-20 19:18领取、19:26交接；6份文档独占 | 本地识别/同条停言优先/群代际票/全输出与在途ACK/重启重连/5步骤12验收项完成；medium待新指令 |
+| LAP-35 | 群临时停言、真实@恢复与重启复位 | 已实现/离线通过；[HANDOFF](tasks/LAP-35/HANDOFF.md)/[报告](../../reports/lap-35-2026-10-20.md) | 34已实现；原触发/ACK/清理门槛保持 | LAP-35-group-silence-implementation，2026-10-20 20:35领取、20:58交接；文件归属见HANDOFF | S35-01—05/SM-01—12离线完成；440单元/44组合918框架、20组合460关闭兼容；本机未改/未加载，真实/完整未验 |
 | LAP-34 | 分层配置文件取代日常配置菜单 | 已实现/离线通过；[HANDOFF](tasks/LAP-34/HANDOFF.md)/[报告](../../reports/lap-34-2026-10-20.md) | schema3与既有能力门槛不变 | LAP-34-config-files-implementation，2026-10-20 19:53领取、20:25交接；文件归属见任务HANDOFF | C34-01—06完成；426单元/20组合460框架、末次30补验；本机未迁移/加载、真实/完整未验；不推进35 |
 | LAP-26 | 清理可靠性、图片理解、free关注、成员与群记忆规划 | completed，仅规划；[HANDOFF](tasks/LAP-26/HANDOFF.md) | 24登录暂缓，25加载未知、18搜索/旧真人差额保留 | LAP-26-group-understanding-plan，13:14领取、13:47续审/13:57完成；7份文档 | 精确协议/调度/证明/记忆事务/回滚及五项独立指令完成；31→27—30待用户实施指令 |
 | LAP-31 | 请求模型进程清理、阻断诊断与有证据恢复 | 部分完成：31A已实现/离线通过；31B门槛未过，见[交接](tasks/LAP-31/HANDOFF.md)；[合同](tasks/LAP-26/PLAN.md)第13节 | 新反馈反复全局拒单，建议先于27—30 | LAP-31-cleanup-reliability，18:16领取、18:34验证；文件归属见交接 | 31A的283单元/384框架通过；31B breakaway/目标Job成员缺口回规划，生产创建/管道/恢复未交付；unknown不解锁 |

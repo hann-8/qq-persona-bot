@@ -72,6 +72,7 @@ async def verify(root,backend,mode,participation="free",attention=True,memes=Fal
             if self.ack=='missing':return {}
             return {'message_id':10000+serial*10+len(self.sent)}
     settings=yaml.safe_load((ROOT/'config/settings.example.yaml').read_text(encoding='utf-8'))
+    settings['participation']['silence']={'enabled':False}  # legacy-disabled regression
     settings['bot']['qq']='222';settings['access'].update(allowed_groups=['111','444'],admin_users=['333'],blocked_users=['999'])
     settings['llm']['backend']=backend
     settings['vision']=dict(enabled=True,input_reserve_tokens=4096)
@@ -128,7 +129,7 @@ async def verify(root,backend,mode,participation="free",attention=True,memes=Fal
     wrapped=WebRunner(harness,reader,InputBudget(),settings['output'])
     queue=ModelQueue(wrapped);token=secrets.token_urlsafe(32)
     wrapped.memes=router.memes
-    gate=OneBotGate(GateConfig('222',frozenset({'111','444'}),frozenset({'333'}),'a'*40,'b'*40,root/'state/gate.db',participation_mode=participation,vision_enabled=True,blocked_users=frozenset({'999'}),attention_enabled=attention))
+    gate=OneBotGate(GateConfig('222',frozenset({'111','444'}),frozenset({'333'}),'a'*40,'b'*40,root/'state/gate.db',participation_mode=participation,vision_enabled=True,blocked_users=frozenset({'999'}),attention_enabled=attention,silence_enabled=False))
     gate.context_token='c'*64;gate.connected=True;gate.online=True;gate.connection_id=connection
     gate.materials.fetch=fetch
     private_server=web.AppRunner(gate.application(),access_log=None);await private_server.setup()

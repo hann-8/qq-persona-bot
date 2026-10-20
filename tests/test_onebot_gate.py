@@ -16,7 +16,7 @@ from qqbot_gateway.onebot_gate import OneBotGate, admitted_message, allowed_acti
 
 
 def configuration(path):
-    return GateConfig('222', frozenset({'111'}), frozenset({'333'}), 'a'*40, 'b'*40, Path(path)/'seen.sqlite')
+    return GateConfig('222', frozenset({'111'}), frozenset({'333'}), 'a'*40, 'b'*40, Path(path)/'seen.sqlite',silence_enabled=False)
 
 
 def message():

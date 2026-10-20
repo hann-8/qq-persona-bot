@@ -18,6 +18,9 @@ vision:
   enabled: false  # production_eligible未证明；true会在启动时拒绝，不自动调用验证
   input_reserve_tokens: 4096  # 待验证假设，不能当视觉token/patch上界
 participation:
+  # 临时停言默认开启；普通成员明确要求后本群静默，下一条真实@恢复；重启复位，无超时解除。
+  silence:
+    enabled: true  # 下次正常启动生效；false关闭此能力，省略仍默认true
   # LAP-27仅free显式开启生效，mentions保留真实@；保存须停机/重启加载
   attention:
     enabled: false

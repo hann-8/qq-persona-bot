@@ -77,6 +77,7 @@ async def verify_context_switch(root):
         async def update_conversation(self,umo,cid,history):self.items[(umo,cid)].history=json.dumps(history)
     directory=root/'context-test';(directory/'config').mkdir(parents=True)
     settings=yaml.safe_load((ROOT/'config/settings.example.yaml').read_text(encoding='utf-8'))
+    settings['participation']['silence']={'enabled':False}  # legacy-disabled regression
     settings['bot']['qq']='222';settings['access'].update(allowed_groups=['111'],admin_users=['333'])
     settings['chat']['user_cooldown_seconds']=0
     settings['llm']['profiles']['ollama_ssh']['expected_digest']='a'*64

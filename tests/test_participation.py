@@ -29,7 +29,7 @@ def reply(decision='speak',**kwargs):
 
 class ProtocolTests(unittest.TestCase):
     def test_defaults_and_rejected_ranges_types(self):
-        self.assertEqual({k:v for k,v in validate_participation({}).items() if k!='attention'},DEFAULTS)
+        self.assertEqual({k:v for k,v in validate_participation({}).items() if k not in ('attention','silence')},DEFAULTS)
         self.assertIs(validate_participation({})['attention']['enabled'],False)
         for value in ({'mode':'auto'},{'context_messages':True},{'context_messages':201},{'debounce_seconds':0},
                       {'max_batch_wait_seconds':2,'debounce_seconds':3},{'allow_ambient_web':'true'},{'probability':.3}):
@@ -117,7 +117,7 @@ class SchedulingTests(unittest.IsolatedAsyncioTestCase):
         import aiohttp
         from types import SimpleNamespace
         with tempfile.TemporaryDirectory() as directory:
-            cfg=GateConfig('222',frozenset({'111'}),frozenset({'333'}),'a'*40,'b'*40,Path(directory)/'gate.db',blocked_users=frozenset({'333'}),participation_mode='free')
+            cfg=GateConfig('222',frozenset({'111'}),frozenset({'333'}),'a'*40,'b'*40,Path(directory)/'gate.db',blocked_users=frozenset({'333'}),participation_mode='free',silence_enabled=False)
             gate=OneBotGate(cfg)
             base=dict(post_type='message',message_type='group',self_id=222,group_id=111,user_id=444,message_id=1,
                 raw_message='PRIVATE RAW',message=[dict(type='text',data=dict(text='hello')),
@@ -248,7 +248,7 @@ class GateFreeTests(unittest.TestCase):
     def test_free_blacklist_first_and_no_history_action(self):
         from qqbot_gateway.onebot_gate import allowed_action
         with tempfile.TemporaryDirectory() as d:
-            cfg=GateConfig('222',frozenset({'111'}),frozenset({'333'}),'a'*40,'b'*40,Path(d)/'db',blocked_users=frozenset({'333'}),participation_mode='free')
+            cfg=GateConfig('222',frozenset({'111'}),frozenset({'333'}),'a'*40,'b'*40,Path(d)/'db',blocked_users=frozenset({'333'}),participation_mode='free',silence_enabled=False)
             base=dict(post_type='message',message_type='group',self_id=222,group_id=111,user_id=444,message=[dict(type='text',data=dict(text='hello'))])
             self.assertTrue(admitted_message(base,cfg));self.assertFalse(admitted_message(base|{'user_id':333},cfg))
             self.assertFalse(admitted_message(base|{'message':[]},cfg));self.assertFalse(admitted_message(base|{'message':[{}]},cfg))
@@ -257,7 +257,7 @@ class GateFreeTests(unittest.TestCase):
 
     def test_connection_generation_changes_on_loss(self):
         with tempfile.TemporaryDirectory() as d:
-            cfg=GateConfig('222',frozenset({'111'}),frozenset({'333'}),'a'*40,'b'*40,Path(d)/'db')
+            cfg=GateConfig('222',frozenset({'111'}),frozenset({'333'}),'a'*40,'b'*40,Path(d)/'db',silence_enabled=False)
             gate=OneBotGate(cfg,Path(d));gate.connected=True;gate.observe_online({'online':True});old=gate.connection_id
             gate.observe_online(None);self.assertNotEqual(old,gate.connection_id)
             value=json.loads((Path(d)/'state/gate-connection.json').read_text())

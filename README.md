@@ -234,3 +234,6 @@ web设置进入会话版本，重启加载后新建当前上下文，旧历史�
 31B仍有实现/验收差额：Windows自造进程的执行前Job归属、归零、失败回收与句柄关闭有离线证据，但强化试验发现breakaway创建请求仍被接受，尚未证明该子进程是否仍属目标Job；禁止breakaway/完整覆盖门槛未通过。生产CLI仍走原asyncio启动路径，未接入执行前Job容器，也未授权真实CLI组合验证；因此没有完整自动恢复能力，不能称清理问题完整解决。后续需按[LAP-31交接](tracks/laptop-workbuddy/tasks/LAP-31/HANDOFF.md)补生产创建/管道适配和验证；本轮不自动启用。Ollama远端未知解除合同不变。
 
 独立验证入口 `.venv/Scripts/python.exe -X utf8 scripts/verify_lap31.py` 只用替身/自造受管进程，自动使用既有框架Python执行实际run_agent/两runner底层替身回归，只写`reports/lap-31-*`，不运行旧verify主程序。[报告](reports/lap-31-2026-10-18.md)区分31A与31B。本轮没有改本机配置、启停或登录真实bot，也没有真实模型/QQ调用。
+
+
+LAP-35临时停言：授权群普通成员明确要求bot停言后，本群无确认输出，下一条非黑名单原始真实@恢复；同条@停言优先。gate/完整bot重启复位，网络/插件/model重连保持；已提交消息不能撤回，旧结果失效。唯一设置 `participation.silence.enabled` 默认true，位于chat.yaml，下一次正常启动生效；当前只离线交付，未改本机配置或加载。详见[配置索引](config/README.md)。忽略的 `state/gate-connection.json` 包含boot与散列群代际诊断镜像，主状态只在RAM，启动不读镜像恢复，不含原话/门票；不能拿停言/重启清除原unknown/cleanup台账。

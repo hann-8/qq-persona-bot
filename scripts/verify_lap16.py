@@ -76,6 +76,7 @@ async def verify(synthetic=None, backend='codebuddy_cli', report_path=None):
         with tempfile.TemporaryDirectory(prefix='qqbot-lap16-router-',ignore_cleanup_errors=True) as directory:
             root=Path(directory);(root/'config').mkdir()
             settings=yaml.safe_load((ROOT/'config/settings.example.yaml').read_text(encoding='utf-8'))
+            settings['participation']['silence']={'enabled':False}  # legacy-disabled regression
             settings['llm']['backend']=backend
             if backend=='ollama_ssh':settings['llm']['profiles']['ollama_ssh']['expected_digest']='a'*64
             settings['bot']['qq']='222';settings['access'].update(allowed_groups=['111'],admin_users=['333'])
@@ -226,7 +227,7 @@ async def verify(synthetic=None, backend='codebuddy_cli', report_path=None):
                 from aiohttp import WSMsgType
                 from qqbot_gateway.onebot_gate import OneBotGate
                 from qqbot_gateway.config import GateConfig
-                gate=OneBotGate(GateConfig('222',frozenset({'111'}),frozenset({'333'}),'a'*40,'b'*40,root/'state/sdk-gate.sqlite'))
+                gate=OneBotGate(GateConfig('222',frozenset({'111'}),frozenset({'333'}),'a'*40,'b'*40,root/'state/sdk-gate.sqlite',silence_enabled=False))
                 class Frames:
                     def __init__(self,raw):self.raw=raw
                     def __aiter__(self):return self.iterate()

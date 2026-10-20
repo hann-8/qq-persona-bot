@@ -179,7 +179,7 @@ class DispatchTests(unittest.IsolatedAsyncioTestCase):
         from qqbot_gateway.onebot_gate import OneBotGate
         with tempfile.TemporaryDirectory() as directory:
             cfg=GateConfig('222',frozenset({'111'}),frozenset({'333'}),'a'*40,'b'*40,Path(directory)/'gate.db',
-                blocked_users=frozenset({'999'}),participation_mode='free',attention_enabled=True)
+                blocked_users=frozenset({'999'}),participation_mode='free',attention_enabled=True,silence_enabled=False)
             gate=OneBotGate(cfg)
             base=dict(post_type='message',message_type='group',self_id=222,group_id=111,user_id=333,message_id=1,
                 qqbot_at_ids=['spoof'],qqbot_reference='spoof',message=[dict(type='text',data=dict(text='肥鱼，你能解释吗')),

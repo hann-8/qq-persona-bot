@@ -1,0 +1,546 @@
+{
+  "passed": true,
+  "ability": "silence explicitly disabled in legacy fixtures",
+  "combinations": 20,
+  "cases": 460,
+  "real_model_calls": 0,
+  "real_qq_calls": 0,
+  "rows": [
+    {
+      "backend": "codebuddy_cli",
+      "mode": "single",
+      "participation": "mentions",
+      "family": "memory",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "32cbadc3ea1853e0f2df018216db554694ac17c95d6b43d3b92621eac5182071"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true,
+      "cases": 9
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "single",
+      "participation": "free",
+      "family": "memory",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "0f75afa914fb5617fab10455fee420cdcca10ef6974101078b72aa255bafd7c5"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true,
+      "cases": 9
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "single",
+      "participation": "mentions",
+      "family": "media",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "3f894ba30ae798595032dad98dd3a2cb1195eef368096e9b25ec1c22236b445e"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true,
+      "cases": 26
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "single",
+      "participation": "free",
+      "family": "media",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "4ff91d5db2bbe1b7ee0d7f37a6216cb649e2e03e645948e17fc46aa5b2816ce6"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true,
+      "cases": 28
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "single",
+      "family": "plain",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "43a37edec38438252304fafe6072a4f793f9011d993cb2132eaeadcb39fce30f"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true,
+      "cases": 42
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "adaptive",
+      "participation": "mentions",
+      "family": "memory",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "2a4d8ec25bfa13b0be2742685c14e88d3885167c637f4d26fe83cb7c30db0751"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true,
+      "cases": 10
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "adaptive",
+      "participation": "free",
+      "family": "memory",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "14ba8d0479718a3a4042c2bb7b0a5843b5c755f4b53875cbbe759731d882ce8b"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true,
+      "cases": 10
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "adaptive",
+      "participation": "mentions",
+      "family": "media",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "3a99e557a59db8ac192a8bc1094a5285c6356b3546052d4554362736f003abb7"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true,
+      "cases": 26
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "adaptive",
+      "participation": "free",
+      "family": "media",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "602607b02f941c0dfd0dbb37e9a9ba854d72179f00bc8577c0d86b03791ae3ed"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true,
+      "cases": 28
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "adaptive",
+      "family": "plain",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "cd543f87208036ee50a7d1d0d82df983547580d9ddcd158e7b7cb0a9bac1c493"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true,
+      "cases": 42
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "single",
+      "participation": "mentions",
+      "family": "memory",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "3c7d93674923754bef9914ead936be87dfd7a104cb8b13a65188b6c3d128934e"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true,
+      "cases": 9
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "single",
+      "participation": "free",
+      "family": "memory",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "d84593a33077517de17a1e8cf3ada67068c714397a170a2b183442f28336763f"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true,
+      "cases": 9
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "single",
+      "participation": "mentions",
+      "family": "media",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "7c28085088836573d697dcf1c02b26464137684bd80d28be9a455bda01ce9170"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true,
+      "cases": 26
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "single",
+      "participation": "free",
+      "family": "media",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "95d428e412d41f581d0a4b92f829e742aa5a31fae9240549da711156a9944305"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true,
+      "cases": 28
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "single",
+      "family": "plain",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "621bca589d7c711f33f141d48e3de081f09645c32772e081a22067d8d40acb2f"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true,
+      "cases": 42
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "adaptive",
+      "participation": "mentions",
+      "family": "memory",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "b383a0060f093883deb99c2048fc72ac778af0246f9c7caaf13276f77e451dad"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true,
+      "cases": 10
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "adaptive",
+      "participation": "free",
+      "family": "memory",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "3ba61dca86475b5de8727e2d7991f6dab92b397c6c01208c7d2bf5b28b293867"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true,
+      "cases": 10
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "adaptive",
+      "participation": "mentions",
+      "family": "media",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "70edb51c63cefe83e22b1f9f58c0577ac4374db43b8bb41bc7d8df1eb0cab11f"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true,
+      "cases": 26
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "adaptive",
+      "participation": "free",
+      "family": "media",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "8a1c10d6f021b9f2ea2756f9ac6f1a815c739693a042c853de08b716ccb3c740"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true,
+      "cases": 28
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "adaptive",
+      "family": "plain",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "aece82a74f4ec4ff8207d2251988f7989a6abb171395665d872b186b4a7ad79d"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true,
+      "cases": 42
+    }
+  ]
+}

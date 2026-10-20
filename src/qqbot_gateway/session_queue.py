@@ -36,7 +36,8 @@ class SessionCoordinator:
     def __init__(self,cooldown=5,limit=2,timeout=600,clock=time.monotonic):
         self.cooldown=cooldown;self.limit=limit;self.timeout=timeout;self.clock=clock;self.states={}
 
-    async def acquire(self,key):
+    async def acquire(self,key,valid=lambda:True):
+        if not valid():raise SessionError('INVALIDATED',False)
         now=self.clock()
         for stale,state in list(self.states.items()):
             if not state.busy and not state.waiting and now-state.last_accepted>3600:self.states.pop(stale,None)
@@ -52,7 +53,12 @@ class SessionCoordinator:
         if not state.busy:state.busy=True;return lease
         future=asyncio.get_running_loop().create_future();state.waiting.append(future)
         try:
-            await asyncio.wait_for(asyncio.shield(future),timeout=self.timeout)
+            deadline=self.clock()+self.timeout
+            while not future.done():
+                if not valid():raise SessionError('INVALIDATED',False)
+                if self.clock()>=deadline:raise TimeoutError()
+                await asyncio.wait((future,),timeout=min(.1,max(0,deadline-self.clock())))
+            if not valid():raise SessionError('INVALIDATED',False)
             return lease
         except BaseException as error:
             granted=future.done() and not future.cancelled()

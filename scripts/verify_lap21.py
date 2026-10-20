@@ -49,6 +49,7 @@ async def verify(root,backend,mode,participation,full_lifecycle=False,lap24=Fals
             self.items[(umo,cid)]=Conversation('qqbot',umo,cid,history='[]',persona_id=persona_id);return cid
         async def update_conversation(self,umo,cid,history,**kwargs):self.items[(umo,cid)].history=json.dumps(history,ensure_ascii=False)
     settings=yaml.safe_load((ROOT/'config/settings.example.yaml').read_text(encoding='utf-8'))
+    settings['participation']['silence']={'enabled':False}  # legacy-disabled regression
     settings['bot']['qq']='222';settings['access'].update(allowed_groups=['111'],admin_users=['333'])
     settings['llm']['backend']=backend
     if backend=='ollama_ssh':settings['llm']['profiles'][backend]['expected_digest']='a'*64
@@ -79,7 +80,7 @@ async def verify(root,backend,mode,participation,full_lifecycle=False,lap24=Fals
     ctx=SimpleNamespace(astrbot_config=config,plugin_manager=SimpleNamespace(context=SimpleNamespace(get_using_tts_provider_async=no_tts)))
     decorate=ResultDecorateStage();respond=RespondStage();await decorate.initialize(ctx);await respond.initialize(ctx)
     stage=InternalAgentSubStage();stage.conv_manager=manager
-    gatecfg=GateConfig('222',frozenset({'111'}),frozenset({'333'}),'x'*32,'y'*32,root/'unused.sqlite',media_catalog=c)
+    gatecfg=GateConfig('222',frozenset({'111'}),frozenset({'333'}),'x'*32,'y'*32,root/'unused.sqlite',media_catalog=c,silence_enabled=False)
     report=[]
     try:
         cases=['text_image','image_only','invalid_id','answer','missing2','duplicate2','error2','timeout2','stop','hash_changed','cooldown','bad','metadata_missing','metadata_mismatch','image_only_missing','web_answer']

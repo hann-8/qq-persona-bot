@@ -725,7 +725,7 @@ def main():
     commands.add_parser('show')
     commands.add_parser('memes-admin',help='图库导入、预览、标签与目录激活（不编辑参数）')
     commands.add_parser('memory-admin',help='授权群记忆查看、导出与确认CRUD（不编辑开关）')
-    commands.add_parser('export-legacy-config')
+    commands.add_parser('export-legacy-config',help='停机功能兼容审阅导出：剥除silence/attention/vision/members/memory；不同于完整布局导出')
     commands.add_parser('connection-init')
     commands.add_parser('connection-check')
     commands.add_parser('clear-remote-unknown').add_argument('identifier')

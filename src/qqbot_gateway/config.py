@@ -29,7 +29,9 @@ def export_legacy_config(path):
         value,source_digest=read_settings(path)
         original=path.read_bytes()
         if hashlib.sha256(original).hexdigest()!=source_digest:raise ValueError('Configuration changed')
-        if isinstance(value.get('participation'),dict):value['participation'].pop('attention',None)
+        if isinstance(value.get('participation'),dict):
+            value['participation'].pop('attention',None)
+            value['participation'].pop('silence',None)
         value.pop('vision',None)
         value.pop('members',None)
         value.pop('memory',None)
@@ -60,7 +62,7 @@ def activate_legacy_config(path,review,source_digest,legacy_digest,confirmation)
         original=path.read_bytes();content=review.read_bytes()
         if hashlib.sha256(original).hexdigest()!=source_digest or hashlib.sha256(content).hexdigest()!=legacy_digest:raise ValueError('Configuration changed')
         data=yaml.safe_load(content);normalize_settings(data)
-        if 'attention' in data.get('participation',{}) or 'vision' in data or 'members' in data or 'memory' in data:raise ValueError('Not legacy compatible')
+        if 'silence' in data.get('participation',{}) or 'attention' in data.get('participation',{}) or 'vision' in data or 'members' in data or 'memory' in data:raise ValueError('Not legacy compatible')
         backup=review.with_name(review.stem+'.activation-original.yaml')
         with backup.open('xb') as f:f.write(original)
         temporary=path.with_name(path.name+'.legacy-'+uuid.uuid4().hex+'.tmp')
@@ -99,8 +101,13 @@ class GateConfig:
     vision_enabled: bool = False
     members_enabled: bool = False
     members_config: object = None
+    silence_enabled: bool = True
+    silence_aliases: tuple = ('肥鱼','大肥鱼','鱼鱼','鲸鱼娘','小鲸鱼','DSH')
+    session_queue_timeout_seconds: int = 600
+    message_max_chars: int = 2000
 
     def __post_init__(self):
+        if type(self.silence_enabled) is not bool:raise ValueError('Invalid silence enabled')
         if self.participation_mode not in ('mentions','free'):raise ValueError('Invalid participation mode')
         if not qq_id(self.bot_qq) or not self.allowed_groups or not self.admin_users:
             raise ValueError('Bot, allowed groups and admins must be nonempty')
@@ -303,6 +310,10 @@ def load_gate_config(path=None, *, root=None, settings=None):
         host=data['onebot']['host'], port=data['onebot']['port'],
         blocked_users=frozenset(data['access']['blocked_users']),
         participation_mode=data['participation']['mode'],
+        silence_enabled=data['participation']['silence']['enabled'],
+        silence_aliases=tuple(data['participation']['attention']['aliases']),
+        session_queue_timeout_seconds=data['chat']['session_queue_timeout_seconds'],
+        message_max_chars=data['participation']['message_max_chars'],
         vision_enabled=data['vision']['enabled'],
         members_enabled=False,
         members_config=suspend_unverified(data),

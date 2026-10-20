@@ -111,6 +111,9 @@ class TaskStore:
     def fail_prepared_part(self,key,index):
         with self.db:self.db.execute("UPDATE delivery_part SET state='failed' WHERE message_key=? AND part=? AND state='prepared'",(key,index))
 
+    def cancel_prepared(self,key):
+        with self.db:self.db.execute("UPDATE delivery_part SET state='failed' WHERE message_key=? AND state='prepared'",(key,))
+
     def begin_part(self,key,index):
         with self.db:
             cur=self.db.execute("UPDATE delivery_part SET state='sending' WHERE message_key=? AND part=? AND state='prepared'",(key,index))
@@ -131,6 +134,7 @@ class TaskStore:
         with self.db:self.db.execute('INSERT OR REPLACE INTO mention_receipt VALUES (?,?,?)',(key,index,None if applied is None else int(applied)))
 
     def finish_delivery(self,key,reason=None):
+        self.cancel_prepared(key)
         parts=self.parts(key)
         complete=bool(parts) and all(state=='sent' for _,state,_ in parts)
         state='sent' if complete else ('unknown' if any(s in ('sending','unknown','sent') for _,s,_ in parts) else 'failed')

@@ -37,10 +37,19 @@ def validate_attention(raw):
     return dict(cfg,aliases=list(names))
 
 
+SILENCE_DEFAULTS=dict(enabled=True)
+
+def validate_silence(raw):
+    if not isinstance(raw,dict) or set(raw)-{'enabled'}:raise ValueError('Invalid silence fields')
+    cfg=SILENCE_DEFAULTS|raw
+    if type(cfg['enabled']) is not bool:raise ValueError('Invalid silence.enabled')
+    return cfg
+
 def validate_participation(raw):
-    if not isinstance(raw,dict) or set(raw)-set(DEFAULTS)-{'attention'}:raise ValueError('Invalid participation fields')
+    if not isinstance(raw,dict) or set(raw)-set(DEFAULTS)-{'attention','silence'}:raise ValueError('Invalid participation fields')
     cfg=DEFAULTS|raw
     cfg['attention']=validate_attention(raw.get('attention',{}))
+    cfg['silence']=validate_silence(raw.get('silence',{}))
     if cfg['mode'] not in ('mentions','free') or type(cfg['allow_ambient_web']) is not bool:raise ValueError('Invalid participation mode/web')
     for k,(lo,hi) in RANGES.items():
         value=cfg[k]

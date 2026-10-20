@@ -6,6 +6,10 @@ import re
 import time
 
 
+class KnownNotSent(Exception):
+    pass
+
+
 class DeliveryStopped(Exception):
     pass
 
@@ -51,7 +55,8 @@ class GroupDeliveryQueue:
 
 class EventReceiptProxy:
     """One event's bot reference is wrapped; shared CQHttp instance is untouched."""
-    def __init__(self,bot,group,image_uri=None,image_digest=None,mention_permission=None,expected_text=None):
+    def __init__(self,bot,group,image_uri=None,image_digest=None,mention_permission=None,expected_text=None,output_ticket=None):
+        self.output_ticket=output_ticket
         self.original=bot;self.group=str(group);self.calls=0;self.message_id=None
         self.image_uri=image_uri;self.image_digest=image_digest
         self.mention_permission=mention_permission;self.expected_text=expected_text;self.mention_applied=None
@@ -76,7 +81,14 @@ class EventReceiptProxy:
         if self.mention_permission:
             if kwargs.get('message')!=[{'type':'text','data':{'text':self.expected_text}}]:raise DeliveryStopped('mention_conversion_mismatch')
             kwargs=dict(kwargs,qqbot_mention_permission=self.mention_permission)
-        result=await self.original.send_group_msg(**kwargs)
+        if self.output_ticket:kwargs=dict(kwargs,qqbot_output_ticket=self.output_ticket)
+        try:result=await self.original.send_group_msg(**kwargs)
+        except Exception as error:
+            # Only the fixed explicit gate refusal proves no downstream submission.
+            if getattr(error,'retcode',None)==1403 and getattr(error,'result',{}).get('message',getattr(error,'message',None))=='GROUP_MUTED_OR_STALE_OUTPUT':
+                raise KnownNotSent() from None
+            raise
+        if isinstance(result,dict) and result.get('retcode')==1403 and result.get('message')=='GROUP_MUTED_OR_STALE_OUTPUT':raise KnownNotSent()
         if isinstance(result,dict):
             if type(result.get('qqbot_mention_applied')) is bool:self.mention_applied=result['qqbot_mention_applied']
             mid=result.get('message_id')
@@ -147,16 +159,19 @@ class ReplyDelivery:
                         guard=event.get_extra('qq_send_guard')
                         if uri and guard:
                             with guard.grant(image_uri=chain.chain[0].file):
-                                await cancellable(event.send(chain),lambda:self.allowed(event),self.timeout)
+                                await asyncio.wait_for(event.send(chain),self.timeout)
                         elif permission and guard:
                             with guard.grant(mention_text=part.payload_ref):
-                                await cancellable(event.send(chain),lambda:self.allowed(event),self.timeout)
-                        else:await cancellable(event.send(chain),lambda:self.allowed(event),self.timeout)
+                                await asyncio.wait_for(event.send(chain),self.timeout)
+                        else:await asyncio.wait_for(event.send(chain),self.timeout)
                         state=self.store.part_result(key,index,'sent' if proxy.calls==1 and proxy.message_id else 'unknown',proxy.message_id)
                         if part.mention_ref:
                             self.store.mention_result(key,index,proxy.mention_applied if state=='sent' else None)
                         if uri and state=='sent':
                             self.image_times[group]=time.monotonic();self.same_times[(group,part.payload_ref)]=time.monotonic()
+                    except KnownNotSent:
+                        self.store.part_result(key,index,'failed')
+                        raise DeliveryStopped('gate_rejected_not_sent') from None
                     except BaseException:
                         # A correlated ACK already captured is evidence even if stop/cancel
                         # arrives while the framework finishes its local send bookkeeping.

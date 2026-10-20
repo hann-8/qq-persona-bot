@@ -25,7 +25,7 @@ def metadata_error_code(error):
     return {5:'ACCESS_DENIED',32:'SHARING_VIOLATION',33:'LOCK_VIOLATION'}.get(getattr(error,'winerror',None),'IO_ERROR')
 
 
-def admitted_message(event, config):
+def controllable_message(event, config):
     if not isinstance(event, dict):
         return False
     if (event.get('post_type') != 'message' or event.get('message_type') != 'group' or
@@ -35,11 +35,15 @@ def admitted_message(event, config):
             qq_id(event.get('group_id')) not in config.allowed_groups):
         return False
     message = event.get('message')
-    return isinstance(message, list) and bool(message) and all(isinstance(s,dict) and isinstance(s.get('type'),str) and isinstance(s.get('data'),dict) for s in message) and (config.participation_mode=='free' or any(
+    return isinstance(message, list) and bool(message) and all(isinstance(s,dict) and isinstance(s.get('type'),str) and isinstance(s.get('data'),dict) for s in message)
+
+
+def admitted_message(event, config):
+    return controllable_message(event,config) and (config.participation_mode=='free' or any(
         isinstance(segment, dict) and segment.get('type') == 'at' and
         isinstance(segment.get('data'), dict) and
         qq_id(segment['data'].get('qq')) == config.bot_qq
-        for segment in message
+        for segment in event['message']
     ))
 
 
@@ -117,6 +121,7 @@ class DedupStore:
 class OneBotGate:
     def __init__(self, config: GateConfig, root=None):
         self.config = config
+        self.config_message_limit=getattr(config,'message_max_chars',2000)
         self.store = DedupStore(config.database)
         self.active = None
         self.failures = 0
@@ -133,6 +138,9 @@ class OneBotGate:
         self.admin_token=admin_token(root) if root else None
         if self.admin_token in (config.inbound_token,config.upstream_token):raise ValueError('Independent admin token required')
         self.connection_id=secrets.token_hex(32)
+        from .group_silence import GroupSilence
+        self.silence=GroupSilence(config.bot_qq,config.allowed_groups,config.blocked_users,config.silence_enabled,
+                                  config.session_queue_timeout_seconds+210)
         from .vision import Materials,context_token
         self.materials=Materials()
         from .members import Members
@@ -149,7 +157,7 @@ class OneBotGate:
             try:
                 path.parent.mkdir(parents=True,exist_ok=True)
                 temp.write_text(json.dumps(dict(id=self.connection_id,connected=self.connected,online=self.online,
-                    pid=os.getpid(),created=psutil.Process().create_time(),updated=time.time())),encoding='utf-8')
+                    pid=os.getpid(),created=psutil.Process().create_time(),updated=time.time(),silence=self.silence.mirror())),encoding='utf-8')
                 # Windows readers can briefly deny replacement. Bound the retry
                 # to 20 ms; a permanent failure still closes the channel.
                 for attempt in range(3):
@@ -172,7 +180,8 @@ class OneBotGate:
             'disconnected' if self.ever_connected else 'waiting_login')
         return {'alive': True, 'connected': self.connected, 'self_id_verified': self.connected,
                 'last_heartbeat': self.last_heartbeat, 'online': online, 'channel_state': channel,
-                'stopping': bool(self.root and stopping(self.root))}
+                'stopping': bool(self.root and stopping(self.root)),
+                'silence_enabled':self.silence.enabled,'muted_groups':sum(s['mode']=='muted' for s in self.silence.states.values())}
 
     def observe_online(self, data):
         previous=self.online
@@ -274,10 +283,32 @@ class OneBotGate:
                 continue
             if not isinstance(event, dict):
                 continue
-            if admitted_message(event, self.config):
+            if controllable_message(event,self.config) and (self.config.silence_enabled or admitted_message(event,self.config)):
                 if self.root and stopping(self.root):continue
                 if self.store.reserve(event):
-                    if (self.config.participation_mode=='mentions' and not self.config.vision_enabled and not self.config.members_enabled and
+                    output_ticket=None
+                    if self.config.silence_enabled:
+                        from .group_silence import silence_request,real_at
+                        group=str(event['group_id'])
+                        async with self.silence.locks[group]:
+                            mention=real_at(event,self.config.bot_qq)
+                            text=''.join(p['data'].get('text','') for p in event['message'] if p['type']=='text' and isinstance(p['data'].get('text'),str))
+                            stop=silence_request(text,self.config.silence_aliases,mention,self.config_message_limit)
+                            changed=self.silence.control(group,stop,mention)
+                            if changed:
+                                for cap,row in list(self.materials.entries.items()):
+                                    if row['identity'][1]==group:self.materials.expire(cap)
+                                self.members.invalidate(group)
+                                for ledger in (self.members.caps,self.members.receipts,self.members.permits):
+                                    for token,row in list(ledger.items()):
+                                        if row['identity'][1]==group:ledger.pop(token,None)
+                                for key in list(self.members.events):
+                                    if key[1]==group:self.members.events.pop(key,None)
+                                self.publish_connection()
+                            if stop or not self.silence.normal(group):continue
+                            if not admitted_message(event,self.config):continue
+                            output_ticket=self.silence.issue(event,self.connection_id)
+                    if (not self.config.silence_enabled and self.config.participation_mode=='mentions' and not self.config.vision_enabled and not self.config.members_enabled and
                         all(s['type'] in ('text','at') for s in event['message']) and
                         not any(k.startswith('qqbot_') for k in event)):
                         # Unchanged legacy text-only frame. Attachments and
@@ -301,6 +332,7 @@ class OneBotGate:
                     event={k:v for k,v in event.items() if k in ('post_type','message_type','sub_type','self_id','group_id','user_id','message_id','time','font','sender')}
                     event=dict(event,message=safe,raw_message='',qqbot_reference=reference,qqbot_media=media,
                                qqbot_connection=self.connection_id)
+                    if output_ticket:event['qqbot_output_ticket']=output_ticket
                     if member_cap:event['qqbot_member_cap']=member_cap
                     if image:event['qqbot_image']=image;event['qqbot_text']=image_text
                     if self.config.attention_enabled:event['qqbot_at_ids']=at_ids
@@ -348,6 +380,19 @@ class OneBotGate:
             key = echo_key(event['echo']) if 'echo' in event else None
             authorized=False
             params=event.get('params',{})
+            output_ticket=None
+            is_send=event.get('action') in ('send_msg','send_group_msg')
+            if is_send and self.config.silence_enabled:
+                from .group_silence import DENIED
+                try:
+                    output_ticket=params.get('qqbot_output_ticket')
+                    self.silence.verify(output_ticket,qq_id(params.get('group_id')),self.connection_id)
+                    if not self.connected or self.online is not True or self.root and stopping(self.root):raise ValueError()
+                except (ValueError,TypeError,AttributeError):
+                    await upstream.send_json(dict(status='failed',retcode=1403,message=DENIED,data=None,echo=event.get('echo')))
+                    continue
+                params={k:v for k,v in params.items() if k!='qqbot_output_ticket'}
+                event=dict(event,params=params)
             if isinstance(params,dict) and 'qqbot_mention_permission' in params:
                 try:
                     if event.get('action')!='send_group_msg' or set(params)!={'group_id','message','qqbot_mention_permission'}:raise ValueError()
@@ -362,7 +407,19 @@ class OneBotGate:
                 pending.add(key)
                 if authorized:self.mention_pending[key]=applied
                 elif event.get('action') in ('send_msg','send_group_msg'):self.mention_pending[key]=False
-                await downstream.send_json(event)
+                if is_send and self.config.silence_enabled:
+                    # Same lock as control transition. Linearization is the bounded
+                    # socket write, never the later QQ ACK.
+                    group=qq_id(params.get('group_id'))
+                    async with self.silence.locks[group]:
+                        try:
+                            self.silence.verify(output_ticket,group,self.connection_id)
+                        except ValueError:
+                            pending.discard(key);self.mention_pending.pop(key,None)
+                            await upstream.send_json(dict(status='failed',retcode=1403,message=DENIED,data=None,echo=event.get('echo')))
+                            continue
+                        await asyncio.wait_for(downstream.send_json(event),3)
+                else:await downstream.send_json(event)
             else:
                 await upstream.send_json({'status': 'failed', 'retcode': 1403,
                                           'message': 'SCOPE_DENIED_OR_PENDING_LIMIT',
@@ -392,7 +449,7 @@ class OneBotGate:
         bot,group,sender,_=identity
         return (self.config.members_enabled and self.connected and self.online is True and
             not (self.root and stopping(self.root)) and bot==self.config.bot_qq and
-            group in self.config.allowed_groups and sender not in self.config.blocked_users and sender!=bot)
+            group in self.config.allowed_groups and (not self.config.silence_enabled or self.silence.normal(group)) and sender not in self.config.blocked_users and sender!=bot)
 
     async def member_rpc(self,action,params):
         # This private method is never exposed as an action-param HTTP proxy.
@@ -413,16 +470,20 @@ class OneBotGate:
         if not self.config.members_enabled or not self.connected or self.online is not True or self.root and stopping(self.root):
             raise web.HTTPServiceUnavailable(text='MEMBERS_CAPABILITY_UNVERIFIED')
         from .reply_plan import _pairs
+        generations={g:s['generation'] for g,s in self.silence.states.items()}
+        def current(identity):
+            return self.member_allowed(identity) and (not self.config.silence_enabled or
+                generations.get(identity[1])==self.silence.states[identity[1]]['generation'])
         try:
             if request.content_length is None or request.content_length>131072:raise ValueError()
             body=json.loads(await request.text(),object_pairs_hook=_pairs)
             if request.path.endswith('/bind'):
-                self.members.bind(body,self.connection_id,self.member_allowed);result={'bound':True}
+                self.members.bind(body,self.connection_id,current);result={'bound':True}
             elif request.path.endswith('/permit'):
-                result={'permit':self.members.permit(body,self.connection_id,self.member_allowed)}
+                result={'permit':self.members.permit(body,self.connection_id,current)}
             else:
                 async with asyncio.timeout(15):
-                    result=await self.members.resolve(body,self.connection_id,self.member_allowed,self.member_rpc)
+                    result=await self.members.resolve(body,self.connection_id,current,self.member_rpc)
             return web.json_response(result)
         except (ValueError,TypeError,KeyError,TimeoutError,ConnectionError):
             raise web.HTTPBadRequest(text='MEMBER_MATERIAL_UNAVAILABLE') from None
@@ -435,13 +496,15 @@ class OneBotGate:
         if not self.config.vision_enabled or not self.connected or self.online is not True or self.root and stopping(self.root):
             raise web.HTTPServiceUnavailable(text='MATERIAL_UNAVAILABLE')
         from .reply_plan import _pairs
+        generations={g:s['generation'] for g,s in self.silence.states.items()}
         try:
             if request.content_length is None or request.content_length>2048:raise ValueError()
             body=json.loads(await request.text(),object_pairs_hook=_pairs)
             def allowed(identity):
                 bot,group,sender,_=identity
                 return (self.connected and self.online is True and not (self.root and stopping(self.root)) and
-                    bot==self.config.bot_qq and group in self.config.allowed_groups and sender not in self.config.blocked_users)
+                    bot==self.config.bot_qq and group in self.config.allowed_groups and
+                    (not self.config.silence_enabled or self.silence.normal(group) and generations.get(group)==self.silence.states[group]['generation']) and sender not in self.config.blocked_users)
             if request.path.endswith('/bind'):
                 self.materials.bind(body,self.connection_id,allowed)
                 return web.json_response({'bound':True})

@@ -67,22 +67,70 @@ class QQRouter(Star):
         self.group_turns.bot=self.bot
         self.connection_id=None
         self.connection_watcher=None
+        self.silence_mirror=None
 
-    def connection(self):
+    def gate_metadata(self):
         try:
             data=json.loads((self.root/'state/gate-connection.json').read_text(encoding='utf-8'))
             process=psutil.Process(data['pid'])
-            if abs(process.create_time()-data['created'])>=.01 or time.time()-data['updated']>45:return None
-            return data['id'] if data['connected'] and data['online'] is True else None
-        except (OSError,ValueError,KeyError,psutil.Error):return None
+            if abs(process.create_time()-data['created'])>=.01 or not 0<=time.time()-data['updated']<=45:return None
+            if self.silence_enabled():
+                from qqbot_gateway.group_silence import group_ref
+                mirror=data.get('silence')
+                if (not isinstance(mirror,dict) or type(mirror.get('v')) is not int or mirror['v']!=1 or
+                    mirror.get('enabled') is not True or not isinstance(mirror.get('boot_id'),str) or
+                    not re.fullmatch('[a-f0-9]{32}',mirror['boot_id']) or not isinstance(mirror.get('groups'),dict) or
+                    set(mirror['groups'])!={group_ref(self.bot,g) for g in self.groups}):return None
+                for state in mirror['groups'].values():
+                    if (not isinstance(state,dict) or set(state)!={'mode','generation'} or state['mode'] not in ('normal','muted') or
+                        type(state['generation']) is not int or state['generation']<0):return None
+            return data if data['connected'] and data['online'] is True else None
+        except (OSError,ValueError,TypeError,KeyError,psutil.Error):return None
+
+    def connection(self):
+        data=self.gate_metadata()
+        return data['id'] if data else None
+
+    def silence_enabled(self):return self.participation.get('silence',{}).get('enabled',True)
+
+    def silence_allowed(self,event):
+        if not self.silence_enabled():return True
+        from qqbot_gateway.group_silence import decode_ticket,group_ref
+        try:
+            d,_,_=decode_ticket(event.get_extra('qq_output_ticket'))
+            data=self.gate_metadata();mirror=data['silence']
+            state=mirror['groups'][group_ref(self.bot,str(event.get_group_id()))]
+            return (mirror['v']==1 and mirror['enabled'] is True and d['boot_id']==mirror['boot_id'] and
+                d['connection_id']==data['id'] and d['bot']==self.bot and d['group']==str(event.get_group_id()) and
+                d['sender']==str(event.get_sender_id()) and d['message_id']==str(event.message_obj.message_id) and
+                type(state['generation']) is int and d['generation']==state['generation'] and state['mode']=='normal' and
+                d['expires_ms']>=int(time.monotonic()*1000))
+        except (ValueError,TypeError,KeyError):return False
+
+    def observe_gate(self):
+        data=self.gate_metadata();current=data['id'] if data else None
+        mirror=data.get('silence') if data else None
+        if current!=self.connection_id:
+            self.group_turns.invalidate();self.connection_id=current
+        elif self.silence_enabled() and mirror!=self.silence_mirror:
+            from qqbot_gateway.group_silence import group_ref
+            for group in self.groups:
+                ref=group_ref(self.bot,group)
+                old=self.silence_mirror;new=mirror
+                if not old or not new or old.get('boot_id')!=new.get('boot_id') or old.get('groups',{}).get(ref)!=new.get('groups',{}).get(ref):
+                    self.group_turns.reset(group)
+        self.silence_mirror=mirror
 
     async def watch_connection(self):
-        # Metadata invalidation only. This task never searches, generates or sends.
+        # RAM invalidation only; never cancels submitted HTTP or runner/SSH work.
         while True:
-            current=self.connection()
-            if current!=self.connection_id:
-                self.group_turns.invalidate();self.connection_id=current
+            self.observe_gate()
             await asyncio.sleep(.1)
+
+    @filter.on_llm_request()
+    async def before_provider(self,event,request):
+        QQBotProvider._output_gate.set(dict(valid=lambda:self.silence_allowed(event),submitted=False))
+        if not self.silence_allowed(event):event.should_call_llm(False);event.stop_event()
 
     async def local_notice(self,event,text):
         guard=event.get_extra('qq_send_guard')
@@ -95,7 +143,7 @@ class QQRouter(Star):
 
     async def initialize(self):
         await self.tasks.recover_deliveries(self.context.conversation_manager)
-        if self.participation['mode']=='free':self.connection_watcher=asyncio.create_task(self.watch_connection())
+        if self.participation['mode']=='free' or self.silence_enabled():self.connection_watcher=asyncio.create_task(self.watch_connection())
         manager=self.context.persona_manager
         try:await manager.get_persona(self.persona_id)
         except ValueError:
@@ -169,7 +217,9 @@ class QQRouter(Star):
         raw=response.raw_completion
         if (raw is None or raw.model!='workbuddy-local' or
                 not raw.id.startswith('chatcmpl-') or len(raw.choices)!=1):
-            if (getattr(self,'output',{}).get('delivery_mode')=='adaptive' or event.get_extra('qq_media_turn')) and event.get_extra('qq_delivery_key'):
+            if (getattr(self,'output',{}).get('delivery_mode')=='adaptive' or event.get_extra('qq_media_turn') or event.get_extra('needs_guarded_delivery')) and event.get_extra('qq_delivery_key'):
+                response.result_chain=MessageChain()
+                if run_context.messages and run_context.messages[-1].role=='assistant':run_context.messages[-1]._no_save=True
                 event.clear_result();event.stop_event()
             return
         if getattr(raw,'qqbot_web_expired',False) is True:
@@ -184,7 +234,9 @@ class QQRouter(Star):
             event.clear_result();event.stop_event();return
         text=raw.choices[0].message.content
         if not isinstance(text,str) or not text.strip() or response.role!='assistant':
-            if (getattr(self,'output',{}).get('delivery_mode')=='adaptive' or event.get_extra('qq_media_turn')) and event.get_extra('qq_delivery_key'):
+            if (getattr(self,'output',{}).get('delivery_mode')=='adaptive' or event.get_extra('qq_media_turn') or event.get_extra('needs_guarded_delivery')) and event.get_extra('qq_delivery_key'):
+                response.result_chain=MessageChain()
+                if run_context.messages and run_context.messages[-1].role=='assistant':run_context.messages[-1]._no_save=True
                 event.clear_result();event.stop_event()
             return
         response.result_chain=MessageChain().message(text)
@@ -192,7 +244,7 @@ class QQRouter(Star):
         if run_context.messages and run_context.messages[-1].role=='assistant':
             run_context.messages[-1].content=[TextPart(text=text)]
         event.set_extra('qq_router_success',True)
-        if (getattr(self,'output',{}).get('delivery_mode')=='adaptive' or event.get_extra('qq_media_turn')) and event.get_extra('qq_delivery_key'):
+        if (getattr(self,'output',{}).get('delivery_mode')=='adaptive' or event.get_extra('qq_media_turn') or event.get_extra('needs_guarded_delivery')) and event.get_extra('qq_delivery_key'):
             # Persist before the framework can either save history or dispatch a result.
             try:
                 key=event.get_extra('qq_delivery_key')
@@ -209,7 +261,7 @@ class QQRouter(Star):
             except Exception:
                 # Framework swallows hook exceptions; explicitly stop unsafe save/dispatch.
                 event.set_extra('qq_router_success',False)
-                if event.get_extra('qq_media_turn') and run_context.messages and run_context.messages[-1].role=='assistant':
+                if (event.get_extra('qq_media_turn') or event.get_extra('needs_guarded_delivery')) and run_context.messages and run_context.messages[-1].role=='assistant':
                     run_context.messages[-1]._no_save=True
                     run_context.messages[-1].content=[]
                 event.clear_result();event.stop_event()
@@ -221,14 +273,14 @@ class QQRouter(Star):
             not self.tasks.group_blocked(str(event.get_group_id())) and
             event.get_extra('qq_connection')==self.connection() and
             (group_request['must_reply'] or (time.monotonic()-event.get_extra('qq_group_created')<=self.participation['max_ambient_age_seconds'] and (group_request.get('addressing')=='focused_candidate' or self.group_turns.may_speak(str(event.get_group_id())))))))
-        return (group_ok and not stopping(self.root) and str(event.get_self_id())==self.bot and
+        return (self.silence_allowed(event) and group_ok and not stopping(self.root) and str(event.get_self_id())==self.bot and
                 str(event.get_group_id()) in self.groups and str(event.get_sender_id()) not in self.blocked and
                 str(event.get_sender_id())!=self.bot and event.get_extra('qq_delivery_version')==self.persona_id and
                 event.get_extra('qq_delivery_identity')==(str(event.get_self_id()),str(event.get_group_id()),str(event.get_sender_id())))
 
     def memory_allowed(self,event):
         request=event.get_extra('qq_group_request')
-        return (request and request.get('version')==2 and not stopping(self.root) and str(event.get_self_id())==self.bot and
+        return (self.silence_allowed(event) and request and request.get('version')==2 and not stopping(self.root) and str(event.get_self_id())==self.bot and
             str(event.get_group_id()) in self.groups and str(event.get_sender_id()) not in self.blocked and
             request['epoch']==self.group_turns.group_epoch(str(event.get_group_id())) and
             event.get_extra('qq_connection')==self.connection() and event.get_extra('qq_delivery_version')==self.persona_id and
@@ -282,7 +334,7 @@ class QQRouter(Star):
             return
         if event.get_extra('qq_web_expired'):
             event.clear_result();event.stop_event();return
-        if (getattr(self,'output',{}).get('delivery_mode')!='adaptive' and not event.get_extra('qq_media_turn')) or not event.get_extra('qq_delivery_key'):
+        if (getattr(self,'output',{}).get('delivery_mode')!='adaptive' and not event.get_extra('qq_media_turn') and not event.get_extra('needs_guarded_delivery')) or not event.get_extra('qq_delivery_key'):
             return
         # Always take over this model event, even if the hook/SDK failed to prepare a plan.
         event.clear_result()
@@ -317,6 +369,13 @@ class QQRouter(Star):
         if (stopping(self.root) or event.is_private_chat() or str(event.get_self_id())!=self.bot or str(event.get_group_id()) not in self.groups or
             str(event.get_sender_id()) in self.blocked or str(event.get_sender_id())==self.bot):
             event.should_call_llm(False);event.stop_event();return
+        self.observe_gate()
+        raw=getattr(event.message_obj,'raw_message',None)
+        event.set_extra('qq_silence_enabled',self.silence_enabled())
+        event.set_extra('qq_output_ticket',raw.get('qqbot_output_ticket') if isinstance(raw,dict) else None)
+        event.set_extra('needs_guarded_delivery',self.silence_enabled())
+        if not self.silence_allowed(event):
+            event.should_call_llm(False);event.stop_event();return
         event.set_extra('qq_send_guard',EventSendGuard(event))
         # Framework otherwise adds SendMessageToUserTool even for explicit requests.
         # Copy metadata on this event only; never mutate the adapter's shared object.
@@ -346,16 +405,17 @@ class QQRouter(Star):
         trace=uuid.uuid4().hex[:10];event.set_extra('qq_router_trace',trace)
         key=self.bot+':'+str(event.get_group_id())+':'+str(event.message_obj.message_id)
         if not self.tasks.accept(key,trace):return
-        try:lease=await self.coordinator.acquire(event.unified_msg_origin)
+        try:lease=await self.coordinator.acquire(event.unified_msg_origin,lambda:self.silence_allowed(event))
         except SessionError as error:
             self.tasks.set(key,'failed')
+            if error.code=='INVALIDATED':event.should_call_llm(False);event.stop_event()
             if error.notify:
                 texts={'COOLDOWN':'上一条还在处理，等几秒再叫我吧。','SESSION_QUEUE_FULL':'你这边还有问题排着队，稍后再试。','SESSION_QUEUE_TIMEOUT':'这条问题排队超时了，请重新提问。'}
                 yield event.plain_result(texts[error.code])
             return
         try:
-            if stopping(self.root):
-                self.tasks.set(key,'failed');return
+            if stopping(self.root) or not self.silence_allowed(event):
+                event.should_call_llm(False);event.stop_event();self.tasks.set(key,'failed');return
             self.tasks.set(key,'running')
             if any(not isinstance(c,(At,AtAll,Plain,Reply)) for c in components) or media and not image:
                 self.tasks.set(key,'failed');yield event.plain_result('目前只接通文字聊天，图片、音频和视频还没接入。');return
@@ -387,7 +447,7 @@ class QQRouter(Star):
             history=self.budget.select_history(self.persona,prompt,history)
             await manager.update_conversation(umo,cid,history=history)
             conv.history=json.dumps(history,ensure_ascii=False)
-            if self.output['delivery_mode']=='adaptive' or self.memes.cfg['enabled'] or self.vision['enabled'] or self.members['enabled'] or self.memory.cfg['enabled']:
+            if event.get_extra('needs_guarded_delivery') or self.output['delivery_mode']=='adaptive' or self.memes.cfg['enabled'] or self.vision['enabled'] or self.members['enabled'] or self.memory.cfg['enabled']:
                 event.set_extra('qq_delivery_key',key)
                 event.set_extra('qq_delivery_cid',cid)
                 event.set_extra('qq_delivery_before',history)
@@ -429,9 +489,10 @@ class QQRouter(Star):
             event.set_extra('qq_meme_question',prompt)
             LOG.warning('QQ_TASK_RUNNING trace=%s',trace)
             try:
+                if not self.silence_allowed(event):event.should_call_llm(False);event.stop_event();return
                 yield event.request_llm(prompt=prompt,conversation=conv,tool_set=None,session_id=session_id)
             finally:
-                if self.output['delivery_mode']=='adaptive' or event.get_extra('qq_media_turn'):
+                if self.output['delivery_mode']=='adaptive' or event.get_extra('qq_media_turn') or event.get_extra('needs_guarded_delivery'):
                     row=self.tasks.delivery(key)
                     if row:
                         await self.tasks.repair_delivery(key,manager)
@@ -497,7 +558,7 @@ class QQRouter(Star):
         epoch=self.group_turns.group_epoch(group);direct=addressing in DIRECT;ticket=None;lease=None
         LOG.info('ATTENTION trace=%s stage=attention_reason addressing=%s',trace,addressing)
         def valid():
-            return (not stopping(self.root) and self.connection()==connection and self.group_turns.group_epoch(group)==epoch and
+            return (self.silence_allowed(event) and not stopping(self.root) and self.connection()==connection and self.group_turns.group_epoch(group)==epoch and
                 group in self.groups and sender not in self.blocked and
                 (direct or time.monotonic()-created<=min(90,self.participation['max_ambient_age_seconds'])))
         try:
@@ -561,6 +622,7 @@ class QQRouter(Star):
             event.set_extra('qq_delivery_key',key);event.set_extra('qq_meme_question',source['meme_question'] or '')
             event.set_extra('qq_snapshot_range',[source['messages'][0]['seq'],source['messages'][-1]['seq']])
             self.tasks.set(key,'running');event.should_call_llm(True)
+            if not self.silence_allowed(event):event.should_call_llm(False);event.stop_event();return
             yield event.request_llm(prompt=body,contexts=[],system_prompt=self.persona,conversation=None,tool_set=None,
                 session_id='qqbot-v2:'+canonical(dict(request=request,trace=trace)))
             if direct and not event.get_extra('qq_delivery_handled'):await self.local_notice(event,'这条没处理好，请稍后再试。')
@@ -640,7 +702,7 @@ class QQRouter(Star):
         epoch=self.group_turns.group_epoch(group)
         target_seq=self.group_turns.window(group).seq
         def valid():
-            return (not stopping(self.root) and self.connection()==connection and self.group_turns.group_epoch(group)==epoch and
+            return (self.silence_allowed(event) and not stopping(self.root) and self.connection()==connection and self.group_turns.group_epoch(group)==epoch and
                 group in self.groups and sender not in self.blocked and (mention or time.monotonic()-created<=self.participation['max_ambient_age_seconds']))
         lease=None
         try:
@@ -686,6 +748,7 @@ class QQRouter(Star):
             event.set_extra('qq_meme_question',next((r['text'] for r in json.loads(body)['messages'] if r['seq']==json.loads(body).get('target_seq')),''))
             event.set_extra('qq_snapshot_range',[snapshot[0]['seq'],snapshot[-1]['seq']])
             event.should_call_llm(True);self.tasks.set(key,'running')
+            if not self.silence_allowed(event):event.should_call_llm(False);event.stop_event();return
             yield event.request_llm(prompt=body,contexts=[],system_prompt=self.persona,conversation=None,tool_set=None,
                                     session_id='qqbot-group:'+json.dumps(request,separators=(',',':')))
             if mention and not event.get_extra('qq_delivery_handled'):

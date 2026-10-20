@@ -20,7 +20,15 @@ class EventSendGuard:
         text=self.mention_text.get()
         if text is not None and (len(chain.chain)!=1 or not isinstance(chain.chain[0],Plain) or chain.chain[0].text!=text):
             raise ValueError('Typed mention text mismatch')
-        await self.original(chain)
+        from .reply_delivery import EventReceiptProxy
+        ticket=self.event.get_extra('qq_output_ticket')
+        if self.event.get_extra('qq_silence_enabled'):
+            if not ticket:raise ValueError('GROUP_MUTED_OR_STALE_OUTPUT')
+            original=self.event.bot
+            self.event.bot=EventReceiptProxy(original,self.event.get_group_id(),output_ticket=ticket)
+            try:await self.original(chain)
+            finally:self.event.bot=original
+        else:await self.original(chain)
 
     @contextmanager
     def grant(self,image_uri=None,mention_text=None):

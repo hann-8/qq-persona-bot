@@ -63,6 +63,7 @@ async def verify(root,backend,mode):
 
     directory=root/(backend+'-'+mode);(directory/'config').mkdir(parents=True)
     settings=yaml.safe_load((ROOT/'config/settings.example.yaml').read_text(encoding='utf-8'))
+    settings['participation']['silence']={'enabled':False}  # legacy-disabled regression
     settings['bot']['qq']='222';settings['access'].update(allowed_groups=['111'],admin_users=['333'])
     settings['llm']['backend']=backend;settings['llm']['profiles']['ollama_ssh']['expected_digest']='a'*64
     settings['chat']['user_cooldown_seconds']=0

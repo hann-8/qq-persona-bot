@@ -115,7 +115,7 @@ class CatalogTests(unittest.TestCase):
 class ImportTests(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
         self.tmp=tempfile.TemporaryDirectory();self.root=Path(self.tmp.name)
-        self.cfg=GateConfig('222',frozenset({'111'}),frozenset({'333'}),'a'*32,'b'*32,self.root/'gate.sqlite')
+        self.cfg=GateConfig('222',frozenset({'111'}),frozenset({'333'}),'a'*32,'b'*32,self.root/'gate.sqlite',silence_enabled=False)
         token=admin_token(self.root,True);self.gate=OneBotGate(self.cfg,self.root);self.token=token
         self.server=web.AppRunner(self.gate.application(),access_log=None);await self.server.setup();site=web.TCPSite(self.server,'127.0.0.1',0);await site.start();self.port=site._server.sockets[0].getsockname()[1]
     async def asyncTearDown(self):await self.server.cleanup();self.tmp.cleanup()

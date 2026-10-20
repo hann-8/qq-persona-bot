@@ -320,7 +320,7 @@ class GateTests(unittest.IsolatedAsyncioTestCase):
         import aiohttp
         from qqbot_gateway.onebot_gate import OneBotGate
         from qqbot_gateway.config import GateConfig
-        def configuration(path):return GateConfig('222',frozenset({'111'}),frozenset({'333'}),'a'*40,'b'*40,Path(path)/'gate.db')
+        def configuration(path):return GateConfig('222',frozenset({'111'}),frozenset({'333'}),'a'*40,'b'*40,Path(path)/'gate.db',silence_enabled=False)
         class Up:
             def __init__(self):self.rows=[]
             async def send_json(self,x):self.rows.append(x)
@@ -347,7 +347,7 @@ class GateTests(unittest.IsolatedAsyncioTestCase):
         from aiohttp import web
         from qqbot_gateway.onebot_gate import OneBotGate
         from qqbot_gateway.config import GateConfig
-        def configuration(path):return GateConfig('222',frozenset({'111'}),frozenset({'333'}),'a'*40,'b'*40,Path(path)/'gate.db')
+        def configuration(path):return GateConfig('222',frozenset({'111'}),frozenset({'333'}),'a'*40,'b'*40,Path(path)/'gate.db',silence_enabled=False)
         from qqbot_gateway.vision import MaterialClient
         with tempfile.TemporaryDirectory() as directory:
             gate=OneBotGate(replace(configuration(directory),vision_enabled=True));gate.connected=True;gate.online=True

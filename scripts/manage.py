@@ -198,6 +198,8 @@ def show_status(report=None):
               'disconnected':'QQ已断开或尚未连接','unknown':'登录状态未确认'}
     print('项目：'+phases.get(report['process_state'],'启动中'))
     print('QQ通道：'+channels.get(report['channel_state'],'登录状态未确认'))
+    gate=report.get('channel',{})
+    if 'silence_enabled' in gate:print('临时停言：'+('开启' if gate['silence_enabled'] else '关闭')+'；当前静默群数：'+str(gate.get('muted_groups',0)))
     login_status=report.get('napcat_login',{})
     if login_status:print('密码回退：'+login_status.get('state','unavailable')+'；数据归属：'+login_status.get('data_scope','unverified')+'；本实例尝试：'+login_status.get('attempt_state','unavailable'))
     print('群消息：'+('可接收授权群真实@' if report['can_receive_group_messages'] else '尚未确认可接收'))

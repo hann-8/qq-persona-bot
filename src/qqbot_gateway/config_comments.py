@@ -36,6 +36,7 @@ DESCRIPTIONS = {
     'enabled': '显式布尔开关；true不等于能力已验证，关注仅free有效',
     'learning_enabled': '记忆学习开关，必须同时开启记忆读取，不新增推理调用',
     'mentions_enabled': '受控成员@开关，仍受成员生产暂停门槛限制',
+    'silence': '每群RAM临时停言；真实@恢复，gate重启复位，重连保持；默认enabled=true',
     'aliases': '关注别名1..16个，每名1..16字符，不当作真实@',
     'focus_ttl_seconds': '焦点保持秒15..180', 'max_intervening_messages': '允许插入条数固定0',
     'direct_queue_limit': '关注直接队列数1..8',

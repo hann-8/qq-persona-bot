@@ -81,6 +81,7 @@ async def verify(root,backend,mode,participation="free",attention=False,memes=Fa
             assert len(up.rows)==1 and not pending
             return up.rows[0]['data']
     settings=yaml.safe_load((ROOT/'config/settings.example.yaml').read_text(encoding='utf-8'))
+    settings['participation']['silence']={'enabled':False}  # legacy-disabled regression
     settings['bot']['qq']='222';settings['access'].update(allowed_groups=['111','444'],admin_users=['333'],blocked_users=['999'])
     settings['llm']['backend']=backend
     settings['vision']=dict(enabled=False,input_reserve_tokens=4096)
@@ -135,7 +136,7 @@ async def verify(root,backend,mode,participation="free",attention=False,memes=Fa
     wrapped=WebRunner(harness,reader,InputBudget(),settings['output'])
     queue=ModelQueue(wrapped);token=secrets.token_urlsafe(32)
     wrapped.memes=router.memes
-    gate=OneBotGate(GateConfig('222',frozenset({'111','444'}),frozenset({'333'}),'a'*40,'b'*40,root/'state/gate.db',participation_mode=participation,members_enabled=False,members_config=settings['members'],media_catalog=router.memes if memes else None,blocked_users=frozenset({'999'}),attention_enabled=attention))
+    gate=OneBotGate(GateConfig('222',frozenset({'111','444'}),frozenset({'333'}),'a'*40,'b'*40,root/'state/gate.db',participation_mode=participation,members_enabled=False,members_config=settings['members'],media_catalog=router.memes if memes else None,blocked_users=frozenset({'999'}),attention_enabled=attention,silence_enabled=False))
     gate.context_token='c'*64;gate.connected=True;gate.online=True;gate.connection_id=connection
     async def forbidden_rpc(*args,**kwargs):raise AssertionError('Memory queried members')
     gate.member_rpc=forbidden_rpc
