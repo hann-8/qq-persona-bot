@@ -1,6 +1,6 @@
-2026-10-21 19:40（Asia/Shanghai）：LAP-24 P1/P3已实现/离线通过；session `LAP-24-autostart-independent-implementation`（19:21:05领取）。固定脱敏登录事件/只读WebUI与独立DPAPI token、受控login-check-only、锁外QQ等待和一次Startup包装器/自有链接注册交付；171项受影响回归通过（30.121秒），新观察器27/Startup12项包含其中。0真实bot启停/认证/登录/6099/凭据/Startup/SSH/模型/QQ操作；原生路径/完整句柄/设备连续性及真实免扫码仍未证，data_scope=unverified。保留persona及并行LAP-36，真实D/R/部署待后续指令。 [报告](reports/lap-24-autostart-2026-10-21.md)；[任务交接](tracks/laptop-workbuddy/tasks/LAP-24/HANDOFF.md)。
-
 2026-10-21 19:48（Asia/Shanghai）：[LAP-36图片与轻量网页/B站详细规划](tracks/laptop-workbuddy/tasks/LAP-36/PLAN.md)及[medium指引](tracks/laptop-workbuddy/tasks/LAP-36/IMPLEMENTATION_GUIDE.md)完成，未实施。NapCat结构支持image/file/url，但日志无真实像素证据；本机DNS五域均非公网、公开DoH TLS未过。明确28入站→18安全网络/正文→28质量/容量→06单轨字幕，readability与yt-dlp最小复用/一次生成/有界节选；07 ASR及旧差额保留。本轮仅11份文档，0代码/配置/启停/登录/模型/QQ/SSH；24并行交付已保留，检查/Git见[36交接](tracks/laptop-workbuddy/tasks/LAP-36/HANDOFF.md)。
+
+2026-10-21 19:40（Asia/Shanghai）：LAP-24 P1/P3已实现/离线通过；session `LAP-24-autostart-independent-implementation`（19:21:05领取）。固定脱敏登录事件/只读WebUI与独立DPAPI token、受控login-check-only、锁外QQ等待和一次Startup包装器/自有链接注册交付；171项受影响回归通过（30.121秒），新观察器27/Startup12项包含其中。0真实bot启停/认证/登录/6099/凭据/Startup/SSH/模型/QQ操作；原生路径/完整句柄/设备连续性及真实免扫码仍未证，data_scope=unverified。保留persona及并行LAP-36，真实D/R/部署待后续指令。 [报告](reports/lap-24-autostart-2026-10-21.md)；[任务交接](tracks/laptop-workbuddy/tasks/LAP-24/HANDOFF.md)。
 
 2026-10-21 19:15（Asia/Shanghai）：[LAP-24自动登录规划续作](tracks/laptop-workbuddy/tasks/LAP-24/HANDOFF.md)详细[PLAN](tracks/laptop-workbuddy/tasks/LAP-24/AUTOSTART_PLAN.md)/[medium指引](tracks/laptop-workbuddy/tasks/LAP-24/AUTOSTART_IMPLEMENTATION_GUIDE.md)完成，未实施。首选原生会话保留→免人工重启→Startup；诊断/只读观察、受控login-check-only、启动等待/自有快捷方式与失败转独立环境合同已定。仅8份文档，保留persona；0本轮启停/登录/模型/QQ/本机配置修改，旧24真实差额保留。验证/Git见24交接。
 
