@@ -34,6 +34,8 @@ LAP-13实现提交`ee7f2d4`已成功推送origin/main；随后仅同步交付检
 
 ## 当前任务
 
+2026-10-21 19:48（Asia/Shanghai）：LAP-36图片与轻量网页/B站详细规划完成，未实施；session `LAP-36-image-web-video-plan`，19:20领取。起点main/b23d961，24并行实现现已738ca0a独立交付并明确留下36归属段落；保留用户persona。归属六份36规划文档、PROGRESS/工作线HANDOFF/本台账与18/28旧HANDOFF指针，共11份；0代码/运行配置/启停/登录/真实模型/QQ/SSH。分级证据/配置/限额/失败/验收/回滚及四阶段[medium指引](tasks/LAP-36/IMPLEMENTATION_GUIDE.md)完成，检查/Git见[36交接](tasks/LAP-36/HANDOFF.md)。28A→18B→28C→06D分别等待后续实施指令，不合并旧差额。
+
 2026-10-21 19:15（Asia/Shanghai）：LAP-24自动登录/开机启动详细规划续作完成，未实施；session `LAP-24-autostart-login-plan` / “保存登录状态与开机自动登录规划”，18:56领取并重读。基线`main/3e4122b4e9046f154ff9fa82d2be317413e69056`，保留用户persona差异。归属8份文档：PROGRESS、本台账、工作线HANDOFF、24 HANDOFF、旧PLAN/IMPLEMENTATION_GUIDE入口、新[AUTOSTART_PLAN](tasks/LAP-24/AUTOSTART_PLAN.md)/[medium指引](tasks/LAP-24/AUTOSTART_IMPLEMENTATION_GUIDE.md)。原生会话优先/双观测/受控验收/Startup及失败转独立环境分支完成；0代码/本机配置/启停/登录/模型/QQ操作。检查/Git见24交接；P1/P3实施等待新指令，旧24真实差额保留。
 
 2026-10-20 20:58（Asia/Shanghai）：[LAP-35群临时停言](tasks/LAP-35/HANDOFF.md)已实现/离线通过，session LAP-35-group-silence-implementation；本地明确停言/真实@恢复、gate唯一RAM状态与签名群代际票、全输出最终栅栏/ACK、router提交边界与重启复位交付。440单元、44组合918实际框架及20组合460关闭兼容通过；[报告](../../reports/lap-35-2026-10-20.md)。本机配置/人设未改、未加载；0真实bot启停/登录/SSH/模型/QQ，真实/完整未验，旧差额保留。Git见任务交接。
@@ -68,12 +70,13 @@ LAP-15内容提交`632fdc5`已推送origin/main，2026-10-17 11:09用ls-remote�
 
 | ID | 单一任务 | 状态与已有证据 | 依赖/推荐顺序 | 执行session | 下一步/完成出口 |
 | --- | --- | --- | --- | --- | --- |
+| LAP-36 | 图片识别、轻量网页理解与B站总结详细规划 | completed，仅规划；[HANDOFF](tasks/LAP-36/HANDOFF.md)/[PLAN](tasks/LAP-36/PLAN.md)/[指引](tasks/LAP-36/IMPLEMENTATION_GUIDE.md) | 28入站→18网络/正文→28质量/容量→06字幕；07 ASR仍延期 | LAP-36-image-web-video-plan，2026-10-21 19:20领取、19:48规划交接；11份文档 | 配置/有限材料/开源复用/验收和失败出口落盘；不实施/启用，Git见交接 |
 | LAP-35 | 群临时停言、真实@恢复与重启复位 | 已实现/离线通过；[HANDOFF](tasks/LAP-35/HANDOFF.md)/[报告](../../reports/lap-35-2026-10-20.md) | 34已实现；原触发/ACK/清理门槛保持 | LAP-35-group-silence-implementation，2026-10-20 20:35领取、20:58交接；文件归属见HANDOFF | S35-01—05/SM-01—12离线完成；440单元/44组合918框架、20组合460关闭兼容；本机未改/未加载，真实/完整未验 |
 | LAP-34 | 分层配置文件取代日常配置菜单 | 已交付；旁注续作/本机定向配置修复完成，[HANDOFF](tasks/LAP-34/HANDOFF.md) | schema3与既有能力门槛不变 | LAP-34-inline-comments-followup，2026-10-20 22:19领取；源/模板/自造测试/索引与交接归属，local仅按用户新授权处理 | 68配置回归；local正式解析通过、未启停/正常加载，真实/完整未验，persona保留 |
 | LAP-26 | 清理可靠性、图片理解、free关注、成员与群记忆规划 | completed，仅规划；[HANDOFF](tasks/LAP-26/HANDOFF.md) | 24登录暂缓，25加载未知、18搜索/旧真人差额保留 | LAP-26-group-understanding-plan，13:14领取、13:47续审/13:57完成；7份文档 | 精确协议/调度/证明/记忆事务/回滚及五项独立指令完成；31→27—30待用户实施指令 |
 | LAP-31 | 请求模型进程清理、阻断诊断与有证据恢复 | 部分完成：31A已实现/离线通过；31B门槛未过，见[交接](tasks/LAP-31/HANDOFF.md)；[合同](tasks/LAP-26/PLAN.md)第13节 | 新反馈反复全局拒单，建议先于27—30 | LAP-31-cleanup-reliability，18:16领取、18:34验证；文件归属见交接 | 31A的283单元/384框架通过；31B breakaway/目标Job成员缺口回规划，生产创建/管道/恢复未交付；unknown不解锁 |
 | LAP-27 | free关注/第二人称与脱敏阶段trace | 已实现/离线通过；[HANDOFF](tasks/LAP-27/HANDOFF.md) | ATT-01—12；301单元/732矩阵+22边界复验；[报告](../../reports/lap-27-2026-10-18.md) | LAP-27-attention-v2；2026-10-18 18:37；文件归属见HANDOFF；根session独占 | 31A交付/31B差额保留；无真实操作，不推进28—30 |
-| LAP-28 | 当前群图片的原生理解 | 已实现/离线通过；[HANDOFF](tasks/LAP-28/HANDOFF.md) | 323单元/56组合900框架；原生未做/生产不可启用 | LAP-28-native-vision，2026-10-18T19:12+08:00领取 | gate/vision/runner/provider/router/config/菜单/测试/README/报告与台账 |
+| LAP-28 | 当前群图片的原生理解 | 旧实现/离线通过，真实未验/生产拒启；[HANDOFF](tasks/LAP-28/HANDOFF.md) | [36图片续作合同](tasks/LAP-36/IMAGE_PLAN.md)：A入站→18B→C质量/容量；原323/900为历史 | 原LAP-28-native-vision；新A/C未领取 | 先证明真实image段/像素，再所选后端质量/可信上界/同链ACK；不删旧差额 |
 | LAP-29 | 少于50人名册与受控@ | 已实现/离线通过；生产人数门槛未证；[HANDOFF](tasks/LAP-29/HANDOFF.md) | 27/28代码已交付；生产人数新鲜度未证 | LAP-29-members-typed-mention；2026-10-18T23:20+08:00；归属见HANDOFF | 355单元/52组合790框架+32专项末次补验通过；MEMB-01—04离线交付，人数新鲜度未证仍拒激活，0真实操作 |
 | LAP-30 | 群独立有界长期记忆 | 已实现/离线通过；[HANDOFF](tasks/LAP-30/HANDOFF.md) / [合同](tasks/LAP-26/PLAN.md) | 27/29身份与typed协议，不要求members/vision启用 | LAP-30-group-memory，2026-10-19 00:00领取；代码/协议/菜单/验证/报告/台账归属见交接 | 396单元/68组合926框架、31专项；HMAC/有限JSON、silent与文字ACK分离、CAS/持久purge/同轮预算；真实/完整未验 |
 | LAP-01 | 旧偶发后端失败记录 | 并入LAP-12；用户说明当时未登录NapCat，不再独立阻塞 | 有新独立模型失败再重开调查 | 无独立执行 | 保留旧trace证据限制，补分层状态/登录提示，不重复制造错误 |
@@ -81,7 +84,7 @@ LAP-15内容提交`632fdc5`已推送origin/main，2026-10-17 11:09用ls-remote�
 | LAP-03 | 人设风格确认 | 部分完成；LAP-11人设v2已实现/暂停准入加载，当前停机；最终接受待验 | LAP-11实现后 | 未登记 | 按用户v2风格和P01做最终人工接受，不与LAP-11实现重复领任务 |
 | LAP-04 | 运行恢复与文本稳定性 | 部分完成；旧脚本存在，完整恢复/长稳待验 | LAP-09—12收敛，最终使用LAP-02/03接受的版本 | 未登记 | 完成适用O项与文本观察，记录锁屏/睡眠及QQ共存边界 |
 | LAP-05 | 文本交付收口 | 待领取 | LAP-09—12新U项及原LAP-02/03/04必要项完成 | 未登记 | 汇总报告、README、限制及版本；延期/不支持项不能写完成 |
-| LAP-06 | B站字幕总结 | 延期，尚未接入 | 文本优先，后续推进 | 未登记 | G5及V类字幕关键项；进入该阶段再补样本/登录意愿 |
+| LAP-06 | B站字幕总结 | 已规划待实施，尚未接入；[36合同](tasks/LAP-36/WEB_VIDEO_PLAN.md) | 36阶段D，依赖18安全传输/单次材料；07 ASR另列 | 未领取；实施时创建06 HANDOFF | 单视频/P/轨、一次生成/有界节选/来源/缓存/认证隔离；真实样本与登录意愿届时明确 |
 | LAP-07 | 无字幕本地ASR | 延期，尚未接入 | LAP-06 | 未登记 | G6及V类音频关键项；基于实际转写，不用标题代替正文 |
 | LAP-08 | 试用体验改进详细规划 | completed，仅规划；[任务HANDOFF](tasks/LAP-08/HANDOFF.md) | 本轮用户只授权计划 | 当前试用体验规划会话，22:10完成 | AGENTS、UX_PLAN及索引/验收已同步；9份文档77个本地链接、U01—20一致性核对通过 |
 | LAP-09 | 配置基础、授权群和黑名单 | 已实现/离线通过，真实待验；[任务HANDOFF](tasks/LAP-09/HANDOFF.md) | 第一实施任务 | LAP-09配置准入实施，2026-10-16 22:54开始，23:00交接 | 53项测试及实际框架离线通过；U04/05真实群、U07暂停准入重启加载已验证，真实群快照待用户参与；[报告](../../reports/lap-09-2026-10-16.md) |
@@ -93,7 +96,7 @@ LAP-15内容提交`632fdc5`已推送origin/main，2026-10-17 11:09用ls-remote�
 | LAP-15 | 精简人设与场景表达 | 已实现/离线通过，真实加载/P01未验；[HANDOFF](tasks/LAP-15/HANDOFF.md) / [报告](../../reports/lap-15-2026-10-17.md) | 用户已明确指定；仅本任务，单条保持 | LAP-15-persona-implementation / LAP-15精简人设与场景表达，2026-10-17 11:06领取、11:09离线交接 | 原文完整hash备份；组合3618字节；108单元/5组框架回环及版本迁移通过；用户接受待验 |
 | LAP-16 | 一次生成与有限分条发送 | 已实现/离线通过，未实际启用；[HANDOFF](tasks/LAP-16/HANDOFF.md) / [报告](../../reports/lap-16-2026-10-17.md) | 用户明确继续，LAP-15离线通过 | LAP-16-adaptive-delivery / LAP-16一次生成与有限分条，2026-10-17 11:16领取、11:35离线交接 | 124单元/40框架回环/原SDK-gate ACK及恢复并发通过；single兼容，真实启用/接受另列 |
 | LAP-17 | 本地后端/配置切换；原群参与分支转LAP-20 | 已由[LAP-19](tasks/LAP-19/PLAN.md)已实现/离线与SSH元数据通过，真实生成/启用未验；[PC资料](../local-5070/HANDOFF.md)有模型/通道只读证据 | 两路线保留；先17→18→20→21；群参与明确拆入20不在17启用 | LAP-17-dual-profile-implementation，2026-10-17 15:35；[HANDOFF](tasks/LAP-17/HANDOFF.md)登记文件归属 | 146单元/90框架合成与SSH零推理元数据通过；内容34f6284已推送/核对；真实能力另按范围验证，不自动开始下一任务 |
-| LAP-18 | 两后端共用联网检索/网页读取 | 部分实现/离线通过；搜索未完成，质量门槛未通过、回规划；[报告](../../reports/lap-18-2026-10-17.md) | 17共用合同已复用；安全读取独立交付，真实未验 | LAP-18-shared-web-implementation，2026-10-17 16:05领取；[HANDOFF](tasks/LAP-18/HANDOFF.md)，文件归属见交接 | 164单元/26网页实际框架/90旧路径回归通过；三公共查询blocked_ip；不启用web/改提供方/开CLI工具，搜索与真实差额保留 |
+| LAP-18 | 两后端共用联网检索/网页读取 | 旧独立实现/离线通过；[HANDOFF](tasks/LAP-18/HANDOFF.md)，搜索未完成/真实读取未过 | [36阶段B](tasks/LAP-36/WEB_VIDEO_PLAN.md)：显式安全解析/TLS、readability正文；搜索另质量门槛 | 原LAP-18-shared-web-implementation；新B未领取 | 旧164单元/26网页/90路径与三查询blocked_ip保留；本轮DNS非公网/DoH TLS未验，0放宽检查/新搜索服务 |
 | LAP-19 | 双后端/联网/自由群聊/表情包总体详细规划 | completed，仅详细规划；内容91b96d5已推送核对；[HANDOFF](tasks/LAP-19/HANDOFF.md) / [PLAN](tasks/LAP-19/PLAN.md) / [追加合同](tasks/LAP-19/GROUP_CHAT_PLAN.md) / [指令](tasks/LAP-19/IMPLEMENTATION_GUIDE.md) | 用户明确只规划、后由gpt-6.1-sol/medium执行；17/18与追加20/21均在此设计 | LAP-19-dual-backend-web-plan / 四项总体规划，2026-10-17 14:49领取；文件归属见HANDOFF | 10份文档/143链接/21唯一ID/隐私与diff检查通过，内容commit/push及远端SHA一致；后续按指引分别实施，不部署/生成/群发 |
 | LAP-20 | 自由参与群聊、@必答与直接群发 | 已实现/离线通过，真实未验；[HANDOFF](tasks/LAP-20/HANDOFF.md) / [报告](../../reports/lap-20-2026-10-17.md) | 17/18共用接口后；原17群参与分支明确拆入，黑名单/群授权保留 | LAP-20-group-participation / LAP-20自由群聊与直接群发实施，2026-10-17 16:19领取；[HANDOFF](tasks/LAP-20/HANDOFF.md)登记文件归属 | 187单元/108群框架/26网页与90原路径回归通过；默认mentions，本机未启用free；旧真人差额保留 |
 | LAP-21 | QQ收藏导入/本地表情图库与发送 | 已实现/离线通过，真实未验；[HANDOFF](tasks/LAP-21/HANDOFF.md) / [合同](tasks/LAP-19/GROUP_CHAT_PLAN.md) | 20统一群发送后；收藏静态支持不当本账号已通过 | LAP-21-controlled-memes / LAP-21受控表情实施，2026-10-17 16:49领取；文件归属见交接 | 207单元、136媒体框架与108群/26网页/90旧路径通过；inbox/library/固定只读收藏RPC/meme_id/typed图片ACK与恢复落地；默认关闭、真实收藏/发图未验，见[报告](../../reports/lap-21-2026-10-17.md) |

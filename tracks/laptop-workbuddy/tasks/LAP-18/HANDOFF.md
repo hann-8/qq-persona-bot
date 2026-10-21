@@ -1,5 +1,7 @@
 # LAP-18 两后端共用联网
 
+2026-10-21续作仅规划：[LAP-36总计划](../LAP-36/PLAN.md)、[网页/网络合同](../LAP-36/WEB_VIDEO_PLAN.md)、[medium指引B](../LAP-36/IMPLEMENTATION_GUIDE.md)已完成；显式安全解析/TLS、readability正文/统一材料预算与来源，B站另由06D实施。当前本机五域DNS仍非公网、DoH TLS未过；本轮没有改18代码/运行配置/搜索门槛或做真实模型/群操作。下方历史离线/搜索差额保留，续作待新指令领取。
+
 返回[PROGRESS](../../../../PROGRESS.md) / [TASKS](../../TASKS.md) / [工作线](../../HANDOFF.md) / [合同](../LAP-19/PLAN.md)。继承AGENTS和实施指引。
 
 2026-10-17 16:16（Asia/Shanghai）。独立部分已实现/离线通过；搜索未完成，质量门槛未通过、回规划。session `LAP-18-shared-web-implementation` / “LAP-18共用按需联网实施”，16:05领取；main起点`a0718087c73cdcebc1dd8e41d497a3a3b5ea3df3`工作区干净，仅18，无其他session变更。

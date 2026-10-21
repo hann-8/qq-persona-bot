@@ -1,5 +1,7 @@
 2026-10-21 19:40（Asia/Shanghai）：LAP-24 P1/P3已实现/离线通过；session `LAP-24-autostart-independent-implementation`（19:21:05领取）。固定脱敏登录事件/只读WebUI与独立DPAPI token、受控login-check-only、锁外QQ等待和一次Startup包装器/自有链接注册交付；171项受影响回归通过（30.121秒），新观察器27/Startup12项包含其中。0真实bot启停/认证/登录/6099/凭据/Startup/SSH/模型/QQ操作；原生路径/完整句柄/设备连续性及真实免扫码仍未证，data_scope=unverified。保留persona及并行LAP-36，真实D/R/部署待后续指令。 [报告](../../reports/lap-24-autostart-2026-10-21.md)；[任务交接](tasks/LAP-24/HANDOFF.md)。
 
+2026-10-21 19:48（Asia/Shanghai）：[LAP-36详细规划](tasks/LAP-36/PLAN.md)/[medium指引](tasks/LAP-36/IMPLEMENTATION_GUIDE.md)完成未实施；28入站→18安全网络/正文→28质量/容量→06字幕四阶段，复用readability/yt-dlp最小片段，0新增推理分类/ASR/浏览器。日志无真实图像证据、系统DNS非公网及DoH TLS缺口分列；11份规划/索引文档，0本轮代码/配置/启停/登录/模型/QQ/SSH操作。24已独立交付，保留persona与全部旧差额，验证/Git见[36交接](tasks/LAP-36/HANDOFF.md)。
+
 2026-10-21 19:15（Asia/Shanghai）：[LAP-24自动登录续作](tasks/LAP-24/HANDOFF.md)详细[PLAN](tasks/LAP-24/AUTOSTART_PLAN.md)/[medium指引](tasks/LAP-24/AUTOSTART_IMPLEMENTATION_GUIDE.md)完成，未实施；原生会话保留优先，脱敏双观测/受控login-check-only/无锁等待、自有Startup及失败转独立环境合同已定。仅8份文档；保留persona和运行实例，0启停/登录/模型/QQ/本机配置修改。P1/P3实施及真实批次待新指令，旧差额保留；检查/Git见24交接。
 
 2026-10-20 22:31（Asia/Shanghai）：LAP-34旁注续作已完成，session LAP-34-inline-comments-followup（22:19领取）；6份模板/生成器改为逐参数同行注释，68项配置相关回归通过。按用户后续明确授权为已有local补旁注，并保留手改项、定向恢复旧源未改项与纠正已确认误填；原字节备份/源摘要/候选整体校验/原子写入通过，旧源不改。未运行迁移或启停/登录/探活/SSH/模型/QQ，不触及凭据/图库/记忆/人设；本机解析通过不等于进程已加载。仅归属代码/模板/文档提交，local/备份忽略，persona差异保留。 [续作报告](../../reports/lap-34-inline-comments-2026-10-20.md)；Git见34交接。
