@@ -1,5 +1,7 @@
 ## 2026-10-21 P1/P3实施交接（当前）
 
+Git交付：2026-10-21（Asia/Shanghai），内容提交`e29a4be3b8b7a3a9430b113ed815147fe426c713`已推送origin/main，rev-parse/ls-remote完整SHA相同；仅16份本任务文件/共享索引差异块。171项组合通过（30.121秒），340个本地Markdown链接无缺失，git diff --cached --check通过。保留用户persona（SHA256 ff6f629d92afab7ea1c47830bd4a7e8735e944862573a90764645604e96f2804）及LAP-36的PROGRESS/工作线HANDOFF/TASKS段落和tasks/LAP-36文档；未纳入本任务提交。本段随后单独提交/推送，最终记录提交以会话回执为准。Git不是部署/免扫码/真实验收。
+
 2026-10-21 19:40（Asia/Shanghai）：LAP-24 P1/P3已实现/离线通过；session `LAP-24-autostart-independent-implementation`（19:21:05领取）。固定脱敏登录事件/只读WebUI与独立DPAPI token、受控login-check-only、锁外QQ等待和一次Startup包装器/自有链接注册交付；171项受影响回归通过（30.121秒），新观察器27/Startup12项包含其中。0真实bot启停/认证/登录/6099/凭据/Startup/SSH/模型/QQ操作；原生路径/完整句柄/设备连续性及真实免扫码仍未证，data_scope=unverified。保留persona及并行LAP-36，真实D/R/部署待后续指令。
 
 合同：[AUTOSTART_PLAN](AUTOSTART_PLAN.md)/[新实施指引](AUTOSTART_IMPLEMENTATION_GUIDE.md)。完成内容、复现命令与具体缺口见[本轮报告](../../../../reports/lap-24-autostart-2026-10-21.md)；旧自然分条与248/324历史结论保留。本轮没有读取/保存真实凭据、写本机运行配置、操作真实6099或部署Startup；用户persona保留不纳入提交。
