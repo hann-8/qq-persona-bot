@@ -6,7 +6,7 @@ from urllib.parse import urlsplit
 DEFAULTS = dict(enabled=False, trigger='auto', provider='bing_rss', max_searches=1,
                 max_results=5, max_pages=2, timeout_seconds=15, max_redirects=2,
                 max_response_bytes=1048576, max_page_text_bytes=4000,
-                max_evidence_bytes=6000, max_sources=2)
+                max_evidence_bytes=6000, max_sources=2, extractor='readability', long_text_policy='excerpt')
 # Candidate has not passed the public quality gate. This is code-owned, not config.
 SEARCH_QUALITY_PASSED = False
 URL = re.compile(r'https?://[^\s<>"\u3000，。！？；、（）]+', re.I)
@@ -16,6 +16,7 @@ VIDEO = re.compile(r'(^|\.)(bilibili\.com|b23\.tv|youtube\.com|youtu\.be|douyin\
 def validate_web(raw):
     if not isinstance(raw, dict):raise ValueError('web must be a mapping')
     cfg = DEFAULTS | raw
+    if cfg['extractor'] not in ('readability','legacy') or cfg['long_text_policy'] not in ('excerpt','reject'):raise ValueError('Invalid web extraction policy')
     if type(cfg['enabled']) is not bool or cfg['trigger'] not in ('auto','explicit') or cfg['provider'] != 'bing_rss':
         raise ValueError('Invalid web mode/provider')
     for key, lo, hi in [('max_searches',1,1),('max_results',1,5),('max_pages',1,2),

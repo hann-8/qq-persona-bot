@@ -16,7 +16,7 @@ sys.path[:0]=[str(ROOT),str(ROOT/'src')]
 os.environ['ASTRBOT_DISABLE_METRICS']='1'
 
 
-async def verify(root,backend,mode,participation="free",attention=True,memes=False,web_enabled=False,memory_enabled=False):
+async def verify(root,backend,mode,participation="free",attention=True,memes=False,web_enabled=False,memory_enabled=False,body_reader=False):
     full_lifecycle=True
     import yaml
     from aiohttp import web
@@ -124,6 +124,9 @@ async def verify(root,backend,mode,participation="free",attention=True,memes=Fal
             self.questions.append(q)
             assert q=='肥鱼，请看 https://example.com/'
             if not web_enabled:return Retrieval('disabled',notice='网页读取尚未开启。')
+            if body_reader:
+                html='<title>合成公开页</title><nav>REMOVE_NAV</nav><article>'+''.join('<p>'+('public synthetic material '*12)+'</p>' for _ in range(12))+'</article>'
+                return Retrieval('read',[await self.extract(html,'https://example.com/','text/html')])
             return Retrieval('read',[dict(url='https://example.com/',title='合成公开页',text='public synthetic material '*50,status='body')])
     reader=OfflineReader()
     wrapped=WebRunner(harness,reader,InputBudget(),settings['output'])
@@ -275,7 +278,11 @@ async def verify(root,backend,mode,participation="free",attention=True,memes=Fal
         original=copy.deepcopy(e.message_obj.raw_message['qqbot_image'])
         await turn(e,'current_first_image_native_once')
         assert fetched==['https://gchat.qpic.cn/synthetic']
-        if web_enabled:assert reader.questions==['肥鱼，请看 https://example.com/']
+        if web_enabled:
+            assert reader.questions==['肥鱼，请看 https://example.com/']
+            assert e.get_extra('qq_group_metadata')['manifest']['web'][0]['coverage'] in ('full','excerpt')
+            if body_reader:
+                assert reader.extractor.last_metrics['exited'] and reader.extractor.last_metrics['cleanup']
         if participation=='mentions':
             histories=[json.loads(c.history) for c in manager.items.values()]
             assert any(h and h[-1]['role']=='assistant' and '合成图片答复' in str(h[-1]['content']) for h in histories),histories
@@ -326,7 +333,7 @@ async def verify(root,backend,mode,participation="free",attention=True,memes=Fal
             assert harness.attempts==before+1 and fetched[-1]=='https://gchat.qpic.cn/newest'
             assert 'https://gchat.qpic.cn/carrier' not in fetched
             report.append(dict(case='ambient_merge_target_and_cap_together',generations=2,sends=len(held.bot.sent)+len(carrier.bot.sent)))
-        return dict(backend=backend,mode=mode,participation=participation,attention=attention,web=web_enabled,memory_enabled=memory_enabled,
+        return dict(backend=backend,mode=mode,participation=participation,attention=attention,web=web_enabled,memory_enabled=memory_enabled,body_reader=body_reader,
             cases=report,real_model_calls=0,real_qq_calls=0,real_run_agent=True,actual_runner=True,
             private_gate_http=True,actual_provider=True,original_event_ACK=True,production_eligible=False)
     finally:

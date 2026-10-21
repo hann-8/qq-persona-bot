@@ -1,5 +1,10 @@
 """Fixed Chinese vocabulary; defaults describe new installs, never migration values."""
 DESCRIPTIONS = {
+    'public_network': '项目公共网络；显式选择解析和CA，不改全局网络配置',
+    'resolver': 'system或固定cloudflare_doh；失败不自动切换，默认system',
+    'ca_bundle_file': '默认null；仅secrets/public-network-ca.local.pem的已审阅CA证书，禁止私钥或链接',
+    'extractor': 'readability本地受管正文提取；legacy仅供显式回滚，不自动兜底',
+    'long_text_policy': 'excerpt六区节选或reject拒超限；完整要求超预算直接拒绝',
     'bot.yaml': '机器人身份、授权群、管理员与前置黑名单',
     'models.yaml': '当前后端与独立双profile；连接/队列为高级项，无失败自动切换',
     'chat.yaml': '群参与、关注续聊、回复与历史；只由授权群新消息驱动',
@@ -59,7 +64,7 @@ DESCRIPTIONS = {
     'max_searches': '搜索最多1次', 'max_results': '搜索结果1..5条', 'max_pages': '正文1..2页',
     'timeout_seconds': '联网总超时秒5..15', 'max_redirects': '重定向0..2次',
     'max_response_bytes': '响应上限65536..1048576字节', 'max_page_text_bytes': '单页正文1000..8000字节',
-    'max_evidence_bytes': '联网材料1000..12000字节', 'max_sources': '来源1..2项',
+    'max_evidence_bytes': '兼容保存1000..12000字节；公共材料实际最多6000且受最终预算约束', 'max_sources': '来源1..2项',
     'inbox_dir': '固定项目assets/memes/inbox，本机素材不提交',
     'library_dir': '固定项目assets/memes/library', 'catalog_file': '固定config/memes.local.yaml，是图库数据而非发送开关',
     'max_candidates': '表情候选数1..32', 'catalog_prompt_max_bytes': '表情提示500..4000字节',
@@ -88,6 +93,11 @@ def comment(key, value=None):
 
 
 PATH_DESCRIPTIONS = {
+    'public_network': '项目公共网络；显式选择解析和CA，不改全局网络配置',
+    'resolver': 'system或固定cloudflare_doh；失败不自动切换，默认system',
+    'ca_bundle_file': '默认null；仅secrets/public-network-ca.local.pem的已审阅CA证书，禁止私钥或链接',
+    'extractor': 'readability本地受管正文提取；legacy仅供显式回滚，不自动兜底',
+    'long_text_policy': 'excerpt六区节选或reject拒超限；完整要求超预算直接拒绝',
     ('access', 'admin_users'): 'bot管理员QQ，通常填你自己的QQ，非QQ群管理员；可真实@重置上下文，不豁免授权群/黑名单',
     ('participation', 'mode'): 'mentions只回应真实@；free可参与授权群新消息，仍受黑名单和频率约束',
     ('participation', 'attention', 'enabled'): 'free中的叫名/指代与自然续聊开关，mentions不生效',

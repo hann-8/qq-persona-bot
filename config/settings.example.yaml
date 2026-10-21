@@ -44,7 +44,9 @@ participation:  # 配置节，子字段见下方；保留既有校验约束
   mention_queue_limit: 8  # 真实@排队条数
   max_ambient_age_seconds: 90  # 普通候选最大年龄秒
   allow_ambient_web: true  # 普通候选可用联网，还必须开启web；不上传历史
-web:  # 配置节，子字段见下方；保留既有校验约束
+web:
+  extractor: readability  # 本地受管正文提取，可显式legacy回滚
+  long_text_policy: excerpt  # 六区节选或reject；完整要求超限直接拒绝  # 配置节，子字段见下方；保留既有校验约束
   enabled: false  # 共用网页读取开关；搜索质量门槛仍关闭，不代表完整搜索可用
   trigger: auto  # 联网触发auto/explicit
   provider: bing_rss  # 搜索提供方固定bing_rss，当前搜索质量门槛关闭
@@ -55,7 +57,7 @@ web:  # 配置节，子字段见下方；保留既有校验约束
   max_redirects: 2  # 重定向0..2次
   max_response_bytes: 1048576  # 响应上限65536..1048576字节
   max_page_text_bytes: 4000  # 单页正文1000..8000字节
-  max_evidence_bytes: 6000  # 联网材料1000..12000字节
+  max_evidence_bytes: 6000  # 兼容保存1000..12000；公共材料实际最多6000且受最终预算约束
   max_sources: 2  # 来源1..2项
 bot:  # 配置节，子字段见下方；保留既有校验约束
   qq: REQUIRED_PERSONAL_BOT_QQ  # 机器人个人QQ，必填正整数字符串，占位不能启动
@@ -143,3 +145,7 @@ members:  # 配置节，子字段见下方；保留既有校验约束
   roster_ttl_seconds: 300  # 名册有效秒数
   max_prompt_entries: 8  # 成员提示条目上限
   max_prompt_bytes: 768  # 记忆/成员提示UTF-8字节上限
+
+public_network:  # 项目公共网络，失败不自动切换
+  resolver: system  # 仅system/cloudflare_doh，不改全局DNS
+  ca_bundle_file: null  # 仅显式secrets/public-network-ca.local.pem，不读取任意路径

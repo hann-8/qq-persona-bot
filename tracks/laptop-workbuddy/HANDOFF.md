@@ -1,3 +1,5 @@
+2026-10-21（Asia/Shanghai）：LAP-18B安全公共网络/轻量正文已实现、离线与合成提取质量通过，session `LAP-18-B-public-body`（20:38领取）。232受影响单元、16组164实际框架替身及末次定向回归通过；5依赖约10.97MiB、单页<2秒/256MiB、取消/超时自有worker回收。真实七域DNS全非公网，DoH TLS verify_code=20，0可用公开正文，仍network_unverified；搜索质量false、真实生成/QQ/完整验收未过。web.enabled保存值true不变，未正常启动加载/未部署；0模型/QQ/SSH/真实bot启停/登录，24/28/人设和旧差额保留，不推进28C/06。 [报告](../../reports/lap-18-B-2026-10-21.md) / [18交接](tasks/LAP-18/HANDOFF.md)。
+
 2026-10-21（Asia/Shanghai）：LAP-28阶段A入站诊断已实现/离线通过，session `LAP-28-A-ingress-diagnostics`（19:57:04领取）。默认inspect/内存合成可重现有段无像素、URL字节解码、文本占位；封闭日志与另行授权的受管intake-only交付，真实模式未运行。213单元/16组158实际框架替身通过，用户人设既有23,393字节预算失败单列保留。真实样本/群图/模型/QQ/SSH/启停/登录均0，仍ingress_unverified、vision=false/生产拒启；不自动推进18/真实验收。 [报告](../../reports/lap-28-A-2026-10-21.md) / [28交接](tasks/LAP-28/HANDOFF.md)。
 
 2026-10-21 19:48（Asia/Shanghai）：[LAP-36详细规划](tasks/LAP-36/PLAN.md)/[medium指引](tasks/LAP-36/IMPLEMENTATION_GUIDE.md)完成未实施；28入站→18安全网络/正文→28质量/容量→06字幕四阶段，复用readability/yt-dlp最小片段，0新增推理分类/ASR/浏览器。日志无真实图像证据、系统DNS非公网及DoH TLS缺口分列；11份规划/索引文档，0本轮代码/配置/启停/登录/模型/QQ/SSH操作。24已独立交付，保留persona与全部旧差额，验证/Git见[36交接](tasks/LAP-36/HANDOFF.md)。

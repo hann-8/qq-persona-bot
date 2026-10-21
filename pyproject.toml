@@ -10,4 +10,5 @@ dependencies = [
   "markdown-it-py==4.2.0",
   "paramiko==5.0.0",
   "pillow==12.3.0",
+  "readability-lxml==0.9",
 ]

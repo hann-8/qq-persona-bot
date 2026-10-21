@@ -82,3 +82,8 @@ LAP-34的 `config_files.py export-legacy` 导出完整schema3（包含silence）
 ## 图片入站诊断字段
 
 `features.yaml` 的 `vision.ingress_diagnostics: false` 只控制准入后封闭元数据日志，下次正常启动生效；不触发下载、推理或生产放行。本轮未改 `config/local/`。`vision.enabled` 仍默认 false，显式 true 仍因可信预算/真实质量缺项拒启。`allow_get_image_fallback` 尚未实现，不应手工加入配置；需后续真实观察证明第一图仅有安全 opaque ID 后，按 I3 单独实施。见[阶段A报告](../reports/lap-28-A-2026-10-21.md)。
+
+
+LAP-18B补充：`features.yaml`新增`public_network`（resolver=system、ca_bundle_file=null）及`web.extractor=readability`、`web.long_text_policy=excerpt`。resolver仅system/cloudflare_doh；固定Cloudflare HTTPS及1.1.1.1 bootstrap，失败不切换。CA仅允许项目忽略的`secrets/public-network-ca.local.pem`，格式/路径/CA属性由公共传输严格校验；不自动创建或填写。正文模式仅readability/legacy，长文策略仅excerpt/reject。六区节选和元数据共享最多6000字节，并受最终整体预算进一步限制；完整要求超限直接拒绝。
+
+这些字段随五文件源摘要、规范化语义摘要、实例快照、兼容单文件导出及会话版本一起生效；不会自动修改已有web.enabled。此轮没有迁移或保存真实local/CA。网络状态仍network_unverified、搜索质量门槛false，需后续本机安全TLS/公网/公开正文质量证据；详见[报告](../reports/lap-18-B-2026-10-21.md)。

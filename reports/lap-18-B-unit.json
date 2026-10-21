@@ -1,0 +1,50 @@
+{
+  "passed": true,
+  "tests": 232,
+  "elapsed_seconds": 32.609,
+  "modules": [
+    "test_lap18_body",
+    "test_web",
+    "test_config",
+    "test_config_files",
+    "test_config_comments",
+    "test_lap28",
+    "test_lap28_ingress",
+    "test_lap29",
+    "test_lap30",
+    "test_group_silence",
+    "test_onebot_gate"
+  ],
+  "real_model_calls": 0,
+  "real_qq_outputs": 0,
+  "final_focused": {
+    "passed": true,
+    "tests": 107,
+    "modules": [
+      "test_lap18_body",
+      "test_web",
+      "test_config_files",
+      "test_config_comments",
+      "test_lap30"
+    ]
+  },
+  "final_transport": {
+    "passed": true,
+    "tests": 62,
+    "elapsed_seconds": 7.219,
+    "modules": [
+      "test_lap18_body",
+      "test_web",
+      "test_lap28"
+    ]
+  },
+  "final_notices_audit": {
+    "passed": true,
+    "tests": 40
+  },
+  "final_worker_compatibility": {
+    "passed": true,
+    "tests": 40,
+    "elapsed_seconds": 6.015
+  }
+}

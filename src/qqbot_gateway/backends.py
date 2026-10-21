@@ -32,6 +32,7 @@ class BackendResult:
     web_expired: bool = False
     response_to_seq: int | None = None
     memory_proposals: tuple = ()
+    web_evidence: tuple = ()
 
 
 def numeric_usage(value):

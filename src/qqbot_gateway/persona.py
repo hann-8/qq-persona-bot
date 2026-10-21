@@ -94,6 +94,7 @@ def session_version(prompt, settings):
             'num_ctx','think','num_predict','keep_alive_seconds','temperature','top_p','top_k','input_budget')
     parameters = {key:cfg[key] for key in keys if key in cfg}
     parameters['web']=settings.get('web',{})
+    parameters['public_network']=settings.get('public_network',{})
     from copy import deepcopy
     parameters['participation']=deepcopy(settings.get('participation',{}))
     parameters['participation'].pop('silence',None)

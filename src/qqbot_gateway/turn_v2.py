@@ -187,11 +187,12 @@ def plan(raw,output,question,request,effective,catalog=None,candidates=(),memory
         if result:result=ReplyPlan(result.kind,result.bubbles,result.canonical_text,result.limited,'v2_core_recovery')
         return decision,result,None
 
-def metadata(request,response_id,decision,result,effective,response_to=None,member_receipt=None,memory_proposals=None):
+def metadata(request,response_id,decision,result,effective,response_to=None,member_receipt=None,memory_proposals=None,web_evidence=None):
     value=dict(request=request,response_id=response_id,decision=decision,plan=result.metadata(response_id) if result else None,
         effective_digest=sha(effective),manifest=manifest(effective),response_to_seq=response_to)
     if member_receipt is not None:value['member_receipt']=member_receipt
     if memory_proposals:value['memory_proposals']=memory_proposals
+    if web_evidence:value['manifest']['web']=list(web_evidence)
     value['plan_hash']=sha(value)
     return value
 
@@ -200,7 +201,10 @@ def verify(value,request,response_id,text,output,source):
     if not isinstance(value,dict) or set(value)-{'member_receipt','memory_proposals'}!={'request','response_id','decision','plan','effective_digest','manifest','response_to_seq','plan_hash'}:raise ValueError('Missing v2 identity')
     if value['request']!=request or value['response_id']!=response_id or sha({k:v for k,v in value.items() if k!='plan_hash'})!=value['plan_hash']:raise ValueError('v2 identity mismatch')
     m=value['manifest']
-    if not isinstance(m,dict) or set(m)-{'member_candidates','memory'}!={'seqs','member_refs','fact_refs','images','eligible_seq'}:raise ValueError('manifest')
+    if not isinstance(m,dict) or set(m)-{'member_candidates','memory','web'}!={'seqs','member_refs','fact_refs','images','eligible_seq'}:raise ValueError('manifest')
+    if 'web' in m:
+        from .evidence_selection import validate_manifest
+        validate_manifest(m['web'],source)
     if not isinstance(m['seqs'],list) or len(set(m['seqs']))!=len(m['seqs']) or any(not integer(s) for s in m['seqs']):raise ValueError('seqs')
     effective=copy.deepcopy(source);effective['messages']=[r for r in effective['messages'] if r['seq'] in m['seqs']];close_refs(effective)
     if 'memory' in m:
@@ -241,7 +245,7 @@ def verify(value,request,response_id,text,output,source):
         # that source availability means actual image delivery.
         effective['images']=[]
         for row in effective['messages']:row['images']=[]
-    if not required_seqs(source,request)<=set(m['seqs']) or manifest(effective)!=m or sha(effective)!=value['effective_digest']:raise ValueError('effective identity')
+    if not required_seqs(source,request)<=set(m['seqs']) or manifest(effective)!={k:v for k,v in m.items() if k!='web'} or sha(effective)!=value['effective_digest']:raise ValueError('effective identity')
     response=value['response_to_seq']
     if response is not None and (not integer(response) or response not in effective['eligible_seq'] or request['must_reply'] and response!=request['target_seq']):raise ValueError('response identity')
     if value['decision'] not in ('speak','silent','error'):raise ValueError('decision')

@@ -250,7 +250,9 @@ class AsyncWebTests(unittest.IsolatedAsyncioTestCase):
                 assert isinstance(kwargs['cookie_jar'],aiohttp.DummyCookieJar)
             async def __aenter__(self):return self
             async def __aexit__(self,*a):await self.connector.close()
-            def get(self,url,**kwargs):return responses.pop(0)
+            def get(self,url,**kwargs):
+                assert self._retry_connection is False
+                return responses.pop(0)
         for response,reason in [(Response(b'x'*100,headers={'Content-Type':'application/pdf'}),'non_text'),
                                 (Response(status=429),'http_status'),
                                 (Response(b'captcha'),'restricted'),

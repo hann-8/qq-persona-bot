@@ -117,7 +117,7 @@ def context_token(root):
 
 
 def image_url(value):
-    from .web_retrieval import safe_url, WebFailure
+    from .public_http import safe_url, WebFailure
     try:
         safe_url(value);url=urlsplit(value)
         if url.scheme!='https' or url.hostname not in HOSTS or url.port not in (None,443):raise ValueError()
@@ -125,12 +125,15 @@ def image_url(value):
     except (ValueError,TypeError,WebFailure):raise ValueError('IMAGE_SOURCE_DENIED') from None
 
 
-async def fetch_image(url, *, diagnostic=None):
-    from .web_retrieval import PublicConnector,PublicResolver
-    connector=PublicConnector(resolver=PublicResolver(),use_dns_cache=False,force_close=True,limit=1)
+async def fetch_image(url, *, diagnostic=None,network=None,root=None):
+    from .public_http import PublicConnector,PublicResolver
+    from .public_network import tls_context
+    context=tls_context(network,root)
+    connector=PublicConnector(resolver=PublicResolver(network,context),ssl=context,use_dns_cache=False,force_close=True,limit=1)
     async with aiohttp.ClientSession(connector=connector,trust_env=False,cookie_jar=aiohttp.DummyCookieJar(),
             auto_decompress=False,timeout=aiohttp.ClientTimeout(total=15,connect=3,sock_read=6),
             headers={'Accept-Encoding':'identity'}) as session:
+        session._retry_connection=False
         for hop in range(3):
             image_url(url)
             async with session.get(url,allow_redirects=False) as response:

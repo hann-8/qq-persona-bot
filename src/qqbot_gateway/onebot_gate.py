@@ -141,8 +141,9 @@ class OneBotGate:
         from .group_silence import GroupSilence
         self.silence=GroupSilence(config.bot_qq,config.allowed_groups,config.blocked_users,config.silence_enabled,
                                   config.session_queue_timeout_seconds+210)
-        from .vision import Materials,context_token
-        self.materials=Materials()
+        from .vision import Materials,context_token,fetch_image
+        from functools import partial
+        self.materials=Materials(fetch=partial(fetch_image,network=config.public_network,root=root))
         from .members import Members
         self.members=Members(config.members_config or {'enabled':config.members_enabled})
         self.mention_pending={}

@@ -102,6 +102,7 @@ class GateConfig:
     ingress_diagnostics: bool = False
     members_enabled: bool = False
     members_config: object = None
+    public_network: object = None
     silence_enabled: bool = True
     silence_aliases: tuple = ('肥鱼','大肥鱼','鱼鱼','鲸鱼娘','小鲸鱼','DSH')
     session_queue_timeout_seconds: int = 600
@@ -139,6 +140,8 @@ def normalize_settings(raw):
     data['members']=validate_members(data.get('members',{}))
     from .vision import validate_config
     data['vision']=validate_config(data.get('vision',{}))
+    from .public_network import validate_network
+    data['public_network']=validate_network(data.get('public_network',{}))
     from .web_policy import validate_web
     data['web'] = validate_web(data.get('web', {}))
     from .participation import validate_participation
@@ -319,6 +322,7 @@ def load_gate_config(path=None, *, root=None, settings=None):
         ingress_diagnostics=data['vision']['ingress_diagnostics'],
         members_enabled=False,
         members_config=suspend_unverified(data),
+        public_network=data['public_network'],
         attention_enabled=data['participation']['mode']=='free' and data['participation']['attention']['enabled'],
         media_catalog=MemeCatalog(root,data['memes']) if data['memes']['enabled'] else None,
     )

@@ -283,3 +283,16 @@ LAP-35临时停言：授权群普通成员明确要求bot停言后，本群无�
 `vision.ingress_diagnostics` 默认 false；操作者下次正常启动时可选择仅记录准入后、剥离前的封闭字段。日志不含URL/file值、身份、原文、cap、token、图片或hash；普通模式不会为了诊断下载图片。`vision.enabled=false` 与原生产拒启门槛保持。
 
 真实模式只能在另行明确授权后使用 `--intake-only --max-events 1 --timeout-seconds 120 --authorize ONE_IMAGE_INGRESS`，并明确 `--sample-group` / `--sample-sender`。要求正常bot已停、无未决清理/任务、端口空闲且项目NapCat文件日志已关闭；无法证明则拒绝，不自动改日志配置。只创建受管NapCat和无转发/发送接口的诊断gate；不带快速登录账号、不读登录凭据、不做密码回退。未登录返回 `login_required`；超时/取消仅回收本诊断创建身份及子进程。该模式本轮没有执行，详见[阶段A报告](reports/lap-28-A-2026-10-21.md)。
+
+
+### 公共网页正文（LAP-18B）
+
+代码支持readability本地正文提取与显式system/cloudflare_doh解析；当前本机公网/TLS/真实正文尚未通过，搜索质量门槛仍关闭，详见[本轮报告](reports/lap-18-B-2026-10-21.md)。浏览器能联网不能代替本机安全HTTP结果。
+
+配置位于`config/local/features.yaml`：`public_network.resolver`默认system，只允许显式切换到固定Cloudflare DoH，不自动回退；`ca_bundle_file`默认null，唯一可选位置是忽略的`secrets/public-network-ca.local.pem`，仅允许已审阅CA证书，拒绝私钥/leaf/链接/大文件。TLS/主机名与每跳全公网/peer验证始终开启；不读取代理环境、不改系统DNS/信任。
+
+`web.extractor`缺省readability，可显式legacy回滚；`web.long_text_policy`默认excerpt，也可reject。总材料连同标题/来源/范围/时间戳最多6000 UTF-8字节，图片/记忆/成员占用后还受最终输入预算限制；超长仅按六区选择完整段落，真实范围随输出标注。完整要求超限或有效节选不足时本地说明，0模型调用。JS/登录/付费/验证码/空壳不使用标题伪装正文。没有浏览器、正文分类模型或B站接入。
+
+提取器只接收已受控下载的HTML；按需启动单个无窗口Python worker，输入1MiB/输出2MiB/提取2秒/进程256MiB、取消后按创建身份确认退出，空闲无worker。异常清理沿用已有cleanup阻断。依赖由`readability-lxml==0.9`及uv锁文件固定；正常使用前须同步项目及框架环境依赖。
+
+代码/模板交付不改已有web.enabled保存值；操作者审阅后正常启动才加载。回滚可分别显式选择legacy/system或关闭web，再按既有流程正常启动；保留pending/unknown/清理台账及配对配置备份，不修改全局网络设置。

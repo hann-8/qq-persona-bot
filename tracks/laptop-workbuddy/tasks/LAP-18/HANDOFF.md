@@ -1,3 +1,37 @@
+# LAP-18 当前交接：阶段B离线交付、网络真实缺口保留
+
+返回[PROGRESS](../../../../PROGRESS.md) / [TASKS](../../TASKS.md) / [工作线](../../HANDOFF.md) / [36合同](../LAP-36/WEB_VIDEO_PLAN.md)。继承AGENTS；本轮仅18，不领取28C/06。
+
+2026-10-21（Asia/Shanghai），session `LAP-18-B-public-body`，20:38登记/重读。本session独占本轮归属；起点main/b02d6b92f6fe2b7bbda47733ccc2ec0c7bf89e2f，git status干净。24/28已交付及用户persona（sha256 ff6f629d92afab7ea1c47830bd4a7e8735e944862573a90764645604e96f2804）原样保留。
+
+## 已完成与证据
+
+安全公共HTTP兼容抽出；显式system/固定Cloudflare DoH、默认无项目CA/固定CA严格扩充、无环境代理/信任旁路/重试/提供方切换；图片复用共用安全网络而不放宽其域/MIME/生产能力门槛。readability-lxml==0.9与4依赖锁定；默认及legacy HTML均按需受管worker，字节/2秒/256MiB/叶进程Job、创建身份/清理台账/取消回收。统一6000字节元数据预算、六区完整段落/真实范围、完整要求拒超限、最终预算重算、来源/封闭manifest、真实@本地失败ReplyPlan/普通候选沉默、网页材料不晋升成员事实；触发/队列/工具/最终哑巴栅栏/ACK保持。
+
+- [报告](../../../../reports/lap-18-B-2026-10-21.md)，[单元](../../../../reports/lap-18-B-unit.json)：232受影响单元通过/32.609秒；新增23专项，末次107/62/40等定向回归独立记录，不累加宣称。最终worker兼容复验命令与结果见JSON。
+- [实际框架](../../../../reports/lap-18-B-framework-offline.json)：16组164例，末次39.922秒；两实际runner底层替身、实际AstrBot/provider/run_agent/原event ACK，覆盖mentions/free、正文worker+图片+记忆+表情与哑巴/成员组合。0真实模型/QQ。
+- [依赖与资源](../../../../reports/lap-18-B-resources.json)：5包，约10.97MiB实装/4.07MiB Windows wheel；prepare4.21秒/install0.193秒。四类正文含11KiB长文，均3事实/去噪；逐页及816KiB压力页耗时/RSS以JSON实测为准，均<2秒/256MiB、exited/cleanup=true、空闲0。缓存/下载纯流量未分离，不冒称测得。
+- [本机公开探测](../../../../reports/lap-18-B-public-probe.json)：初批6正文+3原类查询，另2DoH原因诊断；合计11次HTTP入口/4次DoH TLS尝试、0可用正文。七域系统DNS全非公网；DoH异常链verify_code=20。TLS/公网/正文真实通过均没有；network_unverified、SEARCH_QUALITY_PASSED=false。未借浏览连接器冒充可用。
+
+命令：`.venv/Scripts/python.exe -X utf8 -m unittest`（具体模块见unit.json/忽略state/lap18-B-*.log）；框架Python `scripts/verify_lap18_body.py`；项目Python `scripts/measure_lap18_body.py`、`scripts/probe_lap18_body.py`及`--diagnose-doh`；`runtime/tools/uv.exe lock --check`、compileall与diff/链接/归属核对。原报告不覆盖。公开探测不应为刷新报告重复调用，后续须重新登记限额。
+
+## 文件归属与生效
+
+新增public_http/public_network/evidence_selection/web_extractor/html_worker/extractor_limits、test_lap18_body、probe/verify/measure_lap18_body、本轮报告与4JSON；修改web_retrieval/web_policy/config/config_files/config_comments/persona.py/backends/model_gateway/onebot_gate/vision/turn_v2必要接点、pyproject/uv.lock、两个示例模板/README与config索引、test_web、verify_lap28_framework仅body_reader参数/断言、18交接/PROGRESS/工作线HANDOFF/TASKS。完整归属以本轮Git差异为准；没有修改24进程/登录或28生产能力表。
+
+新增public_network.system/null、web.extractor=readability、long_text_policy=excerpt默认随代码/正常启动生效。现有web.enabled保存值true未写改；本轮未修改真实local/CA/代理/DNS/凭据，不SSH/启停/登录真实bot、不调用模型或QQ，不声称已部署。真实工件/凭据/HTML/群消息均不提交。用户人设旧23393字节预算测试差额保留，没有替换人设来通过测试。
+
+## 剩余、解除条件与回滚
+
+本轮仅代码/离线与合成提取质量合格，LAP-18未完整验收。先由操作者处理本机合法公网解析/严格TLS信任或回规划，再验证中文2/技术1真实静态正文质量、实际peer及图片/字幕域解析。搜索仍须按原至少2/3相关可读/日期证据单独复核；页面成功不能打开门槛。所选后端真实生成、来源抗注入/真实群ACK另批授权。保留28C质量/可信容量/生产拒启、24登录、31B、07 ASR、V11与全部旧差额。
+
+回滚按既有正常停机/配对备份流程，保留pending/unknown/清理台账，分别显式legacy/system或关闭web后正常启动；不动全局网络、真实群记忆/图库/历史。下一步等待用户针对真实网络条件或28C/06的后续指令，不自动续领。
+
+Git：本轮归属内容提交/推送及完整SHA核对记录在交付后补入；不把内容提交当部署/真实验收。
+
+---
+以下为旧检查点与验收差额（历史当时的默认/启用状态不得覆盖上文当前保存值）：
+
 # LAP-18 两后端共用联网
 
 2026-10-21续作仅规划：[LAP-36总计划](../LAP-36/PLAN.md)、[网页/网络合同](../LAP-36/WEB_VIDEO_PLAN.md)、[medium指引B](../LAP-36/IMPLEMENTATION_GUIDE.md)已完成；显式安全解析/TLS、readability正文/统一材料预算与来源，B站另由06D实施。当前本机五域DNS仍非公网、DoH TLS未过；本轮没有改18代码/运行配置/搜索门槛或做真实模型/群操作。下方历史离线/搜索差额保留，续作待新指令领取。
