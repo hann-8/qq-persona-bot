@@ -72,6 +72,7 @@ DESCRIPTIONS = {
     'max_prompt_bytes': '记忆/成员提示UTF-8字节上限', 'max_proposals_per_turn': '单轮学习提议数上限',
     'max_record_bytes': '单条记忆UTF-8字节上限',
     'input_reserve_tokens': '视觉预留4096仅假设，容量/上界未证，true仍拒启动',
+    'ingress_diagnostics': '仅准入后封闭图片元数据日志；不下载、不保存原事件或身份，默认关闭',
     'roster_member_count_lt': '人数必须小于50；未知/过期暂停，不以收到时间假冒观测时间',
     'count_ttl_seconds': '人数有效秒数', 'roster_ttl_seconds': '名册有效秒数', 'max_prompt_entries': '成员提示条目上限',
     'layout_version': '磁盘布局版本固定1，组装时移除', 'schema_version': '内部配置版本固定3',

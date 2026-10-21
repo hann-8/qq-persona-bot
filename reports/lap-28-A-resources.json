@@ -1,0 +1,24 @@
+{
+  "method": "5ms psutil sampling, sum current RSS of owned launcher and descendants; sampled lower bound",
+  "new_dependencies": 0,
+  "Pillow": "12.3.0",
+  "aiohttp": "3.14.5",
+  "observations": [
+    {
+      "mode": "--inspect",
+      "elapsed_seconds": 0.688,
+      "sampled_peak_tree_rss_bytes": 54460416,
+      "max_observed_processes": 2,
+      "exit_code": 0,
+      "ingress_state": "ingress_unverified"
+    },
+    {
+      "mode": "--synthetic",
+      "elapsed_seconds": 0.609,
+      "sampled_peak_tree_rss_bytes": 53080064,
+      "max_observed_processes": 2,
+      "exit_code": 0,
+      "ingress_state": "ingress_unverified"
+    }
+  ]
+}

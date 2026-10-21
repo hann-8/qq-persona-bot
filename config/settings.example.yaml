@@ -15,6 +15,7 @@ memory:  # 配置节，子字段见下方；保留既有校验约束
   max_proposals_per_turn: 3  # 单轮学习提议数上限
   max_record_bytes: 240  # 单条记忆UTF-8字节上限
 vision:  # 配置节，子字段见下方；保留既有校验约束
+  ingress_diagnostics: false  # 仅准入后封闭图片元数据；默认关闭，下次启动生效
   enabled: false  # production_eligible未证明；true会在启动时拒绝，不自动调用验证；原生识图desired开关；生产能力未验证，true仍拒绝启动
   input_reserve_tokens: 4096  # 待验证假设，不能当视觉token/patch上界；视觉预留4096仅假设，容量/上界未证，true仍拒启动
 participation:  # 配置节，子字段见下方；保留既有校验约束

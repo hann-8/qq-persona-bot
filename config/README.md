@@ -78,3 +78,7 @@ LAP-24可选管理token独立于五文件配置和QQ密码，仅用`scripts/conf
 配置下次正常启动生效；关闭能力须显式设false，省略仍为true。运行态、门票不进人设、模型输入或session_version。状态页只显示开关/静默群数；`state/gate-connection.json` 是散列群标识的诊断镜像，禁止手编，也不用于重启恢复。
 
 LAP-34的 `config_files.py export-legacy` 导出完整schema3（包含silence）。退回35之前的代码时，先完成受控布局回滚，再用 `configure_bot.py export-legacy-config` 做功能兼容审阅导出；后者剥除silence及原attention/vision/members/memory节，须核对源/副本双摘要并备份后显式激活。两种导出用途不同，不直接修改启动快照。本轮仅离线交付，本机配置未改、未加载；真实QQ验收另行授权。
+
+## 图片入站诊断字段
+
+`features.yaml` 的 `vision.ingress_diagnostics: false` 只控制准入后封闭元数据日志，下次正常启动生效；不触发下载、推理或生产放行。本轮未改 `config/local/`。`vision.enabled` 仍默认 false，显式 true 仍因可信预算/真实质量缺项拒启。`allow_get_image_fallback` 尚未实现，不应手工加入配置；需后续真实观察证明第一图仅有安全 opaque ID 后，按 I3 单独实施。见[阶段A报告](../reports/lap-28-A-2026-10-21.md)。

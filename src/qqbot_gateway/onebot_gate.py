@@ -308,6 +308,9 @@ class OneBotGate:
                             if stop or not self.silence.normal(group):continue
                             if not admitted_message(event,self.config):continue
                             output_ticket=self.silence.issue(event,self.connection_id)
+                    if self.config.ingress_diagnostics:
+                        from .vision_ingress import inspect_event,encode
+                        LOG.info(encode(inspect_event(event)))
                     if (not self.config.silence_enabled and self.config.participation_mode=='mentions' and not self.config.vision_enabled and not self.config.members_enabled and
                         all(s['type'] in ('text','at') for s in event['message']) and
                         not any(k.startswith('qqbot_') for k in event)):

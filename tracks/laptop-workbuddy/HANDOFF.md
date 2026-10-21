@@ -1,3 +1,5 @@
+2026-10-21（Asia/Shanghai）：LAP-28阶段A入站诊断已实现/离线通过，session `LAP-28-A-ingress-diagnostics`（19:57:04领取）。默认inspect/内存合成可重现有段无像素、URL字节解码、文本占位；封闭日志与另行授权的受管intake-only交付，真实模式未运行。213单元/16组158实际框架替身通过，用户人设既有23,393字节预算失败单列保留。真实样本/群图/模型/QQ/SSH/启停/登录均0，仍ingress_unverified、vision=false/生产拒启；不自动推进18/真实验收。 [报告](../../reports/lap-28-A-2026-10-21.md) / [28交接](tasks/LAP-28/HANDOFF.md)。
+
 2026-10-21 19:48（Asia/Shanghai）：[LAP-36详细规划](tasks/LAP-36/PLAN.md)/[medium指引](tasks/LAP-36/IMPLEMENTATION_GUIDE.md)完成未实施；28入站→18安全网络/正文→28质量/容量→06字幕四阶段，复用readability/yt-dlp最小片段，0新增推理分类/ASR/浏览器。日志无真实图像证据、系统DNS非公网及DoH TLS缺口分列；11份规划/索引文档，0本轮代码/配置/启停/登录/模型/QQ/SSH操作。24已独立交付，保留persona与全部旧差额，验证/Git见[36交接](tasks/LAP-36/HANDOFF.md)。
 
 2026-10-21 19:40（Asia/Shanghai）：LAP-24 P1/P3已实现/离线通过；session `LAP-24-autostart-independent-implementation`（19:21:05领取）。固定脱敏登录事件/只读WebUI与独立DPAPI token、受控login-check-only、锁外QQ等待和一次Startup包装器/自有链接注册交付；171项受影响回归通过（30.121秒），新观察器27/Startup12项包含其中。0真实bot启停/认证/登录/6099/凭据/Startup/SSH/模型/QQ操作；原生路径/完整句柄/设备连续性及真实免扫码仍未证，data_scope=unverified。保留persona及并行LAP-36，真实D/R/部署待后续指令。 [报告](../../reports/lap-24-autostart-2026-10-21.md)；[任务交接](tasks/LAP-24/HANDOFF.md)。

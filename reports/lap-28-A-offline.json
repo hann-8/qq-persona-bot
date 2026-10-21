@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "unit_tests": 213,
+  "framework_combinations": 16,
+  "framework_cases": 158,
+  "elapsed_seconds": 61.188,
+  "adapter_signature": "57f76eb016e6432cce7f79ce00c3088a0bc549ee988f5aa1789838ac60d5d3a5",
+  "ingress_state": "ingress_unverified",
+  "production_eligible": false,
+  "excluded_baseline_test": "test_lap24.PersonaMatrix.test_all_prompt_paths_and_budget",
+  "excluded_reason": "user persona ff2e348: 23393 bytes >= old 8192-byte fixture policy; untouched",
+  "real_napcat_samples": 0,
+  "real_model_calls": 0,
+  "real_qq_outputs": 0,
+  "real_bot_operations": 0
+}

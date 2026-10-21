@@ -40,6 +40,7 @@ memory:  # 配置节，子字段见下方；保留既有校验约束
   max_proposals_per_turn: 3  # 单轮学习提议数上限；新装默认 3
   max_record_bytes: 240  # 单条记忆UTF-8字节上限；新装默认 240
 vision:  # 配置节，子字段见下方；保留既有校验约束
+  ingress_diagnostics: false  # 仅准入后封闭图片元数据日志，无下载/模型/图片正文；默认关闭，下次启动生效
   enabled: false  # 原生识图desired开关；生产能力未验证，true仍拒绝启动；新装默认 false
   input_reserve_tokens: 4096  # 视觉预留4096仅假设，容量/上界未证，true仍拒启动；新装默认 4096
 members:  # 配置节，子字段见下方；保留既有校验约束

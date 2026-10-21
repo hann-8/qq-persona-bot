@@ -1,0 +1,978 @@
+[
+  {
+    "backend": "codebuddy_cli",
+    "mode": "single",
+    "participation": "mentions",
+    "attention": false,
+    "web": false,
+    "memory_enabled": false,
+    "cases": [
+      {
+        "case": "current_first_image_native_once",
+        "generations": 1,
+        "sends": 1
+      },
+      {
+        "case": "vision_effective_text_only_v2_no_image",
+        "generations": 1,
+        "sends": 1
+      },
+      {
+        "case": "replay_local_notice_no_generation",
+        "generations": 0,
+        "sends": 1
+      },
+      {
+        "case": "text_visual_reserve_rejected_before_native",
+        "generations": 0,
+        "sends": 1
+      }
+    ],
+    "real_model_calls": 0,
+    "real_qq_calls": 0,
+    "real_run_agent": true,
+    "actual_runner": true,
+    "private_gate_http": true,
+    "actual_provider": true,
+    "original_event_ACK": true,
+    "production_eligible": false
+  },
+  {
+    "backend": "codebuddy_cli",
+    "mode": "single",
+    "participation": "free",
+    "attention": true,
+    "web": false,
+    "memory_enabled": false,
+    "cases": [
+      {
+        "case": "current_first_image_native_once",
+        "generations": 1,
+        "sends": 1
+      },
+      {
+        "case": "vision_effective_text_only_v2_no_image",
+        "generations": 1,
+        "sends": 1
+      },
+      {
+        "case": "replay_local_notice_no_generation",
+        "generations": 0,
+        "sends": 1
+      },
+      {
+        "case": "text_visual_reserve_rejected_before_native",
+        "generations": 0,
+        "sends": 1
+      },
+      {
+        "case": "ambient_unavailable_silent_no_generation",
+        "generations": 0,
+        "sends": 0
+      },
+      {
+        "case": "ambient_merge_target_and_cap_together",
+        "generations": 2,
+        "sends": 2
+      }
+    ],
+    "real_model_calls": 0,
+    "real_qq_calls": 0,
+    "real_run_agent": true,
+    "actual_runner": true,
+    "private_gate_http": true,
+    "actual_provider": true,
+    "original_event_ACK": true,
+    "production_eligible": false
+  },
+  {
+    "backend": "codebuddy_cli",
+    "mode": "single",
+    "participation": "free",
+    "attention": true,
+    "web": true,
+    "memory_enabled": true,
+    "cases": [
+      {
+        "case": "current_first_image_native_once",
+        "generations": 1,
+        "sends": 1
+      },
+      {
+        "case": "vision_effective_text_only_v2_no_image",
+        "generations": 1,
+        "sends": 1
+      },
+      {
+        "case": "replay_local_notice_no_generation",
+        "generations": 0,
+        "sends": 1
+      },
+      {
+        "case": "text_visual_reserve_rejected_before_native",
+        "generations": 0,
+        "sends": 1
+      },
+      {
+        "case": "ambient_unavailable_silent_no_generation",
+        "generations": 0,
+        "sends": 0
+      },
+      {
+        "case": "ambient_merge_target_and_cap_together",
+        "generations": 2,
+        "sends": 2
+      }
+    ],
+    "real_model_calls": 0,
+    "real_qq_calls": 0,
+    "real_run_agent": true,
+    "actual_runner": true,
+    "private_gate_http": true,
+    "actual_provider": true,
+    "original_event_ACK": true,
+    "production_eligible": false
+  },
+  {
+    "backend": "codebuddy_cli",
+    "mode": "single",
+    "participation": "mentions",
+    "attention": true,
+    "memory": true,
+    "memes": true,
+    "members": true,
+    "cases": [
+      {
+        "case": "normal_original_event_ACK",
+        "sends": 1
+      },
+      {
+        "case": "same_at_stop_blacklist_other_member_wake",
+        "sends": 1
+      },
+      {
+        "case": "old_result_after_wake_no_assistant_history",
+        "sends": 0
+      },
+      {
+        "case": "local_notice_ticket_old_rejected",
+        "sends": 1
+      },
+      {
+        "case": "all_local_notice_families_immutable_ticket",
+        "sends": 11
+      },
+      {
+        "case": "gate_refusal_known_not_sent_no_unknown_lock",
+        "sends": 0
+      },
+      {
+        "case": "submitted_delayed_ACK_retained",
+        "sends": 1
+      },
+      {
+        "case": "image_only_original_ACK_ticket",
+        "sends": 1
+      },
+      {
+        "case": "old_image_after_wake_rejected",
+        "sends": 0
+      },
+      {
+        "case": "failed_image_local_notice_ticket",
+        "sends": 1
+      },
+      {
+        "case": "typed_at_same_chain_ticket_and_permission",
+        "sends": 1
+      },
+      {
+        "case": "typed_at_permission_race_no_send",
+        "sends": 0
+      },
+      {
+        "case": "router_local_wait_no_provider_no_global_cancel",
+        "sends": 0
+      },
+      {
+        "case": "pre_HTTP_invalidated_no_generation",
+        "sends": 0
+      },
+      {
+        "case": "local_input_notice_0",
+        "sends": 1
+      },
+      {
+        "case": "local_input_notice_20",
+        "sends": 1
+      },
+      {
+        "case": "local_input_notice_4",
+        "sends": 1
+      },
+      {
+        "case": "submitted_HTTP_internal_queue_natural_completion",
+        "sends": 0
+      },
+      {
+        "case": "wake_never_clears_real_blocking_state",
+        "sends": 0
+      },
+      {
+        "case": "true_ACK_unknown_preserved",
+        "sends": 1
+      },
+      {
+        "case": "other_group_isolated",
+        "sends": 1
+      },
+      {
+        "case": "missing_mirror_closed",
+        "sends": 0
+      },
+      {
+        "case": "malformed_mirror_closed_then_recovers",
+        "sends": 0
+      }
+    ],
+    "real_model_calls": 0,
+    "real_qq_calls": 0,
+    "real_run_agent": true,
+    "actual_runner": true,
+    "original_event_ACK": true
+  },
+  {
+    "backend": "codebuddy_cli",
+    "mode": "adaptive",
+    "participation": "mentions",
+    "attention": false,
+    "web": false,
+    "memory_enabled": false,
+    "cases": [
+      {
+        "case": "current_first_image_native_once",
+        "generations": 1,
+        "sends": 1
+      },
+      {
+        "case": "vision_effective_text_only_v2_no_image",
+        "generations": 1,
+        "sends": 1
+      },
+      {
+        "case": "replay_local_notice_no_generation",
+        "generations": 0,
+        "sends": 1
+      },
+      {
+        "case": "text_visual_reserve_rejected_before_native",
+        "generations": 0,
+        "sends": 1
+      }
+    ],
+    "real_model_calls": 0,
+    "real_qq_calls": 0,
+    "real_run_agent": true,
+    "actual_runner": true,
+    "private_gate_http": true,
+    "actual_provider": true,
+    "original_event_ACK": true,
+    "production_eligible": false
+  },
+  {
+    "backend": "codebuddy_cli",
+    "mode": "adaptive",
+    "participation": "free",
+    "attention": true,
+    "web": false,
+    "memory_enabled": false,
+    "cases": [
+      {
+        "case": "current_first_image_native_once",
+        "generations": 1,
+        "sends": 1
+      },
+      {
+        "case": "vision_effective_text_only_v2_no_image",
+        "generations": 1,
+        "sends": 1
+      },
+      {
+        "case": "replay_local_notice_no_generation",
+        "generations": 0,
+        "sends": 1
+      },
+      {
+        "case": "text_visual_reserve_rejected_before_native",
+        "generations": 0,
+        "sends": 1
+      },
+      {
+        "case": "ambient_unavailable_silent_no_generation",
+        "generations": 0,
+        "sends": 0
+      },
+      {
+        "case": "ambient_merge_target_and_cap_together",
+        "generations": 2,
+        "sends": 2
+      }
+    ],
+    "real_model_calls": 0,
+    "real_qq_calls": 0,
+    "real_run_agent": true,
+    "actual_runner": true,
+    "private_gate_http": true,
+    "actual_provider": true,
+    "original_event_ACK": true,
+    "production_eligible": false
+  },
+  {
+    "backend": "codebuddy_cli",
+    "mode": "adaptive",
+    "participation": "free",
+    "attention": true,
+    "web": true,
+    "memory_enabled": true,
+    "cases": [
+      {
+        "case": "current_first_image_native_once",
+        "generations": 1,
+        "sends": 1
+      },
+      {
+        "case": "vision_effective_text_only_v2_no_image",
+        "generations": 1,
+        "sends": 1
+      },
+      {
+        "case": "replay_local_notice_no_generation",
+        "generations": 0,
+        "sends": 1
+      },
+      {
+        "case": "text_visual_reserve_rejected_before_native",
+        "generations": 0,
+        "sends": 1
+      },
+      {
+        "case": "ambient_unavailable_silent_no_generation",
+        "generations": 0,
+        "sends": 0
+      },
+      {
+        "case": "ambient_merge_target_and_cap_together",
+        "generations": 2,
+        "sends": 2
+      }
+    ],
+    "real_model_calls": 0,
+    "real_qq_calls": 0,
+    "real_run_agent": true,
+    "actual_runner": true,
+    "private_gate_http": true,
+    "actual_provider": true,
+    "original_event_ACK": true,
+    "production_eligible": false
+  },
+  {
+    "backend": "codebuddy_cli",
+    "mode": "adaptive",
+    "participation": "mentions",
+    "attention": true,
+    "memory": true,
+    "memes": true,
+    "members": true,
+    "cases": [
+      {
+        "case": "normal_original_event_ACK",
+        "sends": 1
+      },
+      {
+        "case": "same_at_stop_blacklist_other_member_wake",
+        "sends": 1
+      },
+      {
+        "case": "old_result_after_wake_no_assistant_history",
+        "sends": 0
+      },
+      {
+        "case": "local_notice_ticket_old_rejected",
+        "sends": 1
+      },
+      {
+        "case": "all_local_notice_families_immutable_ticket",
+        "sends": 11
+      },
+      {
+        "case": "gate_refusal_known_not_sent_no_unknown_lock",
+        "sends": 0
+      },
+      {
+        "case": "submitted_delayed_ACK_retained",
+        "sends": 1
+      },
+      {
+        "case": "bubble_interval_stop_wake_partial",
+        "sends": 1
+      },
+      {
+        "case": "image_only_original_ACK_ticket",
+        "sends": 1
+      },
+      {
+        "case": "old_image_after_wake_rejected",
+        "sends": 0
+      },
+      {
+        "case": "failed_image_local_notice_ticket",
+        "sends": 1
+      },
+      {
+        "case": "typed_at_same_chain_ticket_and_permission",
+        "sends": 1
+      },
+      {
+        "case": "typed_at_permission_race_no_send",
+        "sends": 0
+      },
+      {
+        "case": "router_local_wait_no_provider_no_global_cancel",
+        "sends": 0
+      },
+      {
+        "case": "pre_HTTP_invalidated_no_generation",
+        "sends": 0
+      },
+      {
+        "case": "local_input_notice_0",
+        "sends": 1
+      },
+      {
+        "case": "local_input_notice_20",
+        "sends": 1
+      },
+      {
+        "case": "local_input_notice_4",
+        "sends": 1
+      },
+      {
+        "case": "submitted_HTTP_internal_queue_natural_completion",
+        "sends": 0
+      },
+      {
+        "case": "wake_never_clears_real_blocking_state",
+        "sends": 0
+      },
+      {
+        "case": "true_ACK_unknown_preserved",
+        "sends": 1
+      },
+      {
+        "case": "other_group_isolated",
+        "sends": 1
+      },
+      {
+        "case": "missing_mirror_closed",
+        "sends": 0
+      },
+      {
+        "case": "malformed_mirror_closed_then_recovers",
+        "sends": 0
+      }
+    ],
+    "real_model_calls": 0,
+    "real_qq_calls": 0,
+    "real_run_agent": true,
+    "actual_runner": true,
+    "original_event_ACK": true
+  },
+  {
+    "backend": "ollama_ssh",
+    "mode": "single",
+    "participation": "mentions",
+    "attention": false,
+    "web": false,
+    "memory_enabled": false,
+    "cases": [
+      {
+        "case": "current_first_image_native_once",
+        "generations": 1,
+        "sends": 1
+      },
+      {
+        "case": "vision_effective_text_only_v2_no_image",
+        "generations": 1,
+        "sends": 1
+      },
+      {
+        "case": "replay_local_notice_no_generation",
+        "generations": 0,
+        "sends": 1
+      },
+      {
+        "case": "text_visual_reserve_rejected_before_native",
+        "generations": 0,
+        "sends": 1
+      }
+    ],
+    "real_model_calls": 0,
+    "real_qq_calls": 0,
+    "real_run_agent": true,
+    "actual_runner": true,
+    "private_gate_http": true,
+    "actual_provider": true,
+    "original_event_ACK": true,
+    "production_eligible": false
+  },
+  {
+    "backend": "ollama_ssh",
+    "mode": "single",
+    "participation": "free",
+    "attention": true,
+    "web": false,
+    "memory_enabled": false,
+    "cases": [
+      {
+        "case": "current_first_image_native_once",
+        "generations": 1,
+        "sends": 1
+      },
+      {
+        "case": "vision_effective_text_only_v2_no_image",
+        "generations": 1,
+        "sends": 1
+      },
+      {
+        "case": "replay_local_notice_no_generation",
+        "generations": 0,
+        "sends": 1
+      },
+      {
+        "case": "text_visual_reserve_rejected_before_native",
+        "generations": 0,
+        "sends": 1
+      },
+      {
+        "case": "ambient_unavailable_silent_no_generation",
+        "generations": 0,
+        "sends": 0
+      },
+      {
+        "case": "ambient_merge_target_and_cap_together",
+        "generations": 2,
+        "sends": 2
+      }
+    ],
+    "real_model_calls": 0,
+    "real_qq_calls": 0,
+    "real_run_agent": true,
+    "actual_runner": true,
+    "private_gate_http": true,
+    "actual_provider": true,
+    "original_event_ACK": true,
+    "production_eligible": false
+  },
+  {
+    "backend": "ollama_ssh",
+    "mode": "single",
+    "participation": "free",
+    "attention": true,
+    "web": true,
+    "memory_enabled": true,
+    "cases": [
+      {
+        "case": "current_first_image_native_once",
+        "generations": 1,
+        "sends": 1
+      },
+      {
+        "case": "vision_effective_text_only_v2_no_image",
+        "generations": 1,
+        "sends": 1
+      },
+      {
+        "case": "replay_local_notice_no_generation",
+        "generations": 0,
+        "sends": 1
+      },
+      {
+        "case": "text_visual_reserve_rejected_before_native",
+        "generations": 0,
+        "sends": 1
+      },
+      {
+        "case": "ambient_unavailable_silent_no_generation",
+        "generations": 0,
+        "sends": 0
+      },
+      {
+        "case": "ambient_merge_target_and_cap_together",
+        "generations": 2,
+        "sends": 2
+      }
+    ],
+    "real_model_calls": 0,
+    "real_qq_calls": 0,
+    "real_run_agent": true,
+    "actual_runner": true,
+    "private_gate_http": true,
+    "actual_provider": true,
+    "original_event_ACK": true,
+    "production_eligible": false
+  },
+  {
+    "backend": "ollama_ssh",
+    "mode": "single",
+    "participation": "mentions",
+    "attention": true,
+    "memory": true,
+    "memes": true,
+    "members": true,
+    "cases": [
+      {
+        "case": "normal_original_event_ACK",
+        "sends": 1
+      },
+      {
+        "case": "same_at_stop_blacklist_other_member_wake",
+        "sends": 1
+      },
+      {
+        "case": "old_result_after_wake_no_assistant_history",
+        "sends": 0
+      },
+      {
+        "case": "local_notice_ticket_old_rejected",
+        "sends": 1
+      },
+      {
+        "case": "all_local_notice_families_immutable_ticket",
+        "sends": 11
+      },
+      {
+        "case": "gate_refusal_known_not_sent_no_unknown_lock",
+        "sends": 0
+      },
+      {
+        "case": "submitted_delayed_ACK_retained",
+        "sends": 1
+      },
+      {
+        "case": "image_only_original_ACK_ticket",
+        "sends": 1
+      },
+      {
+        "case": "old_image_after_wake_rejected",
+        "sends": 0
+      },
+      {
+        "case": "failed_image_local_notice_ticket",
+        "sends": 1
+      },
+      {
+        "case": "typed_at_same_chain_ticket_and_permission",
+        "sends": 1
+      },
+      {
+        "case": "typed_at_permission_race_no_send",
+        "sends": 0
+      },
+      {
+        "case": "router_local_wait_no_provider_no_global_cancel",
+        "sends": 0
+      },
+      {
+        "case": "pre_HTTP_invalidated_no_generation",
+        "sends": 0
+      },
+      {
+        "case": "local_input_notice_0",
+        "sends": 1
+      },
+      {
+        "case": "local_input_notice_20",
+        "sends": 1
+      },
+      {
+        "case": "local_input_notice_4",
+        "sends": 1
+      },
+      {
+        "case": "submitted_HTTP_internal_queue_natural_completion",
+        "sends": 0
+      },
+      {
+        "case": "wake_never_clears_real_blocking_state",
+        "sends": 0
+      },
+      {
+        "case": "true_ACK_unknown_preserved",
+        "sends": 1
+      },
+      {
+        "case": "other_group_isolated",
+        "sends": 1
+      },
+      {
+        "case": "missing_mirror_closed",
+        "sends": 0
+      },
+      {
+        "case": "malformed_mirror_closed_then_recovers",
+        "sends": 0
+      }
+    ],
+    "real_model_calls": 0,
+    "real_qq_calls": 0,
+    "real_run_agent": true,
+    "actual_runner": true,
+    "original_event_ACK": true
+  },
+  {
+    "backend": "ollama_ssh",
+    "mode": "adaptive",
+    "participation": "mentions",
+    "attention": false,
+    "web": false,
+    "memory_enabled": false,
+    "cases": [
+      {
+        "case": "current_first_image_native_once",
+        "generations": 1,
+        "sends": 1
+      },
+      {
+        "case": "vision_effective_text_only_v2_no_image",
+        "generations": 1,
+        "sends": 1
+      },
+      {
+        "case": "replay_local_notice_no_generation",
+        "generations": 0,
+        "sends": 1
+      },
+      {
+        "case": "text_visual_reserve_rejected_before_native",
+        "generations": 0,
+        "sends": 1
+      }
+    ],
+    "real_model_calls": 0,
+    "real_qq_calls": 0,
+    "real_run_agent": true,
+    "actual_runner": true,
+    "private_gate_http": true,
+    "actual_provider": true,
+    "original_event_ACK": true,
+    "production_eligible": false
+  },
+  {
+    "backend": "ollama_ssh",
+    "mode": "adaptive",
+    "participation": "free",
+    "attention": true,
+    "web": false,
+    "memory_enabled": false,
+    "cases": [
+      {
+        "case": "current_first_image_native_once",
+        "generations": 1,
+        "sends": 1
+      },
+      {
+        "case": "vision_effective_text_only_v2_no_image",
+        "generations": 1,
+        "sends": 1
+      },
+      {
+        "case": "replay_local_notice_no_generation",
+        "generations": 0,
+        "sends": 1
+      },
+      {
+        "case": "text_visual_reserve_rejected_before_native",
+        "generations": 0,
+        "sends": 1
+      },
+      {
+        "case": "ambient_unavailable_silent_no_generation",
+        "generations": 0,
+        "sends": 0
+      },
+      {
+        "case": "ambient_merge_target_and_cap_together",
+        "generations": 2,
+        "sends": 2
+      }
+    ],
+    "real_model_calls": 0,
+    "real_qq_calls": 0,
+    "real_run_agent": true,
+    "actual_runner": true,
+    "private_gate_http": true,
+    "actual_provider": true,
+    "original_event_ACK": true,
+    "production_eligible": false
+  },
+  {
+    "backend": "ollama_ssh",
+    "mode": "adaptive",
+    "participation": "free",
+    "attention": true,
+    "web": true,
+    "memory_enabled": true,
+    "cases": [
+      {
+        "case": "current_first_image_native_once",
+        "generations": 1,
+        "sends": 1
+      },
+      {
+        "case": "vision_effective_text_only_v2_no_image",
+        "generations": 1,
+        "sends": 1
+      },
+      {
+        "case": "replay_local_notice_no_generation",
+        "generations": 0,
+        "sends": 1
+      },
+      {
+        "case": "text_visual_reserve_rejected_before_native",
+        "generations": 0,
+        "sends": 1
+      },
+      {
+        "case": "ambient_unavailable_silent_no_generation",
+        "generations": 0,
+        "sends": 0
+      },
+      {
+        "case": "ambient_merge_target_and_cap_together",
+        "generations": 2,
+        "sends": 2
+      }
+    ],
+    "real_model_calls": 0,
+    "real_qq_calls": 0,
+    "real_run_agent": true,
+    "actual_runner": true,
+    "private_gate_http": true,
+    "actual_provider": true,
+    "original_event_ACK": true,
+    "production_eligible": false
+  },
+  {
+    "backend": "ollama_ssh",
+    "mode": "adaptive",
+    "participation": "mentions",
+    "attention": true,
+    "memory": true,
+    "memes": true,
+    "members": true,
+    "cases": [
+      {
+        "case": "normal_original_event_ACK",
+        "sends": 1
+      },
+      {
+        "case": "same_at_stop_blacklist_other_member_wake",
+        "sends": 1
+      },
+      {
+        "case": "old_result_after_wake_no_assistant_history",
+        "sends": 0
+      },
+      {
+        "case": "local_notice_ticket_old_rejected",
+        "sends": 1
+      },
+      {
+        "case": "all_local_notice_families_immutable_ticket",
+        "sends": 11
+      },
+      {
+        "case": "gate_refusal_known_not_sent_no_unknown_lock",
+        "sends": 0
+      },
+      {
+        "case": "submitted_delayed_ACK_retained",
+        "sends": 1
+      },
+      {
+        "case": "bubble_interval_stop_wake_partial",
+        "sends": 1
+      },
+      {
+        "case": "image_only_original_ACK_ticket",
+        "sends": 1
+      },
+      {
+        "case": "old_image_after_wake_rejected",
+        "sends": 0
+      },
+      {
+        "case": "failed_image_local_notice_ticket",
+        "sends": 1
+      },
+      {
+        "case": "typed_at_same_chain_ticket_and_permission",
+        "sends": 1
+      },
+      {
+        "case": "typed_at_permission_race_no_send",
+        "sends": 0
+      },
+      {
+        "case": "router_local_wait_no_provider_no_global_cancel",
+        "sends": 0
+      },
+      {
+        "case": "pre_HTTP_invalidated_no_generation",
+        "sends": 0
+      },
+      {
+        "case": "local_input_notice_0",
+        "sends": 1
+      },
+      {
+        "case": "local_input_notice_20",
+        "sends": 1
+      },
+      {
+        "case": "local_input_notice_4",
+        "sends": 1
+      },
+      {
+        "case": "submitted_HTTP_internal_queue_natural_completion",
+        "sends": 0
+      },
+      {
+        "case": "wake_never_clears_real_blocking_state",
+        "sends": 0
+      },
+      {
+        "case": "true_ACK_unknown_preserved",
+        "sends": 1
+      },
+      {
+        "case": "other_group_isolated",
+        "sends": 1
+      },
+      {
+        "case": "missing_mirror_closed",
+        "sends": 0
+      },
+      {
+        "case": "malformed_mirror_closed_then_recovers",
+        "sends": 0
+      }
+    ],
+    "real_model_calls": 0,
+    "real_qq_calls": 0,
+    "real_run_agent": true,
+    "actual_runner": true,
+    "original_event_ACK": true
+  }
+]

@@ -25,7 +25,7 @@ from .errors import GatewayError
 
 NORMALIZER = 'lap28-rgb-png-v1'
 STATES = ('unverified','offline_passed','native_observed','production_eligible')
-DEFAULTS = dict(enabled=False, input_reserve_tokens=4096)
+DEFAULTS = dict(enabled=False, input_reserve_tokens=4096, ingress_diagnostics=False)
 MAX_RAW = 8*1024*1024
 MAX_BLOB = 512*1024
 MAX_WIRE = 2*1024*1024
@@ -54,6 +54,7 @@ def validate_config(raw):
     if not isinstance(raw, dict) or set(raw)-set(DEFAULTS):raise ValueError('Invalid vision fields')
     cfg=DEFAULTS | raw
     if type(cfg['enabled']) is not bool:raise ValueError('Invalid vision.enabled')
+    if type(cfg['ingress_diagnostics']) is not bool:raise ValueError('Invalid vision.ingress_diagnostics')
     if type(cfg['input_reserve_tokens']) is not int or not 1<=cfg['input_reserve_tokens']<=65536:
         raise ValueError('Invalid vision reserve')
     return cfg
@@ -70,6 +71,7 @@ def binding(settings, runtime):
 def adapter_signature():
     root=Path(__file__).resolve().parents[2]
     names=('src/qqbot_gateway/vision.py','src/qqbot_gateway/workbuddy_cli_runner.py',
+        'src/qqbot_gateway/vision_ingress.py','src/qqbot_gateway/vision_intake_gate.py',
         'src/qqbot_gateway/ollama_ssh_runner.py','src/qqbot_gateway/model_gateway.py','src/qqbot_gateway/onebot_gate.py',
         'src/qqbot_gateway/turn_v2.py','src/qqbot_gateway/web_retrieval.py','src/qqbot_gateway/contracts.py',
         'src/qqbot_gateway/token_budget.py','src/qqbot_gateway/persona.py','src/qqbot_gateway/config.py',
@@ -123,7 +125,7 @@ def image_url(value):
     except (ValueError,TypeError,WebFailure):raise ValueError('IMAGE_SOURCE_DENIED') from None
 
 
-async def fetch_image(url):
+async def fetch_image(url, *, diagnostic=None):
     from .web_retrieval import PublicConnector,PublicResolver
     connector=PublicConnector(resolver=PublicResolver(),use_dns_cache=False,force_close=True,limit=1)
     async with aiohttp.ClientSession(connector=connector,trust_env=False,cookie_jar=aiohttp.DummyCookieJar(),
@@ -132,13 +134,17 @@ async def fetch_image(url):
         for hop in range(3):
             image_url(url)
             async with session.get(url,allow_redirects=False) as response:
+                if diagnostic is not None:
+                    diagnostic['http_status_class']=str(response.status//100)+'xx' if 200<=response.status<600 else 'other'
                 if response.status in (301,302,303,307,308):
                     if hop==2:raise ValueError('IMAGE_REDIRECT_LIMIT')
+                    if diagnostic is not None:diagnostic['attempt_counts']['redirect']=hop+1
                     url=image_url(urljoin(url,response.headers.get('Location','')));continue
                 if (response.status!=200 or response.headers.get('Content-Encoding','identity')!='identity' or
                     response.headers.get('Content-Type','').split(';')[0].lower() not in ('image/jpeg','image/png','image/webp','image/gif')):
                     raise ValueError('IMAGE_RESPONSE_DENIED')
                 if response.content_length is not None and response.content_length>MAX_RAW:raise ValueError('IMAGE_TOO_LARGE')
+                if diagnostic is not None:diagnostic['mime']=response.headers['Content-Type'].split(';')[0].lower()
                 data=bytearray()
                 async for chunk in response.content.iter_chunked(16384):
                     data.extend(chunk)
@@ -170,7 +176,7 @@ class Blob:
         return self
 
 
-def normalize(data):
+def normalize(data, *, diagnostic=None):
     if not isinstance(data,bytes) or not 0<len(data)<=MAX_RAW:raise ValueError('IMAGE_TOO_LARGE')
     try:
         with warnings.catch_warnings():
@@ -178,6 +184,7 @@ def normalize(data):
             with Image.open(io.BytesIO(data)) as source:
                 if source.format not in ('PNG','JPEG','WEBP','GIF') or source.width*source.height>16000000:
                     raise ValueError('IMAGE_DECODE_LIMIT')
+                if diagnostic is not None:diagnostic.update(original_dimensions=list(source.size),format=source.format)
                 source.seek(0);source.load()
                 image=ImageOps.exif_transpose(source).convert('RGBA')
                 # Composite transparency; no metadata or hidden RGB channels survive.
@@ -238,7 +245,7 @@ class Materials:
             row['used']=True;raise ValueError('MATERIAL_BINDING_DENIED')
         row['binding']=tuple(body[k] for k in ('request_key','target_seq','source_digest','epoch'))
 
-    async def resolve(self,body,connection,allowed):
+    async def resolve(self,body,connection,allowed, *, diagnostic=None):
         self.prune()
         keys={'purpose','cap','image_ref','request_key','target_seq','source_digest','epoch'}
         if not isinstance(body,dict) or set(body)!=keys:raise ValueError('MATERIAL_REQUEST_INVALID')
@@ -255,7 +262,7 @@ class Materials:
         self.busy=True;generation=self.generation;deadline=self.clock()+15
         try:
             async with asyncio.timeout(15):
-                blob=normalize(await self.fetch(row['url']))
+                blob=normalize(await self.fetch(row['url']),diagnostic=diagnostic)
             if generation!=self.generation or self.clock()>=min(row['expires'],deadline) or not allowed(row['identity']):raise ValueError('MATERIAL_EXPIRED')
             self.blobs[cap]=blob
             row['original_sha256']=blob.original_sha256;row['normalized_sha256']=blob.sha256

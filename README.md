@@ -275,3 +275,11 @@ web设置进入会话版本，重启加载后新建当前上下文，旧历史�
 
 
 LAP-35临时停言：授权群普通成员明确要求bot停言后，本群无确认输出，下一条非黑名单原始真实@恢复；同条@停言优先。gate/完整bot重启复位，网络/插件/model重连保持；已提交消息不能撤回，旧结果失效。唯一设置 `participation.silence.enabled` 默认true，位于chat.yaml，下一次正常启动生效；当前只离线交付，未改本机配置或加载。详见[配置索引](config/README.md)。忽略的 `state/gate-connection.json` 包含boot与散列群代际诊断镜像，主状态只在RAM，启动不读镜像恢复，不含原话/门票；不能拿停言/重启清除原unknown/cleanup台账。
+
+## LAP-28 阶段 A：图片入站诊断
+
+默认 `python scripts/observe_lap28_intake.py`（或 `--inspect`）只读项目配置和安装结构元数据；`--synthetic` 使用内存自造图片/事件，分别重现「有 image 段但无像素」「合规 URL 路径取得并解码」「纯文本占位」。两者均无网络、bot启停、登录、模型或QQ输出，不创建诊断状态。当前真实入站仍为 `ingress_unverified`，不代表收到过真实群图片。
+
+`vision.ingress_diagnostics` 默认 false；操作者下次正常启动时可选择仅记录准入后、剥离前的封闭字段。日志不含URL/file值、身份、原文、cap、token、图片或hash；普通模式不会为了诊断下载图片。`vision.enabled=false` 与原生产拒启门槛保持。
+
+真实模式只能在另行明确授权后使用 `--intake-only --max-events 1 --timeout-seconds 120 --authorize ONE_IMAGE_INGRESS`，并明确 `--sample-group` / `--sample-sender`。要求正常bot已停、无未决清理/任务、端口空闲且项目NapCat文件日志已关闭；无法证明则拒绝，不自动改日志配置。只创建受管NapCat和无转发/发送接口的诊断gate；不带快速登录账号、不读登录凭据、不做密码回退。未登录返回 `login_required`；超时/取消仅回收本诊断创建身份及子进程。该模式本轮没有执行，详见[阶段A报告](reports/lap-28-A-2026-10-21.md)。

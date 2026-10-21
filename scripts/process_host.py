@@ -43,6 +43,9 @@ def login_event(line):
 
 
 def safe_line(component,line):
+    if component=='gate' and 'VISION_INGRESS ' in line:
+        from qqbot_gateway.vision_ingress import safe_log
+        return safe_log(line.rstrip())
     if component=='napcat':return login_event(line)
     if component=='gate' and line.rstrip().endswith('CHANNEL_CONNECTED_SELF_ID_VERIFIED'):
         return 'CHANNEL_CONNECTED_SELF_ID_VERIFIED'

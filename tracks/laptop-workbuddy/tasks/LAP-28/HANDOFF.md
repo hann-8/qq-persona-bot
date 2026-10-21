@@ -1,6 +1,16 @@
 # LAP-28 当前消息原生图片理解
 
-2026-10-21续作仅规划：[LAP-36总计划](../LAP-36/PLAN.md)、[图片合同](../LAP-36/IMAGE_PLAN.md)、[medium指引A/C](../LAP-36/IMPLEMENTATION_GUIDE.md)已完成；先真实入站材料，再所选后端质量/可信容量证明/派生生产门槛。现有日志无原始图像证据，本机DNS/TLS另由18B补齐；本轮没有修改28实现/启用或做真实识图。下方18日历史实现/验收差额原样保留，续作待新指令领取。
+阶段A当前（2026-10-21）：**代码/离线交付，真实ingress_unverified，生产仍拒启**。详细行为、文件/验证/资源、未验证与B/C解除条件见[阶段A报告](../../../../reports/lap-28-A-2026-10-21.md)；[本轮汇总](../../../../reports/lap-28-A-offline.json)/[实际框架矩阵](../../../../reports/lap-28-A-framework-offline.json)/[资源采样](../../../../reports/lap-28-A-resources.json)。默认inspect及synthetic已执行，真实intake-only未运行；0真实启停/登录/下载/SSH/模型/QQ。213项影响集与16组158实际框架替身通过；用户ff2e348人设既有预算回归23,393>=8,192字节失败独立记录，未修改/替换人设，最终验证器明确排除此一项。历史323/900不作本轮结果。
+
+已完成：第一image URL→一次cap/bind/租约→有界bytes→Pillow实际解码的分级诊断；闭合脱敏schema/process_host行；默认false配置/模板/旁注；独立无转发/发送/RPC的诊断gate和复用24最终管理器的受控intake-only。默认/普通日志观察不下载图。无get_image/路径读取/补拉历史/第二图替代，production与4096边界不动。新增依赖0。代码/测试/文档归属见报告及下方领取段，基线后无其他任务差异。
+
+下一步：用户另指令才续18B安全公共网络/正文；另授权正常bot停机、指定自造群图/发送者与最多1事件、0模型/0群输出，才运行真实入站证明。只有段/URL不够，须同次bytes+decoded；无URL且有安全opaque ID的真实证据出现后才能按I3实施默认关闭fallback。28C另续领质量/可信视觉及模板上界/批次预算与派生门槛；真实生成/群ACK另批授权。保留31B/18/24及旧差额，不自动继续。
+
+阶段A领取：2026-10-21T19:57:04+08:00，session `LAP-28-A-ingress-diagnostics`（图片入站证据与诊断工具）。按用户medium职责执行，不检测/切换模型。基线工作区干净；24 P1/P3已提交，process_host/manage无未提交修改，本轮仅增加必要诊断接口，保留24行为。归属：新增vision_ingress.py/observe_lap28_intake.py与test_lap28_ingress.py、vision/onebot_gate/config及配置模板/注释/导出必要字段、process_host/manage必要入口、适用verify与独立报告、本交接/PROGRESS/工作线HANDOFF/TASKS。先登记后实现；无真实进程操作归属，不运行intake-only，不动persona/本机配置/凭据。
+
+目标与验收：复用准入/第一图/一次cap/租约及安全URL下载；封闭分级元数据、默认inspect与独立受管intake-only；合成证明有段无像素、URL解码、纯文字占位，入口拒绝/去敏/取消超时回收及适用实际AstrBot回归。production拒启及vision=false保持；无get_image真实必要证据，不实施fallback。真实仍ingress_unverified。阶段B/C及真实批次等待后续指令。
+
+以下为2026-10-21历史规划记录（A实施状态以上方当前段为准）：[LAP-36总计划](../LAP-36/PLAN.md)、[图片合同](../LAP-36/IMAGE_PLAN.md)、[medium指引A/C](../LAP-36/IMPLEMENTATION_GUIDE.md)已完成；先真实入站材料，再所选后端质量/可信容量证明/派生生产门槛。现有日志无原始图像证据，本机DNS/TLS另由18B补齐；本轮没有修改28实现/启用或做真实识图。下方18日历史实现/验收差额原样保留，续作待新指令领取。
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md)。继承AGENTS及LAP-26 PLAN5、SPEC2/4/5/9/10。
 

@@ -416,6 +416,111 @@ def _start_channel(full=False, paused=False):
     return instance_id,gate.bot_qq
 
 
+def require_intake_logging(bot):
+    """No logging reconfiguration: refuse unsafe/unknown existing file logs."""
+    from qqbot_gateway.napcat_login import bounded_read, strict_json
+    base=NAPCAT/'versions/9.9.33-52230/resources/app/napcat/config'
+    for name in ('napcat.json','napcat_'+bot+'.json'):
+        path=base/name
+        if path.is_symlink() or not path.resolve().is_relative_to(ROOT.resolve()):raise ValueError('INTAKE_LOGGING_UNVERIFIED')
+        try:value=strict_json(bounded_read(path,16384))
+        except (OSError,ValueError):raise ValueError('INTAKE_LOGGING_UNVERIFIED') from None
+        if not isinstance(value,dict) or value.get('fileLog') is not False:raise ValueError('INTAKE_FILE_LOGGING_DENIED')
+
+
+def intake_only(*, authorize, group, sender, max_events=1, timeout_seconds=120):
+    """Separate opt-in transaction. Never calls normal start/login/fallback.
+
+    Reuses this manager's lock, snapshots, process creation ledger, capture and
+    identity-checked cleanup. The lock covers the entire short diagnostic lease.
+    """
+    from qqbot_gateway.config import require_stopped
+    from qqbot_gateway.cleanup_identity import CleanupOwner
+    from qqbot_gateway.vision_ingress import validate_record
+    if authorize!='ONE_IMAGE_INGRESS' or max_events!=1 or type(timeout_seconds) is not int or not 1<=timeout_seconds<=120:
+        raise ValueError('INTAKE_AUTHORIZATION_REQUIRED')
+    with configuration_lock(ROOT):
+        require_stopped(ROOT)
+        if CleanupOwner(ROOT).status()['blocked']:raise ValueError('INTAKE_CLEANUP_UNRESOLVED')
+        if any(v for k,v in task_counts().items() if k in ('accepted','running','unknown','send_unknown')):
+            raise ValueError('INTAKE_TASK_UNRESOLVED')
+        for port in (6185,6199,6200,6099,8765):check_port(port)
+        project=read_project(ROOT)
+        from qqbot_gateway.vision import require_production
+        require_production(project.settings)
+        gate=load_gate_config(root=ROOT,settings=project.settings)
+        if group not in gate.allowed_groups or not group or not sender or sender in gate.blocked_users or sender==gate.bot_qq:
+            raise ValueError('INTAKE_TARGET_DENIED')
+        from qqbot_gateway.config import qq_id
+        if qq_id(sender)!=sender:raise ValueError('INTAKE_TARGET_DENIED')
+        require_intake_logging(gate.bot_qq)
+        instance=uuid.uuid4().hex
+        snapshot,metadata=create_snapshot(project,instance)
+        env=child_environment(os.environ);env.update(snapshot_environment(ROOT,snapshot,metadata))
+        env.update(PYTHONPATH=str(ROOT/'src'),PYTHONUTF8='1',QQBOT_INTAKE_GROUP=group,QQBOT_INTAKE_SENDER=sender)
+        mode=dict(mode='intake_only',instance_id=instance,phase='starting',configuration=metadata,
+                  owner=dict(pid=os.getpid(),created=psutil.Process().create_time()))
+        atomic_json(ROOT/'state/service-mode.json',mode)
+        evidence=ROOT/'state/vision-evidence'/(instance+'.json')
+        logs=ROOT/'logs';logs.mkdir(exist_ok=True)
+        entries=[];result=dict(state='failed_or_unknown',record=None)
+        # Deliberately no account/quick-login argument, credentials or password
+        # fallback. Manual login is a separately authorized operator action.
+        specs=(('gate',[str(ROOT/'.venv/Scripts/python.exe'),'-m','qqbot_gateway.vision_intake_gate',
+                       '--root',str(ROOT),'--config',str(snapshot),'--instance',instance,'--timeout',str(timeout_seconds)],ROOT),
+               ('napcat',[str(NAPCAT/'NapCatWinBootMain.exe')],NAPCAT))
+        owners=[];deadline=time.monotonic()+timeout_seconds
+        try:
+            for component,args,cwd in specs:
+                started=time.time()
+                with (logs/('intake-'+component+'.log')).open('ab') as output:
+                    process=psutil.Popen([str(ROOT/'.venv/Scripts/python.exe'),str(ROOT/'scripts/process_host.py'),component,'--',*args],
+                        cwd=cwd,env=env,stdout=output,stderr=subprocess.STDOUT,creationflags=subprocess.CREATE_NO_WINDOW)
+                owners.append((process,component,started))
+                capture(entries,process,component,started)
+                if not entries:raise RuntimeError('INTAKE_IDENTITY_UNVERIFIED')
+                if component=='gate':
+                    gate_deadline=min(deadline,time.monotonic()+10)
+                    while time.monotonic()<gate_deadline:
+                        capture(entries,process,component,started)
+                        health=fetch_health(gate.port)
+                        if (health.get('intake_only') is True and health.get('instance_id')==instance and
+                            any(e['component']=='gate' and e['pid']==health.get('pid') and
+                                e['created']==health.get('created') and alive(e) is not None for e in entries)):break
+                        if process.poll() is not None:raise RuntimeError('INTAKE_GATE_FAILED')
+                        time.sleep(.1)
+                    else:raise RuntimeError('INTAKE_GATE_TIMEOUT')
+            mode['phase']='running';atomic_json(ROOT/'state/service-mode.json',mode)
+            while time.monotonic()<deadline:
+                for process,component,started in owners:capture(entries,process,component,started)
+                if evidence.exists():
+                    raw=evidence.read_bytes()
+                    if len(raw)>4096:raise ValueError('INTAKE_EVIDENCE_INVALID')
+                    from qqbot_gateway.reply_plan import _pairs
+                    value=json.loads(raw,object_pairs_hook=_pairs)
+                    if (not isinstance(value,dict) or set(value)!={'state','record'} or
+                        value['state'] not in ('observed','cancelled','timeout','login_required')):raise ValueError('INTAKE_EVIDENCE_INVALID')
+                    if value['record'] is not None:validate_record(value['record'])
+                    result=value;break
+                if any(process.poll() is not None for process,_,_ in owners[:1]):break
+                time.sleep(.1)
+            else:
+                result=dict(state='timeout' if fetch_health(gate.port).get('online') else 'login_required',record=None)
+        except KeyboardInterrupt:result=dict(state='cancelled',record=None)
+        finally:
+            # Final discovery precedes termination, including launcher children.
+            # No pre-existing identities are ever handed to stop().
+            mode['phase']='cleanup_failed'
+            try:
+                try:
+                    for process,component,started in owners:capture(entries,process,component,started)
+                finally:stop(entries)
+                mode['phase']='finished'
+            finally:
+                atomic_json(ROOT/'state/service-mode.json',mode)
+        return result
+
+
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('command',choices=['start-channel','start-text','stop','status','test','cleanup'])
