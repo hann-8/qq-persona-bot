@@ -1,5 +1,7 @@
 # LAP-24：6.1-sol/medium实施指引
 
+2026-10-21续作：自动登录与shell:startup使用[新PLAN](AUTOSTART_PLAN.md)和[新medium指引](AUTOSTART_IMPLEMENTATION_GUIDE.md)。本页自然分条/密码回退是旧交付合同，勿重新按第7节复制全文重做；真实免扫码和数据归属仍未验收。
+
 返回[PROGRESS](../../../../PROGRESS.md) / [TASKS](../../TASKS.md) / [HANDOFF](HANDOFF.md) / [详细PLAN](PLAN.md)。2026-10-18由用户指定的max规划职责补齐；本文件是后续实施模板，本轮没有实施。
 
 ## 1. 授权与领取

@@ -1,5 +1,7 @@
 # LAP-24：NapCat登录持久化与自然分条修正计划
 
+2026-10-21登录/开机启动续作入口：[AUTOSTART_PLAN](AUTOSTART_PLAN.md) / [新实施指引](AUTOSTART_IMPLEMENTATION_GUIDE.md)。旧自然分条交付保留；登录部分结合新证据按续作分支推进，不重做已交付代码，不把旧自动回退独立实现当免扫码完成。
+
 返回[PROGRESS](../../../../PROGRESS.md) / [TASKS](../../TASKS.md) / [本任务HANDOFF](HANDOFF.md)。继承[AGENTS](../../../../AGENTS.md)、[LAP-14分条合同](../LAP-14/PLAN.md)、[LAP-19群聊/表情合同](../LAP-19/GROUP_CHAT_PLAN.md)与[LAP-12生命周期](../LAP-12/HANDOFF.md)。
 
 更新：2026-10-18（Asia/Shanghai），max职责复审版。用户明确本会话详细规划，之后由其安排gpt-6.1-sol/medium实施。本次仅只读核对/文档，未实施、未部署，未使用用户提供的密码；不自行检测或切换会话设置。medium可直接执行的步骤见[IMPLEMENTATION_GUIDE](IMPLEMENTATION_GUIDE.md)。

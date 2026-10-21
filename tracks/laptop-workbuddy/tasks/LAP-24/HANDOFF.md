@@ -1,6 +1,18 @@
 # LAP-24：自然分条与登录独立部分交接
 
-## 当前实施续作
+## 2026-10-21自动登录规划续作
+
+2026-10-21 18:56（Asia/Shanghai）领取；session `LAP-24-autostart-login-plan` / “保存登录状态与开机自动登录规划”，基线`main/3e4122b4e9046f154ff9fa82d2be317413e69056`。用户指定本会话承担sol/max规划；不自行检测或切换设置。只读研究并形成[AUTOSTART_PLAN](AUTOSTART_PLAN.md)和[实施指引](AUTOSTART_IMPLEMENTATION_GUIDE.md)，区分QQ会话保存、设备信任、密码回退和Windows触发；本轮不实施、不启停或登录运行中的bot。
+
+归属8份文档：PROGRESS、工作线HANDOFF/TASKS、本HANDOFF、旧PLAN/IMPLEMENTATION_GUIDE仅加续作入口、新AUTOSTART_PLAN/AUTOSTART_IMPLEMENTATION_GUIDE。保留`config/persona.md`未提交差异；不触及本机配置/凭据、设备文件内容、日常QQ、SSH、模型或群消息。旧自然分条交付与登录缺口分别保留。
+
+2026-10-21 19:15（Asia/Shanghai）检查点：详细规划完成，**未实施/未部署/免扫码未验收**。原生会话优先，WebUI管理Cookie/密码回退不能替代QQ设备信任；双来源脱敏诊断、独立管理token、受控login-check-only、锁外有界等待/实例状态、自有Startup与备用独立环境分支均已明确。原生目录位于项目外及Registry20旧mtime只采用本会话前段元数据证据，不推断共享、GUID有效或根因。新规划仍无经验证的Windows原生路径覆盖，未解除旧data_scope。
+
+下一步：用户设置medium并按新指引第4节只实施P1/P3代码/离线交付；不重做自然分条。真实D/R1/R2需另定唯一负责人并阻断群转发；正式R3正常free运行须另定允许的真实触发范围，不承诺全程0生成。两次普通重启+一次Windows重启免人工先通过，才能安装Startup；失败按分支回规划，不重复填密/重置GUID/自动换环境。
+
+验证：只读核对固定bundle哈希/符号、现有锁/状态/配置入口及官方资料；8份文档316个本地链接全部存在、代码围栏配对、归属检查与git diff --check通过；新增文本未含本机真实QQ/访问控制ID，persona原字节哈希未变。没有新增运行探活或单元/框架测试；前段在线观察和18日248/324分别是既有证据，不算本次新验收。0本轮真实启停/认证/登录/模型/QQ/SSH/本机配置修改，Git待交付。
+
+## 2026-10-18实施检查点（历史）
 
 2026-10-18 00:20（Asia/Shanghai）领取；session `LAP-24-natural-login-implementation`，标题“LAP-24自然分条与登录独立部分实施”。开始main/`d319811`，工作区干净。仅实施本任务：先统一自然分条，再核对数据归属并实现DPAPI配置/固定WebUI单次回退；离线及实际框架合成验证后文档、commit/push。无真实启停/认证/登录/模型/群消息，不填本机凭据或运行配置。
 
