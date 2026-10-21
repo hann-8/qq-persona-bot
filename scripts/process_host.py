@@ -5,7 +5,45 @@ import subprocess
 import time
 
 
+class BoundedLines:
+    """Discard the entire oversized logical line, including later fragments."""
+    def __init__(self):self.buffer=b'';self.discard=False
+    def feed(self, chunk):
+        for index, part in enumerate(chunk.split(b'\n')):
+            if index:
+                if not self.discard:yield self.buffer.decode('utf-8',errors='replace')
+                self.buffer=b'';self.discard=False
+            if not self.discard:
+                if len(self.buffer)+len(part)>16384:self.buffer=b'';self.discard=True
+                else:self.buffer+=part
+
+
+def login_event(line):
+    if len(line.encode('utf-8'))>16384:return None
+    line=re.sub(r'\x1b\[[0-?]*[ -/]*[@-~]','',line).strip()
+    line=re.sub(r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} \[(?:info|warn|error)\] ?','',line,flags=re.I)
+    patterns=[(r'需要验证码, proofWaterUrl: .*','verification_required'),
+              (r'新设备需要扫码验证, jumpUrl: .*','verification_required'),
+              (r'异常设备需要验证, jumpUrl: .*','verification_required'),
+              (r'密码回退需要(?:验证码|新设备验证)，请在 WebUi 中继续完成验证.*','verification_required'),
+              (r'正在快速登录 +[0-9]{5,20}', 'quick_login_started'),
+              (r'快速登录错误：.*', 'quick_login_failed'),
+              (r'快速登录异常：.*', 'quick_login_failed'),
+              (r'快速登录失败，未找到该 QQ 历史登录记录，将尝试密码回退登录', 'native_history_missing_hint'),
+              (r'没有 -q 指令指定快速登录，将使用二维码登录方式', 'quick_target_missing'),
+              (r'\[NapCat\] \[WebUi\] 自动快速登录失败: .*','quick_login_failed'),
+              (r'\[NapCat\] \[WebUi\] 自动快速登录成功: [0-9]{5,20}','quick_login_success_hint'),
+              (r'\[NapCat\] 已通知主进程登录成功','login_success_hint')]
+    for pattern,event in patterns:
+        if re.fullmatch(pattern,line):
+            code=re.search(r'错误码: (0|140022008|140022010|140022011)$',line)
+            if code and code[1]!='0':event='verification_required'
+            return 'NAPCAT_LOGIN_EVENT event='+event+((' code='+code[1]) if code else '')
+    return None
+
+
 def safe_line(component,line):
+    if component=='napcat':return login_event(line)
     if component=='gate' and line.rstrip().endswith('CHANNEL_CONNECTED_SELF_ID_VERIFIED'):
         return 'CHANNEL_CONNECTED_SELF_ID_VERIFIED'
     if component=='gate' and line.rstrip().endswith('CHANNEL_DISCONNECTED'):
@@ -29,17 +67,16 @@ def main():
     print('HOST_START component='+args.component,flush=True)
     process=subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,stdin=subprocess.DEVNULL,
                              creationflags=subprocess.CREATE_NO_WINDOW)
-    buffer=b'';last_error=0
+    lines=BoundedLines();last_error=0;events=set()
     while chunk:=process.stdout.read1(4096):
-        buffer+=chunk
-        while b'\n' in buffer:
-            raw,buffer=buffer.split(b'\n',1)
-            line=raw.decode('utf-8',errors='replace')
+        for line in lines.feed(chunk):
             safe=safe_line(args.component,line)
+            if safe and args.component=='napcat':
+                if safe in events or len(events)>=32:continue
+                events.add(safe)
             if safe:print(time.strftime('%Y-%m-%d %H:%M:%S')+' '+safe,flush=True)
-            elif ('ERROR' in line or '[ERRO]' in line) and time.monotonic()-last_error>30:
+            elif args.component!='napcat' and ('ERROR' in line or '[ERRO]' in line) and time.monotonic()-last_error>30:
                 print('COMPONENT_ERROR component='+args.component+' details_suppressed',flush=True);last_error=time.monotonic()
-        if len(buffer)>16384:buffer=b''
     code=process.wait();print('HOST_EXIT component='+args.component+' code='+str(code),flush=True)
     raise SystemExit(code)
 

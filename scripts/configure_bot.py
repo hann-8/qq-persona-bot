@@ -84,6 +84,10 @@ def execute(path, section, action, identifier=None, *, expected_digest=None):
     settings, digest = read_settings(path)
     if expected_digest is not None and digest != expected_digest:
         raise ValueError('Configuration changed; reload before saving')
+    if section == 'napcat-login' and action in ('set-observer-token','clear-observer-token','observer-status'):
+        import json
+        from qqbot_gateway.napcat_login_observer import configure_token
+        print(json.dumps(configure_token(path,action),ensure_ascii=False));return
     if section == 'napcat-login':
         import json
         from qqbot_gateway.napcat_login import configure_credentials
@@ -730,7 +734,7 @@ def main():
     commands.add_parser('connection-check')
     commands.add_parser('clear-remote-unknown').add_argument('identifier')
     login=commands.add_parser('napcat-login').add_subparsers(dest='action',required=True)
-    for action in ('status','set-password','clear-password'):login.add_parser(action)
+    for action in ('status','set-password','clear-password','set-observer-token','clear-observer-token','observer-status'):login.add_parser(action)
     for section in (*OUTPUT_FIELDS,'backend','model','context','context-window','effort','history','overhead','output-reserve'):
         actions=commands.add_parser(section).add_subparsers(dest='action',required=True)
         actions.add_parser('set').add_argument('identifier')

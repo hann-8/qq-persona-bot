@@ -1,3 +1,19 @@
+## 2026-10-21 P1/P3实施交接（当前）
+
+2026-10-21 19:40（Asia/Shanghai）：LAP-24 P1/P3已实现/离线通过；session `LAP-24-autostart-independent-implementation`（19:21:05领取）。固定脱敏登录事件/只读WebUI与独立DPAPI token、受控login-check-only、锁外QQ等待和一次Startup包装器/自有链接注册交付；171项受影响回归通过（30.121秒），新观察器27/Startup12项包含其中。0真实bot启停/认证/登录/6099/凭据/Startup/SSH/模型/QQ操作；原生路径/完整句柄/设备连续性及真实免扫码仍未证，data_scope=unverified。保留persona及并行LAP-36，真实D/R/部署待后续指令。
+
+合同：[AUTOSTART_PLAN](AUTOSTART_PLAN.md)/[新实施指引](AUTOSTART_IMPLEMENTATION_GUIDE.md)。完成内容、复现命令与具体缺口见[本轮报告](../../../../reports/lap-24-autostart-2026-10-21.md)；旧自然分条与248/324历史结论保留。本轮没有读取/保存真实凭据、写本机运行配置、操作真实6099或部署Startup；用户persona保留不纳入提交。
+
+归属文件：scripts/{process_host,manage,configure_bot,autostart}.py、scripts/startup_shortcut.ps1、开机启动机器人.cmd、src/qqbot_gateway/napcat_login_observer.py、tests/test_napcat_login_observer.py、tests/test_autostart.py、README、config/README、本轮报告、本HANDOFF及PROGRESS/工作线HANDOFF/TASKS的24差异。并行LAP-36仅各自段落归属；不提交其规划段落/文档，不覆写其内容。
+
+验证：新观察器27项/Startup12项在最终组合中通过；此前独立26项（12.504秒）/12项（0.262秒）通过；最终报告内组合命令171项全部通过（30.121秒），涵盖生命周期/配置快照/旧单次密码账本及实际gate的free暂停转发。测试进程内读取已提交persona基线，不修改磁盘用户人设。PowerShell辅助仅Parser语法检查，未执行COM；bundle哈希与规划一致。差异/链接/Git最终核对见交付记录。
+
+明确缺口：stdout完整可达性、WebUI真实兼容、完整Windows文件句柄枚举/原生设备文件连续性/可强制绑定的专属原生路径报告仍未证。open_files只能尽力提供scope/路径摘要比较，失败unknown；外部根不转project_only，未解除旧密码回退门槛。不切容器/Windows用户/QQ框架，不操作外部资料/票据/设备身份。
+
+下一步：等待用户明确真实D/R1/R2范围和唯一实例负责人；先login-check-only验证会话，两次正常重启及一次Windows重启免人工通过后，才安排真实Startup部署/R3及3使用日观察。正常text/free真实触发范围另定，不把暂停qq_session_ready算qq_ready。回滚先移除自有Startup/停包装入口，再按身份关闭项目回代码，保留原生资料和所有pending/unknown/清理/密码尝试账本。旧18/31B等差额不变。
+
+LAP-24 P1/P3实施进行中：session `LAP-24-autostart-independent-implementation` / “自动登录观测与Startup独立代码”，开始2026-10-21T19:21:05+08:00，基线main/b23d961。唯一写入负责人为本session；文件归属：scripts/process_host.py、manage.py、configure_bot.py、新autostart.py/必要固定快捷方式辅助、开机启动机器人.cmd、src/qqbot_gateway/napcat_login_observer.py、相关observer/autostart/process_host/lifecycle测试、README/config/README、reports/lap-24-autostart-2026-10-21.md、本台账/工作线HANDOFF/24 HANDOFF/PROGRESS。按AUTOSTART_PLAN与新指引仅代码和离线夹具，0真实启停/认证/登录/6099/Startup/SSH/模型/QQ；保留用户persona差异，不动旧自然分条、runner/vendor/data_scope。
+
 # LAP-24：自然分条与登录独立部分交接
 
 ## 2026-10-21自动登录规划续作

@@ -1,3 +1,41 @@
+## LAP-24 登录观测与开机入口（代码交付，未部署）
+
+2026-10-21：P1/P3已实现并离线验证，见[报告](reports/lap-24-autostart-2026-10-21.md)和[交接](tracks/laptop-workbuddy/tasks/LAP-24/HANDOFF.md)。本轮没有操作真实bot、6099认证、凭据或Startup；不代表反复扫码已修好。原生资料归属仍unverified，旧密码回退门槛保持。
+
+普通启动保持原行为。以下是日后经用户指定范围后使用的入口，本轮没有执行：
+
+```powershell
+# 停机时本机TTY无回显录入可选WebUI管理token；无需QQ密码
+.venv/Scripts/python.exe -X utf8 scripts/configure_bot.py napcat-login set-observer-token
+.venv/Scripts/python.exe -X utf8 scripts/configure_bot.py napcat-login observer-status
+.venv/Scripts/python.exe -X utf8 scripts/configure_bot.py napcat-login clear-observer-token
+# 受控登录层验收：保持暂停准入，不启动模型
+.venv/Scripts/python.exe -X utf8 scripts/manage.py start-channel --login-check-only --login-diagnostics --wait-login-seconds 120
+# 正常聊天启动的可选有界等待（会恢复既有授权群行为，须另定真实范围）
+.venv/Scripts/python.exe -X utf8 scripts/manage.py start-text --login-diagnostics --wait-login-seconds 120
+```
+
+`--login-check-only`只接受start-channel，不在结束时自动解除停止标记；connected/online/self_id_verified只证明`qq_session_ready`。正常模式还须stopping=false才是`qq_ready`，组件phase另列。status只读；当前通道优先，保存的验证原因/开机结果标为历史，不为了更新它们进行认证。新实例才观察，重复start不再次认证；观察期间释放配置锁，停止或实例/受管Worker变化会取消。
+
+管理token仅CurrentUser DPAPI密文，文件为忽略的`secrets/napcat-observer.local.json`，最多16KiB，schema1且拒未知键；不从旧凭据、浏览器或聊天导入。管理2FA返回management_verification_required后交人工。观察固定loopback四条路由：管理认证、CheckLoginStatus、GetQuickLoginList、GetQQLoginInfo；无代理/重定向，单请求3秒/64KiB，管理观测最多120秒/16请求（1认证/12状态/2缓存/1信息，状态间隔至少5秒）。快登缓存missing不等于原生历史缺失。没有token不影响原生快登。
+
+受管NapCat stdout仅重建固定事件和0/140022008/140022010/140022011白名单码；每次host最多32条并去重，每条小于256字节。原始行缓冲16KiB，超长整行直至换行丢弃；群正文、票据、URL和任意错误码不落日志。成功hint不是在线证明；没有输出可能是Worker/named pipe绕开host，须记telemetry_unavailable。原生路径采集只用受管后代的open_files元数据，可能不完整/不可用；只留scope及最多4个本机路径摘要，不能证明专属/可绑定目录、GUID或票据连续性。
+
+`开机启动机器人.cmd`调用固定项目解释器与`autostart.py run`。默认延迟30秒（0..120），本机网络接口等待120秒（0..300），然后一次start-text并等待QQ最多120秒；观察器共用该预算，不额外生成模型请求。接口可用不证明互联网、家庭PC或模型可用，E盘在登录前必须可访问。wrapper有独立单实例锁；生命周期/快照仍走manage，所有长等待不持配置锁。partial/冲突/清理未决不重试、不清账本、不自动kill/切模型；超时退出并保留组件现状，无pause/TTY/自动浏览器或后台循环。
+
+只有两次正常重启及一次Windows重启免人工恢复通过后，再由用户授权部署唯一当前用户Startup入口：
+
+```powershell
+# 未来部署/撤销入口，本轮未执行install/remove，也未写真实Startup
+.venv/Scripts/python.exe -X utf8 scripts/autostart.py install
+.venv/Scripts/python.exe -X utf8 scripts/autostart.py status
+.venv/Scripts/python.exe -X utf8 scripts/autostart.py remove
+```
+
+仅管理`QQbot-managed-startup.lnk`：固定目标/参数/工作目录、项目归属台账和链接字节摘要必须匹配；同名外部项拒覆盖/移除，重复install幂等，改参数先remove。PowerShell固定脚本创建临时链接，隐藏执行，不改执行策略/注册表/全局服务。异常中断可能留下无台账链接，此时拒绝认领，需人工核对。状态保存在忽略的`state/napcat-login-observation.json`、`autostart-status.json`、`autostart-registration.json`，不含QQ密码、管理token或原始响应。
+
+回滚先撤销自有Startup/停用包装入口，再按身份关闭本项目并恢复代码；保留原生资料、pending/unknown/清理/密码尝试账本，不操作日常QQ资料或设备身份。真实诊断、R1/R2/R3及3个使用日观察均待后续指令。
+
 配置入口见[config/README.md](config/README.md)。LAP-34已实现的日常流程为关闭→编辑config/local五文件→正常启动；未迁移时继续兼容旧单文件。本机迁移/加载待另行明确授权。根配置cmd退役，无参configure_bot只打印索引；图库/记忆/凭据/连接管理动作保留。以下历史能力的真实验收差额均保留。
 
 # QQ 人设文字 Bot（笔记本测试版）

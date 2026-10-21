@@ -1,3 +1,5 @@
+LAP-24可选管理token独立于五文件配置和QQ密码，仅用`scripts/configure_bot.py napcat-login set-observer-token / clear-observer-token / observer-status`管理；无回显TTY录入、停机/配置锁/原子保存，CurrentUser DPAPI密文在忽略的`secrets/napcat-observer.local.json`（schema1/16KiB）。status只检查文件schema，不解密/认证；没有token不阻断原生快登，不能解除data_scope。登录观察和Startup命令见[根说明](../README.md)，本轮仅代码/离线交付，真实录入、登录和部署未执行。
+
 # 配置文件索引
 
 模板和本机文件均在每个参数旁写中文注释，列表参数在列表名旁说明。注释中的“新装默认”只供参考，不会覆盖右侧当前值；既有用户备注保留。`participation.mode`控制mentions/free，`output.mode`固定plain_chat，分条方式另由`output.delivery_mode`控制。
