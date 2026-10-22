@@ -1,5 +1,7 @@
 # LAP-18 当前交接：阶段B离线交付、网络真实缺口保留
 
+2026-10-22最新规划：[LAP-38](../LAP-38/PLAN.md)本轮现有安全PublicHTTP取得公开HTML，旧DNS全非公网是历史；另一次连接仍超时。JSON文档正文提取缺关键标识，新增[18续作C合同](../LAP-38/QQ_VISION_WEB_PLAN.md)/[medium指令](../LAP-38/IMPLEMENTATION_GUIDE.md)补结构主体/相关选材与封闭诊断。仅规划，SEARCH_QUALITY仍false，本机配置/运行实例不改；旧B报告与真实/完整差额保留。[38证据](../LAP-38/EVIDENCE.md)。
+
 返回[PROGRESS](../../../../PROGRESS.md) / [TASKS](../../TASKS.md) / [工作线](../../HANDOFF.md) / [36合同](../LAP-36/WEB_VIDEO_PLAN.md)。继承AGENTS；本轮仅18，不领取28C/06。
 
 2026-10-21（Asia/Shanghai），session `LAP-18-B-public-body`，20:38登记/重读。本session独占本轮归属；起点main/b02d6b92f6fe2b7bbda47733ccc2ec0c7bf89e2f，git status干净。24/28已交付及用户persona（sha256 ff6f629d92afab7ea1c47830bd4a7e8735e944862573a90764645604e96f2804）原样保留。

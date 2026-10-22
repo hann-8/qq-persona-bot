@@ -1,5 +1,7 @@
 # LAP-36 图片识别、网页理解与B站总结详细规划
 
+2026-10-22后续：[LAP-38](../LAP-38/PLAN.md)在28A/18B/28C/06D已离线交付的基础上补网页真实质量反例、当前公网观察、28R实际路径/上界及独立微信接入；新[medium指引](../LAP-38/IMPLEMENTATION_GUIDE.md)。36原合同/旧验收差额保留，不重复实施四阶段；本轮补充仅规划，未启用/真实识图。[38交接](../LAP-38/HANDOFF.md)。
+
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md)。继承AGENTS；唯一根入口仍为PROGRESS。
 
 领取：2026-10-21 19:20（Asia/Shanghai），session `LAP-36-image-web-video-plan` / “图片与轻量网页/B站理解规划”。用户指定sol/max规划、后交sol/medium实施；会话设置由用户管理，本任务不检测或切换。起点main/b23d961，唯一已有已跟踪差异为用户`config/persona.md`，保留且不读取其正文、不提交。

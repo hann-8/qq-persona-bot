@@ -1,5 +1,7 @@
 # LAP-28 当前交接：阶段C代码/离线交付，真实与可信上界仍缺
 
+2026-10-22最新规划：[LAP-38 QQ合同](../LAP-38/QQ_VISION_WEB_PLAN.md)补Windows/GGUF实际路径固定源码链、零生成收集器/尺寸域上界/激活工件与分批验收；[medium指令](../LAP-38/IMPLEMENTATION_GUIDE.md)第2段用于后续R代码/离线任务。仅规划，不改本任务已实现/真实未验结论，不启用vision/自动换后端。[38交接](../LAP-38/HANDOFF.md)。
+
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [I4/I5](../LAP-36/IMAGE_PLAN.md)。继承AGENTS，保留以下A及18日历史交接/全部旧差额。
 
 2026-10-22，session `LAP-28-C-quality-capacity`，19:59:05+08:00领取/重读；起点工作区干净，本session独占本轮文件，无真实实例操作归属。详细[报告](../../../../reports/lap-28-C-2026-10-22.md)与[汇总](../../../../reports/lap-28-C-offline.json)。
