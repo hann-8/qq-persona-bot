@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 STATE = ROOT / 'state/managed-processes.json'
 NAPCAT = ROOT / 'runtime/napcat/installer/NapCat.52230.Shell'
 NAPCAT_URL = 'http://127.0.0.1:6099'
-sys.path.insert(0, str(ROOT / 'src'))
+sys.path[:0] = [str(ROOT), str(ROOT / 'src')]
 from qqbot_gateway.config import load_settings, load_gate_config, configuration_lock
 from qqbot_gateway.config_files import (read_project, create_snapshot, snapshot_environment, load_consumer, prune_snapshots)
 from qqbot_gateway.lifecycle import atomic_json
@@ -524,7 +524,7 @@ def intake_only(*, authorize, group, sender, max_events=1, timeout_seconds=120):
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('command',choices=['start-channel','start-text','stop','status','test','cleanup'])
-    parser.add_argument('cleanup_action',nargs='?',choices=['status','check'])
+    parser.add_argument('cleanup_action',nargs='?',choices=['status','check','recover'])
     parser.add_argument('--no-pause',action='store_true',help=argparse.SUPPRESS)
     parser.add_argument('--json',action='store_true',help='metadata status as JSON')
     parser.add_argument('--login-check-only',action='store_true')
@@ -544,11 +544,15 @@ def main():
             report=status_report()
             print(json.dumps(report,ensure_ascii=False,indent=2)) if args.json else show_status(report)
         elif args.command=='cleanup':
-            # Local fixed read-only identity path. Never starts/stops the bot.
+            # No model calls or bot start/stop. Recovery is explicit maintenance.
             import asyncio
             from qqbot_gateway.cleanup_identity import CleanupOwner
-            owner=CleanupOwner(ROOT)
-            report=asyncio.run(owner.check()) if args.cleanup_action=='check' else owner.status()
+            if args.cleanup_action=='recover':
+                from scripts.cleanup_recovery import recover
+                report=recover(ROOT)
+            else:
+                owner=CleanupOwner(ROOT)
+                report=asyncio.run(owner.check()) if args.cleanup_action=='check' else owner.status()
             print(json.dumps(report,ensure_ascii=False,indent=2))
         else:
             return subprocess.call([sys.executable,'-m','unittest','discover','-s','tests','-v'],cwd=ROOT)

@@ -1,3 +1,5 @@
+2026-10-22：LAP-37容量阻断修复/手动恢复完成，session `LAP-37-cleanup-capacity-recovery`（21:20领取）。128条累计身份超限已定位；容量满时仅回收系统确认退出条目，105项回归通过。21:21:50停机核验/完整备份归档后独立blocked=false，任务计数不变，bot保持停止；根清理cmd交付。用户放弃自启，项目Startup status/remove均not_installed，旧入口退役；以后手动启动24h运行。0真实模型/QQ/启停/登录，31B/真实稳定及旧差额保留。 [37交接](tasks/LAP-37/HANDOFF.md)。
+
 2026-10-22（Asia/Shanghai）：LAP-06轻量B站字幕已实现/离线通过，session `LAP-06-light-subtitles`；单P/轨、固定源最小适配/认证隔离、六区真实范围与最终预算、RAM缓存/共享取消及同链v2/ACK交付。273受影响单元+末次25材料专项（含20字幕）、8组合88字幕框架与8组合118关闭兼容通过；真实anonymous/auth/字幕正文/生成/群ACK均未验，18仍network_unverified。默认false/explicit/none，本机未改/未启用，0真实模型/QQ/SSH/启停/登录；07 ASR与完整V11、原第一版/旧差额保留。[06交接](tasks/LAP-06/HANDOFF.md)。
 
 2026-10-22（Asia/Shanghai）：LAP-28阶段C已实现/离线通过，session `LAP-28-C-quality-capacity`。代码所有审阅表/全条件派生生产门槛、固定六例原子预占/总6次/精确事实+人工评分、原生wire审计与自造夹具交付。真实材料/六例/运行路径与视觉模板上界未过，初始组合仍拒启、vision=false；实际Windows/NVIDIA GGUF路径独立证明缺口回sol/max。0真实模型/SSH/QQ/群图/登录/启停/本机配置修改，不进入06；31B/18/24及旧差额保留。 [28交接](tasks/LAP-28/HANDOFF.md)。

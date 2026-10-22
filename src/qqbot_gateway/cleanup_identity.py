@@ -195,8 +195,20 @@ class CleanupOwner:
         with self.lock:
             if not any(e['pid'] == entry['pid'] and e['created'] == entry['created'] for e in self.record['identities']):
                 if len(self.record['identities']) >= 128:
-                    self.reason('capacity_exceeded')
-                    return False
+                    # The bound applies to identities still needing cleanup,
+                    # not every short-lived helper ever seen in this request.
+                    # Recheck the OS; cached outcomes alone are not exit proof.
+                    # Keep reused PIDs and inaccessible identities conservatively.
+                    retained = []
+                    for old in self.record['identities']:
+                        if self.deadline is not None and time.monotonic() >= self.deadline:
+                            retained.append(old)
+                        elif inspect(old)[0] != 'exited':
+                            retained.append(old)
+                    self.record['identities'] = retained
+                    if len(self.record['identities']) >= 128:
+                        self.reason('capacity_exceeded')
+                        return False
                 self.record['identities'].append(entry)
                 self.save()
         return True

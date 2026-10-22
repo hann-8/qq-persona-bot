@@ -71,7 +71,9 @@ class IdentityTests(unittest.TestCase):
             fake=Mock(pid=i+1);fake.create_time.return_value=1.
             self.assertTrue(self.owner.add(fake))
         extra=Mock(pid=1000);extra.create_time.return_value=1.
-        self.assertFalse(self.owner.add(extra));self.owner.save()
+        with patch('qqbot_gateway.cleanup_identity.inspect',return_value=('access_denied',None)):
+            self.assertFalse(self.owner.add(extra))
+        self.owner.save()
         self.assertEqual(len(self.owner.ledger.read()['identities']),128)
         with self.assertRaises(GatewayError):self.owner.reserve()
         self.assertIn('capacity_exceeded',self.owner.record['reasons'])

@@ -1,4 +1,14 @@
-## LAP-24 登录观测与开机入口（代码交付，未部署）
+## 日常使用与清理恢复
+
+2026-10-22：已修复已退出子进程身份不回收、累计耗尽128条清理台账容量的问题。当前旧阻断已停机核验、完整备份归档并独立确认blocked=false，bot保持关闭。正常使用请双击根目录`启动机器人.cmd`，按需手动保持24h运行。
+
+再次出现“模型进程清理未确认完成”时：先用`关闭机器人.cmd`关闭本项目，再双击[清理模型阻断.cmd](清理模型阻断.cmd)，成功后手动启动。命令行等价入口：`.venv/Scripts/python.exe -X utf8 scripts/manage.py cleanup recover`。脚本不杀进程：只有登记进程全部确认退出、五项目端口关闭、账本可解析且配置锁可取得才备份/hash核验并归档；失败按提示处理，不强删账本。恢复仅为操作者接受observed_only的人工维护，不代表31B完整后代退出证明。
+
+`uv.lock`只锁定Python依赖版本，不是进程锁，删除它不能清除此阻断。故障证据/回滚见[LAP-37交接](tracks/laptop-workbuddy/tasks/LAP-37/HANDOFF.md)。
+
+用户已放弃开机自启方案，2026-10-22项目自有Startup检查/撤销均为not_installed；`开机启动机器人.cmd`已退役为提示，不启动bot。历史实现保留供追溯，不再作为推荐部署路线。
+
+## LAP-24 登录观测（历史交付，真实缺口保留）
 
 2026-10-21：P1/P3已实现并离线验证，见[报告](reports/lap-24-autostart-2026-10-21.md)和[交接](tracks/laptop-workbuddy/tasks/LAP-24/HANDOFF.md)。本轮没有操作真实bot、6099认证、凭据或Startup；不代表反复扫码已修好。原生资料归属仍unverified，旧密码回退门槛保持。
 
@@ -21,20 +31,7 @@
 
 受管NapCat stdout仅重建固定事件和0/140022008/140022010/140022011白名单码；每次host最多32条并去重，每条小于256字节。原始行缓冲16KiB，超长整行直至换行丢弃；群正文、票据、URL和任意错误码不落日志。成功hint不是在线证明；没有输出可能是Worker/named pipe绕开host，须记telemetry_unavailable。原生路径采集只用受管后代的open_files元数据，可能不完整/不可用；只留scope及最多4个本机路径摘要，不能证明专属/可绑定目录、GUID或票据连续性。
 
-`开机启动机器人.cmd`调用固定项目解释器与`autostart.py run`。默认延迟30秒（0..120），本机网络接口等待120秒（0..300），然后一次start-text并等待QQ最多120秒；观察器共用该预算，不额外生成模型请求。接口可用不证明互联网、家庭PC或模型可用，E盘在登录前必须可访问。wrapper有独立单实例锁；生命周期/快照仍走manage，所有长等待不持配置锁。partial/冲突/清理未决不重试、不清账本、不自动kill/切模型；超时退出并保留组件现状，无pause/TTY/自动浏览器或后台循环。
-
-只有两次正常重启及一次Windows重启免人工恢复通过后，再由用户授权部署唯一当前用户Startup入口：
-
-```powershell
-# 未来部署/撤销入口，本轮未执行install/remove，也未写真实Startup
-.venv/Scripts/python.exe -X utf8 scripts/autostart.py install
-.venv/Scripts/python.exe -X utf8 scripts/autostart.py status
-.venv/Scripts/python.exe -X utf8 scripts/autostart.py remove
-```
-
-仅管理`QQbot-managed-startup.lnk`：固定目标/参数/工作目录、项目归属台账和链接字节摘要必须匹配；同名外部项拒覆盖/移除，重复install幂等，改参数先remove。PowerShell固定脚本创建临时链接，隐藏执行，不改执行策略/注册表/全局服务。异常中断可能留下无台账链接，此时拒绝认领，需人工核对。状态保存在忽略的`state/napcat-login-observation.json`、`autostart-status.json`、`autostart-registration.json`，不含QQ密码、管理token或原始响应。
-
-回滚先撤销自有Startup/停用包装入口，再按身份关闭本项目并恢复代码；保留原生资料、pending/unknown/清理/密码尝试账本，不操作日常QQ资料或设备身份。真实诊断、R1/R2/R3及3个使用日观察均待后续指令。
+历史自启包装器/注册实现及当时参数见[LAP-24交接](tracks/laptop-workbuddy/tasks/LAP-24/HANDOFF.md)，已按用户要求弃用，不再推进Startup部署与重启免人工验收。独立登录/原生资料归属仍未证明。撤销不触碰日常QQ资料、凭据、历史/ACK或unknown账本。
 
 配置入口见[config/README.md](config/README.md)。LAP-34已实现的日常流程为关闭→编辑config/local五文件→正常启动；未迁移时继续兼容旧单文件。本机迁移/加载待另行明确授权。根配置cmd退役，无参configure_bot只打印索引；图库/记忆/凭据/连接管理动作保留。以下历史能力的真实验收差额均保留。
 
@@ -159,7 +156,7 @@ CLI的`context-window`当前仅接受auto（YAML为null）。设置收到ACK不�
 
 状态页查看队列、累计CLI尝试、最近错误和router_ready，不会调用模型。`backend_state=not_probed`表示本次启动尚未真实推理，不能据此判定登录失败。认证/配额故障后暂停请求；在官方界面处理后再重启，不反复尝试登录。进程运行不等于文本链路通过，验收证据见 `reports`。
 
-`runtime`、`state`、`cache`、`logs`及`secrets`为本机数据；会话数据库可能含聊天内容，分享项目时不要附带这些目录。暂未配置开机自启；电脑睡眠时不承诺在线。
+`runtime`、`state`、`cache`、`logs`及`secrets`为本机数据；会话数据库可能含聊天内容，分享项目时不要附带这些目录。用户已放弃开机自启，采用手动启动/24h保持运行；电脑睡眠时不承诺在线。
 
 LAP-11由网关一次将模型最终Markdown转为聊天纯文本：保留正文、可见链接、代码字面量和缩进，表格改成字段/值。single缺省仍为单条消息；可显式选adaptive，具体行为见下段，超长明确提示未展示完；格式转换后为空则本次失败，不自动重试。`output.mode`仅支持`plain_chat`，`output.max_reply_chars`可在停止后手工编辑本机YAML为200—8000，默认1200，下次完整启动生效；原max_reply_chars仍可手工设置；回复方式见chat.yaml的output。新部署会因组合政策/人设版本变化使下一次请求开启新上下文，旧历史保留。LAP-12已暂停准入启动验证后关闭；真实QQ ACK和P01人设接受仍待用户参与，见[LAP-11报告](reports/lap-11-2026-10-16.md)。
 

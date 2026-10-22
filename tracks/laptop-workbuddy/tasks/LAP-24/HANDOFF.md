@@ -1,4 +1,6 @@
-## 2026-10-21 P1/P3实施交接（当前）
+2026-10-22用户明确放弃开机自启方法，以后手动启动24h运行。LAP-37已执行项目Startup status/remove，均not_installed；根自启cmd退役为提示，不启动bot。P3部署/P4自启真实验收不再推进，以下代码交付/独立登录与原生资料缺口作为历史保留，不据此声称免扫码已修好。见[LAP-37](../LAP-37/HANDOFF.md)。
+
+## 2026-10-21 P1/P3实施交接（历史）
 
 Git交付：2026-10-21（Asia/Shanghai），内容提交`e29a4be3b8b7a3a9430b113ed815147fe426c713`已推送origin/main，rev-parse/ls-remote完整SHA相同；仅16份本任务文件/共享索引差异块。171项组合通过（30.121秒），340个本地Markdown链接无缺失，git diff --cached --check通过。保留用户persona（SHA256 ff6f629d92afab7ea1c47830bd4a7e8735e944862573a90764645604e96f2804）及LAP-36的PROGRESS/工作线HANDOFF/TASKS段落和tasks/LAP-36文档；未纳入本任务提交。本段随后单独提交/推送，最终记录提交以会话回执为准。Git不是部署/免扫码/真实验收。
 

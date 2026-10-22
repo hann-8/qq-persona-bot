@@ -1,5 +1,4 @@
 @echo off
 chcp 65001 >nul
-cd /d "%~dp0"
-"%~dp0.venv\Scripts\python.exe" -X utf8 "%~dp0scripts\autostart.py" run %*
-exit /b %errorlevel%
+echo 开机自启方案已停用。请手动运行“启动机器人.cmd”。
+exit /b 0

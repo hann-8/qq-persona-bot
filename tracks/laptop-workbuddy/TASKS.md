@@ -1,3 +1,5 @@
+2026-10-22：LAP-37容量阻断修复/手动恢复完成，session `LAP-37-cleanup-capacity-recovery`（21:20领取）。128条累计身份超限已定位；容量满时仅回收系统确认退出条目，105项回归通过。21:21:50停机核验/完整备份归档后独立blocked=false，任务计数不变，bot保持停止；根清理cmd交付。用户放弃自启，项目Startup status/remove均not_installed，旧入口退役；以后手动启动24h运行。0真实模型/QQ/启停/登录，31B/真实稳定及旧差额保留。 [37交接](tasks/LAP-37/HANDOFF.md)。
+
 LAP-28阶段C领取记录（现已代码/离线交付）：session `LAP-28-C-quality-capacity`，开始2026-10-22T19:59:05+08:00；本session唯一写入。归属：src/qqbot_gateway/vision.py、新vision_capabilities.py/vision_quality.py、config/vision-capabilities.json、scripts/observe_lap28.py及新verify_lap28_quality.py、tests/test_lap28_capability.py/自造夹具生成器及tests/fixtures/lap28-C六例、必要runner预算接点（backends/两runner）、config/model_gateway/router/main与manage/configure_astrbot/configure_bot仅固定root门槛/诊断接点、reports/lap-28-C-*、28 HANDOFF/PROGRESS/工作线HANDOFF/TASKS。仅I4/I5代码、审阅来源、自造夹具与底层替身；0真实模型/SSH/QQ/群图/启停/登录/本机配置修改。默认vision=false，可信上界或真实质量缺失继续拒启；旧31B/18/24等差额保留，不推进06。
 
 2026-10-21（Asia/Shanghai）：LAP-18B安全公共网络/轻量正文已实现、离线与合成提取质量通过，session `LAP-18-B-public-body`（20:38领取）。232受影响单元、16组164实际框架替身及末次定向回归通过；5依赖约10.97MiB、单页<2秒/256MiB、取消/超时自有worker回收。真实七域DNS全非公网，DoH TLS verify_code=20，0可用公开正文，仍network_unverified；搜索质量false、真实生成/QQ/完整验收未过。web.enabled保存值true不变，未正常启动加载/未部署；0模型/QQ/SSH/真实bot启停/登录，24/28/人设和旧差额保留，不推进28C/06。 [报告](../../reports/lap-18-B-2026-10-21.md) / [18交接](tasks/LAP-18/HANDOFF.md)。
@@ -76,6 +78,7 @@ LAP-15内容提交`632fdc5`已推送origin/main，2026-10-17 11:09用ls-remote�
 
 | ID | 单一任务 | 状态与已有证据 | 依赖/推荐顺序 | 执行session | 下一步/完成出口 |
 | --- | --- | --- | --- | --- | --- |
+| LAP-37 | 清理容量阻断修复/人工恢复与弃用自启 | 已实现/105项离线通过/停机现场恢复通过；[HANDOFF](tasks/LAP-37/HANDOFF.md) | 既有31/33合同修复，不自动解锁unknown | LAP-37-cleanup-capacity-recovery，2026-10-22 21:20；归属见交接 | blocked=false，bot停机；清理cmd可复用；自启弃用，真实运行/31B差额保留 |
 | LAP-36 | 图片识别、轻量网页理解与B站总结详细规划 | completed，仅规划；[HANDOFF](tasks/LAP-36/HANDOFF.md)/[PLAN](tasks/LAP-36/PLAN.md)/[指引](tasks/LAP-36/IMPLEMENTATION_GUIDE.md) | 28入站→18网络/正文→28质量/容量→06字幕；07 ASR仍延期 | LAP-36-image-web-video-plan，2026-10-21 19:20领取、19:48规划交接；11份文档 | 配置/有限材料/开源复用/验收和失败出口落盘；不实施/启用，Git见交接 |
 | LAP-35 | 群临时停言、真实@恢复与重启复位 | 已实现/离线通过；[HANDOFF](tasks/LAP-35/HANDOFF.md)/[报告](../../reports/lap-35-2026-10-20.md) | 34已实现；原触发/ACK/清理门槛保持 | LAP-35-group-silence-implementation，2026-10-20 20:35领取、20:58交接；文件归属见HANDOFF | S35-01—05/SM-01—12离线完成；440单元/44组合918框架、20组合460关闭兼容；本机未改/未加载，真实/完整未验 |
 | LAP-34 | 分层配置文件取代日常配置菜单 | 已交付；旁注续作/本机定向配置修复完成，[HANDOFF](tasks/LAP-34/HANDOFF.md) | schema3与既有能力门槛不变 | LAP-34-inline-comments-followup，2026-10-20 22:19领取；源/模板/自造测试/索引与交接归属，local仅按用户新授权处理 | 68配置回归；local正式解析通过、未启停/正常加载，真实/完整未验，persona保留 |
@@ -108,7 +111,7 @@ LAP-15内容提交`632fdc5`已推送origin/main，2026-10-17 11:09用ls-remote�
 | LAP-21 | QQ收藏导入/本地表情图库与发送 | 已实现/离线通过，真实未验；[HANDOFF](tasks/LAP-21/HANDOFF.md) / [合同](tasks/LAP-19/GROUP_CHAT_PLAN.md) | 20统一群发送后；收藏静态支持不当本账号已通过 | LAP-21-controlled-memes / LAP-21受控表情实施，2026-10-17 16:49领取；文件归属见交接 | 207单元、136媒体框架与108群/26网页/90旧路径通过；inbox/library/固定只读收藏RPC/meme_id/typed图片ACK与恢复落地；默认关闭、真实收藏/发图未验，见[报告](../../reports/lap-21-2026-10-17.md) |
 | LAP-22 | free模式兜底回复故障修复 | 已实现/离线通过，真实待验；[HANDOFF](tasks/LAP-22/HANDOFF.md) | LAP-20/21合同内修复 | LAP-22-free-framework-delivery，2026-10-17 18:01领取 | 空链修复；207单元/132群框架/136媒体回归通过；未重启加载；归属与命令见交接 |
 | LAP-23 | WebSocket断开后持续409修复 | 已实现/离线通过，真实待验；[HANDOFF](tasks/LAP-23/HANDOFF.md) | 既有连接/恢复合同内修复 | LAP-23-gate-reconnect，2026-10-17 18:47领取 | 状态写失败不再泄漏连接；212单元/18入口/实际框架门槛通过；未启动，现场首异常未完整取证 |
-| LAP-24 | 自然分条/登录独立部分与自动启动续作 | P1/P3已实现/171项离线通过；真实未验；[HANDOFF](tasks/LAP-24/HANDOFF.md) / [新PLAN](tasks/LAP-24/AUTOSTART_PLAN.md) / [报告](../../reports/lap-24-autostart-2026-10-21.md) | LAP-12生命周期、34配置快照；旧自然分条不重做 | LAP-24-autostart-independent-implementation，2026-10-21 19:21:05领取、19:40交接；归属见交接 | P2/P4/P5真实诊断/免人工恢复/Startup部署待新指令；原生归属/设备连续性未证，密码回退仍unverified不可启用 |
+| LAP-24 | 自然分条/登录独立部分与自动启动续作 | P1/P3已实现/171项离线通过；真实未验；[HANDOFF](tasks/LAP-24/HANDOFF.md) / [新PLAN](tasks/LAP-24/AUTOSTART_PLAN.md) / [报告](../../reports/lap-24-autostart-2026-10-21.md) | LAP-12生命周期、34配置快照；旧自然分条不重做 | LAP-24-autostart-independent-implementation，2026-10-21 19:21:05领取、19:40交接；归属见交接 | 2026-10-22用户放弃自启，P3部署/P4自启验收不再推进；独立登录缺口保留；原生归属/设备连续性未证，密码回退仍unverified不可启用 |
 | LAP-25 | 群发送容错、预算与输出解析修复 | 已实现/离线通过，真实待验；[HANDOFF](tasks/LAP-25/HANDOFF.md) / [PLAN](tasks/LAP-25/PLAN.md) | 用户明确要求分析并修复；覆盖20/21旧隔离合同，保留24交付 | LAP-25-chat-reliability-fix，2026-10-18 00:44领取、00:55交接 | 260单元、12组合384框架合成；0真实模型/群/启停，正常重启后试用 |
 
 G0可行性、G1环境、G2通道、G3实际provider调用已有证据，见[工作线交接](HANDOFF.md#已验证与重要修复)。这是阶段基线；W02/W10等未真实制造的情形仍按验收矩阵记录，不能据此把完整W/Q/P/O标成通过。G4完整验收归LAP-02/03，G7文本相关部分归LAP-01/04/05。
