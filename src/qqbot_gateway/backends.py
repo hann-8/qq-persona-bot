@@ -46,6 +46,9 @@ def create_runner(root, settings, budget):
     cfg = resolve_backend(settings)
     if cfg['backend'] == 'codebuddy_cli':
         from .workbuddy_cli_runner import CLIRunner
-        return CLIRunner(root,cfg['model'],cfg['run_timeout_seconds'],cfg['cleanup_seconds'],cfg['reasoning_effort'],budget)
-    from .ollama_ssh_runner import OllamaSSHRunner
-    return OllamaSSHRunner(root,cfg,budget,settings['output'])
+        runner = CLIRunner(root,cfg['model'],cfg['run_timeout_seconds'],cfg['cleanup_seconds'],cfg['reasoning_effort'],budget)
+    else:
+        from .ollama_ssh_runner import OllamaSSHRunner
+        runner = OllamaSSHRunner(root,cfg,budget,settings['output'])
+    runner.vision_settings = deepcopy(settings)
+    return runner

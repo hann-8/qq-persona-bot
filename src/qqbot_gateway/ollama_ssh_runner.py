@@ -67,7 +67,7 @@ class OllamaSSHRunner:
             loaded = request('GET','/api/ps',deadline=deadline)
             observed = [{k:m.get(k) for k in ('name','digest','context_length','size_vram')} for m in loaded.get('models',[]) if isinstance(m,dict) and m.get('name')==self.profile['model']]
             return {'state':'metadata_ready','version':version.get('version'),'digest':model['digest'],
-                'digest_confirmed':bool(expected),
+                'digest_confirmed':bool(expected),'vision_supported':'vision' in capabilities,
                 'declared_context_max':max(windows),'think_false_supported':True,'loaded_observation':observed,
                 'checked_at':time.time(),'real_generation_verified':False}
         try:
@@ -89,7 +89,8 @@ class OllamaSSHRunner:
 
     async def run(self,system,prompt,request_id):
         if self.marker.exists():raise GatewayError('REMOTE_RESULT_UNKNOWN')
-        from .vision import text_budget,native_payload_images,wire_check
+        from .vision import CURRENT,text_budget,native_payload_images,wire_check,production_budget
+        production_budget(self.root,getattr(self,'vision_settings',{}),self.budget,system,prompt)
         text_budget(self.budget).check(system,prompt)
         cfg = self.profile
         payload = native_payload_images(native_payload(cfg,system,prompt))
@@ -101,6 +102,14 @@ class OllamaSSHRunner:
             nonlocal sent
             self.pending(request_id);sent=True
         def generate():
+            if CURRENT.get() and getattr(self,'vision_settings',{}).get('vision',{}).get('enabled'):
+                from .vision_capabilities import load_production
+                record,missing=load_production(self.vision_settings,self.root)
+                if missing:raise GatewayError('OLLAMA_PARAMETERS_UNSUPPORTED')
+                version=self.transport.request('GET','/api/version',deadline=deadline)
+                show=self.transport.request('POST','/api/show',{'model':cfg['model'],'verbose':False},deadline=deadline)
+                if version.get('version')!=record['runtime']['version'] or 'vision' not in show.get('capabilities',[]):
+                    raise GatewayError('OLLAMA_PARAMETERS_UNSUPPORTED')
             tags = self.transport.request('GET','/api/tags',deadline=deadline)
             if not isinstance(tags.get('models'),list):raise GatewayError('PROTOCOL_ERROR')
             model = next((m for m in tags.get('models',[]) if isinstance(m,dict) and m.get('name')==cfg['model']),None)

@@ -312,7 +312,7 @@ def _start_channel(full=False, paused=False):
     project_config=read_project(ROOT)
     if project_config.extensions:print('已保留旧顶层扩展字段；不保证扩展具有运行功能。')
     from qqbot_gateway.vision import require_production
-    require_production(project_config.settings)
+    require_production(project_config.settings,root=ROOT)
     instance_id=uuid.uuid4().hex
     prune_snapshots(ROOT,keep=2)
     snapshot,metadata=create_snapshot(project_config,instance_id)
@@ -447,7 +447,7 @@ def intake_only(*, authorize, group, sender, max_events=1, timeout_seconds=120):
         for port in (6185,6199,6200,6099,8765):check_port(port)
         project=read_project(ROOT)
         from qqbot_gateway.vision import require_production
-        require_production(project.settings)
+        require_production(project.settings,root=ROOT)
         gate=load_gate_config(root=ROOT,settings=project.settings)
         if group not in gate.allowed_groups or not group or not sender or sender in gate.blocked_users or sender==gate.bot_qq:
             raise ValueError('INTAKE_TARGET_DENIED')

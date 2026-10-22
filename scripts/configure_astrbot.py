@@ -16,7 +16,7 @@ from qqbot_gateway.persona import compose_persona, session_version
 async def configure():
     settings=load_consumer(ROOT)
     from qqbot_gateway.vision import require_production
-    require_production(settings)
+    require_production(settings,root=ROOT)
     budget=resolve_backend(settings)['input_budget']
     path=ROOT/'runtime/astrbot/data/cmd_config.json'
     config=json.loads(path.read_text(encoding='utf-8-sig'))

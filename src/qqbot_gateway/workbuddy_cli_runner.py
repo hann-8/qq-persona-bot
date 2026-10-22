@@ -141,7 +141,8 @@ class CLIRunner:
             await owner.join()
 
     async def run(self, system, prompt, request_id):
-        from .vision import CURRENT,text_budget,cli_message,wire_check
+        from .vision import CURRENT,text_budget,cli_message,wire_check,production_budget
+        production_budget(self.root,getattr(self,'vision_settings',{}),self.budget,system,prompt)
         text_budget(self.budget).check(system, prompt)
         image_message=cli_message(prompt)
         wire_check(dict(system=system,input=image_message))

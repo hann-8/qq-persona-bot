@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "records": [],
+  "unverified": [
+    {
+      "backend": "codebuddy_cli",
+      "model": "deepseek-v4.1-flash",
+      "missing": ["selected model vision declaration", "native window", "image processor upper bound", "template and visible bytes to tokens bound", "six real IQ observations"],
+      "source": "config/cli-capabilities.json: locked CLI table contains no vision declaration; image wire encoding is not model capability"
+    },
+    {
+      "backend": "ollama_ssh",
+      "model": "qwen3.5:9b-q4_K_M",
+      "missing": ["Windows NVIDIA GGUF selected processor/projector path attestation", "visual and template upper bounds", "visible bytes to tokens bound", "six real IQ observations"],
+      "source": "https://github.com/ollama/ollama/blob/v0.40.5/model/renderers/qwen35.go",
+      "review": "Renderer image offsets alone do not bound the selected GGUF image processor. Mac MLX formulas are inapplicable without path proof. No reviewed formula is granted."
+    }
+  ]
+}

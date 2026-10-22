@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "tests": 272,
+  "modules": [
+    "test_lap28_capability",
+    "test_lap28",
+    "test_lap28_ingress",
+    "test_lap18_body",
+    "test_web",
+    "test_token_budget",
+    "test_cli_runner",
+    "test_cli_control",
+    "test_lap27",
+    "test_lap29",
+    "test_lap30",
+    "test_group_silence",
+    "test_config",
+    "test_config_files",
+    "test_config_comments",
+    "test_configure_menu"
+  ],
+  "elapsed_seconds": 25.047,
+  "failures": 0,
+  "errors": 0,
+  "real_model_calls": 0,
+  "real_qq_outputs": 0,
+  "adapter_signature": "172925876f03e9f5eda8da4beddbd49eb198dde4ec0a7d938426d5a6687931af"
+}

@@ -39,7 +39,7 @@ class QQRouter(Star):
         self.root=Path(os.environ['QQBOT_ROOT']).resolve()
         settings=load_consumer(self.root)
         from qqbot_gateway.vision import require_production
-        require_production(settings)
+        require_production(settings,root=self.root)
         self.vision=settings['vision']
         from qqbot_gateway.members import suspend_unverified,MemberClient
         from qqbot_gateway.vision import context_token

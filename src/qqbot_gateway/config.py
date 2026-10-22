@@ -289,7 +289,7 @@ def load_gate_config(path=None, *, root=None, settings=None):
     root = Path(root).resolve() if root is not None else management_root(path)
     data = deepcopy(settings) if settings is not None else load_consumer(root, path)
     from .vision import require_production
-    require_production(data)
+    require_production(data,root=root)
     token_path = (root / data['secrets_file']).resolve()
     if not token_path.is_relative_to(root / 'secrets'):
         raise ValueError('Secrets file must remain in project secrets directory')

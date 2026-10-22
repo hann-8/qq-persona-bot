@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "cases": {
+    "IQ-01": {
+      "sha256": "a0b036d3818746f9f5f46b1a94b2fe6cfdc9ecbbe53947c716b4812544b122bb",
+      "truth": {
+        "text": "FRQCF7",
+        "color": "red",
+        "position": "center"
+      }
+    },
+    "IQ-02": {
+      "sha256": "002af765315a4613eeb3e0c956b5d3f6fda3c91262cfa83a52e5ee7bc3324e0e",
+      "truth": {
+        "red_circles": 2,
+        "blue_squares": 1,
+        "green_triangles": 3
+      }
+    },
+    "IQ-04": {
+      "sha256": "9607dae1e82227eee7a3626996df1b3b34e1700396904d3c2b81e72913c963ab",
+      "truth": {
+        "red_circles": 1,
+        "blue_squares": 3,
+        "green_triangles": 2
+      }
+    },
+    "IQ-03": {
+      "sha256": "535757892e2bd9e98b6720b3542458a1f6e3cbaac5f4543c4882366e2eb18e56",
+      "truth": {
+        "Code": "KSVADS",
+        "Count": "25",
+        "State": "READY",
+        "layout": "top-to-bottom"
+      }
+    },
+    "IQ-05": {
+      "sha256": "54b1563d610196fa5e469180d4a04b1a509575a6123f9df1410c3a6de145a076",
+      "truth": {
+        "top_left": "TMS2ME",
+        "top_right": "TURZTE",
+        "bottom_left": "77P5LE",
+        "bottom_right": "4NK6PR"
+      }
+    },
+    "IQ-06": {
+      "sha256": "6777a931e4e3148a5f617b3e7447d8d7a6a04a79a90f273d93c67511321310a3",
+      "truth": {
+        "badge": "H3H3H5",
+        "color": "blue"
+      }
+    }
+  }
+}

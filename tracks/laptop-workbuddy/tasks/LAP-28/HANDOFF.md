@@ -1,3 +1,24 @@
+# LAP-28 当前交接：阶段C代码/离线交付，真实与可信上界仍缺
+
+返回[PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [I4/I5](../LAP-36/IMAGE_PLAN.md)。继承AGENTS，保留以下A及18日历史交接/全部旧差额。
+
+2026-10-22，session `LAP-28-C-quality-capacity`，19:59:05+08:00领取/重读；起点工作区干净，本session独占本轮文件，无真实实例操作归属。详细[报告](../../../../reports/lap-28-C-2026-10-22.md)与[汇总](../../../../reports/lap-28-C-offline.json)。
+
+已完成：公开初始空审阅表与缺项、固定最大视觉/模板/字节转换来源校验、完整条件派生/固定私有台账和入站/离线回查、两runner最终预算/原生hash审计；固定六例/spec绑定/SQLite FULL逐例原子预占与失败不可重试、精确结构化评分+人工审阅、自造六PNG。保留gate唯一材料/一次cap/第一图/sideband/TTL/租约/隔离，复用18最终传输未重写网络。门槛纯合成正例可达，初始生产组合仍不合格。
+
+证据分级：已实现/离线通过；真实入站ingress_unverified，native_observed/真实质量/容量/群ACK/完整验收未过，production_eligible=false。真实模型/家庭SSH/QQ/群图/登录/启停/本机配置修改均0；默认vision=false，本机配置/人设/家庭凭据未动，不部署/不进入06。272单元通过（最终签名一致）；12组138实际框架底层替身、7专项（与全套重叠，不累加）、12条两原生编码/预算指标均单列。新增依赖0；旧用户人设23393字节预算差额保留。
+
+剩余/回规划：现有API的version/digest/vision不能独立证明Windows/NVIDIA GGUF实际processor/projector/二进制路径；观察器只用真实观测事实，不从审阅表反填路径。所选路径可信观测、视觉/模板上界与bytes→tokens保守证明/原生窗口需sol/max规划；CLI视觉未知/无支持不换模型。审阅表初始无可用记录，不能手写eligible/缩reserve/搬Mac MLX公式来开图。A真实入站、18公网/TLS/搜索、24登录/原生归属、31B完整覆盖/恢复、07ASR及所有旧差额保留。
+
+下一步：用户后续明确规划指令才补所选路径与上界；明确选定后端和总6次授权后才运行一个固定IQ批次，失败/取消/unknown消耗，同case不换trace重试；群同链ACK另批。脚本只导出观察，不写active或vision=true。真正启用须所选组合材料/质量/可信预算全部通过，由操作者停机审阅配置后正常启动；保持未知状态台账，不自动清理重试。
+
+归属：vision/vision_capabilities/vision_quality、公开能力JSON、backends/两runner、config/model_gateway/router main固定root门槛、manage/configure_astrbot/configure_bot必要root/缺项接点、observe_lap28/verify_lap28_quality、test_lap28_capability/tests/fixtures/lap28-C、C报告JSON/Markdown、本交接与PROGRESS/工作线HANDOFF/TASKS。旧报告未覆盖，未改18安全传输实现。测试命令/资源/回滚见报告；临时替身进程及测试日志state保持忽略。
+
+Git收口：待本阶段归属差异/AST/JSON/本地链接/围栏检查后提交推送并核对；下方旧SHA仅历史。最终交付SHA见会话回执，Git不等于启用或真实验收。
+
+---
+LAP-28阶段C进行中：session `LAP-28-C-quality-capacity`，开始2026-10-22T19:59:05+08:00；本session唯一写入。归属：src/qqbot_gateway/vision.py、新vision_capabilities.py/vision_quality.py、config/vision-capabilities.json、scripts/observe_lap28.py及新verify_lap28_quality.py、tests/test_lap28_capability.py/自造夹具生成器及tests/fixtures/lap28-C六例、必要runner预算接点（backends/两runner）、config/model_gateway/router/main与manage/configure_astrbot/configure_bot仅固定root门槛/诊断接点、reports/lap-28-C-*、28 HANDOFF/PROGRESS/工作线HANDOFF/TASKS。仅I4/I5代码、审阅来源、自造夹具与底层替身；0真实模型/SSH/QQ/群图/启停/登录/本机配置修改。默认vision=false，可信上界或真实质量缺失继续拒启；旧31B/18/24等差额保留，不推进06。
+
 # LAP-28 当前消息原生图片理解
 
 阶段A当前（2026-10-21）：**代码/离线交付，真实ingress_unverified，生产仍拒启**。详细行为、文件/验证/资源、未验证与B/C解除条件见[阶段A报告](../../../../reports/lap-28-A-2026-10-21.md)；[本轮汇总](../../../../reports/lap-28-A-offline.json)/[实际框架矩阵](../../../../reports/lap-28-A-framework-offline.json)/[资源采样](../../../../reports/lap-28-A-resources.json)。默认inspect及synthetic已执行，真实intake-only未运行；0真实启停/登录/下载/SSH/模型/QQ。213项影响集与16组158实际框架替身通过；用户ff2e348人设既有预算回归23,393>=8,192字节失败独立记录，未修改/替换人设，最终验证器明确排除此一项。历史323/900不作本轮结果。

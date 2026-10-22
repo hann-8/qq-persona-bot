@@ -492,7 +492,7 @@ def main():
     tokens=json.loads((root/settings['secrets_file']).read_text(encoding='utf-8'))
     budget=InputBudget.from_settings(settings,validate_model_settings(settings))
     from .vision import require_production
-    require_production(settings)
+    require_production(settings,root=root)
     runner=create_runner(root,settings,budget)
     from .web_retrieval import WebRunner, Retriever
     ids=[settings['bot']['qq']]+sum((settings['access'][k] for k in ('allowed_groups','admin_users','blocked_users')),[])

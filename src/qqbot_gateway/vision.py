@@ -64,7 +64,12 @@ def binding(settings, runtime):
     from .backends import resolve_backend
     from .turn_v2 import sha
     profile=resolve_backend(settings)
-    return sha(dict(profile=profile, runtime=runtime, adapter_signature=adapter_signature(),normalizer=NORMALIZER,
+    from copy import deepcopy
+    policy=deepcopy(settings)
+    # Operator activation and metadata logging do not alter model input. All
+    # other prompt/config/network policy, selected parameters and budgets bind.
+    policy['vision']=dict(policy.get('vision',DEFAULTS),enabled=False,ingress_diagnostics=False)
+    return sha(dict(profile=profile, policy=policy, runtime=runtime, adapter_signature=adapter_signature(),normalizer=NORMALIZER,
                     reserve=settings.get('vision',DEFAULTS)['input_reserve_tokens']))
 
 
@@ -79,12 +84,20 @@ def adapter_signature():
     h=hashlib.sha256()
     from PIL import __version__ as pillow_version
     h.update(pillow_version.encode());h.update(aiohttp.__version__.encode())
+    # Bind every prompt/network/normalizer dependency, including LAP-18's final
+    # transport and extraction policy. Public review records are code-owned.
+    names=sorted(set(names) | {str(p.relative_to(root)).replace('\\','/') for p in (root/'src/qqbot_gateway').glob('*.py')} |
+        {'config/vision-capabilities.json','config/cli-capabilities.json','config/versions.lock.json','uv.lock',
+         'scripts/observe_lap28.py','config/persona.md'})
+    from importlib.metadata import version
+    for package in ('readability-lxml','lxml','lxml_html_clean','chardet','cssselect'):
+        h.update(package.encode());h.update(version(package).encode())
     for name in names:
         h.update(name.encode());h.update((root/name).read_bytes())
     return h.hexdigest()
 
 
-def capability(evidence, expected):
+def capability(evidence, expected, settings=None, runtime=None):
     """Read-only derived state. Unknown upper bounds never become eligibility.
 
     Native observations are persisted only by the separate controlled command.
@@ -92,15 +105,22 @@ def capability(evidence, expected):
     """
     if not isinstance(evidence,dict) or evidence.get('binding')!=expected:return 'unverified'
     if evidence.get('offline_passed') is not True:return 'unverified'
+    if settings is not None and runtime is not None:
+        from .vision_capabilities import production_diagnostics
+        if not production_diagnostics(settings,evidence,runtime):return 'production_eligible'
     observations=evidence.get('observations',[])
     if isinstance(observations,list) and any(isinstance(o,dict) and o.get('native_success') is True for o in observations):
         return 'native_observed'
     return 'offline_passed'
 
 
-def require_production(settings):
+def require_production(settings, *, root=None):
     if settings.get('vision',DEFAULTS)['enabled']:
-        raise ValueError('vision production_eligible unavailable: trusted template/token upper bound and native capacity unverified')
+        from .vision_capabilities import load_production
+        try:record,missing=load_production(settings,root)
+        except (KeyError,TypeError,AttributeError,OSError):raise ValueError('vision production_eligible unavailable: INVALID_OR_MISSING_EVIDENCE') from None
+        if missing:raise ValueError('vision production_eligible unavailable: '+','.join(missing))
+        return True
     return False
 
 
@@ -294,6 +314,7 @@ class BlobLease:
 
 
 CURRENT = ContextVar('qqbot_native_image',default=None)
+AUDIT = ContextVar('qqbot_native_audit',default=None)
 
 
 def text_budget(budget):
@@ -305,6 +326,17 @@ def text_budget(budget):
     reduced=replace(budget,limit=budget.limit-current.reserve)
     if budget.window is not None and reduced.limit+current.reserve+budget.output>budget.window:raise GatewayError('INPUT_TOO_LONG')
     return reduced
+
+
+def production_budget(root,settings,budget,system,prompt):
+    """Final runner boundary; observation mode has no production proof context."""
+    current=CURRENT.get()
+    if not current or not settings.get('vision',DEFAULTS)['enabled']:return
+    from .vision_capabilities import load_production,final_budget
+    record,missing=load_production(settings,root)
+    if missing:raise GatewayError('INPUT_TOO_LONG')
+    try:final_budget(record,budget,system,prompt,current.blob.width,current.blob.height)
+    except ValueError:raise GatewayError('INPUT_TOO_LONG') from None
 
 
 def cli_message(prompt):
@@ -327,6 +359,21 @@ def wire_check(payload):
     # compact CLI message plus its newline and separate system input.
     if CURRENT.get() and len(json.dumps(payload,ensure_ascii=False,allow_nan=False).encode('utf-8'))+1>MAX_WIRE:
         raise GatewayError('INPUT_TOO_LONG')
+    audit=AUDIT.get()
+    if CURRENT.get() and audit is not None:
+        if 'input' in payload:
+            content=payload['input']['message']['content']
+            images=[p['source']['data'] for p in content if p['type']=='image']
+            system=payload['system'];prompt=next(p['text'] for p in content if p['type']=='text')
+        else:
+            images=payload['messages'][-1].get('images',[])
+            system=payload['messages'][0]['content']
+            prompt=json.dumps([{k:v for k,v in m.items() if k!='images'} for m in payload['messages'][1:]],ensure_ascii=False,separators=(',',':'))
+        audit.update(native_image_count=len(images),native_image_verified=len(images)==1 and
+            hashlib.sha256(base64.b64decode(images[0],validate=True)).hexdigest()==CURRENT.get().blob.sha256,
+            wire_bytes=len(json.dumps(payload,ensure_ascii=False,allow_nan=False).encode('utf-8'))+1,
+            system_bytes=len(system.encode('utf-8')),prompt_bytes=len(prompt.encode('utf-8')),
+            normalized_sha256=CURRENT.get().blob.sha256)
 
 
 class MaterialClient:

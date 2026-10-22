@@ -1,0 +1,7 @@
+{
+  "passed": true,
+  "tests": 7,
+  "elapsed_seconds": 1.484,
+  "coverage": "geometry/transparency; actual unsupported preflight zero generation; fixed startup proof positive and durable unknown negative; atomic batch and exact score",
+  "real_model_calls": 0
+}

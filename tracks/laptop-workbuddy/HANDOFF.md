@@ -1,3 +1,5 @@
+2026-10-22（Asia/Shanghai）：LAP-28阶段C已实现/离线通过，session `LAP-28-C-quality-capacity`。代码所有审阅表/全条件派生生产门槛、固定六例原子预占/总6次/精确事实+人工评分、原生wire审计与自造夹具交付。真实材料/六例/运行路径与视觉模板上界未过，初始组合仍拒启、vision=false；实际Windows/NVIDIA GGUF路径独立证明缺口回sol/max。0真实模型/SSH/QQ/群图/登录/启停/本机配置修改，不进入06；31B/18/24及旧差额保留。 [28交接](tasks/LAP-28/HANDOFF.md)。
+
 2026-10-21（Asia/Shanghai）：LAP-18B安全公共网络/轻量正文已实现、离线与合成提取质量通过，session `LAP-18-B-public-body`（20:38领取）。232受影响单元、16组164实际框架替身及末次定向回归通过；5依赖约10.97MiB、单页<2秒/256MiB、取消/超时自有worker回收。真实七域DNS全非公网，DoH TLS verify_code=20，0可用公开正文，仍network_unverified；搜索质量false、真实生成/QQ/完整验收未过。web.enabled保存值true不变，未正常启动加载/未部署；0模型/QQ/SSH/真实bot启停/登录，24/28/人设和旧差额保留，不推进28C/06。 [报告](../../reports/lap-18-B-2026-10-21.md) / [18交接](tasks/LAP-18/HANDOFF.md)。
 
 2026-10-21（Asia/Shanghai）：LAP-28阶段A入站诊断已实现/离线通过，session `LAP-28-A-ingress-diagnostics`（19:57:04领取）。默认inspect/内存合成可重现有段无像素、URL字节解码、文本占位；封闭日志与另行授权的受管intake-only交付，真实模式未运行。213单元/16组158实际框架替身通过，用户人设既有23,393字节预算失败单列保留。真实样本/群图/模型/QQ/SSH/启停/登录均0，仍ingress_unverified、vision=false/生产拒启；不自动推进18/真实验收。 [报告](../../reports/lap-28-A-2026-10-21.md) / [28交接](tasks/LAP-28/HANDOFF.md)。
