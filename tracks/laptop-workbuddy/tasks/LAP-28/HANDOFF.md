@@ -14,10 +14,10 @@
 
 归属：vision/vision_capabilities/vision_quality、公开能力JSON、backends/两runner、config/model_gateway/router main固定root门槛、manage/configure_astrbot/configure_bot必要root/缺项接点、observe_lap28/verify_lap28_quality、test_lap28_capability/tests/fixtures/lap28-C、C报告JSON/Markdown、本交接与PROGRESS/工作线HANDOFF/TASKS。旧报告未覆盖，未改18安全传输实现。测试命令/资源/回滚见报告；临时替身进程及测试日志state保持忽略。
 
-Git收口：待本阶段归属差异/AST/JSON/本地链接/围栏检查后提交推送并核对；下方旧SHA仅历史。最终交付SHA见会话回执，Git不等于启用或真实验收。
+Git收口：33份本阶段归属文件内容提交`eb5278bcac0ce08059fcaf31d945217c48fb26a2`已推送origin/main，git rev-parse HEAD与git ls-remote完整SHA一致，核对时git status --short为空。272单元25.047秒、12组138框架22.828秒；15Python AST/7JSON解析、340本地链接/围栏、uv lock --check（29包）、暂存/工作区diff检查通过；最终离线签名172925876f03e9f5eda8da4beddbd49eb198dde4ec0a7d938426d5a6687931af一致。无非忽略本机差异，local/secrets/state保持忽略。随后仅本交接/TASKS/报告同步交付记录另提交推送，最终SHA见回执；下方旧SHA仅历史，Git不等于启用或真实验收。
 
 ---
-LAP-28阶段C进行中：session `LAP-28-C-quality-capacity`，开始2026-10-22T19:59:05+08:00；本session唯一写入。归属：src/qqbot_gateway/vision.py、新vision_capabilities.py/vision_quality.py、config/vision-capabilities.json、scripts/observe_lap28.py及新verify_lap28_quality.py、tests/test_lap28_capability.py/自造夹具生成器及tests/fixtures/lap28-C六例、必要runner预算接点（backends/两runner）、config/model_gateway/router/main与manage/configure_astrbot/configure_bot仅固定root门槛/诊断接点、reports/lap-28-C-*、28 HANDOFF/PROGRESS/工作线HANDOFF/TASKS。仅I4/I5代码、审阅来源、自造夹具与底层替身；0真实模型/SSH/QQ/群图/启停/登录/本机配置修改。默认vision=false，可信上界或真实质量缺失继续拒启；旧31B/18/24等差额保留，不推进06。
+LAP-28阶段C领取记录（现已代码/离线交付）：session `LAP-28-C-quality-capacity`，开始2026-10-22T19:59:05+08:00；本session唯一写入。归属：src/qqbot_gateway/vision.py、新vision_capabilities.py/vision_quality.py、config/vision-capabilities.json、scripts/observe_lap28.py及新verify_lap28_quality.py、tests/test_lap28_capability.py/自造夹具生成器及tests/fixtures/lap28-C六例、必要runner预算接点（backends/两runner）、config/model_gateway/router/main与manage/configure_astrbot/configure_bot仅固定root门槛/诊断接点、reports/lap-28-C-*、28 HANDOFF/PROGRESS/工作线HANDOFF/TASKS。仅I4/I5代码、审阅来源、自造夹具与底层替身；0真实模型/SSH/QQ/群图/启停/登录/本机配置修改。默认vision=false，可信上界或真实质量缺失继续拒启；旧31B/18/24等差额保留，不推进06。
 
 # LAP-28 当前消息原生图片理解
 
