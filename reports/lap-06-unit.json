@@ -1,0 +1,36 @@
+{
+  "passed": true,
+  "tests": 273,
+  "failures": 0,
+  "errors": 0,
+  "elapsed_seconds": 26.297,
+  "modules": [
+    "test_bilibili",
+    "test_web",
+    "test_lap18_body",
+    "test_config_files",
+    "test_config_comments",
+    "test_config",
+    "test_token_budget",
+    "test_lap27",
+    "test_lap28",
+    "test_lap29",
+    "test_lap30",
+    "test_group_silence",
+    "test_participation",
+    "test_model_gateway"
+  ],
+  "real_model_calls": 0,
+  "real_qq_outputs": 0,
+  "post_review": {
+    "passed": true,
+    "tests": 25,
+    "elapsed_seconds": 0.557,
+    "command": ".venv/Scripts/python.exe -X utf8 -m unittest tests.test_bilibili tests.test_lap18_body.EvidenceTests -q",
+    "includes": {
+      "bilibili_tests": 20,
+      "web_evidence_tests": 5
+    },
+    "note": "完整影响集273为前一检查点；随后新增旧eligible反例并收紧manifest URL类型/字幕证明检查；次数不相加。"
+  }
+}

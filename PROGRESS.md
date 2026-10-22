@@ -1,3 +1,5 @@
+2026-10-22（Asia/Shanghai）：LAP-06轻量B站字幕已实现/离线通过，session `LAP-06-light-subtitles`；单P/轨、固定源最小适配/认证隔离、六区真实范围与最终预算、RAM缓存/共享取消及同链v2/ACK交付。273受影响单元+末次25材料专项（含20字幕）、8组合88字幕框架与8组合118关闭兼容通过；真实anonymous/auth/字幕正文/生成/群ACK均未验，18仍network_unverified。默认false/explicit/none，本机未改/未启用，0真实模型/QQ/SSH/启停/登录；07 ASR与完整V11、原第一版/旧差额保留。[06交接](tracks/laptop-workbuddy/tasks/LAP-06/HANDOFF.md)。
+
 2026-10-22（Asia/Shanghai）：LAP-28阶段C已实现/离线通过，session `LAP-28-C-quality-capacity`。代码所有审阅表/全条件派生生产门槛、固定六例原子预占/总6次/精确事实+人工评分、原生wire审计与自造夹具交付。真实材料/六例/运行路径与视觉模板上界未过，初始组合仍拒启、vision=false；实际Windows/NVIDIA GGUF路径独立证明缺口回sol/max。0真实模型/SSH/QQ/群图/登录/启停/本机配置修改，不进入06；31B/18/24及旧差额保留。 [28交接](tracks/laptop-workbuddy/tasks/LAP-28/HANDOFF.md)。
 
 2026-10-21（Asia/Shanghai）：LAP-18B安全公共网络/轻量正文已实现、离线与合成提取质量通过，session `LAP-18-B-public-body`（20:38领取）。232受影响单元、16组164实际框架替身及末次定向回归通过；5依赖约10.97MiB、单页<2秒/256MiB、取消/超时自有worker回收。真实七域DNS全非公网，DoH TLS verify_code=20，0可用公开正文，仍network_unverified；搜索质量false、真实生成/QQ/完整验收未过。web.enabled保存值true不变，未正常启动加载/未部署；0模型/QQ/SSH/真实bot启停/登录，24/28/人设和旧差额保留，不推进28C/06。 [报告](reports/lap-18-B-2026-10-21.md) / [18交接](tracks/laptop-workbuddy/tasks/LAP-18/HANDOFF.md)。
@@ -94,7 +96,7 @@ LAP-17已有SSH原生runner/schema3/切换及统一结果/版本；LAP-18安全�
 
 ## 阅读顺序与下一步
 
-当前图片/网页/B站先读[LAP-36交接](tracks/laptop-workbuddy/tasks/LAP-36/HANDOFF.md)、[总计划](tracks/laptop-workbuddy/tasks/LAP-36/PLAN.md)与[四阶段medium指引](tracks/laptop-workbuddy/tasks/LAP-36/IMPLEMENTATION_GUIDE.md)，28A/18B/28C已离线交付；28C实际路径/可信上界回sol/max，06D仅按后续指令领取；18网络真实缺口见最新交接。规划不自动启用或授权真实推理/群验收；24独立实施已交付，真实登录差额仍保留。
+当前图片/网页/B站先读[LAP-36交接](tracks/laptop-workbuddy/tasks/LAP-36/HANDOFF.md)、[总计划](tracks/laptop-workbuddy/tasks/LAP-36/PLAN.md)与[四阶段medium指引](tracks/laptop-workbuddy/tasks/LAP-36/IMPLEMENTATION_GUIDE.md)，28A/18B/28C已离线交付；28C实际路径/可信上界回sol/max，06D已代码/离线交付，真实字幕/生成/群ACK待明确批次；18网络真实缺口见最新交接。规划不自动启用或授权真实推理/群验收；24独立实施已交付，真实登录差额仍保留。
 
 1. [AGENTS](AGENTS.md)→本入口→[笔记本HANDOFF](tracks/laptop-workbuddy/HANDOFF.md)与[TASKS](tracks/laptop-workbuddy/TASKS.md)。当前自动登录先读[LAP-24交接](tracks/laptop-workbuddy/tasks/LAP-24/HANDOFF.md)/[续作PLAN](tracks/laptop-workbuddy/tasks/LAP-24/AUTOSTART_PLAN.md)/[medium指引](tracks/laptop-workbuddy/tasks/LAP-24/AUTOSTART_IMPLEMENTATION_GUIDE.md)，P1/P3代码/离线交付完成，P2/P4真实操作待后续指令。配置/停言另读[LAP-34配置交接](tracks/laptop-workbuddy/tasks/LAP-34/HANDOFF.md)与[LAP-35停言交接](tracks/laptop-workbuddy/tasks/LAP-35/HANDOFF.md)；34/35已实现/离线通过，加载/真实验收差额分别保留。
 2. 当前关注实现先读[LAP-27交接](tracks/laptop-workbuddy/tasks/LAP-27/HANDOFF.md)与[报告](reports/lap-27-2026-10-18.md)；清理实现再读[LAP-31交接](tracks/laptop-workbuddy/tasks/LAP-31/HANDOFF.md)与[报告](reports/lap-31-2026-10-18.md)，31A通过/31B未过分别保留；本次使用反馈与新需求先读[LAP-26交接](tracks/laptop-workbuddy/tasks/LAP-26/HANDOFF.md)/[总体规划](tracks/laptop-workbuddy/tasks/LAP-26/PLAN.md)/[精确实施合同](tracks/laptop-workbuddy/tasks/LAP-26/IMPLEMENTATION_SPEC.md)/[五项medium指令](tracks/laptop-workbuddy/tasks/LAP-26/IMPLEMENTATION_GUIDE.md)，后续分项等待用户指令，不能把规划当启用授权。LAP-25是否加载未知；[LAP-24](tracks/laptop-workbuddy/tasks/LAP-24/HANDOFF.md)登录已由21日自动启动续作重新前置，原生归属/反复扫码尚未解决。总体旧合同仍见[LAP-19](tracks/laptop-workbuddy/tasks/LAP-19/PLAN.md)/[群聊合同](tracks/laptop-workbuddy/tasks/LAP-19/GROUP_CHAT_PLAN.md)；[18搜索缺口](tracks/laptop-workbuddy/tasks/LAP-18/HANDOFF.md)与旧真实差额保留。
@@ -116,7 +118,7 @@ LAP-17已有SSH原生runner/schema3/切换及统一结果/版本；LAP-18安全�
 - LAP-09授权群/黑名单真实缺项、LAP-11/15最终P01风格接受、LAP-13终端视觉接受、LAP-16真实QQ ACK/多人/关闭中发送和adaptive启用均未由本轮补齐。
 - LAP-02/03/04/05真人交错/隔离/三轮记忆/重置/长稳/完整文本交付保留。旧G4仅单条/无@/两轮口令有证据，两小时混合文本/视频完整验收不以离线代替；见[TASKS验收差额](tracks/laptop-workbuddy/TASKS.md#验收差额)。
 - LAP-12最后全停/端口关闭是历史检查点，不能推断用户试用后状态；当前未探活bot。旧失败trace上游根因缺完整证据，不为旧错误循环消费额度。
-- LAP-06/07视频/ASR延期；原LAP-17未@分支由LAP-20实现/离线通过，尚未启用。17已有离线/元数据证据；新后端/联网/free/表情包仍无真实生成/群验收，PC已加载或NapCat静态API存在不等于真实验收通过。
+- LAP-06轻量字幕代码/离线通过，真实未验；LAP-07 ASR及完整V11仍延期；原LAP-17未@分支由LAP-20实现/离线通过，尚未启用。17已有离线/元数据证据；新后端/联网/free/表情包仍无真实生成/群验收，PC已加载或NapCat静态API存在不等于真实验收通过。
 
 ## 多session与Git交付
 

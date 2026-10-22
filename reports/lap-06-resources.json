@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "fixture_rows": 10000,
+  "fixture_json_bytes": 691573,
+  "parse_normalize_seconds": 0.179859,
+  "selection_seconds": 0.000966,
+  "evidence_bytes": 4159,
+  "cache_entries": 1,
+  "cache_accounted_bytes": 109669,
+  "cache_payload_is_bytes": true,
+  "tracemalloc_peak_bytes": 9311125,
+  "rss_baseline_bytes": 46563328,
+  "rss_after_bytes": 56983552,
+  "new_runtime_dependencies": 0,
+  "idle_workers": 0,
+  "real_network_requests": 0,
+  "real_model_calls": 0,
+  "real_qq_outputs": 0
+}

@@ -36,6 +36,8 @@ class Intent:
 
 def intent(question, cfg, private_ids=()):
     if re.search(r'不要联网|别联网|不联网|禁止联网|只根据这段文字|只凭记忆',question):return Intent()
+    from .bilibili_policy import LINK, BARE
+    if LINK.search(question) or BARE.search(question):return Intent('video')
     urls=tuple(dict.fromkeys(x.rstrip('。，；！？、）)]') for x in URL.findall(question)))
     if urls:
         if not cfg['enabled']:return Intent('disabled')

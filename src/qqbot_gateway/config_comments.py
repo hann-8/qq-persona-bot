@@ -1,5 +1,6 @@
 """Fixed Chinese vocabulary; defaults describe new installs, never migration values."""
 DESCRIPTIONS = {
+    'bilibili': '轻量单P单轨字幕；默认关闭，无ASR/音视频/评论或平台AI摘要',
     'public_network': '项目公共网络；显式选择解析和CA，不改全局网络配置',
     'resolver': 'system或固定cloudflare_doh；失败不自动切换，默认system',
     'ca_bundle_file': '默认null；仅secrets/public-network-ca.local.pem的已审阅CA证书，禁止私钥或链接',
@@ -85,7 +86,7 @@ DESCRIPTIONS = {
     'secrets_file': '项目secrets内token文件引用，check不读凭据',
     'legacy_extensions': '仅迁移保留的未知顶层字段，不保证功能，不得冲突已知字段',
 }
-COMMENT_KEYS = frozenset(DESCRIPTIONS) | frozenset(('bot','access','llm','profiles','codebuddy_cli','ollama_ssh','input_budget','chat','participation','attention','output','web','memes','memory','vision','members','onebot'))
+COMMENT_KEYS = frozenset(('auth_mode','preferred_language','long_subtitle_policy','max_duration_seconds','max_subtitle_response_bytes','cache_ttl_seconds')) | frozenset(DESCRIPTIONS) | frozenset(('bot','access','llm','profiles','codebuddy_cli','ollama_ssh','input_budget','chat','participation','attention','output','web','bilibili','memes','memory','vision','members','onebot'))
 
 
 def comment(key, value=None):
@@ -93,6 +94,7 @@ def comment(key, value=None):
 
 
 PATH_DESCRIPTIONS = {
+    'bilibili': '轻量单P单轨字幕；默认关闭，无ASR/音视频/评论或平台AI摘要',
     'public_network': '项目公共网络；显式选择解析和CA，不改全局网络配置',
     'resolver': 'system或固定cloudflare_doh；失败不自动切换，默认system',
     'ca_bundle_file': '默认null；仅secrets/public-network-ca.local.pem的已审阅CA证书，禁止私钥或链接',
@@ -104,6 +106,15 @@ PATH_DESCRIPTIONS = {
     ('participation', 'silence', 'enabled'): '临时停言开关；明确停言后本群静默，新真实@恢复，gate重启复位',
     ('output', 'mode'): 'QQ正文固定plain_chat自然纯文本',
     ('web', 'enabled'): '共用网页读取开关；搜索质量门槛仍关闭，不代表完整搜索可用',
+    ('bilibili','enabled'): '默认false；仅明确请求单P字幕，要求web开启；下次正常启动生效',
+    ('bilibili','trigger'): '固定explicit；真实@单定位或当前目标明确总结请求，free裸链接不抓取',
+    ('bilibili','auth_mode'): 'none匿名或操作者明确sessdata；仅固定secrets/bilibili-session.local.json，不读浏览器',
+    ('bilibili','preferred_language'): 'zh或en；同语人工优先，再自动；中文可回退英文并标注',
+    ('bilibili','long_subtitle_policy'): 'excerpt六区真实时间节选或reject；完整要求超限拒绝，不多次生成',
+    ('bilibili','max_duration_seconds'): '60..1200秒，默认1200，只检查当前P',
+    ('bilibili','max_subtitle_response_bytes'): '65536..1048576字节，API/字幕压缩前后均有界',
+    ('bilibili','max_evidence_bytes'): '1000..6000 UTF-8字节，元数据/范围共用且取最终剩余更小值',
+    ('bilibili','cache_ttl_seconds'): '0..600秒，0禁用；仅RAM最多32条/4MiB，不缓存回答',
     ('memes', 'enabled'): '发送已登记表情图片的开关，不开放任意媒体',
     ('memory', 'enabled'): '读取本群长期记忆的开关，不等于开启学习',
     ('vision', 'enabled'): '原生识图desired开关；生产能力未验证，true仍拒绝启动',

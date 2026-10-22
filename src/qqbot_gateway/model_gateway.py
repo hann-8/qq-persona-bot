@@ -496,7 +496,7 @@ def main():
     runner=create_runner(root,settings,budget)
     from .web_retrieval import WebRunner, Retriever
     ids=[settings['bot']['qq']]+sum((settings['access'][k] for k in ('allowed_groups','admin_users','blocked_users')),[])
-    runner=WebRunner(runner,Retriever(settings['web'],ids,network=settings['public_network'],root=root),budget,settings['output'],root)
+    runner=WebRunner(runner,Retriever(settings['web'],ids,network=settings['public_network'],root=root,bilibili=settings['bilibili']),budget,settings['output'],root)
     runner.allow_ambient_web=settings['participation']['allow_ambient_web']
     from .meme_catalog import MemeCatalog
     memes=MemeCatalog(root,settings['memes'])
@@ -506,10 +506,10 @@ def main():
     from .members import suspend_unverified,MemberClient
     settings['members']=suspend_unverified(settings)
     v2=None
-    if settings['participation']['mode']=='free' and settings['participation']['attention']['enabled'] or settings['vision']['enabled'] or settings['members']['enabled'] or settings['memory']['enabled']:
+    if settings['participation']['mode']=='free' and settings['participation']['attention']['enabled'] or settings['vision']['enabled'] or settings['members']['enabled'] or settings['memory']['enabled'] or settings['bilibili']['enabled']:
         from .persona import compose_persona,session_version
         from .reply_plan import digest
-        persona=compose_persona((root/'config/persona.md').read_text(encoding='utf-8'),settings['output'],settings['web'],settings['participation'],settings['memes'],settings.get('vision'),settings['members'],settings['memory'])
+        persona=compose_persona((root/'config/persona.md').read_text(encoding='utf-8'),settings['output'],settings['web'],settings['participation'],settings['memes'],settings.get('vision'),settings['members'],settings['memory'],settings.get('bilibili'))
         persona_id=session_version(persona+('\n'+memes.fingerprint() if memes.cfg['enabled'] else ''),settings)
         v2=dict(mode=settings['participation']['mode'],config_version=digest(persona_id),aliases=settings['participation']['attention']['aliases'],mentions_enabled=settings['members']['mentions_enabled'],memory_enabled=settings['memory']['enabled'],learning_enabled=settings['memory']['learning_enabled'])
     from .vision import MaterialClient,context_token

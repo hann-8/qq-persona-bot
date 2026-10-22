@@ -35,6 +35,7 @@ def export_legacy_config(path):
         value.pop('vision',None)
         value.pop('members',None)
         value.pop('memory',None)
+        value.pop('bilibili',None)
         content=yaml.safe_dump(value,allow_unicode=True,sort_keys=False).encode('utf-8')
         directory=root/'state/config-exports';directory.mkdir(parents=True,exist_ok=True)
         tag=uuid.uuid4().hex
@@ -62,7 +63,7 @@ def activate_legacy_config(path,review,source_digest,legacy_digest,confirmation)
         original=path.read_bytes();content=review.read_bytes()
         if hashlib.sha256(original).hexdigest()!=source_digest or hashlib.sha256(content).hexdigest()!=legacy_digest:raise ValueError('Configuration changed')
         data=yaml.safe_load(content);normalize_settings(data)
-        if 'silence' in data.get('participation',{}) or 'attention' in data.get('participation',{}) or 'vision' in data or 'members' in data or 'memory' in data:raise ValueError('Not legacy compatible')
+        if 'silence' in data.get('participation',{}) or 'attention' in data.get('participation',{}) or 'vision' in data or 'members' in data or 'memory' in data or 'bilibili' in data:raise ValueError('Not legacy compatible')
         backup=review.with_name(review.stem+'.activation-original.yaml')
         with backup.open('xb') as f:f.write(original)
         temporary=path.with_name(path.name+'.legacy-'+uuid.uuid4().hex+'.tmp')
@@ -144,6 +145,8 @@ def normalize_settings(raw):
     data['public_network']=validate_network(data.get('public_network',{}))
     from .web_policy import validate_web
     data['web'] = validate_web(data.get('web', {}))
+    from .bilibili_policy import validate as validate_bilibili
+    data['bilibili']=validate_bilibili(data.get('bilibili',{}),data['web'])
     from .participation import validate_participation
     data['participation']=validate_participation(data.get('participation',{}))
     from .meme_catalog import validate_memes

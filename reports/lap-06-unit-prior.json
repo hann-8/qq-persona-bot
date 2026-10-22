@@ -1,0 +1,26 @@
+{
+  "passed": false,
+  "tests": 273,
+  "failures": 1,
+  "errors": 0,
+  "elapsed_seconds": 26.766,
+  "modules": [
+    "test_bilibili",
+    "test_web",
+    "test_lap18_body",
+    "test_config_files",
+    "test_config_comments",
+    "test_config",
+    "test_token_budget",
+    "test_lap27",
+    "test_lap28",
+    "test_lap29",
+    "test_lap30",
+    "test_group_silence",
+    "test_participation",
+    "test_model_gateway"
+  ],
+  "real_model_calls": 0,
+  "real_qq_outputs": 0,
+  "limitation": "既有test_lap29把随机ref/receipt中的444子串误认为原始QQ号泄露；本次ref含9444，未改生产/旧测试，单列并定向复核。"
+}

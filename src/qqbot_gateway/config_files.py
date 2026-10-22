@@ -19,7 +19,7 @@ LAYOUT = {
     'bot.yaml': ('bot', 'access'),
     'models.yaml': ('llm',),
     'chat.yaml': ('chat', 'participation', 'output'),
-    'features.yaml': ('public_network', 'web', 'memes', 'memory', 'vision', 'members'),
+    'features.yaml': ('public_network', 'web', 'bilibili', 'memes', 'memory', 'vision', 'members'),
     'runtime.yaml': ('layout_version', 'schema_version', 'onebot', 'secrets_file', 'legacy_extensions'),
 }
 KNOWN = frozenset(k for keys in LAYOUT.values() for k in keys)

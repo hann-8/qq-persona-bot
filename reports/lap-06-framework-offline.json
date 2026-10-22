@@ -1,0 +1,747 @@
+{
+  "passed": true,
+  "combinations": 8,
+  "cases": 88,
+  "elapsed_seconds": 16.422,
+  "real_model_calls": 0,
+  "real_qq_outputs": 0,
+  "real_bot_operations": 0,
+  "rows": [
+    {
+      "backend": "codebuddy_cli",
+      "mode": "single",
+      "participation": "mentions",
+      "cases": [
+        {
+          "case": "mention_bare_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "cached_material_independent_generation",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 0
+        },
+        {
+          "case": "short_p2_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 4
+        },
+        {
+          "case": "login_notice_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "multiple_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "excerpt_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "complete_budget_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 3
+        },
+        {
+          "case": "unknown_ack_no_resend",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "blacklist_and_silence_no_framework_or_fetch",
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "real_mention_restores_silence",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        }
+      ],
+      "real_run_agent": true,
+      "actual_provider": true,
+      "actual_runner": true,
+      "original_event_ACK": true,
+      "gate": true,
+      "memory": false,
+      "memes": true,
+      "bilibili_only_v2": true,
+      "real_model_calls": 0,
+      "real_qq_calls": 0
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "single",
+      "participation": "free",
+      "cases": [
+        {
+          "case": "mention_bare_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "cached_material_independent_generation",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 0
+        },
+        {
+          "case": "short_p2_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 4
+        },
+        {
+          "case": "free_explicit_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "free_bare_no_fetch",
+          "generations": 1,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 0
+        },
+        {
+          "case": "login_notice_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "multiple_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "excerpt_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "complete_budget_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 3
+        },
+        {
+          "case": "unknown_ack_no_resend",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "blacklist_and_silence_no_framework_or_fetch",
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "real_mention_restores_silence",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        }
+      ],
+      "real_run_agent": true,
+      "actual_provider": true,
+      "actual_runner": true,
+      "original_event_ACK": true,
+      "gate": true,
+      "memory": false,
+      "memes": true,
+      "bilibili_only_v2": true,
+      "real_model_calls": 0,
+      "real_qq_calls": 0
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "adaptive",
+      "participation": "mentions",
+      "cases": [
+        {
+          "case": "mention_bare_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "cached_material_independent_generation",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 0
+        },
+        {
+          "case": "short_p2_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 4
+        },
+        {
+          "case": "login_notice_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "multiple_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "excerpt_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "complete_budget_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 3
+        },
+        {
+          "case": "unknown_ack_no_resend",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "blacklist_and_silence_no_framework_or_fetch",
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "real_mention_restores_silence",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        }
+      ],
+      "real_run_agent": true,
+      "actual_provider": true,
+      "actual_runner": true,
+      "original_event_ACK": true,
+      "gate": true,
+      "memory": true,
+      "memes": true,
+      "bilibili_only_v2": false,
+      "real_model_calls": 0,
+      "real_qq_calls": 0
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "adaptive",
+      "participation": "free",
+      "cases": [
+        {
+          "case": "mention_bare_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "cached_material_independent_generation",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 0
+        },
+        {
+          "case": "short_p2_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 4
+        },
+        {
+          "case": "free_explicit_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "free_bare_no_fetch",
+          "generations": 1,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 0
+        },
+        {
+          "case": "login_notice_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "multiple_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "excerpt_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "complete_budget_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 3
+        },
+        {
+          "case": "unknown_ack_no_resend",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "blacklist_and_silence_no_framework_or_fetch",
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "real_mention_restores_silence",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        }
+      ],
+      "real_run_agent": true,
+      "actual_provider": true,
+      "actual_runner": true,
+      "original_event_ACK": true,
+      "gate": true,
+      "memory": true,
+      "memes": true,
+      "bilibili_only_v2": false,
+      "real_model_calls": 0,
+      "real_qq_calls": 0
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "single",
+      "participation": "mentions",
+      "cases": [
+        {
+          "case": "mention_bare_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "cached_material_independent_generation",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 0
+        },
+        {
+          "case": "short_p2_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 4
+        },
+        {
+          "case": "login_notice_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "multiple_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "excerpt_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "complete_budget_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 3
+        },
+        {
+          "case": "unknown_ack_no_resend",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "blacklist_and_silence_no_framework_or_fetch",
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "real_mention_restores_silence",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        }
+      ],
+      "real_run_agent": true,
+      "actual_provider": true,
+      "actual_runner": true,
+      "original_event_ACK": true,
+      "gate": true,
+      "memory": false,
+      "memes": true,
+      "bilibili_only_v2": true,
+      "real_model_calls": 0,
+      "real_qq_calls": 0
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "single",
+      "participation": "free",
+      "cases": [
+        {
+          "case": "mention_bare_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "cached_material_independent_generation",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 0
+        },
+        {
+          "case": "short_p2_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 4
+        },
+        {
+          "case": "free_explicit_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "free_bare_no_fetch",
+          "generations": 1,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 0
+        },
+        {
+          "case": "login_notice_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "multiple_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "excerpt_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "complete_budget_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 3
+        },
+        {
+          "case": "unknown_ack_no_resend",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "blacklist_and_silence_no_framework_or_fetch",
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "real_mention_restores_silence",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        }
+      ],
+      "real_run_agent": true,
+      "actual_provider": true,
+      "actual_runner": true,
+      "original_event_ACK": true,
+      "gate": true,
+      "memory": false,
+      "memes": true,
+      "bilibili_only_v2": true,
+      "real_model_calls": 0,
+      "real_qq_calls": 0
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "adaptive",
+      "participation": "mentions",
+      "cases": [
+        {
+          "case": "mention_bare_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "cached_material_independent_generation",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 0
+        },
+        {
+          "case": "short_p2_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 4
+        },
+        {
+          "case": "login_notice_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "multiple_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "excerpt_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "complete_budget_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 3
+        },
+        {
+          "case": "unknown_ack_no_resend",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "blacklist_and_silence_no_framework_or_fetch",
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "real_mention_restores_silence",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        }
+      ],
+      "real_run_agent": true,
+      "actual_provider": true,
+      "actual_runner": true,
+      "original_event_ACK": true,
+      "gate": true,
+      "memory": true,
+      "memes": true,
+      "bilibili_only_v2": false,
+      "real_model_calls": 0,
+      "real_qq_calls": 0
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "adaptive",
+      "participation": "free",
+      "cases": [
+        {
+          "case": "mention_bare_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "cached_material_independent_generation",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 0
+        },
+        {
+          "case": "short_p2_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 4
+        },
+        {
+          "case": "free_explicit_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "free_bare_no_fetch",
+          "generations": 1,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 0
+        },
+        {
+          "case": "login_notice_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "multiple_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "excerpt_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "complete_budget_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 3
+        },
+        {
+          "case": "unknown_ack_no_resend",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "blacklist_and_silence_no_framework_or_fetch",
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "real_mention_restores_silence",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        }
+      ],
+      "real_run_agent": true,
+      "actual_provider": true,
+      "actual_runner": true,
+      "original_event_ACK": true,
+      "gate": true,
+      "memory": true,
+      "memes": true,
+      "bilibili_only_v2": false,
+      "real_model_calls": 0,
+      "real_qq_calls": 0
+    }
+  ]
+}

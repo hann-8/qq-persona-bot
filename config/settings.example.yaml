@@ -149,3 +149,14 @@ members:  # 配置节，子字段见下方；保留既有校验约束
 public_network:  # 项目公共网络，失败不自动切换
   resolver: system  # 仅system/cloudflare_doh，不改全局DNS
   ca_bundle_file: null  # 仅显式secrets/public-network-ca.local.pem，不读取任意路径
+
+bilibili:  # 轻量单P单轨字幕；默认关闭，无ASR/音视频/评论或平台AI摘要
+  enabled: false  # 默认false；仅明确请求单P字幕，要求web开启；下次正常启动生效
+  trigger: explicit  # 固定explicit；真实@单定位或当前目标明确总结请求，free裸链接不抓取
+  auth_mode: none  # none匿名或操作者明确sessdata；仅固定secrets/bilibili-session.local.json，不读浏览器
+  preferred_language: zh  # zh或en；同语人工优先，再自动；中文可回退英文并标注
+  long_subtitle_policy: excerpt  # excerpt六区真实时间节选或reject；完整要求超限拒绝，不多次生成
+  max_duration_seconds: 1200  # 60..1200秒，默认1200，只检查当前P
+  max_subtitle_response_bytes: 1048576  # 65536..1048576字节，API/字幕压缩前后均有界
+  max_evidence_bytes: 6000  # 1000..6000 UTF-8字节，元数据/范围共用且取最终剩余更小值
+  cache_ttl_seconds: 600  # 0..600秒，0禁用；仅RAM最多32条/4MiB，不缓存回答

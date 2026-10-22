@@ -51,10 +51,11 @@ class QQRouter(Star):
         self.memory=MemoryStore(self.root,self.bot,self.groups,self.blocked,self.admins,settings['memory'])
         self.output=settings['output']
         self.web=settings['web']
+        self.bilibili=settings['bilibili']
         self.participation=settings['participation']
         from qqbot_gateway.meme_catalog import MemeCatalog
         self.memes=MemeCatalog(self.root,settings['memes'])
-        self.persona=compose_persona((self.root/'config/persona.md').read_text(encoding='utf-8'),self.output,self.web,self.participation,settings['memes'],settings.get('vision'),settings.get('members'),settings['memory'])
+        self.persona=compose_persona((self.root/'config/persona.md').read_text(encoding='utf-8'),self.output,self.web,self.participation,settings['memes'],settings.get('vision'),settings.get('members'),settings['memory'],settings.get('bilibili'))
         self.persona_id=session_version(self.persona+('\n'+self.memes.fingerprint() if self.memes.cfg['enabled'] else ''),settings)
         chat=settings.get('chat',{})
         self.budget=InputBudget.from_settings(settings,validate_model_settings(settings))
@@ -63,7 +64,7 @@ class QQRouter(Star):
         self.delivery=ReplyDelivery(self.tasks,self.output,self.delivery_allowed,catalog=self.memes,members=self.member_client)
         self.attention_effective=self.participation['mode']=='free' and self.participation['attention']['enabled']
         from qqbot_gateway.attention import Attention
-        self.group_turns=(Attention if self.attention_effective or self.vision['enabled'] or self.members['enabled'] or self.memory.cfg['enabled'] else Participation)(self.participation,digest(self.persona_id+uuid.uuid4().hex),settings['llm']['queue_limit'],chat.get('session_queue_timeout_seconds',600))
+        self.group_turns=(Attention if self.attention_effective or self.vision['enabled'] or self.members['enabled'] or self.memory.cfg['enabled'] or self.bilibili['enabled'] else Participation)(self.participation,digest(self.persona_id+uuid.uuid4().hex),settings['llm']['queue_limit'],chat.get('session_queue_timeout_seconds',600))
         self.group_turns.bot=self.bot
         self.connection_id=None
         self.connection_watcher=None
@@ -382,7 +383,7 @@ class QQRouter(Star):
         event.platform_meta=replace(event.platform_meta,support_proactive_message=False)
         event.set_extra('qq_delivery_version',self.persona_id)
         event.set_extra('qq_delivery_identity',(str(event.get_self_id()),str(event.get_group_id()),str(event.get_sender_id())))
-        if self.attention_effective or (self.vision['enabled'] or self.members['enabled'] or self.memory.cfg['enabled']) and self.participation['mode']=='free':
+        if self.attention_effective or (self.vision['enabled'] or self.members['enabled'] or self.memory.cfg['enabled'] or self.bilibili['enabled']) and self.participation['mode']=='free':
             async for item in self.on_attention_group(event):yield item
         elif self.participation['mode']=='free':
             async for item in self.on_free_group(event):yield item
@@ -447,7 +448,7 @@ class QQRouter(Star):
             history=self.budget.select_history(self.persona,prompt,history)
             await manager.update_conversation(umo,cid,history=history)
             conv.history=json.dumps(history,ensure_ascii=False)
-            if event.get_extra('needs_guarded_delivery') or self.output['delivery_mode']=='adaptive' or self.memes.cfg['enabled'] or self.vision['enabled'] or self.members['enabled'] or self.memory.cfg['enabled']:
+            if event.get_extra('needs_guarded_delivery') or self.output['delivery_mode']=='adaptive' or self.memes.cfg['enabled'] or self.vision['enabled'] or self.members['enabled'] or self.memory.cfg['enabled'] or self.bilibili['enabled']:
                 event.set_extra('qq_delivery_key',key)
                 event.set_extra('qq_delivery_cid',cid)
                 event.set_extra('qq_delivery_before',history)
@@ -455,7 +456,7 @@ class QQRouter(Star):
                 event.set_extra('qq_delivery_identity',(str(event.get_self_id()),str(event.get_group_id()),str(event.get_sender_id())))
             if self.memes.cfg['enabled']:event.set_extra('qq_media_turn',True)
             session_id='qqbot-media' if event.get_extra('qq_media_turn') else None
-            if self.vision['enabled'] or self.members['enabled'] or self.memory.cfg['enabled']:
+            if self.vision['enabled'] or self.members['enabled'] or self.memory.cfg['enabled'] or self.bilibili['enabled']:
                 from qqbot_gateway.vision import member_source,attach_image
                 from qqbot_gateway.turn_v2 import sha
                 from qqbot_gateway.attention import canonical

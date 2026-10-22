@@ -83,11 +83,15 @@ class PublicHTTP:
         self.cfg=cfg;self.audit=audit
         self.context=tls_context(cfg.get('public_network'),cfg.get('_root'))
         self.resolver=PublicResolver(cfg.get('public_network'),self.context,audit)
-    async def get(self,url,*,rss=False,purpose=None):
+    async def get(self,url,*,rss=False,purpose=None,credential=None):
         purpose=purpose or ('search' if rss else 'page')
         # Future Bilibili/JSON purposes need their own fixed endpoint policy;
         # declaring a purpose never grants a generic JSON downloader.
-        if purpose not in ('page','search') or (purpose=='search')!=rss:raise WebFailure('purpose_denied')
+        special=purpose in ('bilibili_api','subtitle','bilibili_short')
+        if not special and (purpose not in ('page','search') or (purpose=='search')!=rss):raise WebFailure('purpose_denied')
+        if special and rss:raise WebFailure('purpose_denied')
+        if credential is not None and (purpose!='bilibili_api' or not re.fullmatch(r'[A-Za-z0-9%_,.-]{1,4096}',credential)):raise WebFailure('credential_denied')
+        if special:bilibili_url(url,purpose)
         if rss and (urlsplit(url).hostname!='cn.bing.com' or urlsplit(url).path!='/search'):raise WebFailure('search_endpoint')
         connector=PublicConnector(resolver=self.resolver,ssl=self.context,use_dns_cache=False,force_close=True,limit=1)
         timeout=aiohttp.ClientTimeout(total=self.cfg['timeout_seconds'],connect=3,sock_read=6)
@@ -97,18 +101,27 @@ class PublicHTTP:
             # aiohttp 3.14.5 otherwise retries idempotent requests on disconnect.
             session._retry_connection=False
             for hop in range(self.cfg['max_redirects']+1):
-                page_url(url);self.audit.http_calls+=1
-                if self.audit.http_calls>8:raise WebFailure('http_limit')
-                async with session.get(url,allow_redirects=False) as response:
+                bilibili_url(url,purpose) if special else page_url(url)
+                if self.audit.http_calls>=(6 if special else 8):raise WebFailure('http_limit')
+                self.audit.http_calls+=1
+                headers={'Cookie':'SESSDATA='+credential} if credential is not None else {}
+                async with session.get(url,allow_redirects=False,headers=headers) as response:
                     if response.status in (301,302,303,307,308):
-                        if rss:raise WebFailure('search_redirect')
+                        if rss or purpose=='bilibili_api':raise WebFailure('api_redirect' if special else 'search_redirect')
+                        if purpose=='bilibili_short':
+                            final=urljoin(url,response.headers.get('Location',''))
+                            from .bilibili_policy import locator
+                            locator(final)  # validate before caller considers any next request
+                            return '',final,'redirect'
                         if hop==self.cfg['max_redirects']:raise WebFailure('redirect_limit')
-                        url=page_url(urljoin(url,response.headers.get('Location','')))
+                        url=urljoin(url,response.headers.get('Location',''))
+                        bilibili_url(url,purpose) if special else page_url(url)
                         self.audit.redirect_hops+=1;continue
-                    if response.status!=200:raise WebFailure('http_status')
+                    if response.status!=200:raise WebFailure('http_'+str(response.status) if special else 'http_status')
+                    if purpose=='bilibili_short':raise WebFailure('short_no_redirect')
                     if getattr(response,'content_length',None) is not None and response.content_length>self.cfg['max_response_bytes']:raise WebFailure('response_limit')
                     mime=response.headers.get('Content-Type','').split(';')[0].lower()
-                    if mime not in (('text/xml','application/rss+xml','application/xml') if rss else ('text/html','text/plain','application/xhtml+xml')):raise WebFailure('non_text')
+                    if mime not in (('application/json','text/json') if special else ('text/xml','application/rss+xml','application/xml') if rss else ('text/html','text/plain','application/xhtml+xml')):raise WebFailure('non_text')
                     encoding=response.headers.get('Content-Encoding','identity').lower()
                     if encoding not in ('identity','gzip','deflate'):raise WebFailure('encoding')
                     decoder=zlib.decompressobj(31 if encoding=='gzip' else 15) if encoding!='identity' else None
@@ -124,6 +137,28 @@ class PublicHTTP:
                     charset=response.charset or 'utf-8'
                     try:text=out.decode(charset,errors='replace')
                     except LookupError:raise WebFailure('charset') from None
-                    if re.search(r'captcha|verify you are human|人机验证|验证码|access denied|sign in to continue|登录后阅读|付费阅读',text,re.I):raise WebFailure('restricted')
+                    if not special and re.search(r'captcha|verify you are human|人机验证|验证码|access denied|sign in to continue|登录后阅读|付费阅读',text,re.I):raise WebFailure('restricted')
                     return text,str(response.url),mime
             raise WebFailure('redirect_limit')
+
+
+def bilibili_url(url,purpose):
+    """Purpose-bound HTTPS endpoints; credentials can only reach these two APIs."""
+    safe_url(url);u=urlsplit(url)
+    if u.scheme!='https':raise WebFailure('bilibili_url')
+    if purpose=='bilibili_api':
+        from urllib.parse import parse_qs
+        from .bilibili_policy import BV
+        q=parse_qs(u.query,keep_blank_values=True,max_num_fields=4)
+        if u.hostname!='api.bilibili.com' or u.path not in ('/x/web-interface/view','/x/player/wbi/v2'):raise WebFailure('bilibili_api')
+        fields={'bvid','cid'} if 'bvid' in q else {'aid','cid'}
+        if u.path.endswith('/view'):fields.discard('cid')
+        if set(q)!=fields or any(len(v)!=1 for v in q.values()):raise WebFailure('bilibili_api')
+        for k,v in q.items():
+            if not re.fullmatch(BV if k=='bvid' else '[1-9][0-9]{0,18}',v[0]):raise WebFailure('bilibili_api')
+    elif purpose=='subtitle':
+        if u.hostname not in ('aisubtitle.hdslb.com','i0.hdslb.com','i1.hdslb.com') or not re.fullmatch(r'/bfs/(?:ai_subtitle|subtitle)/[A-Za-z0-9_./-]+',u.path) or any(x in u.path.split('/') for x in ('.','..')):raise WebFailure('subtitle_url')
+    elif purpose=='bilibili_short':
+        if u.hostname!='b23.tv' or u.query or not re.fullmatch('/[A-Za-z0-9]{1,32}',u.path):raise WebFailure('short_url')
+    else:raise WebFailure('purpose_denied')
+    return url

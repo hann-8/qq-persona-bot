@@ -1,3 +1,5 @@
+2026-10-22（Asia/Shanghai）：LAP-06轻量B站字幕已实现/离线通过，session `LAP-06-light-subtitles`；单P/轨、固定源最小适配/认证隔离、六区真实范围与最终预算、RAM缓存/共享取消及同链v2/ACK交付。273受影响单元+末次25材料专项（含20字幕）、8组合88字幕框架与8组合118关闭兼容通过；真实anonymous/auth/字幕正文/生成/群ACK均未验，18仍network_unverified。默认false/explicit/none，本机未改/未启用，0真实模型/QQ/SSH/启停/登录；07 ASR与完整V11、原第一版/旧差额保留。[06交接](tasks/LAP-06/HANDOFF.md)。
+
 2026-10-22（Asia/Shanghai）：LAP-28阶段C已实现/离线通过，session `LAP-28-C-quality-capacity`。代码所有审阅表/全条件派生生产门槛、固定六例原子预占/总6次/精确事实+人工评分、原生wire审计与自造夹具交付。真实材料/六例/运行路径与视觉模板上界未过，初始组合仍拒启、vision=false；实际Windows/NVIDIA GGUF路径独立证明缺口回sol/max。0真实模型/SSH/QQ/群图/登录/启停/本机配置修改，不进入06；31B/18/24及旧差额保留。 [28交接](tasks/LAP-28/HANDOFF.md)。
 
 2026-10-21（Asia/Shanghai）：LAP-18B安全公共网络/轻量正文已实现、离线与合成提取质量通过，session `LAP-18-B-public-body`（20:38领取）。232受影响单元、16组164实际框架替身及末次定向回归通过；5依赖约10.97MiB、单页<2秒/256MiB、取消/超时自有worker回收。真实七域DNS全非公网，DoH TLS verify_code=20，0可用公开正文，仍network_unverified；搜索质量false、真实生成/QQ/完整验收未过。web.enabled保存值true不变，未正常启动加载/未部署；0模型/QQ/SSH/真实bot启停/登录，24/28/人设和旧差额保留，不推进28C/06。 [报告](../../reports/lap-18-B-2026-10-21.md) / [18交接](tasks/LAP-18/HANDOFF.md)。
