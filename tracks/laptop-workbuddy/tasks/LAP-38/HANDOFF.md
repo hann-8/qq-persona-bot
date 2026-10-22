@@ -2,7 +2,7 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md)。继承[AGENTS](../../../../AGENTS.md)。
 
-状态：2026-10-22 23:50（Asia/Shanghai）详细规划完成，未实施/启用；文档核验通过，Git交付核对中。23:19领取，session `LAP-38-vision-web-wechat-plan`，用户指定 sol/max 详细规划，后续由 sol/medium 按新指令实施；不检测或切换会话设置。
+状态：2026-10-22 23:50（Asia/Shanghai）详细规划完成，未实施/启用；文档核验及内容Git交付通过。23:19领取，session `LAP-38-vision-web-wechat-plan`，用户指定 sol/max 详细规划，后续由 sol/medium 按新指令实施；不检测或切换会话设置。
 
 范围：只读核对已交付28A/C、18B、06D及脱敏运行日志；调研公开GitHub个人微信适配；制定识图/网页闭环和 `E:\CodexWS\WeChatbot` 独立项目实施方案及medium复制指令。用户补充微信用于个人娱乐、朋友家人聊天。只写规划文档，不改代码/本机配置/人设，不启停、登录、调用真实模型、发送消息或访问家庭SSH。
 
@@ -18,8 +18,8 @@
 
 微信选择：pyweixin为4.1系列亲友聊天验证候选，当前显示名/UI临时ID/按键返回不足生产合同；腾讯iLink固定commit只声明direct，不能承诺亲友群。WeChatFerry已归档、Gewechat停维；不自动改产品形态/付费协议/旧客户端。目标目录只文档，未建独立Git或remote；其快照随QQ提交不代表微信独立推送。
 
-验证：18份文档本地链接/围栏、QQ/WX任务行ID唯一、git diff --check通过；七份微信文档SHA256一致。未改代码/配置/人设，不为低影响文档重跑代码测试。没有bot启停/登录、真实模型、QQ/微信收发、家庭SSH或凭据/CA/全局网络设置变更；只读公共网络请求是本轮唯一外部功能观察。全部31B/18搜索/28真实/06/07/登录及旧真人差额保留。
+验证：18份文档450个本地链接/围栏、QQ/WX任务行ID唯一（36/5）、git diff --check和暂存区同项通过；七份微信文档SHA256一致，18份暂存文件精确等于归属集合、私密模式检查0命中。未改代码/配置/人设，不为低影响文档重跑代码测试。没有bot启停/登录、真实模型、QQ/微信收发、家庭SSH或凭据/CA/全局网络设置变更；只读公共网络请求是本轮唯一外部功能观察。全部31B/18搜索/28真实/06/07/登录及旧真人差额保留。
 
 下一步：用户选择medium，分别按指引先18C修正文质量、再28R实现采集/边界/激活工具；微信另目录先WX-01离线核心。真实入站/家庭只读/6例IQ/群/微信均另按具体批次，不自动执行。Git仅提交本归属文档，推送后核对完整远端SHA；记录如下。
 
-Git交付：待完成最终暂存检查、commit/push及HEAD与origin/main的完整SHA核对。非忽略工作区当前仅本任务18份文档；没有用户/其他session差异被夹带。本机local/secrets/state/logs/runtime维持忽略，微信目标文档未独立推送。
+Git交付：18份归属文档内容提交`cf74e49645e9ce509fa4b5e5d1ea7b7eecf4fc6c`已推送origin/main，git rev-parse HEAD与git ls-remote完整SHA一致；检查点git status --short为空。随后仅本交接同步交付记录另提交推送，最终SHA见会话回执，不自引用。没有用户/其他session差异被夹带，本机local/secrets/state/logs/runtime维持忽略，微信目标文档未建独立仓库/推送；无部署或真实识图/微信验收。
