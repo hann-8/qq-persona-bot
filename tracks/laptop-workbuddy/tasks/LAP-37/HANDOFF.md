@@ -33,3 +33,5 @@ session `LAP-37-cleanup-capacity-recovery`，21:20（Asia/Shanghai）登记领�
 现在可由用户双击根启动机器人.cmd。以后再遇相同提示：先关闭机器人.cmd，再清理模型阻断.cmd，成功后手动启动；拒绝时保留提示检查存活身份/端口，不直接删除台账。uv.lock只锁依赖，不用于进程恢复。
 
 回滚须保持bot停止且无新unresolved，在配置锁内从归档原字节恢复原路径（会恢复阻断）；代码可回退本任务提交，两个cmd的CRLF按属性保留。归档证据不删除。不为恢复操作回滚数据库、历史、配置或unknown。31B完整覆盖/未观察后代退出证明、真实稳定/QQ群效果仍未验；本轮不再推进24自启验收，不自动启bot。
+
+Git交付：内容提交`8b470ed67cba886c1c2ff73f586f92f75208b4b7`已推送origin/main，rev-parse与ls-remote完整SHA一致；15份本任务文件、387个本地Markdown链接/暂存diff检查通过，内容检查点工作区干净。uv.lock/本机配置/人设无差异，归档/日志保持忽略。推送后独立cleanup status仍blocked=false；本段单独记录提交，最终记录提交SHA见会话回执。
