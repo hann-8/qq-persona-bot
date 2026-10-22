@@ -35,4 +35,4 @@ anonymous未验；auth未验；真实字幕正文材料未验；真实生成/群
 
 回滚：操作者正常停止并保留pending/unknown/清理账，显式关闭bilibili或恢复配对旧代码/审阅兼容配置后正常启动；不删除历史/记忆/图库/凭据，不改全局网络。
 
-Git交付：待归属差异审阅后提交并推送origin/main，核对完整SHA；本节随交付更新，不自引用自身提交。提交不代表部署/真实验收。
+Git交付：37份归属文件内容提交`9ae6688e466aa21bc7f0eb5b9de61358d90fda9e`已推送origin/main；git rev-parse HEAD与git ls-remote origin refs/heads/main完整SHA一致，内容检查点git status --short为空。408个本地Markdown链接核对无缺失，diff/compileall/uv检查通过。没有夹带其他session/人设/local/secrets，既有忽略配置/凭据与本轮state测试/源码工件保留。随后仅本交接和报告补Git记录，记录提交由main/HEAD恢复，不自引用；无新增业务网络/模型/QQ/SSH/部署操作。提交不代表真实验收。
