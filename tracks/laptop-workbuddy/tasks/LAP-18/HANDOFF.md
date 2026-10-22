@@ -27,7 +27,7 @@
 
 回滚按既有正常停机/配对备份流程，保留pending/unknown/清理台账，分别显式legacy/system或关闭web后正常启动；不动全局网络、真实群记忆/图库/历史。下一步等待用户针对真实网络条件或28C/06的后续指令，不自动续领。
 
-Git：本轮归属内容提交/推送及完整SHA核对记录在交付后补入；不把内容提交当部署/真实验收。
+Git交付（2026-10-22，Asia/Shanghai续作核对）：归属38文件内容提交`74eff6bb1a86a8ecb633f33ac303985f88d94de7`已推送origin/main；git rev-parse HEAD与git ls-remote origin refs/heads/main完整SHA一致。核对时git status --short为空，未夹带24/28/用户人设差异；本机local/secrets/state/runtime保持忽略。随后仅本交接与报告补交付记录，记录提交以main/HEAD为准，不自引用自身SHA。没有新增网络/模型/QQ调用或部署；保留全部真实差额。
 
 ---
 以下为旧检查点与验收差额（历史当时的默认/启用状态不得覆盖上文当前保存值）：
