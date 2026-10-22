@@ -43,6 +43,9 @@ def login_event(line):
 
 
 def safe_line(component,line):
+    if component=='model' and 'PUBLIC_MATERIAL ' in line:
+        from qqbot_gateway.web_retrieval import safe_material_log
+        return safe_material_log(line.rstrip())
     if component=='gate' and 'VISION_INGRESS ' in line:
         from qqbot_gateway.vision_ingress import safe_log
         return safe_log(line.rstrip())

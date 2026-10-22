@@ -98,3 +98,11 @@ LAP-18B补充：`features.yaml`新增`public_network`（resolver=system、ca_bun
 认证none完全不读凭据。操作者另行明确选择sessdata时，仅固定忽略`secrets/bilibili-session.local.json`，结构只有字符串字段SESSDATA；拒链接/重解析点/超过8KiB/额外字段。Cookie只发固定api.bilibili.com的view/player API，不随重定向，不发短链/CDN/DoH/模型。不在聊天粘贴Cookie，不读浏览器、不登录/刷新、不重试或切身份。本轮不创建凭据文件。
 
 缓存仅RAM的有界编码材料，键含群隔离epoch、bvid/cid/P、语言、认证模式/凭据RAM摘要、配置/网络/提取版本；600秒内最多32条/4MiB，每条含预留开销不超过128KiB，0禁缓存，重启清空。只共享材料，不共享最终问题或答案；配置/认证变化不复用。配置进入快照/版本及五文件映射；旧代码回滚用原有双摘要审阅导出的兼容副本，先正常停止并保留unknown/pending/清理账，不直接删除字段或历史。首次启用使用已有v2材料/ACK管道，不依赖开启图片/群记忆/成员能力。
+
+## 网页相关选材（LAP-18C）
+
+`features.yaml`的`web.selection_policy`仅coverage/question，默认coverage；缺字段的旧配置保持六区节选。question从当前目标问题提取最多32个英文/数字/代码词项或中文二元词组，只在RAM选相关完整段落/相邻上下文，不使用历史或额外模型。纯总结/无词项保留coverage；无可靠命中或节选不足1200字节明确失败。所有元数据共用最多6000 UTF-8字节及最终输入预算，完整要求仍超限拒绝。
+
+字段随原五文件源摘要、语义摘要、实例快照、兼容导出和会话版本保存；下次正常启动生效，不热更新。readability模式内部升级为显式main/role=main/article优先，候选不合格/不确定才对同一RAM文档用readability；legacy仍为操作者显式回滚选择。full仅表示提取主体全部入包。公开模板/中文旁注已同步，本机local/persona未改；web默认false、搜索质量门槛false不变。
+
+当前网络证据以[LAP-38](../tracks/laptop-workbuddy/tasks/LAP-38/EVIDENCE.md)为准：部分公共正文成功且仍超时，不再沿用18B当时全非公网结论。18C仅代码/离线通过，真实材料质量、模型与QQ/ACK验收未完成，见[18C报告](../reports/lap-18-C-2026-10-23.md)。

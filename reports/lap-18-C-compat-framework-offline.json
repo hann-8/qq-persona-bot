@@ -1,0 +1,4443 @@
+{
+  "passed": true,
+  "combinations": 20,
+  "cases": 460,
+  "elapsed_seconds": 93.922,
+  "real_model_calls": 0,
+  "real_qq_outputs": 0,
+  "real_bot_operations": 0,
+  "rows": [
+    {
+      "backend": "codebuddy_cli",
+      "mode": "single",
+      "participation": "mentions",
+      "attention": false,
+      "web": false,
+      "memes": false,
+      "cases": [
+        {
+          "case": "inbound_speak",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "relevant_injection_same_subject",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_missing",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_error",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_timeout",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_sent_ACK",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "bad_aux_preserves_text",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "identity_failure_no_memory",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "personal_history_never_group_source",
+          "generations": 1,
+          "original_event_ACK": true
+        }
+      ],
+      "real_model_calls": 0,
+      "real_qq_calls": 0,
+      "real_bot_operations": 0,
+      "real_run_agent": true,
+      "actual_runner": true,
+      "original_event_ACK": true,
+      "members_enabled": false,
+      "vision_enabled": false,
+      "lap34": true,
+      "family": "memory",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "63eb4448f38a0b3935283af8b7941520e9660d76e0a8e70259a3f41a91478b69"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "single",
+      "participation": "free",
+      "attention": false,
+      "web": false,
+      "memes": false,
+      "cases": [
+        {
+          "case": "inbound_speak",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "relevant_injection_same_subject",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "silent_inbound_commits",
+          "generations": 1,
+          "sends": 0,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_missing",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_error",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_timeout",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_sent_ACK",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "bad_aux_preserves_text",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "identity_failure_no_memory",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        }
+      ],
+      "real_model_calls": 0,
+      "real_qq_calls": 0,
+      "real_bot_operations": 0,
+      "real_run_agent": true,
+      "actual_runner": true,
+      "original_event_ACK": true,
+      "members_enabled": false,
+      "vision_enabled": false,
+      "lap34": true,
+      "family": "memory",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "5de92955328a5893afe9e36443dcc0446ceddc841c36c2f7423187a5a071424d"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "single",
+      "participation": "mentions",
+      "cases": [
+        {
+          "case": "text_image",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "image_only",
+          "types": [
+            "image"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "invalid_id",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "answer",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "missing2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "duplicate2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "error2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "timeout2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "stop",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent",
+            "failed"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "hash_changed",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "cooldown",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent",
+            "failed"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "bad",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "metadata_missing",
+          "types": [],
+          "ack": [],
+          "generations": 1
+        },
+        {
+          "case": "metadata_mismatch",
+          "types": [],
+          "ack": [],
+          "generations": 1
+        },
+        {
+          "case": "image_only_missing",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "web_answer",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text1",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text2",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text3",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text2_image",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "capacity_image",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "fenced",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "optional",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "plain",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "bad_meme_text",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "final_system_trim",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        }
+      ],
+      "recovery": true,
+      "real_model_requests": 0,
+      "real_qq_messages": 0,
+      "real_favorites_reads": 0,
+      "lap34": true,
+      "family": "media",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "8b0ee95639c9ce7ab5008f4f1f8da2b954436b2b240f6116c84d59a4c54946d5"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "single",
+      "participation": "free",
+      "cases": [
+        {
+          "case": "text_image",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "image_only",
+          "types": [
+            "image"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "invalid_id",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "answer",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "missing2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "duplicate2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "error2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "timeout2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "stop",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent",
+            "failed"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "hash_changed",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "cooldown",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent",
+            "failed"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "bad",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "metadata_missing",
+          "types": [
+            "text"
+          ],
+          "ack": [],
+          "generations": 1
+        },
+        {
+          "case": "metadata_mismatch",
+          "types": [
+            "text"
+          ],
+          "ack": [],
+          "generations": 1
+        },
+        {
+          "case": "image_only_missing",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "web_answer",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text1",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text2",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text3",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text2_image",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "capacity_image",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "fenced",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "optional",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "plain",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "bad_meme_text",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "final_system_trim",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "ambient_image_only",
+          "types": [
+            "image"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "silent",
+          "types": [],
+          "ack": [],
+          "generations": 1
+        }
+      ],
+      "recovery": true,
+      "real_model_requests": 0,
+      "real_qq_messages": 0,
+      "real_favorites_reads": 0,
+      "lap34": true,
+      "family": "media",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "e26ffe6ac1ed15c8c3ba9a227d8c18a34c4ee4ba7fa4bdd4a8e2d86a19fa93c0"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "single",
+      "real_model_requests": 0,
+      "real_qq_messages": 0,
+      "real_ssh": 0,
+      "cases": [
+        {
+          "case": "lap25_fenced",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "lap25_plain",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "lap25_optional",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "lap25_gateway_budget",
+          "generations": 0,
+          "sends": 1
+        },
+        {
+          "case": "lap25_final_system_trim",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "lap24_chat1",
+          "sends": 1,
+          "generations": 1,
+          "ack": true
+        },
+        {
+          "case": "lap24_chat2",
+          "sends": 1,
+          "generations": 1,
+          "ack": true
+        },
+        {
+          "case": "lap24_chat3",
+          "sends": 1,
+          "generations": 1,
+          "ack": true
+        },
+        {
+          "case": "lap24_answer3",
+          "sends": 1,
+          "generations": 1,
+          "ack": true
+        },
+        {
+          "case": "full_lifecycle_speak",
+          "mention": false,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "full_lifecycle_silent",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "full_lifecycle_bad",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "full_lifecycle_speak",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "full_lifecycle_silent",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "full_lifecycle_bad",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "speak",
+          "mention": false,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "silent",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "bad",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "tamper",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "missing",
+          "mention": false,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "error",
+          "mention": false,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "timeout",
+          "mention": false,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "stop",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "disconnect",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "framework_error",
+          "mention": false,
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "late",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "blocked",
+          "mention": false,
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "speak",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "silent",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "bad",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "tamper",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "missing",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "error",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "timeout",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "stop",
+          "mention": true,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "disconnect",
+          "mention": true,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "framework_error",
+          "mention": true,
+          "generations": 0,
+          "sends": 1
+        },
+        {
+          "case": "late",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "blocked",
+          "mention": true,
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "multiuser_batch_dedup_snapshot_priority_distinct_mentions_anchor",
+          "passed": true
+        },
+        {
+          "case": "scope_media_and_embedded_quote",
+          "passed": true
+        },
+        {
+          "case": "waiting_mention_continues_after_unknown_ack",
+          "passed": true
+        }
+      ],
+      "original_event": true,
+      "no_personal_conversation": true,
+      "recovery": true,
+      "usage": {
+        "mention:speak": 23,
+        "mention:generations": 27,
+        "mention:error": 5,
+        "ambient:speak": 10,
+        "ambient:generations": 16,
+        "ambient:silent": 4,
+        "ambient:error": 2
+      },
+      "lap34": true,
+      "family": "plain",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "467563f0f2cca912dba51a7b14c5e4e9c88b14d663abab079ed43d6ef5c01951"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "adaptive",
+      "participation": "mentions",
+      "attention": false,
+      "web": false,
+      "memes": false,
+      "cases": [
+        {
+          "case": "inbound_speak",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "relevant_injection_same_subject",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_missing",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_error",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_timeout",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_sent_ACK",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "bad_aux_preserves_text",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "identity_failure_no_memory",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "partial_second_promise_discarded",
+          "generations": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "personal_history_never_group_source",
+          "generations": 1,
+          "original_event_ACK": true
+        }
+      ],
+      "real_model_calls": 0,
+      "real_qq_calls": 0,
+      "real_bot_operations": 0,
+      "real_run_agent": true,
+      "actual_runner": true,
+      "original_event_ACK": true,
+      "members_enabled": false,
+      "vision_enabled": false,
+      "lap34": true,
+      "family": "memory",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "755a6fabb39b199f64afd03ba7a3da8c652d0691cc0ad9f54eb1bf749053430e"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "adaptive",
+      "participation": "free",
+      "attention": false,
+      "web": false,
+      "memes": false,
+      "cases": [
+        {
+          "case": "inbound_speak",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "relevant_injection_same_subject",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "silent_inbound_commits",
+          "generations": 1,
+          "sends": 0,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_missing",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_error",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_timeout",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_sent_ACK",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "bad_aux_preserves_text",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "identity_failure_no_memory",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "partial_second_promise_discarded",
+          "generations": 1,
+          "original_event_ACK": true
+        }
+      ],
+      "real_model_calls": 0,
+      "real_qq_calls": 0,
+      "real_bot_operations": 0,
+      "real_run_agent": true,
+      "actual_runner": true,
+      "original_event_ACK": true,
+      "members_enabled": false,
+      "vision_enabled": false,
+      "lap34": true,
+      "family": "memory",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "52966ebb1c9904d214841113a669333bcd65cdf2b538dd54e60812a0e9552d86"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "adaptive",
+      "participation": "mentions",
+      "cases": [
+        {
+          "case": "text_image",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "image_only",
+          "types": [
+            "image"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "invalid_id",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "answer",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "missing2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "duplicate2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "error2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "timeout2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "stop",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent",
+            "failed"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "hash_changed",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "cooldown",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent",
+            "failed"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "bad",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "metadata_missing",
+          "types": [],
+          "ack": [],
+          "generations": 1
+        },
+        {
+          "case": "metadata_mismatch",
+          "types": [],
+          "ack": [],
+          "generations": 1
+        },
+        {
+          "case": "image_only_missing",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "web_answer",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text1",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text2",
+          "types": [
+            "text",
+            "text"
+          ],
+          "ack": [
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text3",
+          "types": [
+            "text",
+            "text",
+            "text"
+          ],
+          "ack": [
+            "sent",
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text2_image",
+          "types": [
+            "text",
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "capacity_image",
+          "types": [
+            "text",
+            "text",
+            "text"
+          ],
+          "ack": [
+            "sent",
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "fenced",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "optional",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "plain",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "bad_meme_text",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "final_system_trim",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        }
+      ],
+      "recovery": true,
+      "real_model_requests": 0,
+      "real_qq_messages": 0,
+      "real_favorites_reads": 0,
+      "lap34": true,
+      "family": "media",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "bf9985c7e4b0c9551892c037956542ca89e79fb08b4a93442eb9da866134270e"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "adaptive",
+      "participation": "free",
+      "cases": [
+        {
+          "case": "text_image",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "image_only",
+          "types": [
+            "image"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "invalid_id",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "answer",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "missing2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "duplicate2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "error2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "timeout2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "stop",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent",
+            "failed"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "hash_changed",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "cooldown",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent",
+            "failed"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "bad",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "metadata_missing",
+          "types": [
+            "text"
+          ],
+          "ack": [],
+          "generations": 1
+        },
+        {
+          "case": "metadata_mismatch",
+          "types": [
+            "text"
+          ],
+          "ack": [],
+          "generations": 1
+        },
+        {
+          "case": "image_only_missing",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "web_answer",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text1",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text2",
+          "types": [
+            "text",
+            "text"
+          ],
+          "ack": [
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text3",
+          "types": [
+            "text",
+            "text",
+            "text"
+          ],
+          "ack": [
+            "sent",
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text2_image",
+          "types": [
+            "text",
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "capacity_image",
+          "types": [
+            "text",
+            "text",
+            "text"
+          ],
+          "ack": [
+            "sent",
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "fenced",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "optional",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "plain",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "bad_meme_text",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "final_system_trim",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "ambient_image_only",
+          "types": [
+            "image"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "silent",
+          "types": [],
+          "ack": [],
+          "generations": 1
+        }
+      ],
+      "recovery": true,
+      "real_model_requests": 0,
+      "real_qq_messages": 0,
+      "real_favorites_reads": 0,
+      "lap34": true,
+      "family": "media",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "1667c6cdf7e140efd68963f53010bbe9864c05c365e4077778602b33fa940b59"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "adaptive",
+      "real_model_requests": 0,
+      "real_qq_messages": 0,
+      "real_ssh": 0,
+      "cases": [
+        {
+          "case": "lap25_fenced",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "lap25_plain",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "lap25_optional",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "lap25_gateway_budget",
+          "generations": 0,
+          "sends": 1
+        },
+        {
+          "case": "lap25_final_system_trim",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "lap24_chat1",
+          "sends": 1,
+          "generations": 1,
+          "ack": true
+        },
+        {
+          "case": "lap24_chat2",
+          "sends": 2,
+          "generations": 1,
+          "ack": true
+        },
+        {
+          "case": "lap24_chat3",
+          "sends": 3,
+          "generations": 1,
+          "ack": true
+        },
+        {
+          "case": "lap24_answer3",
+          "sends": 1,
+          "generations": 1,
+          "ack": true
+        },
+        {
+          "case": "full_lifecycle_speak",
+          "mention": false,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "full_lifecycle_silent",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "full_lifecycle_bad",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "full_lifecycle_speak",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "full_lifecycle_silent",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "full_lifecycle_bad",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "speak",
+          "mention": false,
+          "generations": 1,
+          "sends": 2
+        },
+        {
+          "case": "silent",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "bad",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "tamper",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "missing",
+          "mention": false,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "error",
+          "mention": false,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "timeout",
+          "mention": false,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "stop",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "disconnect",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "framework_error",
+          "mention": false,
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "late",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "blocked",
+          "mention": false,
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "speak",
+          "mention": true,
+          "generations": 1,
+          "sends": 2
+        },
+        {
+          "case": "silent",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "bad",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "tamper",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "missing",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "error",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "timeout",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "stop",
+          "mention": true,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "disconnect",
+          "mention": true,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "framework_error",
+          "mention": true,
+          "generations": 0,
+          "sends": 1
+        },
+        {
+          "case": "late",
+          "mention": true,
+          "generations": 1,
+          "sends": 2
+        },
+        {
+          "case": "blocked",
+          "mention": true,
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "multiuser_batch_dedup_snapshot_priority_distinct_mentions_anchor",
+          "passed": true
+        },
+        {
+          "case": "scope_media_and_embedded_quote",
+          "passed": true
+        },
+        {
+          "case": "waiting_mention_continues_after_unknown_ack",
+          "passed": true
+        }
+      ],
+      "original_event": true,
+      "no_personal_conversation": true,
+      "recovery": true,
+      "usage": {
+        "mention:speak": 23,
+        "mention:generations": 27,
+        "mention:error": 5,
+        "ambient:speak": 10,
+        "ambient:generations": 16,
+        "ambient:silent": 4,
+        "ambient:error": 2
+      },
+      "lap34": true,
+      "family": "plain",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "4a7fa109eb52ccc9f06f11f2f0bde1223a303eb4b21aece9532d43df57a461e2"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "single",
+      "participation": "mentions",
+      "attention": false,
+      "web": false,
+      "memes": false,
+      "cases": [
+        {
+          "case": "inbound_speak",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "relevant_injection_same_subject",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_missing",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_error",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_timeout",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_sent_ACK",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "bad_aux_preserves_text",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "identity_failure_no_memory",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "personal_history_never_group_source",
+          "generations": 1,
+          "original_event_ACK": true
+        }
+      ],
+      "real_model_calls": 0,
+      "real_qq_calls": 0,
+      "real_bot_operations": 0,
+      "real_run_agent": true,
+      "actual_runner": true,
+      "original_event_ACK": true,
+      "members_enabled": false,
+      "vision_enabled": false,
+      "lap34": true,
+      "family": "memory",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "d1ac5ea5a0e4941b3288a023d0b54b0e970511f0ab8aecaadf9aef1a4c453ef3"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "single",
+      "participation": "free",
+      "attention": false,
+      "web": false,
+      "memes": false,
+      "cases": [
+        {
+          "case": "inbound_speak",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "relevant_injection_same_subject",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "silent_inbound_commits",
+          "generations": 1,
+          "sends": 0,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_missing",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_error",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_timeout",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_sent_ACK",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "bad_aux_preserves_text",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "identity_failure_no_memory",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        }
+      ],
+      "real_model_calls": 0,
+      "real_qq_calls": 0,
+      "real_bot_operations": 0,
+      "real_run_agent": true,
+      "actual_runner": true,
+      "original_event_ACK": true,
+      "members_enabled": false,
+      "vision_enabled": false,
+      "lap34": true,
+      "family": "memory",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "a2187859e3f8e621a5242b65482f6ff6c61b03f21717ea4cebdd2b0c7ae0d9ac"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "single",
+      "participation": "mentions",
+      "cases": [
+        {
+          "case": "text_image",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "image_only",
+          "types": [
+            "image"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "invalid_id",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "answer",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "missing2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "duplicate2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "error2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "timeout2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "stop",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent",
+            "failed"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "hash_changed",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "cooldown",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent",
+            "failed"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "bad",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "metadata_missing",
+          "types": [],
+          "ack": [],
+          "generations": 1
+        },
+        {
+          "case": "metadata_mismatch",
+          "types": [],
+          "ack": [],
+          "generations": 1
+        },
+        {
+          "case": "image_only_missing",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "web_answer",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text1",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text2",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text3",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text2_image",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "capacity_image",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "fenced",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "optional",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "plain",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "bad_meme_text",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "final_system_trim",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        }
+      ],
+      "recovery": true,
+      "real_model_requests": 0,
+      "real_qq_messages": 0,
+      "real_favorites_reads": 0,
+      "lap34": true,
+      "family": "media",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "e4dd8988fa388fcd0f3f62fe38ceb15fb4378c2891a0ab3eb94c85e71a7154e7"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "single",
+      "participation": "free",
+      "cases": [
+        {
+          "case": "text_image",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "image_only",
+          "types": [
+            "image"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "invalid_id",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "answer",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "missing2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "duplicate2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "error2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "timeout2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "stop",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent",
+            "failed"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "hash_changed",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "cooldown",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent",
+            "failed"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "bad",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "metadata_missing",
+          "types": [
+            "text"
+          ],
+          "ack": [],
+          "generations": 1
+        },
+        {
+          "case": "metadata_mismatch",
+          "types": [
+            "text"
+          ],
+          "ack": [],
+          "generations": 1
+        },
+        {
+          "case": "image_only_missing",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "web_answer",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text1",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text2",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text3",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text2_image",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "capacity_image",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "fenced",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "optional",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "plain",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "bad_meme_text",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "final_system_trim",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "ambient_image_only",
+          "types": [
+            "image"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "silent",
+          "types": [],
+          "ack": [],
+          "generations": 1
+        }
+      ],
+      "recovery": true,
+      "real_model_requests": 0,
+      "real_qq_messages": 0,
+      "real_favorites_reads": 0,
+      "lap34": true,
+      "family": "media",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "f994011041769d296bb9c6e86b54ba63e6171fff515e4f21e17d7e0a43705d72"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "single",
+      "real_model_requests": 0,
+      "real_qq_messages": 0,
+      "real_ssh": 0,
+      "cases": [
+        {
+          "case": "lap25_fenced",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "lap25_plain",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "lap25_optional",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "lap25_gateway_budget",
+          "generations": 0,
+          "sends": 1
+        },
+        {
+          "case": "lap25_final_system_trim",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "lap24_chat1",
+          "sends": 1,
+          "generations": 1,
+          "ack": true
+        },
+        {
+          "case": "lap24_chat2",
+          "sends": 1,
+          "generations": 1,
+          "ack": true
+        },
+        {
+          "case": "lap24_chat3",
+          "sends": 1,
+          "generations": 1,
+          "ack": true
+        },
+        {
+          "case": "lap24_answer3",
+          "sends": 1,
+          "generations": 1,
+          "ack": true
+        },
+        {
+          "case": "full_lifecycle_speak",
+          "mention": false,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "full_lifecycle_silent",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "full_lifecycle_bad",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "full_lifecycle_speak",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "full_lifecycle_silent",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "full_lifecycle_bad",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "speak",
+          "mention": false,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "silent",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "bad",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "tamper",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "missing",
+          "mention": false,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "error",
+          "mention": false,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "timeout",
+          "mention": false,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "stop",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "disconnect",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "framework_error",
+          "mention": false,
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "late",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "blocked",
+          "mention": false,
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "speak",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "silent",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "bad",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "tamper",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "missing",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "error",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "timeout",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "stop",
+          "mention": true,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "disconnect",
+          "mention": true,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "framework_error",
+          "mention": true,
+          "generations": 0,
+          "sends": 1
+        },
+        {
+          "case": "late",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "blocked",
+          "mention": true,
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "multiuser_batch_dedup_snapshot_priority_distinct_mentions_anchor",
+          "passed": true
+        },
+        {
+          "case": "scope_media_and_embedded_quote",
+          "passed": true
+        },
+        {
+          "case": "waiting_mention_continues_after_unknown_ack",
+          "passed": true
+        }
+      ],
+      "original_event": true,
+      "no_personal_conversation": true,
+      "recovery": true,
+      "usage": {
+        "mention:speak": 23,
+        "mention:generations": 27,
+        "mention:error": 5,
+        "ambient:speak": 10,
+        "ambient:generations": 16,
+        "ambient:silent": 4,
+        "ambient:error": 2
+      },
+      "lap34": true,
+      "family": "plain",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "7fb7de075bfabbd3497fb49e324cf7dd209ce57083652b71e0ff3e11e8c2fb6f"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "adaptive",
+      "participation": "mentions",
+      "attention": false,
+      "web": false,
+      "memes": false,
+      "cases": [
+        {
+          "case": "inbound_speak",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "relevant_injection_same_subject",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_missing",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_error",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_timeout",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_sent_ACK",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "bad_aux_preserves_text",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "identity_failure_no_memory",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "partial_second_promise_discarded",
+          "generations": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "personal_history_never_group_source",
+          "generations": 1,
+          "original_event_ACK": true
+        }
+      ],
+      "real_model_calls": 0,
+      "real_qq_calls": 0,
+      "real_bot_operations": 0,
+      "real_run_agent": true,
+      "actual_runner": true,
+      "original_event_ACK": true,
+      "members_enabled": false,
+      "vision_enabled": false,
+      "lap34": true,
+      "family": "memory",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "dbbf44fb758f25457e3aa2d3113bfe8f37bc7c271cc7ef7585e730da6ab7b8ca"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "adaptive",
+      "participation": "free",
+      "attention": false,
+      "web": false,
+      "memes": false,
+      "cases": [
+        {
+          "case": "inbound_speak",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "relevant_injection_same_subject",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "silent_inbound_commits",
+          "generations": 1,
+          "sends": 0,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_missing",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_error",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_timeout",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "promise_sent_ACK",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "bad_aux_preserves_text",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "identity_failure_no_memory",
+          "generations": 1,
+          "sends": 1,
+          "original_event_ACK": true
+        },
+        {
+          "case": "partial_second_promise_discarded",
+          "generations": 1,
+          "original_event_ACK": true
+        }
+      ],
+      "real_model_calls": 0,
+      "real_qq_calls": 0,
+      "real_bot_operations": 0,
+      "real_run_agent": true,
+      "actual_runner": true,
+      "original_event_ACK": true,
+      "members_enabled": false,
+      "vision_enabled": false,
+      "lap34": true,
+      "family": "memory",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "a10a724636c7d943dd4d57a78ca1ee36fbca57ccbe0872308a2681a87bed3e4a"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "adaptive",
+      "participation": "mentions",
+      "cases": [
+        {
+          "case": "text_image",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "image_only",
+          "types": [
+            "image"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "invalid_id",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "answer",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "missing2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "duplicate2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "error2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "timeout2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "stop",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent",
+            "failed"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "hash_changed",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "cooldown",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent",
+            "failed"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "bad",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "metadata_missing",
+          "types": [],
+          "ack": [],
+          "generations": 1
+        },
+        {
+          "case": "metadata_mismatch",
+          "types": [],
+          "ack": [],
+          "generations": 1
+        },
+        {
+          "case": "image_only_missing",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "web_answer",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text1",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text2",
+          "types": [
+            "text",
+            "text"
+          ],
+          "ack": [
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text3",
+          "types": [
+            "text",
+            "text",
+            "text"
+          ],
+          "ack": [
+            "sent",
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text2_image",
+          "types": [
+            "text",
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "capacity_image",
+          "types": [
+            "text",
+            "text",
+            "text"
+          ],
+          "ack": [
+            "sent",
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "fenced",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "optional",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "plain",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "bad_meme_text",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "final_system_trim",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        }
+      ],
+      "recovery": true,
+      "real_model_requests": 0,
+      "real_qq_messages": 0,
+      "real_favorites_reads": 0,
+      "lap34": true,
+      "family": "media",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "79abdc60a75fb80a6dc41cadb47599eda42c93ea3ef15acd2960134203914f89"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "adaptive",
+      "participation": "free",
+      "cases": [
+        {
+          "case": "text_image",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "image_only",
+          "types": [
+            "image"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "invalid_id",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "answer",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "missing2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "duplicate2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "error2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "timeout2",
+          "types": [
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "unknown"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "stop",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent",
+            "failed"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "hash_changed",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "cooldown",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent",
+            "failed"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "bad",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "metadata_missing",
+          "types": [
+            "text"
+          ],
+          "ack": [],
+          "generations": 1
+        },
+        {
+          "case": "metadata_mismatch",
+          "types": [
+            "text"
+          ],
+          "ack": [],
+          "generations": 1
+        },
+        {
+          "case": "image_only_missing",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "web_answer",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text1",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text2",
+          "types": [
+            "text",
+            "text"
+          ],
+          "ack": [
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text3",
+          "types": [
+            "text",
+            "text",
+            "text"
+          ],
+          "ack": [
+            "sent",
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "text2_image",
+          "types": [
+            "text",
+            "text",
+            "image"
+          ],
+          "ack": [
+            "sent",
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "capacity_image",
+          "types": [
+            "text",
+            "text",
+            "text"
+          ],
+          "ack": [
+            "sent",
+            "sent",
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "fenced",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "optional",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "plain",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "bad_meme_text",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "final_system_trim",
+          "types": [
+            "text"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "ambient_image_only",
+          "types": [
+            "image"
+          ],
+          "ack": [
+            "sent"
+          ],
+          "generations": 1
+        },
+        {
+          "case": "silent",
+          "types": [],
+          "ack": [],
+          "generations": 1
+        }
+      ],
+      "recovery": true,
+      "real_model_requests": 0,
+      "real_qq_messages": 0,
+      "real_favorites_reads": 0,
+      "lap34": true,
+      "family": "media",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "a8e0f044786793a3faffe38b6e00f07dad8a22fbfc03c9d440649d270dc8bf30"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "adaptive",
+      "real_model_requests": 0,
+      "real_qq_messages": 0,
+      "real_ssh": 0,
+      "cases": [
+        {
+          "case": "lap25_fenced",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "lap25_plain",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "lap25_optional",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "lap25_gateway_budget",
+          "generations": 0,
+          "sends": 1
+        },
+        {
+          "case": "lap25_final_system_trim",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "lap24_chat1",
+          "sends": 1,
+          "generations": 1,
+          "ack": true
+        },
+        {
+          "case": "lap24_chat2",
+          "sends": 2,
+          "generations": 1,
+          "ack": true
+        },
+        {
+          "case": "lap24_chat3",
+          "sends": 3,
+          "generations": 1,
+          "ack": true
+        },
+        {
+          "case": "lap24_answer3",
+          "sends": 1,
+          "generations": 1,
+          "ack": true
+        },
+        {
+          "case": "full_lifecycle_speak",
+          "mention": false,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "full_lifecycle_silent",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "full_lifecycle_bad",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "full_lifecycle_speak",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "full_lifecycle_silent",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "full_lifecycle_bad",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "speak",
+          "mention": false,
+          "generations": 1,
+          "sends": 2
+        },
+        {
+          "case": "silent",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "bad",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "tamper",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "missing",
+          "mention": false,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "error",
+          "mention": false,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "timeout",
+          "mention": false,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "stop",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "disconnect",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "framework_error",
+          "mention": false,
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "late",
+          "mention": false,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "blocked",
+          "mention": false,
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "speak",
+          "mention": true,
+          "generations": 1,
+          "sends": 2
+        },
+        {
+          "case": "silent",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "bad",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "tamper",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "missing",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "error",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "timeout",
+          "mention": true,
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "stop",
+          "mention": true,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "disconnect",
+          "mention": true,
+          "generations": 1,
+          "sends": 0
+        },
+        {
+          "case": "framework_error",
+          "mention": true,
+          "generations": 0,
+          "sends": 1
+        },
+        {
+          "case": "late",
+          "mention": true,
+          "generations": 1,
+          "sends": 2
+        },
+        {
+          "case": "blocked",
+          "mention": true,
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "multiuser_batch_dedup_snapshot_priority_distinct_mentions_anchor",
+          "passed": true
+        },
+        {
+          "case": "scope_media_and_embedded_quote",
+          "passed": true
+        },
+        {
+          "case": "waiting_mention_continues_after_unknown_ack",
+          "passed": true
+        }
+      ],
+      "original_event": true,
+      "no_personal_conversation": true,
+      "recovery": true,
+      "usage": {
+        "mention:speak": 23,
+        "mention:generations": 27,
+        "mention:error": 5,
+        "ambient:speak": 10,
+        "ambient:generations": 16,
+        "ambient:silent": 4,
+        "ambient:error": 2
+      },
+      "lap34": true,
+      "family": "plain",
+      "snapshot_consumers": [
+        {
+          "consumer": "router",
+          "semantic": "d3c3dc50cf1d7cbcff930583d43fd8704920207a072d5b473ccf7848ffc69c58"
+        },
+        {
+          "consumer": "prepare",
+          "history_turns": 8
+        },
+        {
+          "consumer": "gate",
+          "root_explicit": true
+        },
+        {
+          "consumer": "model",
+          "root_explicit": true,
+          "history_turns": 8
+        }
+      ],
+      "source_edited_during_instance": true
+    }
+  ]
+}

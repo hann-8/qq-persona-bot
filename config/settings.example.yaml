@@ -47,6 +47,7 @@ participation:  # 配置节，子字段见下方；保留既有校验约束
 web:
   extractor: readability  # 本地受管正文提取，可显式legacy回滚
   long_text_policy: excerpt  # 六区节选或reject；完整要求超限直接拒绝  # 配置节，子字段见下方；保留既有校验约束
+  selection_policy: coverage  # coverage六区或question当前问题本地相关整段；保存后正常重启生效
   enabled: false  # 共用网页读取开关；搜索质量门槛仍关闭，不代表完整搜索可用
   trigger: auto  # 联网触发auto/explicit
   provider: bing_rss  # 搜索提供方固定bing_rss，当前搜索质量门槛关闭

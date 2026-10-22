@@ -7,11 +7,73 @@ from .public_http import WebFailure
 def encoded(value):return json.dumps(value,ensure_ascii=False,separators=(',',':')).encode('utf-8')
 
 
-def select(text,cap,policy='excerpt',complete=False):
+STOP={'the','and','for','with','this','that','what','how','does','from','page','please','总结','概括','这页','网页','这个','如何','什么','请问','一下','介绍'}
+
+
+def question_terms(question):
+    # URL paths and hostnames are source identity, not target question terms.
+    question=re.sub(r'https?://[^\s<>]+',' ',question)
+    question=re.sub(r'总结|概括|这页|网页|请看|请问|一下|(?i:please|summari[sz]e|summary|this page)',' ',question)
+    result=[]
+    for match in re.finditer(r'[A-Za-z0-9_]+(?:[.:-][A-Za-z0-9_]+)*|[\u4e00-\u9fff]+',question[:4096]):
+        word=match.group().lower()
+        words=[word[i:i+2] for i in range(len(word)-1)] if '\u4e00'<=word[0]<='\u9fff' else [word]
+        for term in words:
+            if term not in STOP and term not in result:result.append(term)
+            if len(result)==32:return result
+    return result
+
+
+def term_hits(text,terms):
+    text=text.lower()
+    return sum(bool(re.search(r'(?<![A-Za-z0-9_.])'+re.escape(t)+r'(?![A-Za-z0-9_]|\.[A-Za-z0-9_])',text)) if t.isascii() else t in text for t in terms)
+
+
+def question_rows(paragraphs,cap,terms):
+    scores=[term_hits(row[2],terms) for row in paragraphs]
+    ranked=sorted((i for i,s in enumerate(scores) if s),key=lambda i:(-scores[i],-int(len(paragraphs[i][2])<=160),i))
+    if not ranked:raise WebFailure('evidence_insufficient')
+    chosen=set();used=0;matched=0
+    def add(indices,limit):
+        nonlocal used
+        indices=set(indices)-chosen
+        cost=sum(len(paragraphs[i][2].encode()) for i in indices)+len(indices)
+        if indices and len(chosen|indices)<=512 and used+cost<=limit:
+            chosen.update(indices);used+=cost;return True
+        return False
+    # Allocate at least 60% to complete matching blocks and local context.
+    # Reserve this partition before adding global coverage; no paragraph clipping.
+    for i in ranked:
+        heading=next((j for j in range(i-1,-1,-1) if len(paragraphs[j][2])<=160),None)
+        for neighbor in (i+1,i-1):
+            if not 0<=neighbor<len(paragraphs):continue
+            group=[i,neighbor]+([heading] if heading is not None and heading>=i-2 else [])
+            if add(group,int(cap*.7)):
+                matched+=1;break
+    if not matched:raise WebFailure('evidence_insufficient')
+    # Fill the reserved relevant partition before the remaining position coverage.
+    for i in ranked:
+        if used>=int(cap*.6):break
+        add([i,i+1 if i+1<len(paragraphs) else i-1],int(cap*.7))
+    for anchor in (0,len(paragraphs)//2,len(paragraphs)-1):
+        for i in sorted(range(len(paragraphs)),key=lambda j:abs(j-anchor)):
+            if add([i],cap):break
+    rows=[paragraphs[i] for i in sorted(chosen)]
+    if len(rows)<2 or not any(b==a+1 for a,b in zip(sorted(chosen),sorted(chosen)[1:])):raise WebFailure('evidence_insufficient')
+    return rows
+
+
+def select(text,cap,policy='excerpt',complete=False,selection_policy='coverage',question=''):
     total=len(text.encode('utf-8'))
     if total<=cap:return dict(text=text,coverage='full',ranges=[[0,len(text)]],input_bytes=total,selected_bytes=total,truncated=False)
     if policy=='reject' or complete:raise WebFailure('evidence_full_required')
     paragraphs=[(m.start(),m.end(),m.group()) for m in re.finditer(r'[^\n]+',text) if m.group().strip()]
+    terms=question_terms(question) if selection_policy=='question' else []
+    relevant=question_rows(paragraphs,cap,terms) if terms else None
+    if relevant:
+        body='\n'.join(row[2] for row in relevant);size=len(body.encode('utf-8'))
+        if size<1200:raise WebFailure('evidence_insufficient')
+        return dict(text=body,coverage='excerpt',ranges=[[row[0],row[1]] for row in relevant],input_bytes=total,selected_bytes=size,truncated=True)
     count=min(6,len(paragraphs));chosen=[];zones=0
     if not count:raise WebFailure('evidence_insufficient')
     # Even paragraph-position zones; each window is contiguous and whole.
@@ -30,7 +92,7 @@ def select(text,cap,policy='excerpt',complete=False):
                 input_bytes=total,selected_bytes=size,truncated=True)
 
 
-def sources_for_budget(sources,cap,page_cap,policy,question):
+def sources_for_budget(sources,cap,page_cap,policy,question,selection_policy='coverage'):
     complete=bool(re.search(r'完整|逐项|不得省略|不许省略|不遗漏|in full|complete|without omissions',question,re.I))
     prepared=[]
     for source in sources:
@@ -44,14 +106,14 @@ def sources_for_budget(sources,cap,page_cap,policy,question):
             raise WebFailure('evidence_insufficient')
         row={k:v for k,v in source.items() if not k.startswith('_')}
         body=source.get('_full_text',source['text'])
-        row.update(select(body,min(page_cap,cap),policy,complete));prepared.append((row,body))
+        row.update(select(body,min(page_cap,cap),policy,complete,selection_policy,question));prepared.append((row,body))
     # All fields, ranges, titles, source URLs and timestamps share one cap.
     text_cap=min(page_cap,cap)
     while text_cap>=80:
         rows=[]
         try:
             for original,body in prepared:
-                row=dict(original);row.update(select(body,text_cap,policy,complete));rows.append(row)
+                row=dict(original);row.update(select(body,text_cap,policy,complete,selection_policy,question));rows.append(row)
         except WebFailure:
             raise
         if len(encoded(dict(partial=False,sources=rows)))<=cap:return rows

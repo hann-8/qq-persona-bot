@@ -1,0 +1,2235 @@
+{
+  "passed": true,
+  "combinations": 28,
+  "cases": 346,
+  "elapsed_seconds": 44.218,
+  "real_model_calls": 0,
+  "real_qq_outputs": 0,
+  "real_bot_operations": 0,
+  "rows": [
+    {
+      "backend": "codebuddy_cli",
+      "mode": "single",
+      "cases": [
+        {
+          "case": "body",
+          "generations": 1,
+          "one_send": true,
+          "original_question_history": true,
+          "evidence_not_persisted": true,
+          "ack": "synthetic"
+        },
+        {
+          "case": "partial",
+          "generations": 1,
+          "one_send": true,
+          "original_question_history": true,
+          "evidence_not_persisted": true,
+          "ack": "synthetic"
+        },
+        {
+          "case": "literal",
+          "generations": 1,
+          "one_send": true,
+          "original_question_history": true,
+          "evidence_not_persisted": true,
+          "ack": "synthetic"
+        },
+        {
+          "case": "failure",
+          "generations": 0,
+          "one_send": true,
+          "original_question_history": true,
+          "evidence_not_persisted": true,
+          "ack": "synthetic"
+        },
+        {
+          "case": "search_gap",
+          "generations": 0,
+          "one_send": true,
+          "original_question_history": true,
+          "evidence_not_persisted": true,
+          "ack": "synthetic"
+        },
+        {
+          "case": "expired",
+          "generations": 0,
+          "sends": 0,
+          "no_internal_marker_history": true
+        }
+      ],
+      "admission_zero_http": true,
+      "real_model_requests": 0,
+      "real_qq_messages": 0,
+      "actual_runner": true
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "single",
+      "participation": "mentions",
+      "attention": true,
+      "web": true,
+      "memory_enabled": true,
+      "body_reader": true,
+      "cases": [
+        {
+          "case": "current_first_image_native_once",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "vision_effective_text_only_v2_no_image",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "replay_local_notice_no_generation",
+          "generations": 0,
+          "sends": 1
+        },
+        {
+          "case": "text_visual_reserve_rejected_before_native",
+          "generations": 0,
+          "sends": 1
+        }
+      ],
+      "real_model_calls": 0,
+      "real_qq_calls": 0,
+      "real_run_agent": true,
+      "actual_runner": true,
+      "private_gate_http": true,
+      "actual_provider": true,
+      "original_event_ACK": true,
+      "production_eligible": false
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "single",
+      "participation": "mentions",
+      "cases": [
+        {
+          "case": "mention_bare_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "cached_material_independent_generation",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 0
+        },
+        {
+          "case": "short_p2_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 4
+        },
+        {
+          "case": "login_notice_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "multiple_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "excerpt_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "complete_budget_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 3
+        },
+        {
+          "case": "unknown_ack_no_resend",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "blacklist_and_silence_no_framework_or_fetch",
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "real_mention_restores_silence",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        }
+      ],
+      "real_run_agent": true,
+      "actual_provider": true,
+      "actual_runner": true,
+      "original_event_ACK": true,
+      "gate": true,
+      "memory": false,
+      "memes": true,
+      "bilibili_only_v2": true,
+      "real_model_calls": 0,
+      "real_qq_calls": 0
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "single",
+      "participation": "mentions",
+      "attention": true,
+      "memory": true,
+      "memes": true,
+      "members": true,
+      "cases": [
+        {
+          "case": "normal_original_event_ACK",
+          "sends": 1
+        },
+        {
+          "case": "same_at_stop_blacklist_other_member_wake",
+          "sends": 1
+        },
+        {
+          "case": "old_result_after_wake_no_assistant_history",
+          "sends": 0
+        },
+        {
+          "case": "local_notice_ticket_old_rejected",
+          "sends": 1
+        },
+        {
+          "case": "all_local_notice_families_immutable_ticket",
+          "sends": 11
+        },
+        {
+          "case": "gate_refusal_known_not_sent_no_unknown_lock",
+          "sends": 0
+        },
+        {
+          "case": "submitted_delayed_ACK_retained",
+          "sends": 1
+        },
+        {
+          "case": "image_only_original_ACK_ticket",
+          "sends": 1
+        },
+        {
+          "case": "old_image_after_wake_rejected",
+          "sends": 0
+        },
+        {
+          "case": "failed_image_local_notice_ticket",
+          "sends": 1
+        },
+        {
+          "case": "typed_at_same_chain_ticket_and_permission",
+          "sends": 1
+        },
+        {
+          "case": "typed_at_permission_race_no_send",
+          "sends": 0
+        },
+        {
+          "case": "router_local_wait_no_provider_no_global_cancel",
+          "sends": 0
+        },
+        {
+          "case": "pre_HTTP_invalidated_no_generation",
+          "sends": 0
+        },
+        {
+          "case": "local_input_notice_0",
+          "sends": 1
+        },
+        {
+          "case": "local_input_notice_20",
+          "sends": 0
+        },
+        {
+          "case": "local_input_notice_4",
+          "sends": 1
+        },
+        {
+          "case": "submitted_HTTP_internal_queue_natural_completion",
+          "sends": 0
+        },
+        {
+          "case": "wake_never_clears_real_blocking_state",
+          "sends": 0
+        },
+        {
+          "case": "true_ACK_unknown_preserved",
+          "sends": 1
+        },
+        {
+          "case": "other_group_isolated",
+          "sends": 1
+        },
+        {
+          "case": "missing_mirror_closed",
+          "sends": 0
+        },
+        {
+          "case": "malformed_mirror_closed_then_recovers",
+          "sends": 0
+        }
+      ],
+      "real_model_calls": 0,
+      "real_qq_calls": 0,
+      "real_run_agent": true,
+      "actual_runner": true,
+      "original_event_ACK": true
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "single",
+      "participation": "free",
+      "attention": true,
+      "web": true,
+      "memory_enabled": true,
+      "body_reader": true,
+      "cases": [
+        {
+          "case": "current_first_image_native_once",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "vision_effective_text_only_v2_no_image",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "replay_local_notice_no_generation",
+          "generations": 0,
+          "sends": 1
+        },
+        {
+          "case": "text_visual_reserve_rejected_before_native",
+          "generations": 0,
+          "sends": 1
+        },
+        {
+          "case": "ambient_unavailable_silent_no_generation",
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "ambient_merge_target_and_cap_together",
+          "generations": 2,
+          "sends": 2
+        }
+      ],
+      "real_model_calls": 0,
+      "real_qq_calls": 0,
+      "real_run_agent": true,
+      "actual_runner": true,
+      "private_gate_http": true,
+      "actual_provider": true,
+      "original_event_ACK": true,
+      "production_eligible": false
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "single",
+      "participation": "free",
+      "cases": [
+        {
+          "case": "mention_bare_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "cached_material_independent_generation",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 0
+        },
+        {
+          "case": "short_p2_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 4
+        },
+        {
+          "case": "free_explicit_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "free_bare_no_fetch",
+          "generations": 1,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 0
+        },
+        {
+          "case": "login_notice_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "multiple_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "excerpt_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "complete_budget_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 3
+        },
+        {
+          "case": "unknown_ack_no_resend",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "blacklist_and_silence_no_framework_or_fetch",
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "real_mention_restores_silence",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        }
+      ],
+      "real_run_agent": true,
+      "actual_provider": true,
+      "actual_runner": true,
+      "original_event_ACK": true,
+      "gate": true,
+      "memory": false,
+      "memes": true,
+      "bilibili_only_v2": true,
+      "real_model_calls": 0,
+      "real_qq_calls": 0
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "single",
+      "participation": "free",
+      "attention": true,
+      "memory": true,
+      "memes": true,
+      "members": true,
+      "cases": [
+        {
+          "case": "normal_original_event_ACK",
+          "sends": 1
+        },
+        {
+          "case": "same_at_stop_blacklist_other_member_wake",
+          "sends": 1
+        },
+        {
+          "case": "old_result_after_wake_no_assistant_history",
+          "sends": 0
+        },
+        {
+          "case": "local_notice_ticket_old_rejected",
+          "sends": 1
+        },
+        {
+          "case": "all_local_notice_families_immutable_ticket",
+          "sends": 11
+        },
+        {
+          "case": "gate_refusal_known_not_sent_no_unknown_lock",
+          "sends": 0
+        },
+        {
+          "case": "submitted_delayed_ACK_retained",
+          "sends": 1
+        },
+        {
+          "case": "image_only_original_ACK_ticket",
+          "sends": 1
+        },
+        {
+          "case": "old_image_after_wake_rejected",
+          "sends": 0
+        },
+        {
+          "case": "failed_image_local_notice_ticket",
+          "sends": 1
+        },
+        {
+          "case": "typed_at_same_chain_ticket_and_permission",
+          "sends": 1
+        },
+        {
+          "case": "typed_at_permission_race_no_send",
+          "sends": 0
+        },
+        {
+          "case": "router_local_wait_no_provider_no_global_cancel",
+          "sends": 0
+        },
+        {
+          "case": "ambient_batch_discard_no_backlog",
+          "sends": 0
+        },
+        {
+          "case": "pre_HTTP_invalidated_no_generation",
+          "sends": 0
+        },
+        {
+          "case": "local_input_notice_0",
+          "sends": 1
+        },
+        {
+          "case": "local_input_notice_4200",
+          "sends": 1
+        },
+        {
+          "case": "local_input_notice_7",
+          "sends": 1
+        },
+        {
+          "case": "submitted_HTTP_internal_queue_natural_completion",
+          "sends": 0
+        },
+        {
+          "case": "wake_never_clears_real_blocking_state",
+          "sends": 0
+        },
+        {
+          "case": "true_ACK_unknown_preserved",
+          "sends": 1
+        },
+        {
+          "case": "other_group_isolated",
+          "sends": 1
+        },
+        {
+          "case": "missing_mirror_closed",
+          "sends": 0
+        },
+        {
+          "case": "malformed_mirror_closed_then_recovers",
+          "sends": 0
+        }
+      ],
+      "real_model_calls": 0,
+      "real_qq_calls": 0,
+      "real_run_agent": true,
+      "actual_runner": true,
+      "original_event_ACK": true
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "adaptive",
+      "cases": [
+        {
+          "case": "body",
+          "generations": 1,
+          "one_send": true,
+          "original_question_history": true,
+          "evidence_not_persisted": true,
+          "ack": "synthetic"
+        },
+        {
+          "case": "partial",
+          "generations": 1,
+          "one_send": true,
+          "original_question_history": true,
+          "evidence_not_persisted": true,
+          "ack": "synthetic"
+        },
+        {
+          "case": "literal",
+          "generations": 1,
+          "one_send": true,
+          "original_question_history": true,
+          "evidence_not_persisted": true,
+          "ack": "synthetic"
+        },
+        {
+          "case": "failure",
+          "generations": 0,
+          "one_send": true,
+          "original_question_history": true,
+          "evidence_not_persisted": true,
+          "ack": "synthetic"
+        },
+        {
+          "case": "search_gap",
+          "generations": 0,
+          "one_send": true,
+          "original_question_history": true,
+          "evidence_not_persisted": true,
+          "ack": "synthetic"
+        },
+        {
+          "case": "expired",
+          "generations": 0,
+          "sends": 0,
+          "no_internal_marker_history": true
+        },
+        {
+          "case": "unknown_ack",
+          "generations": 1,
+          "one_send": true,
+          "original_question_history": true,
+          "evidence_not_persisted": true,
+          "ack": "synthetic"
+        }
+      ],
+      "admission_zero_http": true,
+      "real_model_requests": 0,
+      "real_qq_messages": 0,
+      "actual_runner": true
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "adaptive",
+      "participation": "mentions",
+      "attention": true,
+      "web": true,
+      "memory_enabled": true,
+      "body_reader": true,
+      "cases": [
+        {
+          "case": "current_first_image_native_once",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "vision_effective_text_only_v2_no_image",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "replay_local_notice_no_generation",
+          "generations": 0,
+          "sends": 1
+        },
+        {
+          "case": "text_visual_reserve_rejected_before_native",
+          "generations": 0,
+          "sends": 1
+        }
+      ],
+      "real_model_calls": 0,
+      "real_qq_calls": 0,
+      "real_run_agent": true,
+      "actual_runner": true,
+      "private_gate_http": true,
+      "actual_provider": true,
+      "original_event_ACK": true,
+      "production_eligible": false
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "adaptive",
+      "participation": "mentions",
+      "cases": [
+        {
+          "case": "mention_bare_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "cached_material_independent_generation",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 0
+        },
+        {
+          "case": "short_p2_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 4
+        },
+        {
+          "case": "login_notice_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "multiple_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "excerpt_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "complete_budget_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 3
+        },
+        {
+          "case": "unknown_ack_no_resend",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "blacklist_and_silence_no_framework_or_fetch",
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "real_mention_restores_silence",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        }
+      ],
+      "real_run_agent": true,
+      "actual_provider": true,
+      "actual_runner": true,
+      "original_event_ACK": true,
+      "gate": true,
+      "memory": true,
+      "memes": true,
+      "bilibili_only_v2": false,
+      "real_model_calls": 0,
+      "real_qq_calls": 0
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "adaptive",
+      "participation": "mentions",
+      "attention": true,
+      "memory": true,
+      "memes": true,
+      "members": true,
+      "cases": [
+        {
+          "case": "normal_original_event_ACK",
+          "sends": 1
+        },
+        {
+          "case": "same_at_stop_blacklist_other_member_wake",
+          "sends": 1
+        },
+        {
+          "case": "old_result_after_wake_no_assistant_history",
+          "sends": 0
+        },
+        {
+          "case": "local_notice_ticket_old_rejected",
+          "sends": 1
+        },
+        {
+          "case": "all_local_notice_families_immutable_ticket",
+          "sends": 11
+        },
+        {
+          "case": "gate_refusal_known_not_sent_no_unknown_lock",
+          "sends": 0
+        },
+        {
+          "case": "submitted_delayed_ACK_retained",
+          "sends": 1
+        },
+        {
+          "case": "bubble_interval_stop_wake_partial",
+          "sends": 1
+        },
+        {
+          "case": "image_only_original_ACK_ticket",
+          "sends": 1
+        },
+        {
+          "case": "old_image_after_wake_rejected",
+          "sends": 0
+        },
+        {
+          "case": "failed_image_local_notice_ticket",
+          "sends": 1
+        },
+        {
+          "case": "typed_at_same_chain_ticket_and_permission",
+          "sends": 1
+        },
+        {
+          "case": "typed_at_permission_race_no_send",
+          "sends": 0
+        },
+        {
+          "case": "router_local_wait_no_provider_no_global_cancel",
+          "sends": 0
+        },
+        {
+          "case": "pre_HTTP_invalidated_no_generation",
+          "sends": 0
+        },
+        {
+          "case": "local_input_notice_0",
+          "sends": 1
+        },
+        {
+          "case": "local_input_notice_20",
+          "sends": 0
+        },
+        {
+          "case": "local_input_notice_4",
+          "sends": 1
+        },
+        {
+          "case": "submitted_HTTP_internal_queue_natural_completion",
+          "sends": 0
+        },
+        {
+          "case": "wake_never_clears_real_blocking_state",
+          "sends": 0
+        },
+        {
+          "case": "true_ACK_unknown_preserved",
+          "sends": 1
+        },
+        {
+          "case": "other_group_isolated",
+          "sends": 1
+        },
+        {
+          "case": "missing_mirror_closed",
+          "sends": 0
+        },
+        {
+          "case": "malformed_mirror_closed_then_recovers",
+          "sends": 0
+        }
+      ],
+      "real_model_calls": 0,
+      "real_qq_calls": 0,
+      "real_run_agent": true,
+      "actual_runner": true,
+      "original_event_ACK": true
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "adaptive",
+      "participation": "free",
+      "attention": true,
+      "web": true,
+      "memory_enabled": true,
+      "body_reader": true,
+      "cases": [
+        {
+          "case": "current_first_image_native_once",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "vision_effective_text_only_v2_no_image",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "replay_local_notice_no_generation",
+          "generations": 0,
+          "sends": 1
+        },
+        {
+          "case": "text_visual_reserve_rejected_before_native",
+          "generations": 0,
+          "sends": 1
+        },
+        {
+          "case": "ambient_unavailable_silent_no_generation",
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "ambient_merge_target_and_cap_together",
+          "generations": 2,
+          "sends": 2
+        }
+      ],
+      "real_model_calls": 0,
+      "real_qq_calls": 0,
+      "real_run_agent": true,
+      "actual_runner": true,
+      "private_gate_http": true,
+      "actual_provider": true,
+      "original_event_ACK": true,
+      "production_eligible": false
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "adaptive",
+      "participation": "free",
+      "cases": [
+        {
+          "case": "mention_bare_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "cached_material_independent_generation",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 0
+        },
+        {
+          "case": "short_p2_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 4
+        },
+        {
+          "case": "free_explicit_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "free_bare_no_fetch",
+          "generations": 1,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 0
+        },
+        {
+          "case": "login_notice_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "multiple_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "excerpt_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "complete_budget_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 3
+        },
+        {
+          "case": "unknown_ack_no_resend",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "blacklist_and_silence_no_framework_or_fetch",
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "real_mention_restores_silence",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        }
+      ],
+      "real_run_agent": true,
+      "actual_provider": true,
+      "actual_runner": true,
+      "original_event_ACK": true,
+      "gate": true,
+      "memory": true,
+      "memes": true,
+      "bilibili_only_v2": false,
+      "real_model_calls": 0,
+      "real_qq_calls": 0
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "adaptive",
+      "participation": "free",
+      "attention": true,
+      "memory": true,
+      "memes": true,
+      "members": true,
+      "cases": [
+        {
+          "case": "normal_original_event_ACK",
+          "sends": 1
+        },
+        {
+          "case": "same_at_stop_blacklist_other_member_wake",
+          "sends": 1
+        },
+        {
+          "case": "old_result_after_wake_no_assistant_history",
+          "sends": 0
+        },
+        {
+          "case": "local_notice_ticket_old_rejected",
+          "sends": 1
+        },
+        {
+          "case": "all_local_notice_families_immutable_ticket",
+          "sends": 11
+        },
+        {
+          "case": "gate_refusal_known_not_sent_no_unknown_lock",
+          "sends": 0
+        },
+        {
+          "case": "submitted_delayed_ACK_retained",
+          "sends": 1
+        },
+        {
+          "case": "bubble_interval_stop_wake_partial",
+          "sends": 1
+        },
+        {
+          "case": "image_only_original_ACK_ticket",
+          "sends": 1
+        },
+        {
+          "case": "old_image_after_wake_rejected",
+          "sends": 0
+        },
+        {
+          "case": "failed_image_local_notice_ticket",
+          "sends": 1
+        },
+        {
+          "case": "typed_at_same_chain_ticket_and_permission",
+          "sends": 1
+        },
+        {
+          "case": "typed_at_permission_race_no_send",
+          "sends": 0
+        },
+        {
+          "case": "router_local_wait_no_provider_no_global_cancel",
+          "sends": 0
+        },
+        {
+          "case": "ambient_batch_discard_no_backlog",
+          "sends": 0
+        },
+        {
+          "case": "pre_HTTP_invalidated_no_generation",
+          "sends": 0
+        },
+        {
+          "case": "local_input_notice_0",
+          "sends": 1
+        },
+        {
+          "case": "local_input_notice_4200",
+          "sends": 1
+        },
+        {
+          "case": "local_input_notice_7",
+          "sends": 1
+        },
+        {
+          "case": "submitted_HTTP_internal_queue_natural_completion",
+          "sends": 0
+        },
+        {
+          "case": "wake_never_clears_real_blocking_state",
+          "sends": 0
+        },
+        {
+          "case": "true_ACK_unknown_preserved",
+          "sends": 1
+        },
+        {
+          "case": "other_group_isolated",
+          "sends": 1
+        },
+        {
+          "case": "missing_mirror_closed",
+          "sends": 0
+        },
+        {
+          "case": "malformed_mirror_closed_then_recovers",
+          "sends": 0
+        }
+      ],
+      "real_model_calls": 0,
+      "real_qq_calls": 0,
+      "real_run_agent": true,
+      "actual_runner": true,
+      "original_event_ACK": true
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "single",
+      "cases": [
+        {
+          "case": "body",
+          "generations": 1,
+          "one_send": true,
+          "original_question_history": true,
+          "evidence_not_persisted": true,
+          "ack": "synthetic"
+        },
+        {
+          "case": "partial",
+          "generations": 1,
+          "one_send": true,
+          "original_question_history": true,
+          "evidence_not_persisted": true,
+          "ack": "synthetic"
+        },
+        {
+          "case": "literal",
+          "generations": 1,
+          "one_send": true,
+          "original_question_history": true,
+          "evidence_not_persisted": true,
+          "ack": "synthetic"
+        },
+        {
+          "case": "failure",
+          "generations": 0,
+          "one_send": true,
+          "original_question_history": true,
+          "evidence_not_persisted": true,
+          "ack": "synthetic"
+        },
+        {
+          "case": "search_gap",
+          "generations": 0,
+          "one_send": true,
+          "original_question_history": true,
+          "evidence_not_persisted": true,
+          "ack": "synthetic"
+        },
+        {
+          "case": "expired",
+          "generations": 0,
+          "sends": 0,
+          "no_internal_marker_history": true
+        }
+      ],
+      "admission_zero_http": true,
+      "real_model_requests": 0,
+      "real_qq_messages": 0,
+      "actual_runner": true
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "single",
+      "participation": "mentions",
+      "attention": true,
+      "web": true,
+      "memory_enabled": true,
+      "body_reader": true,
+      "cases": [
+        {
+          "case": "current_first_image_native_once",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "vision_effective_text_only_v2_no_image",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "replay_local_notice_no_generation",
+          "generations": 0,
+          "sends": 1
+        },
+        {
+          "case": "text_visual_reserve_rejected_before_native",
+          "generations": 0,
+          "sends": 1
+        }
+      ],
+      "real_model_calls": 0,
+      "real_qq_calls": 0,
+      "real_run_agent": true,
+      "actual_runner": true,
+      "private_gate_http": true,
+      "actual_provider": true,
+      "original_event_ACK": true,
+      "production_eligible": false
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "single",
+      "participation": "mentions",
+      "cases": [
+        {
+          "case": "mention_bare_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "cached_material_independent_generation",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 0
+        },
+        {
+          "case": "short_p2_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 4
+        },
+        {
+          "case": "login_notice_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "multiple_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "excerpt_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "complete_budget_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 3
+        },
+        {
+          "case": "unknown_ack_no_resend",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "blacklist_and_silence_no_framework_or_fetch",
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "real_mention_restores_silence",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        }
+      ],
+      "real_run_agent": true,
+      "actual_provider": true,
+      "actual_runner": true,
+      "original_event_ACK": true,
+      "gate": true,
+      "memory": false,
+      "memes": true,
+      "bilibili_only_v2": true,
+      "real_model_calls": 0,
+      "real_qq_calls": 0
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "single",
+      "participation": "mentions",
+      "attention": true,
+      "memory": true,
+      "memes": true,
+      "members": true,
+      "cases": [
+        {
+          "case": "normal_original_event_ACK",
+          "sends": 1
+        },
+        {
+          "case": "same_at_stop_blacklist_other_member_wake",
+          "sends": 1
+        },
+        {
+          "case": "old_result_after_wake_no_assistant_history",
+          "sends": 0
+        },
+        {
+          "case": "local_notice_ticket_old_rejected",
+          "sends": 1
+        },
+        {
+          "case": "all_local_notice_families_immutable_ticket",
+          "sends": 11
+        },
+        {
+          "case": "gate_refusal_known_not_sent_no_unknown_lock",
+          "sends": 0
+        },
+        {
+          "case": "submitted_delayed_ACK_retained",
+          "sends": 1
+        },
+        {
+          "case": "image_only_original_ACK_ticket",
+          "sends": 1
+        },
+        {
+          "case": "old_image_after_wake_rejected",
+          "sends": 0
+        },
+        {
+          "case": "failed_image_local_notice_ticket",
+          "sends": 1
+        },
+        {
+          "case": "typed_at_same_chain_ticket_and_permission",
+          "sends": 1
+        },
+        {
+          "case": "typed_at_permission_race_no_send",
+          "sends": 0
+        },
+        {
+          "case": "router_local_wait_no_provider_no_global_cancel",
+          "sends": 0
+        },
+        {
+          "case": "pre_HTTP_invalidated_no_generation",
+          "sends": 0
+        },
+        {
+          "case": "local_input_notice_0",
+          "sends": 1
+        },
+        {
+          "case": "local_input_notice_20",
+          "sends": 0
+        },
+        {
+          "case": "local_input_notice_4",
+          "sends": 1
+        },
+        {
+          "case": "submitted_HTTP_internal_queue_natural_completion",
+          "sends": 0
+        },
+        {
+          "case": "wake_never_clears_real_blocking_state",
+          "sends": 0
+        },
+        {
+          "case": "true_ACK_unknown_preserved",
+          "sends": 1
+        },
+        {
+          "case": "other_group_isolated",
+          "sends": 1
+        },
+        {
+          "case": "missing_mirror_closed",
+          "sends": 0
+        },
+        {
+          "case": "malformed_mirror_closed_then_recovers",
+          "sends": 0
+        }
+      ],
+      "real_model_calls": 0,
+      "real_qq_calls": 0,
+      "real_run_agent": true,
+      "actual_runner": true,
+      "original_event_ACK": true
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "single",
+      "participation": "free",
+      "attention": true,
+      "web": true,
+      "memory_enabled": true,
+      "body_reader": true,
+      "cases": [
+        {
+          "case": "current_first_image_native_once",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "vision_effective_text_only_v2_no_image",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "replay_local_notice_no_generation",
+          "generations": 0,
+          "sends": 1
+        },
+        {
+          "case": "text_visual_reserve_rejected_before_native",
+          "generations": 0,
+          "sends": 1
+        },
+        {
+          "case": "ambient_unavailable_silent_no_generation",
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "ambient_merge_target_and_cap_together",
+          "generations": 2,
+          "sends": 2
+        }
+      ],
+      "real_model_calls": 0,
+      "real_qq_calls": 0,
+      "real_run_agent": true,
+      "actual_runner": true,
+      "private_gate_http": true,
+      "actual_provider": true,
+      "original_event_ACK": true,
+      "production_eligible": false
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "single",
+      "participation": "free",
+      "cases": [
+        {
+          "case": "mention_bare_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "cached_material_independent_generation",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 0
+        },
+        {
+          "case": "short_p2_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 4
+        },
+        {
+          "case": "free_explicit_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "free_bare_no_fetch",
+          "generations": 1,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 0
+        },
+        {
+          "case": "login_notice_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "multiple_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "excerpt_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "complete_budget_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 3
+        },
+        {
+          "case": "unknown_ack_no_resend",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "blacklist_and_silence_no_framework_or_fetch",
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "real_mention_restores_silence",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        }
+      ],
+      "real_run_agent": true,
+      "actual_provider": true,
+      "actual_runner": true,
+      "original_event_ACK": true,
+      "gate": true,
+      "memory": false,
+      "memes": true,
+      "bilibili_only_v2": true,
+      "real_model_calls": 0,
+      "real_qq_calls": 0
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "single",
+      "participation": "free",
+      "attention": true,
+      "memory": true,
+      "memes": true,
+      "members": true,
+      "cases": [
+        {
+          "case": "normal_original_event_ACK",
+          "sends": 1
+        },
+        {
+          "case": "same_at_stop_blacklist_other_member_wake",
+          "sends": 1
+        },
+        {
+          "case": "old_result_after_wake_no_assistant_history",
+          "sends": 0
+        },
+        {
+          "case": "local_notice_ticket_old_rejected",
+          "sends": 1
+        },
+        {
+          "case": "all_local_notice_families_immutable_ticket",
+          "sends": 11
+        },
+        {
+          "case": "gate_refusal_known_not_sent_no_unknown_lock",
+          "sends": 0
+        },
+        {
+          "case": "submitted_delayed_ACK_retained",
+          "sends": 1
+        },
+        {
+          "case": "image_only_original_ACK_ticket",
+          "sends": 1
+        },
+        {
+          "case": "old_image_after_wake_rejected",
+          "sends": 0
+        },
+        {
+          "case": "failed_image_local_notice_ticket",
+          "sends": 1
+        },
+        {
+          "case": "typed_at_same_chain_ticket_and_permission",
+          "sends": 1
+        },
+        {
+          "case": "typed_at_permission_race_no_send",
+          "sends": 0
+        },
+        {
+          "case": "router_local_wait_no_provider_no_global_cancel",
+          "sends": 0
+        },
+        {
+          "case": "ambient_batch_discard_no_backlog",
+          "sends": 0
+        },
+        {
+          "case": "pre_HTTP_invalidated_no_generation",
+          "sends": 0
+        },
+        {
+          "case": "local_input_notice_0",
+          "sends": 1
+        },
+        {
+          "case": "local_input_notice_4200",
+          "sends": 1
+        },
+        {
+          "case": "local_input_notice_7",
+          "sends": 1
+        },
+        {
+          "case": "submitted_HTTP_internal_queue_natural_completion",
+          "sends": 0
+        },
+        {
+          "case": "wake_never_clears_real_blocking_state",
+          "sends": 0
+        },
+        {
+          "case": "true_ACK_unknown_preserved",
+          "sends": 1
+        },
+        {
+          "case": "other_group_isolated",
+          "sends": 1
+        },
+        {
+          "case": "missing_mirror_closed",
+          "sends": 0
+        },
+        {
+          "case": "malformed_mirror_closed_then_recovers",
+          "sends": 0
+        }
+      ],
+      "real_model_calls": 0,
+      "real_qq_calls": 0,
+      "real_run_agent": true,
+      "actual_runner": true,
+      "original_event_ACK": true
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "adaptive",
+      "cases": [
+        {
+          "case": "body",
+          "generations": 1,
+          "one_send": true,
+          "original_question_history": true,
+          "evidence_not_persisted": true,
+          "ack": "synthetic"
+        },
+        {
+          "case": "partial",
+          "generations": 1,
+          "one_send": true,
+          "original_question_history": true,
+          "evidence_not_persisted": true,
+          "ack": "synthetic"
+        },
+        {
+          "case": "literal",
+          "generations": 1,
+          "one_send": true,
+          "original_question_history": true,
+          "evidence_not_persisted": true,
+          "ack": "synthetic"
+        },
+        {
+          "case": "failure",
+          "generations": 0,
+          "one_send": true,
+          "original_question_history": true,
+          "evidence_not_persisted": true,
+          "ack": "synthetic"
+        },
+        {
+          "case": "search_gap",
+          "generations": 0,
+          "one_send": true,
+          "original_question_history": true,
+          "evidence_not_persisted": true,
+          "ack": "synthetic"
+        },
+        {
+          "case": "expired",
+          "generations": 0,
+          "sends": 0,
+          "no_internal_marker_history": true
+        },
+        {
+          "case": "unknown_ack",
+          "generations": 1,
+          "one_send": true,
+          "original_question_history": true,
+          "evidence_not_persisted": true,
+          "ack": "synthetic"
+        }
+      ],
+      "admission_zero_http": true,
+      "real_model_requests": 0,
+      "real_qq_messages": 0,
+      "actual_runner": true
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "adaptive",
+      "participation": "mentions",
+      "attention": true,
+      "web": true,
+      "memory_enabled": true,
+      "body_reader": true,
+      "cases": [
+        {
+          "case": "current_first_image_native_once",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "vision_effective_text_only_v2_no_image",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "replay_local_notice_no_generation",
+          "generations": 0,
+          "sends": 1
+        },
+        {
+          "case": "text_visual_reserve_rejected_before_native",
+          "generations": 0,
+          "sends": 1
+        }
+      ],
+      "real_model_calls": 0,
+      "real_qq_calls": 0,
+      "real_run_agent": true,
+      "actual_runner": true,
+      "private_gate_http": true,
+      "actual_provider": true,
+      "original_event_ACK": true,
+      "production_eligible": false
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "adaptive",
+      "participation": "mentions",
+      "cases": [
+        {
+          "case": "mention_bare_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "cached_material_independent_generation",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 0
+        },
+        {
+          "case": "short_p2_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 4
+        },
+        {
+          "case": "login_notice_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "multiple_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "excerpt_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "complete_budget_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 3
+        },
+        {
+          "case": "unknown_ack_no_resend",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "blacklist_and_silence_no_framework_or_fetch",
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "real_mention_restores_silence",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        }
+      ],
+      "real_run_agent": true,
+      "actual_provider": true,
+      "actual_runner": true,
+      "original_event_ACK": true,
+      "gate": true,
+      "memory": true,
+      "memes": true,
+      "bilibili_only_v2": false,
+      "real_model_calls": 0,
+      "real_qq_calls": 0
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "adaptive",
+      "participation": "mentions",
+      "attention": true,
+      "memory": true,
+      "memes": true,
+      "members": true,
+      "cases": [
+        {
+          "case": "normal_original_event_ACK",
+          "sends": 1
+        },
+        {
+          "case": "same_at_stop_blacklist_other_member_wake",
+          "sends": 1
+        },
+        {
+          "case": "old_result_after_wake_no_assistant_history",
+          "sends": 0
+        },
+        {
+          "case": "local_notice_ticket_old_rejected",
+          "sends": 1
+        },
+        {
+          "case": "all_local_notice_families_immutable_ticket",
+          "sends": 11
+        },
+        {
+          "case": "gate_refusal_known_not_sent_no_unknown_lock",
+          "sends": 0
+        },
+        {
+          "case": "submitted_delayed_ACK_retained",
+          "sends": 1
+        },
+        {
+          "case": "bubble_interval_stop_wake_partial",
+          "sends": 1
+        },
+        {
+          "case": "image_only_original_ACK_ticket",
+          "sends": 1
+        },
+        {
+          "case": "old_image_after_wake_rejected",
+          "sends": 0
+        },
+        {
+          "case": "failed_image_local_notice_ticket",
+          "sends": 1
+        },
+        {
+          "case": "typed_at_same_chain_ticket_and_permission",
+          "sends": 1
+        },
+        {
+          "case": "typed_at_permission_race_no_send",
+          "sends": 0
+        },
+        {
+          "case": "router_local_wait_no_provider_no_global_cancel",
+          "sends": 0
+        },
+        {
+          "case": "pre_HTTP_invalidated_no_generation",
+          "sends": 0
+        },
+        {
+          "case": "local_input_notice_0",
+          "sends": 1
+        },
+        {
+          "case": "local_input_notice_20",
+          "sends": 0
+        },
+        {
+          "case": "local_input_notice_4",
+          "sends": 1
+        },
+        {
+          "case": "submitted_HTTP_internal_queue_natural_completion",
+          "sends": 0
+        },
+        {
+          "case": "wake_never_clears_real_blocking_state",
+          "sends": 0
+        },
+        {
+          "case": "true_ACK_unknown_preserved",
+          "sends": 1
+        },
+        {
+          "case": "other_group_isolated",
+          "sends": 1
+        },
+        {
+          "case": "missing_mirror_closed",
+          "sends": 0
+        },
+        {
+          "case": "malformed_mirror_closed_then_recovers",
+          "sends": 0
+        }
+      ],
+      "real_model_calls": 0,
+      "real_qq_calls": 0,
+      "real_run_agent": true,
+      "actual_runner": true,
+      "original_event_ACK": true
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "adaptive",
+      "participation": "free",
+      "attention": true,
+      "web": true,
+      "memory_enabled": true,
+      "body_reader": true,
+      "cases": [
+        {
+          "case": "current_first_image_native_once",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "vision_effective_text_only_v2_no_image",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "replay_local_notice_no_generation",
+          "generations": 0,
+          "sends": 1
+        },
+        {
+          "case": "text_visual_reserve_rejected_before_native",
+          "generations": 0,
+          "sends": 1
+        },
+        {
+          "case": "ambient_unavailable_silent_no_generation",
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "ambient_merge_target_and_cap_together",
+          "generations": 2,
+          "sends": 2
+        }
+      ],
+      "real_model_calls": 0,
+      "real_qq_calls": 0,
+      "real_run_agent": true,
+      "actual_runner": true,
+      "private_gate_http": true,
+      "actual_provider": true,
+      "original_event_ACK": true,
+      "production_eligible": false
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "adaptive",
+      "participation": "free",
+      "cases": [
+        {
+          "case": "mention_bare_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "cached_material_independent_generation",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 0
+        },
+        {
+          "case": "short_p2_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 4
+        },
+        {
+          "case": "free_explicit_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "free_bare_no_fetch",
+          "generations": 1,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 0
+        },
+        {
+          "case": "login_notice_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "multiple_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 2
+        },
+        {
+          "case": "excerpt_once",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "complete_budget_zero",
+          "generations": 0,
+          "sends": 1,
+          "evidence": false,
+          "http_calls": 3
+        },
+        {
+          "case": "unknown_ack_no_resend",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        },
+        {
+          "case": "blacklist_and_silence_no_framework_or_fetch",
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "real_mention_restores_silence",
+          "generations": 1,
+          "sends": 1,
+          "evidence": true,
+          "http_calls": 3
+        }
+      ],
+      "real_run_agent": true,
+      "actual_provider": true,
+      "actual_runner": true,
+      "original_event_ACK": true,
+      "gate": true,
+      "memory": true,
+      "memes": true,
+      "bilibili_only_v2": false,
+      "real_model_calls": 0,
+      "real_qq_calls": 0
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "adaptive",
+      "participation": "free",
+      "attention": true,
+      "memory": true,
+      "memes": true,
+      "members": true,
+      "cases": [
+        {
+          "case": "normal_original_event_ACK",
+          "sends": 1
+        },
+        {
+          "case": "same_at_stop_blacklist_other_member_wake",
+          "sends": 1
+        },
+        {
+          "case": "old_result_after_wake_no_assistant_history",
+          "sends": 0
+        },
+        {
+          "case": "local_notice_ticket_old_rejected",
+          "sends": 1
+        },
+        {
+          "case": "all_local_notice_families_immutable_ticket",
+          "sends": 11
+        },
+        {
+          "case": "gate_refusal_known_not_sent_no_unknown_lock",
+          "sends": 0
+        },
+        {
+          "case": "submitted_delayed_ACK_retained",
+          "sends": 1
+        },
+        {
+          "case": "bubble_interval_stop_wake_partial",
+          "sends": 1
+        },
+        {
+          "case": "image_only_original_ACK_ticket",
+          "sends": 1
+        },
+        {
+          "case": "old_image_after_wake_rejected",
+          "sends": 0
+        },
+        {
+          "case": "failed_image_local_notice_ticket",
+          "sends": 1
+        },
+        {
+          "case": "typed_at_same_chain_ticket_and_permission",
+          "sends": 1
+        },
+        {
+          "case": "typed_at_permission_race_no_send",
+          "sends": 0
+        },
+        {
+          "case": "router_local_wait_no_provider_no_global_cancel",
+          "sends": 0
+        },
+        {
+          "case": "ambient_batch_discard_no_backlog",
+          "sends": 0
+        },
+        {
+          "case": "pre_HTTP_invalidated_no_generation",
+          "sends": 0
+        },
+        {
+          "case": "local_input_notice_0",
+          "sends": 1
+        },
+        {
+          "case": "local_input_notice_4200",
+          "sends": 1
+        },
+        {
+          "case": "local_input_notice_7",
+          "sends": 1
+        },
+        {
+          "case": "submitted_HTTP_internal_queue_natural_completion",
+          "sends": 0
+        },
+        {
+          "case": "wake_never_clears_real_blocking_state",
+          "sends": 0
+        },
+        {
+          "case": "true_ACK_unknown_preserved",
+          "sends": 1
+        },
+        {
+          "case": "other_group_isolated",
+          "sends": 1
+        },
+        {
+          "case": "missing_mirror_closed",
+          "sends": 0
+        },
+        {
+          "case": "malformed_mirror_closed_then_recovers",
+          "sends": 0
+        }
+      ],
+      "real_model_calls": 0,
+      "real_qq_calls": 0,
+      "real_run_agent": true,
+      "actual_runner": true,
+      "original_event_ACK": true
+    }
+  ]
+}

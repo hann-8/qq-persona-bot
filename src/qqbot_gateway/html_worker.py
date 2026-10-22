@@ -32,6 +32,53 @@ class Extractor(HTMLParser):
         (self.title if self.in_title else self.text).append(data)
 
 
+def body_text(body):
+    """Render content blocks in DOM order, preserving pre and table structure."""
+    chunks=[]
+    blocks={'p','div','section','article','main','header','h1','h2','h3','h4','h5','h6','li','dt','dd','pre','tr','blockquote'}
+    def walk(node,pre=False):
+        tag=node.tag
+        if not isinstance(tag,str):return
+        if tag in blocks:chunks.append('\n')
+        if tag in ('h2','h3','h4','h5','h6'):chunks.append('  '*(int(tag[1])-1))
+        if tag=='br':chunks.append('\n')
+        if tag in ('td','th') and chunks and not chunks[-1].endswith('\n'):chunks.append(' | ')
+        pre=pre or tag=='pre'
+        if node.text:chunks.append(node.text if pre else re.sub(r'\s+',' ',node.text))
+        for child in node:
+            walk(child,pre)
+            if child.tail:chunks.append(child.tail if pre else re.sub(r'\s+',' ',child.tail))
+        if tag in blocks:chunks.append('\n')
+    walk(body)
+    return '\n'.join(line.rstrip() for line in ''.join(chunks).splitlines() if line.strip())
+
+
+def semantic_body(tree):
+    # Prefer explicit document containers. Drop contained roots, never stitch
+    # parallel articles or duplicate nested article/main trees together.
+    for expression,method in (('//main|//*[@role="main"]','semantic_main'),('//article','semantic_article')):
+        candidates=tree.xpath(expression);roots=[];seen=set()
+        for node in candidates:
+            if any(parent in candidates for parent in node.iterancestors()):continue
+            content=body_text(node)
+            size=len(content.strip())
+            blocks=node.xpath('.//p|.//pre|.//li|.//tr|.//dt|.//dd|.//h1|.//h2|.//h3|.//h4')
+            blocks=[x for x in blocks if x.text_content().strip()]
+            links=sum(len(' '.join(x.text_content().split())) for x in node.xpath('.//a'))
+            density=min(1,links/max(1,size))
+            if size>=80 and len(blocks)>=2 and density<.5:
+                if content in seen:continue
+                seen.add(content)
+                score=size*(1-density)+min(len(blocks),100)*20
+                roots.append((score,node))
+        if roots:
+            # DOM order resolves equal scores; near ties are ambiguous.
+            roots.sort(key=lambda x:x[0],reverse=True)
+            if len(roots)>1 and roots[1][0]>=roots[0][0]*.95:return None,None
+            return roots[0][1],method
+    return None,None
+
+
 def extract_html(text):
     from lxml import html
     from readability import Document
@@ -45,24 +92,21 @@ def extract_html(text):
         try:datetime.fromisoformat(value.replace('Z','+00:00'))
         except ValueError:continue
         published=value;break
-    for node in tree.xpath('//script|//style|//nav|//form|//iframe|//footer|//header|//aside|//noscript|//svg|//template|//object|//embed|//*[@hidden or @aria-hidden="true"]'):
+    for node in tree.xpath('//script|//style|//nav|//form|//iframe|//footer|//header[not(ancestor::main or ancestor::article or ancestor::section or ancestor::*[@role="main"])]|//aside|//noscript|//svg|//template|//object|//embed|//*[@hidden or @aria-hidden="true"]'):
         if node.getparent() is not None:node.drop_tree()
     for node in list(tree.iter()):
         style=node.get('style','').replace(' ','').lower()
         if ('display:none' in style or 'visibility:hidden' in style) and node.getparent() is not None:node.drop_tree()
     doc=Document(html.tostring(tree,encoding='unicode'))
     title=doc.short_title()[:120]
-    body=html.fromstring(doc.summary(),parser=parser)
+    body,method=semantic_body(tree)
+    if body is None:
+        body=html.fromstring(doc.summary(),parser=parser);method='readability'
     for node in body.xpath('//script|//style|//iframe|//form|//nav|//img|//object|//embed'):
         if node.getparent() is not None:node.drop_tree()
-    # Block boundaries preserve paragraph/heading/list/code order, no rendering.
-    for node in body.iter():
-        if node.tag in ('p','div','section','article','main','h1','h2','h3','h4','li','pre','br','tr'):
-            node.tail='\n'+(node.tail or '')
-    paragraphs=[' '.join(x.split()) for x in body.text_content().splitlines()]
-    content='\n'.join(x for x in paragraphs if x)
+    content=body_text(body)
     if len(content)<80 or re.search(r'verify you are human|access denied|登录后阅读|付费阅读|人机验证',content,re.I):raise ValueError('empty_shell')
-    return dict(title=title,text=content,published_at=published)
+    return dict(title=title,text=content,published_at=published,body_method=method,body_scope='extracted_main')
 
 
 def main():
@@ -75,7 +119,7 @@ def main():
             parser=Extractor();parser.feed(text)
             body=' '.join(' '.join(parser.text).split())
             if len(body)<80:raise ValueError('empty_shell')
-            result=dict(title=' '.join(' '.join(parser.title).split())[:120],text=body,published_at=parser.published)
+            result=dict(title=' '.join(' '.join(parser.title).split())[:120],text=body,published_at=parser.published,body_method='legacy',body_scope='extracted_main')
         else:result=extract_html(text)
         result['elapsed_seconds']=time.monotonic()-started
         data=json.dumps(result,ensure_ascii=False,separators=(',',':')).encode()

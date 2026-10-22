@@ -16,7 +16,7 @@ sys.path[:0]=[str(ROOT),str(ROOT/'src')]
 os.environ['ASTRBOT_DISABLE_METRICS']='1'
 
 
-async def verify(root,backend,mode,participation="free",attention=True,memes=False,web_enabled=False,memory_enabled=False,body_reader=False):
+async def verify(root,backend,mode,participation="free",attention=True,memes=False,web_enabled=False,memory_enabled=False,body_reader=False,selection_policy='coverage'):
     full_lifecycle=True
     import yaml
     from aiohttp import web
@@ -82,6 +82,7 @@ async def verify(root,backend,mode,participation="free",attention=True,memes=Fal
     settings['participation']['attention']['enabled']=attention
     settings['memes']['enabled']=memes
     settings['web']['enabled']=web_enabled
+    settings['web']['selection_policy']=selection_policy
     settings['output'].update(delivery_mode=mode,bubble_delay_min_ms=0,bubble_delay_max_ms=0)
     if backend=='ollama_ssh':settings['llm']['profiles'][backend]['expected_digest']='a'*64
     (root/'config').mkdir();(root/'state').mkdir()
@@ -122,10 +123,10 @@ async def verify(root,backend,mode,participation="free",attention=True,memes=Fal
         def __init__(self):super().__init__(settings['web']);self.questions=[]
         async def retrieve(self,q):
             self.questions.append(q)
-            assert q=='肥鱼，请看 https://example.com/'
+            assert q==('json.loads https://example.com/' if selection_policy=='question' else '肥鱼，请看 https://example.com/')
             if not web_enabled:return Retrieval('disabled',notice='网页读取尚未开启。')
             if body_reader:
-                html='<title>合成公开页</title><nav>REMOVE_NAV</nav><article>'+''.join('<p>'+('public synthetic material '*12)+'</p>' for _ in range(12))+'</article>'
+                html='<title>合成公开页</title><nav>REMOVE_NAV</nav><article>'+''.join('<p>'+(('json.loads returns the decoded JSON value. ' if n==6 else 'public synthetic material ')*12)+'</p>' for n in range(32))+'</article>'
                 return Retrieval('read',[await self.extract(html,'https://example.com/','text/html')])
             return Retrieval('read',[dict(url='https://example.com/',title='合成公开页',text='public synthetic material '*50,status='body')])
     reader=OfflineReader()
@@ -274,12 +275,12 @@ async def verify(root,backend,mode,participation="free",attention=True,memes=Fal
         return header
 
     try:
-        e=await image_event(text='肥鱼，请看 https://example.com/' if web_enabled else '合成问题')
+        e=await image_event(text=('json.loads https://example.com/' if selection_policy=='question' else '肥鱼，请看 https://example.com/') if web_enabled else '合成问题')
         original=copy.deepcopy(e.message_obj.raw_message['qqbot_image'])
         await turn(e,'current_first_image_native_once')
         assert fetched==['https://gchat.qpic.cn/synthetic']
         if web_enabled:
-            assert reader.questions==['肥鱼，请看 https://example.com/']
+            assert reader.questions==['json.loads https://example.com/' if selection_policy=='question' else '肥鱼，请看 https://example.com/']
             assert e.get_extra('qq_group_metadata')['manifest']['web'][0]['coverage'] in ('full','excerpt')
             if body_reader:
                 assert reader.extractor.last_metrics['exited'] and reader.extractor.last_metrics['cleanup']

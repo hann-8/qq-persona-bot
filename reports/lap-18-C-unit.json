@@ -1,0 +1,34 @@
+{
+  "passed": true,
+  "tests": 290,
+  "failures": 0,
+  "errors": 0,
+  "elapsed_seconds": 23.5,
+  "modules": [
+    "test_lap18C",
+    "test_bilibili",
+    "test_web",
+    "test_lap18_body",
+    "test_config_files",
+    "test_config_comments",
+    "test_config",
+    "test_token_budget",
+    "test_lap27",
+    "test_lap28",
+    "test_lap29",
+    "test_lap30",
+    "test_group_silence",
+    "test_participation",
+    "test_model_gateway"
+  ],
+  "real_model_calls": 0,
+  "real_qq_outputs": 0,
+  "final_focused": {
+    "passed": true,
+    "tests": 39,
+    "elapsed_seconds": 5.232,
+    "command": ".venv/Scripts/python.exe -X utf8 -m unittest tests.test_lap18C tests.test_lap18_body -q",
+    "note": "末次标题层级/诊断时延补验；不与290项累加。实际耗时见state/lap18C-final-focused.log。"
+  },
+  "prior_attempt_note": "一次旧test_lap29随机receipt恰含合成ID子串444，触发原assertNotIn误报；未改成员实现/测试，重跑290项通过。"
+}

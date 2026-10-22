@@ -284,11 +284,11 @@ LAP-35临时停言：授权群普通成员明确要求bot停言后，本群无�
 
 ### 公共网页正文（LAP-18B）
 
-代码支持readability本地正文提取与显式system/cloudflare_doh解析；当前本机公网/TLS/真实正文尚未通过，搜索质量门槛仍关闭，详见[本轮报告](reports/lap-18-B-2026-10-21.md)。浏览器能联网不能代替本机安全HTTP结果。
+代码支持受管readability正文提取与显式system/cloudflare_doh解析。LAP-38已有部分真实公共正文读取成功及另一次连接超时，不能沿用18B当时所有DNS非公网的结论，也未证明网络稳定；搜索质量门槛仍关闭。历史见[18B报告](reports/lap-18-B-2026-10-21.md)，最新修复见[18C报告](reports/lap-18-C-2026-10-23.md)。
 
 配置位于`config/local/features.yaml`：`public_network.resolver`默认system，只允许显式切换到固定Cloudflare DoH，不自动回退；`ca_bundle_file`默认null，唯一可选位置是忽略的`secrets/public-network-ca.local.pem`，仅允许已审阅CA证书，拒绝私钥/leaf/链接/大文件。TLS/主机名与每跳全公网/peer验证始终开启；不读取代理环境、不改系统DNS/信任。
 
-`web.extractor`缺省readability，可显式legacy回滚；`web.long_text_policy`默认excerpt，也可reject。总材料连同标题/来源/范围/时间戳最多6000 UTF-8字节，图片/记忆/成员占用后还受最终输入预算限制；超长仅按六区选择完整段落，真实范围随输出标注。完整要求超限或有效节选不足时本地说明，0模型调用。JS/登录/付费/验证码/空壳不使用标题伪装正文。没有浏览器、正文分类模型或B站接入。
+`web.extractor`缺省readability，可显式legacy回滚；`web.long_text_policy`默认excerpt，也可reject。总材料连同标题/来源/范围/时间戳最多6000 UTF-8字节，图片/记忆/成员占用后还受最终输入预算限制；超长默认六区选择完整段落，真实范围随输出标注。完整要求超限或有效节选不足时本地说明，0模型调用。JS/登录/付费/验证码/空壳不使用标题伪装正文。不增加浏览器或正文分类模型；B站字幕仍独立按LAP-06合同。
 
 提取器只接收已受控下载的HTML；按需启动单个无窗口Python worker，输入1MiB/输出2MiB/提取2秒/进程256MiB、取消后按创建身份确认退出，空闲无worker。异常清理沿用已有cleanup阻断。依赖由`readability-lxml==0.9`及uv锁文件固定；正常使用前须同步项目及框架环境依赖。
 
@@ -296,3 +296,9 @@ LAP-35临时停言：授权群普通成员明确要求bot停言后，本群无�
 
 
 LAP-06轻量B站字幕已接入代码，默认关闭；配置和边界见[配置说明](config/README.md#b站轻量字幕lap-06)，分级证据见[06交接](tracks/laptop-workbuddy/tasks/LAP-06/HANDOFF.md)。仅单视频/P/字幕轨、当前文字明确触发、现有后端最多一次生成。长字幕是标范围的确定性节选；07 ASR、原V11多段归纳及完整第一版仍未完成。离线替身不代表真实字幕、生成或群ACK通过，本机未自动启用。
+
+LAP-18C：readability模式内优先合格main/role=main，再article；无合格或多个主体评分近似时用同份RAM文档的readability分支。保留嵌套标题、列表、代码与表格行，去除导航/隐藏等噪声和重复主体。`body_method`标提取方式，`body_scope=extracted_main`及full仅指提取主体，不保证全网页/互动内容完整。
+
+`web.selection_policy`新增coverage/question，默认coverage兼容旧配置；question只用当前问题最多32词项本地选整段和相邻上下文，优先预留70%正文预算给相关材料，余量覆盖前中后。纯总结或无词项走coverage，有词项但无可靠命中/整段不足1200字节则明确材料不足。完整要求超预算仍0生成。五文件双摘要、导出、快照、会话版本包含该字段，操作者保存后下次正常启动生效，本轮未修改本机配置。
+
+`scripts/diagnose_public_materials.py`默认inspect，0网络/模型/bot；`--public-samples`是需另行明确授权的四份固定公开材料批次，每份一次请求，输出统计/事实位置/保留标记，不保存正文或据关键词自动判质量。process_host仅放行封闭PUBLIC_MATERIAL元数据（随机关联、阶段、提取方式/范围、数量/字节/耗时、固定失败枚举），不含问题、URL、正文或身份；旧日志缺WEB行不证明无网络请求。

@@ -1,3 +1,5 @@
+2026-10-23：LAP-18阶段C已实现/离线通过，session `LAP-18-C-body-selection-diagnostics`（00:01:00领取）。语义主体/代码表格、coverage默认及question相关整段、封闭PUBLIC_MATERIAL/default inspect交付；290单元/28组合346框架/20组合460关闭兼容、末次39专项通过。0真实公共取样/模型/QQ/SSH/启停/登录，本机配置/人设未改；搜索false。38部分公网成功且仍超时为历史，原页真实质量/旧差额保留，不自动28R/微信。 [18交接](tracks/laptop-workbuddy/tasks/LAP-18/HANDOFF.md)。
+
 2026-10-22 23:50（Asia/Shanghai）：[LAP-38详细规划](tracks/laptop-workbuddy/tasks/LAP-38/PLAN.md)与[medium指令](tracks/laptop-workbuddy/tasks/LAP-38/IMPLEMENTATION_GUIDE.md)完成，未实施。公网3正文成功/另一次超时，JSON文档提取缺关键内容；补18C质量/28R Windows-GGUF路径与可信边界。微信pyweixin仅验证候选、iLink当前direct only；E:\CodexWS\WeChatbot七份纯文档已复制/hash核对。18份归属文档，0代码/配置/启停/登录/模型/QQ/微信/SSH，旧差额保留。验证/Git见[38交接](tracks/laptop-workbuddy/tasks/LAP-38/HANDOFF.md)。
 
 2026-10-22：LAP-37容量阻断修复/手动恢复完成，session `LAP-37-cleanup-capacity-recovery`（21:20领取）。128条累计身份超限已定位；容量满时仅回收系统确认退出条目，105项回归通过。21:21:50停机核验/完整备份归档后独立blocked=false，任务计数不变，bot保持停止；根清理cmd交付。用户放弃自启，项目Startup status/remove均not_installed，旧入口退役；以后手动启动24h运行。0真实模型/QQ/启停/登录，31B/真实稳定及旧差额保留。 [37交接](tracks/laptop-workbuddy/tasks/LAP-37/HANDOFF.md)。
@@ -140,4 +142,4 @@ PROGRESS保存全局结论，工作线HANDOFF保存当前检查点，TASKS登记
 - LAP-12一键生命周期本机无推理验证有历史证据；LAP-13配置交互实现/离线通过，真实终端接受待验。
 - G0—G4和LAP-09—11技术/群文本基线可从工作线及各任务恢复，不等同完整第一版文本/视频交付。
 
-当前规划交付：[LAP-38](tracks/laptop-workbuddy/tasks/LAP-38/HANDOFF.md)，等待用户medium分别续18C/28R或在微信目录领取WX-01；[LAP-36](tracks/laptop-workbuddy/tasks/LAP-36/HANDOFF.md)保留为原四阶段合同与历史。37恢复/弃用自启、06字幕等代码交付见最新段落。原18日29固定RPC/typed@离线检查点及人数新鲜度、28视觉/31B等旧差额保留。
+当前规划交付：[LAP-38](tracks/laptop-workbuddy/tasks/LAP-38/HANDOFF.md)，18C已离线交付；28R或微信WX-01须等待用户另行领取；[LAP-36](tracks/laptop-workbuddy/tasks/LAP-36/HANDOFF.md)保留为原四阶段合同与历史。37恢复/弃用自启、06字幕等代码交付见最新段落。原18日29固定RPC/typed@离线检查点及人数新鲜度、28视觉/31B等旧差额保留。

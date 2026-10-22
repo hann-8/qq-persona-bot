@@ -9,6 +9,7 @@ import logging
 import re
 import socket
 import time
+import secrets
 from urllib.parse import urlsplit, urljoin, urlencode
 import xml.etree.ElementTree as ET
 import zlib
@@ -21,6 +22,38 @@ from .reply_plan import ReplyPlan, make_reply_plan, truncate
 
 LOG=logging.getLogger(__name__)
 CURRENT_TEXT=ContextVar('public_current_text',default=(False,None))
+MATERIAL_TRACE=ContextVar('public_material_trace',default='')
+BODY_METHODS={'none','semantic_main','semantic_article','readability','legacy','plain'}
+MATERIAL_FAILURES={'none','blocked','timeout','cancelled','transport_failed','body_failed','selection_failed','search_unverified'}
+
+
+def material_record(trace,stage,kind,method='none',coverage='none',count=0,size=0,elapsed=0,failure='none'):
+    row=dict(random_trace=trace,stage=stage,kind=kind,body_method=method,coverage=coverage,
+             count=count,bytes=size,elapsed_ms=elapsed,failure=failure)
+    return 'PUBLIC_MATERIAL '+json.dumps(row,separators=(',',':'))
+
+
+def safe_material_log(line):
+    match=re.fullmatch(r'(?:\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:[.,]\d{3})? (?:INFO|WARNING) )?PUBLIC_MATERIAL (\{[^\r\n]*\})',line)
+    if not match or len(line)>1024:return None
+    try:
+        from .reply_plan import _pairs
+        row=json.loads(match[1],object_pairs_hook=_pairs)
+        if set(row)!={'random_trace','stage','kind','body_method','coverage','count','bytes','elapsed_ms','failure'}:return None
+        if not isinstance(row['random_trace'],str) or not re.fullmatch('[a-f0-9]{16}',row['random_trace']):return None
+        for key,values in [('stage',{'intent','transport','body','selection'}),('kind',{'none','read','search','subtitle','video','disabled','blocked','clarify','sensitive'}),('body_method',BODY_METHODS),('coverage',{'none','full','excerpt'}),('failure',MATERIAL_FAILURES)]:
+            if not isinstance(row[key],str) or row[key] not in values:return None
+        if any(type(row[k]) is not int or not 0<=row[k]<=limit for k,limit in [('count',1048576),('bytes',4194304),('elapsed_ms',60000)]):return None
+        return 'PUBLIC_MATERIAL '+json.dumps(row,separators=(',',':'))
+    except (ValueError,TypeError,KeyError):return None
+
+
+def material_log(stage,kind,*,trace=None,method='none',coverage='none',count=0,size=0,elapsed=0,failure='none'):
+    trace=trace or MATERIAL_TRACE.get()
+    if not trace:return
+    line=material_record(trace,stage,kind,method,coverage,count,min(size,4194304),min(60000,int(elapsed*1000)),failure)
+    safe=safe_material_log(line)
+    if safe:LOG.info(safe)
 
 
 # Compatibility exports for existing callers.
@@ -43,7 +76,8 @@ def extract(text,url,mime,cfg):
     # Keep the full bounded body in RAM for final-budget re-selection.
     clipped=byte_clip(body,cfg['max_page_text_bytes'])
     return dict(title=title,url=safe_url(url),fetched_at=datetime.now(timezone.utc).isoformat(),
-                published_at=published,status='body',truncated=clipped!=body,text=clipped,_full_text=body)
+                published_at=published,status='body',truncated=clipped!=body,text=clipped,_full_text=body,
+                body_method='plain' if mime=='text/plain' else 'legacy',body_scope='extracted_main')
 
 
 def parse_rss(text,query,cfg):
@@ -85,6 +119,7 @@ class Retrieval:
     notice: str | None=None
     partial: bool=False
     expired: bool=False
+    random_trace: str=''
 
 
 class Retriever:
@@ -94,14 +129,25 @@ class Retriever:
         from .bilibili_subtitles import Subtitles
         self.bilibili=Subtitles(bilibili or {},self.cfg,network,root,http_factory)
     async def extract(self,text,url,mime):
-        if mime=='text/plain':return extract(text,url,mime,self.cfg)
+        if mime=='text/plain':
+            result=extract(text,url,mime,self.cfg)
+            material_log('body','read',method='plain',size=len(text.encode()),count=len(text.splitlines()))
+            return result
         from .web_extractor import WebExtractor
         if self.extractor is None:self.extractor=WebExtractor(self.cfg['_root'])
         result=await self.extractor.extract(text,self.cfg['extractor'])
         body=result['text']
         return dict(title=result['title'],url=safe_url(url),fetched_at=datetime.now(timezone.utc).isoformat(),
-                    published_at=result['published_at'],status='body',text=body,_full_text=body,truncated=False)
+                    published_at=result['published_at'],status='body',text=body,_full_text=body,truncated=False,
+                    body_method=result['body_method'],body_scope=result['body_scope'])
     async def retrieve(self,question):
+        trace=secrets.token_hex(8);token=MATERIAL_TRACE.set(trace)
+        try:
+            result=await self._retrieve(question);result.random_trace=trace;return result
+        except asyncio.CancelledError:
+            material_log('transport','read',failure='cancelled');raise
+        finally:MATERIAL_TRACE.reset(token)
+    async def _retrieve(self,question):
         self.last_audit=vars(Audit())
         from .bilibili_policy import current_locators, FORBID, LINK, BARE, REQUEST
         mentioned,scope=CURRENT_TEXT.get()
@@ -139,6 +185,7 @@ class Retriever:
                 self.last_audit=dict(self.bilibili.last_audit)
                 if failures:self.last_audit['failures']=failures
         decision=intent(question,self.cfg,self.private_ids)
+        material_log('intent',decision.kind,failure='search_unverified' if decision.kind=='search' and not SEARCH_QUALITY_PASSED else 'blocked' if decision.kind=='blocked' else 'none')
         if decision.kind=='none':return Retrieval()
         if decision.kind in NOTICES:return Retrieval(decision.kind,notice=NOTICES[decision.kind])
         if decision.kind=='search' and not SEARCH_QUALITY_PASSED:return Retrieval('search',notice=NOTICES['unavailable'])
@@ -154,18 +201,26 @@ class Retriever:
                     urls=tuple(x['url'] for x in candidates[:self.cfg['max_pages']])
                 for url in urls:
                     audit.fetch_calls+=1
+                    stage='transport'
                     try:
                         text,final,mime=await http.get(url)
+                        material_log('transport',decision.kind,size=len(text.encode()),count=1,elapsed=time.monotonic()-started)
+                        stage='body';body_started=time.monotonic()
                         source=await self.extract(text,final,mime)
+                        if mime!='text/plain':material_log('body',decision.kind,method=source['body_method'],size=len(source['text'].encode()),count=len(source['text'].splitlines()),elapsed=time.monotonic()-body_started)
                         if source['url'] not in {s['url'] for s in sources}:sources.append(source)
                     except (WebFailure,aiohttp.ClientError,OSError,TimeoutError) as error:
                         from .public_network import failure_status
                         failed+=1;audit.failures.append(failure_status(error))
+                        material_log(stage,decision.kind,elapsed=time.monotonic()-started,
+                                     failure='timeout' if isinstance(error,TimeoutError) else 'body_failed' if stage=='body' else 'transport_failed')
         except TimeoutError:
+            material_log('transport',decision.kind,failure='timeout',elapsed=time.monotonic()-started)
             return Retrieval(decision.kind,expired=True)
         except (WebFailure,aiohttp.ClientError,OSError) as error:
             from .public_network import failure_status
             audit.failures.append(failure_status(error))
+            material_log('transport',decision.kind,failure='transport_failed',elapsed=time.monotonic()-started)
             return Retrieval(decision.kind,notice=NOTICES['failed'])
         finally:
             audit.latency=round(time.monotonic()-started,3);self.last_audit=vars(audit)
@@ -173,6 +228,7 @@ class Retriever:
 
 
 def evidence_prompt(system,prompt,retrieval,budget,cfg):
+    selection_started=time.monotonic()
     dialog=json.loads(prompt);question=dialog[-1]['content'];history=dialog[:-1]
     try:selection_question=json.loads(question).get('web_anchor') or ''
     except (ValueError,AttributeError):selection_question=question
@@ -191,12 +247,15 @@ def evidence_prompt(system,prompt,retrieval,budget,cfg):
             history=history[2:]
         cap=min(cfg['max_evidence_bytes'],6000)
         while cap>=300:
-            sources=sources_for_budget(retrieval.sources,cap,cfg['max_page_text_bytes'],cfg['long_text_policy'],selection_question)
+            sources=sources_for_budget(retrieval.sources,cap,cfg['max_page_text_bytes'],cfg['long_text_policy'],selection_question,cfg.get('selection_policy','coverage'))
             candidate=dialog_text(history+[dict(role='user',content=material(sources))])
-            if budget.usage(system,candidate)<=budget.limit:return candidate,sources
+            if budget.usage(system,candidate)<=budget.limit:
+                for row in sources:material_log('selection',retrieval.kind,trace=retrieval.random_trace,method=row.get('body_method','none'),coverage=row['coverage'],count=len(row['ranges']),size=row['selected_bytes'],elapsed=time.monotonic()-selection_started)
+                return candidate,sources
             if history:history=history[2:];continue
             cap-=100
     except WebFailure:pass
+    material_log('selection',retrieval.kind,trace=retrieval.random_trace,failure='selection_failed',elapsed=time.monotonic()-selection_started)
     return None,[]
 
 
@@ -215,7 +274,7 @@ def source_plan(raw,sources,output,question,partial=False):
             if x['status']=='subtitle':
                 ranges='、'.join(f'{a:g}–{b:g}秒' for a,b in x['time_ranges'])
                 return f'（P{x["page"]}，'+('自动' if x['subtitle_type']=='automatic' else '人工')+f'字幕/{x["language"]}，'+('字幕节选，可能遗漏细节' if x['coverage']=='excerpt' else '字幕全文')+f'；实际时间范围：{ranges}；字幕时间覆盖{x["time_coverage"]:.1%}，不代表已看画面）'
-            return '（仅搜索摘要）' if x['status']=='summary' else '（基于正文节选，可能遗漏细节）' if x.get('coverage')=='excerpt' else '（网页正文完整）'
+            return '（仅搜索摘要）' if x['status']=='summary' else '（基于正文节选，可能遗漏细节）' if x.get('coverage')=='excerpt' else '（提取主体全文）'
         suffix=('\n本次仅取得部分页面。' if partial else '')+'\n来源：'+'\n'.join(title+' '+x['url']+label(x) for x,title in zip(rows,titles))
         check_decoded_tools(suffix)
         room=output['max_reply_chars']-len(suffix)

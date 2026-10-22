@@ -1,4 +1,23 @@
-# LAP-18 当前交接：阶段B离线交付、网络真实缺口保留
+# LAP-18 当前交接：阶段C代码/离线交付，真实差额保留
+
+返回[PROGRESS](../../../../PROGRESS.md) / [TASKS](../../TASKS.md) / [工作线](../../HANDOFF.md) / [38合同第3节](../LAP-38/QQ_VISION_WEB_PLAN.md)。继承AGENTS；本session只18C，不推进28R/微信。
+
+2026-10-23：LAP-18阶段C已续领，session `LAP-18-C-body-selection-diagnostics`，开始2026-10-23T00:01:00+08:00（Asia/Shanghai），本session唯一写入。仅按38第3节修正文主体/相关选材/封闭诊断及离线验证；归属html_worker/web_extractor/evidence_selection/web_policy/web_retrieval、配置旁注/公开模板/导出必要接点、process_host、新diagnose_public_materials/18C验证脚本及测试、reports/lap-18-C-*、18 HANDOFF与三个索引。起点工作区干净；不改local/persona/网络/凭据，不启停/登录/SSH/真实模型/消息或真实公共样本读取；搜索false，旧差额保留，不开始28R/微信。返回[18交接](HANDOFF.md)。
+
+已完成：main/role=main/article优先/固定评分/重复根去重/受控readability、标题层级/列表/代码/表格与去噪；新selection_policy默认coverage，显式question仅当前问题最多32词项，优先70%相关整段/上下文及余量覆盖、两相邻块/真实范围/1200字节下限、总6000及最终预算/完整要求0生成；五文件旁注/模板/双摘要/导出/快照/会话版本同步。默认inspect诊断脚本、封闭同次PUBLIC_MATERIAL元数据/日志白名单交付。原18B网络与06字幕底座保留，无新依赖。
+
+验证：290受影响单元通过/23.500秒，28组合346实际AstrBot/runner替身/同链ACK通过/44.218秒，20组合460关闭兼容通过/93.922秒，末次39专项通过。新增16项含JSON同结构自造夹具的语义事实/顺序/代码表格与诱饵去除、相关选材/中文代码边界/两相邻块、完整及最终超限0生成、封闭日志/默认零动作与固定批次替身、配置双摘要/导出/快照/会话版本。完整命令/文件/一次旧随机receipt子串测试误报与重跑通过记录见[独立报告](../../../../reports/lap-18-C-2026-10-23.md)及三个JSON；旧18B/06报告未覆盖。
+
+归属文件：src/qqbot_gateway/{html_worker,web_extractor,evidence_selection,web_policy,web_retrieval,config_comments}.py；scripts/process_host.py、新diagnose_public_materials.py/verify_lap18C_unit.py/verify_lap18C_framework.py、verify_lap28_framework.py仅可选策略与自造正文；test_lap18C.py、公开settings/features模板、README/config说明、报告与三个JSON、本交接/PROGRESS/工作线HANDOFF/TASKS。本session唯一写入，起点干净，无他人差异；没有改local/persona/public_http/public_network/28生产门槛。
+
+本轮0真实公共样本/模型/QQ/SSH/登录/bot启停，未修改运行配置/人设/CA/代理/DNS/凭据；SEARCH_QUALITY仍false，未启用question/部署。LAP-38部分公开正文成功、另次超时为现有历史证据，不能沿用18B全非公网或说稳定全通。原官方页尚未重新读取/人工事实对齐；夹具通过不是该页真实质量/模型/QQ通过。搜索/06/07/28/31B/24与全部旧真人差额继续保留。
+
+下一步仅等待用户另授权固定真实公共材料批次（0模型）或其他独立任务；真实模型/群批次须明确后端/次数/对象，不自动开始。回滚须操作者按原停机审阅流程选coverage、必要时legacy/配对旧代码，保留pending/unknown/清理台账，不降安全边界。Git按长期授权只提交归属并push/核对远端，最终完整SHA见会话回执；交付不是部署。
+
+---
+以下为阶段B及原任务历史，当前结论以上文C为准。
+
+## 阶段B历史交接
 
 2026-10-22最新规划：[LAP-38](../LAP-38/PLAN.md)本轮现有安全PublicHTTP取得公开HTML，旧DNS全非公网是历史；另一次连接仍超时。JSON文档正文提取缺关键标识，新增[18续作C合同](../LAP-38/QQ_VISION_WEB_PLAN.md)/[medium指令](../LAP-38/IMPLEMENTATION_GUIDE.md)补结构主体/相关选材与封闭诊断。仅规划，SEARCH_QUALITY仍false，本机配置/运行实例不改；旧B报告与真实/完整差额保留。[38证据](../LAP-38/EVIDENCE.md)。
 

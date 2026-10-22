@@ -1,3 +1,5 @@
+2026-10-23：LAP-18阶段C已实现/离线通过，session `LAP-18-C-body-selection-diagnostics`（00:01:00领取）。语义主体/代码表格、coverage默认及question相关整段、封闭PUBLIC_MATERIAL/default inspect交付；290单元/28组合346框架/20组合460关闭兼容、末次39专项通过。0真实公共取样/模型/QQ/SSH/启停/登录，本机配置/人设未改；搜索false。38部分公网成功且仍超时为历史，原页真实质量/旧差额保留，不自动28R/微信。 [18交接](tasks/LAP-18/HANDOFF.md)。
+
 2026-10-22 23:50（Asia/Shanghai）：LAP-38由 `LAP-38-vision-web-wechat-plan` 完成[详细规划](tasks/LAP-38/PLAN.md)/[medium指引](tasks/LAP-38/IMPLEMENTATION_GUIDE.md)，未实施。当前公网可取部分正文但仍波动；已复现JSON正文丢失，补18C/28R；微信独立目录七份引导文档/hash相同，pyweixin仅候选、iLink direct only。18份归属Markdown，0代码/运行配置/启停/登录/模型/QQ/微信/SSH；旧差额保留，验证/Git与下一步见[38交接](tasks/LAP-38/HANDOFF.md)。
 
 2026-10-22：LAP-37容量阻断修复/手动恢复完成，session `LAP-37-cleanup-capacity-recovery`（21:20领取）。128条累计身份超限已定位；容量满时仅回收系统确认退出条目，105项回归通过。21:21:50停机核验/完整备份归档后独立blocked=false，任务计数不变，bot保持停止；根清理cmd交付。用户放弃自启，项目Startup status/remove均not_installed，旧入口退役；以后手动启动24h运行。0真实模型/QQ/启停/登录，31B/真实稳定及旧差额保留。 [37交接](tasks/LAP-37/HANDOFF.md)。

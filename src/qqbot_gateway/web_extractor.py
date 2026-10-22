@@ -67,7 +67,8 @@ class WebExtractor:
                 try:result=json.loads(output)
                 except (ValueError,UnicodeError):raise WebFailure('extract_protocol') from None
                 if not isinstance(result,dict) or 'error' in result:raise WebFailure('extract_failed')
-                if set(result)!={'title','text','published_at','elapsed_seconds'} or not all(isinstance(result[k],str) for k in ('title','text')):raise WebFailure('extract_protocol')
+                if set(result)!={'title','text','published_at','elapsed_seconds','body_method','body_scope'} or not all(isinstance(result[k],str) for k in ('title','text')):raise WebFailure('extract_protocol')
+                if result['body_method'] not in ('semantic_main','semantic_article','readability','legacy') or result['body_scope']!='extracted_main':raise WebFailure('extract_protocol')
                 return result
             except TimeoutError:raise WebFailure('extract_timeout') from None
             except (OSError,psutil.Error):raise WebFailure('extract_worker') from None
