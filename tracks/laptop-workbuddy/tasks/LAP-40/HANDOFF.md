@@ -17,3 +17,11 @@ session `LAP-40-SnowLuma-trial-plan`，2026-10-24 01:19（Asia/Shanghai）开始
 额度约束：用户明确5小时剩余<=5%时，无论规划或medium执行都交接并等待北京时间2026-10-24 07:10恢复；根agent负责heartbeat。01:50实际300分钟used=2%，remaining=98%，未触发等待；不得使用reset credit/购买额度。每阶段及长步骤之间检查，medium约15分钟核对。
 
 规划验证：6份Markdown本地链接/代码围栏检查通过；git diff --check通过。差异仅上述6文档，未运行代码测试或上游测试，没有把静态阅读当本机通过。规划Git交付后由根agent记录精确提交/远端SHA并开始阶段1。
+
+## 2026-10-24 02:03 实施准备
+
+规划内容提交`09ad5a43c3be57d8cc736029357dcc710d7a4368`已推送origin/codex/lap-40-snowluma-trial，git ls-remote核对完整SHA一致，规划checkout干净。
+
+受管worktree `C:\Users\yutha\.codex\worktrees\lap-40-snowluma-impl\QQbot`，分支`codex/lap-40-snowluma-impl`从精确规划提交创建；不含原runtime/state/secrets/local，不复制认证/私改。原`E:\CodexWS\QQbot`仍为规划分支，运行代码/状态未动。可借原`.venv/Scripts/python.exe`作为只读解释器，测试工作目录/PYTHONPATH必须指向隔离worktree，禁止写原运行目录。
+
+阶段1登记：`LAP-40-medium-stage1-config`，开始02:03，待根agent调用gpt-6.1-sol/medium。归属qq_transport/provider、config.py/config_files.py/config_comments.py/必要布局操作、scripts/transport.py只读inspect、模板/配置说明、对应测试及本任务交接/报告。共享3入口只由根agent写。完成后交根agent审阅，不自行越级启动真实阶段。
