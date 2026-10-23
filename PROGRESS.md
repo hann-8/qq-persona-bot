@@ -1,3 +1,5 @@
+2026-10-24：LAP-39复发只读诊断/上游调研完成，当前故障未恢复。00:30仍进程/WS/缓存在线，最后准入23日22:29:36；bot自身状态失败、原生资料刷新10031ms超时，模型空闲/cleanup未阻断。全局o3=1与账号0不同，早期Hook实际读全局；改0仅候选，旧故障亦可能默认0，不能归因或保证。优先受控单变量试验，再补诊断/评估接入替换，均未执行；0代码/运行配置/启停/QQ登录/模型/群/SSH，仅5份文档。[调研与验证路线](tracks/laptop-workbuddy/tasks/LAP-39/RESEARCH.md) / [39交接](tracks/laptop-workbuddy/tasks/LAP-39/HANDOFF.md)。
+
 2026-10-23 22:05（Asia/Shanghai）：按用户要求补[LAP-39背景与现象](tracks/laptop-workbuddy/tasks/LAP-39/CONTEXT_FOR_MAX.md)供max接续；含上轮人设预算断言的口径与未验证假设；仅记录观察、事实与不确定性，不预设为问题或修复任务。本轮仅文档，未探查/修改运行状态。
 
 2026-10-23 20:52（Asia/Shanghai）：LAP-39配置覆盖修复已实现/离线通过：项目text/channel/login-check-only启动仅备份NapCat全局/账号核心配置，不再重写或补建。14生命周期（新增12组合）/25入站通过；LAP-24另25通过、既有23393字节人设预算1失败保留。未启停/改运行配置/模型/群操作，真实重启待验；QQ诱因/长稳差额保留。[39交接](tracks/laptop-workbuddy/tasks/LAP-39/HANDOFF.md)。

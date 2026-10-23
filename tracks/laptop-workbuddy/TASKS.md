@@ -1,3 +1,5 @@
+2026-10-24 00:27（Asia/Shanghai）：LAP-39续领只读复发诊断与上游调研，session `LAP-39-max-recurrence-research`；现调研完成、故障未恢复。用户要求读背景并联网找办法，期间报告再次真实@无响应；本session仅诊断/调研及文档，独占本台账、PROGRESS、工作线HANDOFF、39 HANDOFF与新RESEARCH.md；不改代码/运行配置/人设，不启停/QQ登录/模型生成/群发。开始main/04aff7b、工作区干净。22:29后无新准入、自身状态失败/资料刷新超时；全局o3试验、诊断修复与接入替换均只是候选，见[调研](tasks/LAP-39/RESEARCH.md) / [交接](tasks/LAP-39/HANDOFF.md)。
+
 2026-10-23：LAP-18阶段C已实现/离线通过，session `LAP-18-C-body-selection-diagnostics`（00:01:00领取）。语义主体/代码表格、coverage默认及question相关整段、封闭PUBLIC_MATERIAL/default inspect交付；290单元/28组合346框架/20组合460关闭兼容、末次39专项通过。0真实公共取样/模型/QQ/SSH/启停/登录，本机配置/人设未改；搜索false。38部分公网成功且仍超时为历史，原页真实质量/旧差额保留，不自动28R/微信。 [18交接](tasks/LAP-18/HANDOFF.md)。
 
 2026-10-22：LAP-37容量阻断修复/手动恢复完成，session `LAP-37-cleanup-capacity-recovery`（21:20领取）。128条累计身份超限已定位；容量满时仅回收系统确认退出条目，105项回归通过。21:21:50停机核验/完整备份归档后独立blocked=false，任务计数不变，bot保持停止；根清理cmd交付。用户放弃自启，项目Startup status/remove均not_installed，旧入口退役；以后手动启动24h运行。0真实模型/QQ/启停/登录，31B/真实稳定及旧差额保留。 [37交接](tasks/LAP-37/HANDOFF.md)。
@@ -80,7 +82,7 @@ LAP-15内容提交`632fdc5`已推送origin/main，2026-10-17 11:09用ls-remote�
 
 | ID | 单一任务 | 状态与已有证据 | 依赖/推荐顺序 | 执行session | 下一步/完成出口 |
 | --- | --- | --- | --- | --- | --- |
-| LAP-39 | 夜间不回复/疑似掉登录诊断与恢复对照 | 配置覆盖修复已实现/离线通过；旧QQ/NapCat会话异常已定位、现场恢复；同查询超时→250ms成功，3新准入完成/2条sent；风控诱因未确认/长稳未验；[HANDOFF](tasks/LAP-39/HANDOFF.md) | 用户最新仅要求[背景与现象](tasks/LAP-39/CONTEXT_FOR_MAX.md)供max判断，不预设待修任务；配置真实重启/QQ诱因/长稳未验 | LAP-39-overnight-no-reply-diagnostics，2026-10-23 18:40开始、20:50配置保留修复续作；独占原4份文档及scripts/manage.py、tests/test_lifecycle.py | agent stop/暂停channel启动，用户扫码并正常启动；本次仅启动代码/回归及文档，未改运行配置/启停；无agent模型群发/填凭据，保留具体诱因缺口 |
+| LAP-39 | 夜间不回复诊断、配置保留与复发调研 | 23日恢复为历史；24日同类业务失活复发，故障未恢复；配置覆盖修复已实现/离线通过；[HANDOFF](tasks/LAP-39/HANDOFF.md) / [调研](tasks/LAP-39/RESEARCH.md) | 全局o3单变量试验为候选；诊断/接入替换需后续规划实施；QQ诱因/长稳与WebUI完整重启验收保留 | 当前LAP-39-max-recurrence-research，2026-10-24 00:27登记；只读/调研完成，独占5份文档；23日执行归属见历史HANDOFF | 本轮0启停/QQ登录/模型/群/配置变更；不因调研自动恢复或迁移；首选用户指定受控试验，不能保证改o3根治 |
 | LAP-38 | 识图/网页补证与个人微信接入详细规划 | completed，仅规划；[HANDOFF](tasks/LAP-38/HANDOFF.md)/[PLAN](tasks/LAP-38/PLAN.md)/[指令](tasks/LAP-38/IMPLEMENTATION_GUIDE.md) | 补18C/28R；微信独立先WX-01，旧36/验收差额保留 | LAP-38-vision-web-wechat-plan，2026-10-22 23:19领取、23:50规划收口；18份文档独占 | 公共网络/正文质量新证据、路径/激活合同与微信七份引导/hash交付；0代码/配置/模型/QQ/微信/SSH/启停，Git见交接 |
 | LAP-37 | 清理容量阻断修复/人工恢复与弃用自启 | 已实现/105项离线通过/停机现场恢复通过；[HANDOFF](tasks/LAP-37/HANDOFF.md) | 既有31/33合同修复，不自动解锁unknown | LAP-37-cleanup-capacity-recovery，2026-10-22 21:20；归属见交接 | blocked=false，bot停机；清理cmd可复用；自启弃用，真实运行/31B差额保留 |
 | LAP-36 | 图片识别、轻量网页理解与B站总结详细规划 | completed，仅规划；[HANDOFF](tasks/LAP-36/HANDOFF.md)/[PLAN](tasks/LAP-36/PLAN.md)/[指引](tasks/LAP-36/IMPLEMENTATION_GUIDE.md) | 28入站→18网络/正文→28质量/容量→06字幕；07 ASR仍延期 | LAP-36-image-web-video-plan，2026-10-21 19:20领取、19:48规划交接；11份文档 | 配置/有限材料/开源复用/验收和失败出口落盘；不实施/启用，Git见交接 |
