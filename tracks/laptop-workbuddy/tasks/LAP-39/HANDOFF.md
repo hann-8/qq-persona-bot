@@ -1,12 +1,12 @@
-# LAP-39 夜间不回复只读诊断
+# LAP-39 夜间不回复诊断与恢复对照
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md)。继承AGENTS。
 
-状态：2026-10-23 19:40—19:46续查定位到QQ/NapCat底层请求/消息事件异常：用户再次以另一个QQ在授权群真实@仍无回复、准入/模型均无新增，原生刷新资料接口约10秒回调超时，但在线缓存仍true。底层故障可复现，夜间具体触发原因未确认；尚未恢复或完整验收。管理网页重登不等于QQ重登。只读诊断由本session独占，agent不登录QQ、不发群消息、不自行调用模型或重启。
+状态：2026-10-23 20:15现场已恢复、对照通过。旧QQ/NapCat会话异常/状态失配导致消息链路失活，重建并由操作者扫码后，原生资料刷新由10062ms超时变250ms成功，自身协议状态由失败变在线；用户另行正常启动，3条新消息完成/2条sent回执。腾讯风控/普通会话失效/客户端缺陷的最初诱因仍未能唯一判定，过夜稳定与长期修复未验。WebUI管理凭证到期与此分开。agent仅受管stop及暂停转发的channel启动，未自行请求模型、发群消息或代填QQ凭据。
 
 session `LAP-39-overnight-no-reply-diagnostics`，2026-10-23 18:40（Asia/Shanghai）开始只读排查，18:46登记文档归属。用户指定sol high排查凌晨正常、早上约08:30无回复及疑似登录丢失；不声称自动检测或切换模型/档位。
 
-开始基线main/`746451cb6d29741f4d32cab416447ae0ec5d5cec`，工作区干净。本session独占归属仅PROGRESS、工作线HANDOFF/TASKS、本HANDOFF；不改代码、本机配置、人设或运行数据，不启停、不执行QQ登录、不调用真实模型或发送群消息。项目WebUI管理鉴权仅为读取状态与内存日志；管理token只在进程内使用且不输出、不保存，不读取QQ密码或登录票据。
+开始基线main/`746451cb6d29741f4d32cab416447ae0ec5d5cec`，工作区干净。本session独占跟踪文件仍仅PROGRESS、工作线HANDOFF/TASKS、本HANDOFF；前段只读、没有启停。本次彻底排查续作不改代码/本机源配置/人设，增加现有受管启停命令的恢复对照，运行快照/生命周期记录按现有命令维护；不自行触发模型或发送群消息。项目WebUI管理token只在进程内使用且不输出、不保存，不读取QQ密码或登录票据。
 
 目标：对齐2026-10-23凌晨至早上故障时间的进程、Windows电源、消息入站、模型及QQ状态证据；区分已证实事实、源码推断和缺失历史证据。完成后保留现场，给出下一步最小定位办法。
 
@@ -53,12 +53,38 @@ session `LAP-39-overnight-no-reply-diagnostics`，2026-10-23 18:40（Asia/Shangh
 
 管理/auth/login仅签发独立凭证、不撤销其他会话；撤销发生于专门logout/修改认证操作。本session未调用这些写操作、未修改token或签名密钥，项目进程未重启。只读查询的管理鉴权不等于QQ登录，也没有源码证据说明它把用户网页踢下线。
 
-不重放旧消息、不补发、不重启保留现场。现在不再重复要求用户@或核对发送账号。下一步：若用户要求恢复，先按唯一负责人/项目创建身份重建受管QQ/NapCat会话，再由操作者同群真实@验证；恢复前保留当前定位证据，不能把重启有效等同夜间触发原因已证明。补全受控脱敏掉线日志是已识别的后续修复，当前未改代码、未扩大群正文日志；没有自动切框架/后端或填QQ密码。
+前段只读现场已按下节留存摘要，受控恢复对照实际完成，不再重复启停/要求用户@。后续优先修复脱敏掉线日志及健康识别的覆盖缺口，再做长稳观察，不能把当前恢复等同夜间触发原因已证明。不重放旧消息、不补发；当前未改代码、未扩大群正文日志、未自动切框架/后端/系统，未填QQ密码。
 
 ## 验证与交付
 
-已执行：manage.py只读状态/cleanup status；SQLite mode=ro仅时间/状态统计；Windows电源/网络事件与进程创建身份核验；本地WebUI状态/账号相等性/SSE元数据读取；一次机器人自身资料刷新只读查询、最多3次当前远端TCP连通性探测；5条合成safe_line验证与源码核对。未重跑测试套件、未调用真实模型、QQ登录、群发或启停。用户手工测试未进入模型层。
+### 20:08受控恢复前证据与操作归属
 
-现场已缩小到QQ/NapCat底层请求/事件异常，管理登录页与QQ登录分开；仍不支持“夜间被踢/特定风控/唯一网络原因”的确定归因。保留初查证据与用户澄清，不把当前true或一次超时夸大为完整根因证明，也不标已恢复。
+用户提供的Downloads/napcat.log为18,811字节、125行、无时间戳的近期导出；109条get_status，包含本session资料查询的Timeout，EventRet为result=0/errMsg空/source=1/detail={}。它证明原生方法接受请求但未等到符合条件回调，不包含凌晨最早掉线事件。原日志不复制/提交。
 
-初查文档提交`b55de99a5ac953b244328862b76a688e9143ae15`已推送并核对origin/main一致，检查点干净。本次续作只更新同4份归属文档；5条合成safe_line验证、只读50秒观察与文档链接/差异检查后提交推送，最终提交号以会话回执为准。没有修改生产代码/配置，也没有重启加载诊断修复。历史验收差额保留，根因未确认不能标已修复或完整验收通过。
+新增对照：get_version_info成功32ms，当前4.18.38；get_group_list缓存/刷新两次均成功16ms，三授权群均在列表中；get_group_info_ex成功但data=null（不能当远端刷新成功证明）；nc_get_packet_status成功15ms，nc_get_user_status查询机器人自身失败63ms、固定错误“无法获取用户状态”，没有状态数值或底层错误码，不能断言服务端显示离线。均只读，不取历史/别人资料。
+
+按登记PID+创建时间获取的open_files仅stat元数据：项目QQ进程持有nt_msg.db-wal的mtime为06:57:31，group_info/profile_info WAL为06:57:29，与准入停点吻合。外部原生DB未打开/解密、未读票据或群正文；文件mtime是辅助线索（Windows打开文件的落盘时间可能延迟），不将它单独当成完整入站证明。System/Application在06:45—07:15没有命中相关事件；NetworkProfile日志开启、最后记录00:21:57，无对应时间网络切换；TaskScheduler日志关闭，不能据无记录排除定时任务。
+
+用户论坛链接[Koishi 11478](https://forum.koishi.xyz/t/topic/11478)描述Win11 Shell运行2—5小时后掉线，回帖建议Linux，属于社区经验不是本机根因证明。上游[#2071](https://github.com/NapNeko/NapCatQQ/issues/2071)也报告Linux静默离线/WS假活，但当前bundle已有SelfOffline事件及60秒恢复路径，与该帖旧缺口不能直接等同；[#1977](https://github.com/NapNeko/NapCatQQ/issues/1977)同名资料超时案例仍有群消息，说明单项资料超时不等于完全收不到消息。官方最新v4.18.41发布说明未确认修复本机症状，不升级/迁移或承诺Linux解决。npx临时调用defuddle读取讨论，未改全局应用配置或项目依赖。
+
+20:08:43预检：四组件running、28条登记身份均存活，model.active=false/queue=0/control_attempts=16，cleanup.blocked=false，无accepted/running任务；任务计数completed=794/failed=57/send_unknown=1。源配置无待重启/改动。bundle SHA256=f80e4be3e8640369d23846cf3e8bcfd2a5b6dc5920f50d7ad733d7cca18179e6，与LAP-24规划核验一致，排除本轮擅改bundle。
+
+本session唯一执行顺序：现有manage.py stop（只按登记创建身份）→确认组件停止→start-channel --login-check-only（不启动模型、停止入站转发）→固定只读登录状态/同一机器人自身资料查询对照。若需手机验证，保留等待状态交给操作者，不输入密码、不调用额外登录接口；若启停身份不明或清理失败则停止该动作，不按进程名kill。对照后是否恢复原text/free运行依现场就绪与当前授权判断，记录真实动作与结果，不能沿用前段0启停声明。
+
+### 20:10—20:15实际恢复动作与结果
+
+- agent执行manage.py stop正常完成，独立核对四组件均0/stopped；completed=794/failed=57/send_unknown=1不变。随后执行start-channel --login-check-only，三组件启动、模型未启动、gate.stopping=true、can_receive_group_messages=false，未向AstrBot转发群事件。
+- 20:11:20原生状态isLogin=false/coreReady=false/loginPhase=waiting_qrcode；启动内存日志有正在快速登录/快速登录错误/转二维码，未取得明确风控错误码。WebUI快速列表缓存中目标missing；不能以此认定真实原生历史被删除。agent未重试快登、未密码回退、未输入/保存凭据，要求操作者扫码。
+- 用户确认已完成QQ扫码；20:13:27检查账号与配置匹配，isLogin=true/coreReady=true/phase=ready。此时发现mode=text/model.alive=true/stopping=false与agent暂停启动不同，立即不再启停并询问归属；用户确认“我也启动了机器人”。正常text恢复是操作者操作，不记为agent在暂停模式自行升级。
+- 同一授权群、同一机器人自身、同一no_cache=true资料查询：旧会话10062ms failed/200/timeout，扫码后的新会话250ms ok/0，群与bot匹配；nc_get_user_status查询同一bot，旧会话63ms失败，新会话63ms成功，status=10/ext_status=0。这是会话重建+重新认证前后业务能力对照，不是仅比较缓存在线标志；重启与扫码同时改变，仍不能唯一分离服务端认证失效与客户端会话缺陷。
+- 扫码后WebUI缓存快速列表仍missing，即使账号已经真实在线。**因此此前missing不能作为凭据失效、历史丢失或腾讯风控的证据**；保留启动快登失败这个事实，不夸大缓存列表能力。该限制与LAP-24旧缺口一致。
+- 20:15:06正常text/qq_ready/可收群，queue=0/active=false/last_error=null。20:12:47、20:13:04、20:13:12有新准入，3条completed；20:12:54及20:13:22有delivery.sent回执，另一条无发送记录，不解读为失败。completed=797/failed=57/send_unknown=1，当前实例真实模型3次均generation=success/cleanup reason=none，均由操作者恢复后的正常新消息触发，agent未发送测试消息/自行调用生成。
+- 源配置与运行快照摘要均仍6b1f1a108b3654d930e9864f8fe8a060e793b7019f8de1e58c9d410d3bd6c3c1，无pending_restart/source_changed；bundle SHA256未变。没有修改代码、人设、授权群、黑名单、触发范围、后端或费用来源；旧unknown/清理台账与验收差额保留。
+
+结论层级：直接故障为旧QQ/NapCat会话异常、进程/WS/缓存在线造成假活，新的认证会话恢复业务能力；触发时间在06:57以后至用户08:30失败前的窗口（具体掉线时刻缺历史证据）。腾讯主动会话撤销/风控是候选，不能在没有KickedOffLine/通知/结果码时标成已确认“腾讯风控”；普通会话失效、QQ客户端/NapCat状态失配也未独立排除。自身get_status健康检测只看到同源缓存，日志过滤又遗漏诊断，解释了为何长期未自动发现/恢复，但不证明它们是最初诱因。
+
+已执行：只读状态/cleanup/SQL时间状态统计、Windows/身份/文件stat、WebUI固定查询/SSE元数据、授权元数据及自身资料/状态对照、最多3次现有远端TCP探测、5条合成日志、只读上游检索，以及agent一次受管stop/一次login-check-only启动。QQ扫码及正常text启动由用户完成；此后3次真实生成/2次sent为正常群新消息触发。未重跑测试套件，未由agent自行调用生成/发群消息、填凭据或修改代码配置。
+
+现场恢复与真实收发已有当前证据，仍不支持“夜间被踢/特定风控/唯一网络原因”的确定归因；过夜稳定与完整验收未过。保留初查/对照/用户操作归属，不把恢复夸大为风控根因证明，也不将新会话短时成功当成长稳保证。
+
+前段文档提交b55de99/21ea24c/6c430f2均已推送核对；本次续作仍只更新同4份跟踪文档。链接/差异/归属检查后提交推送，最终提交号以会话回执为准。原始导出、运行快照和本机数据不提交；没有修改生产代码或加载日志/健康修复。旧差额与未确认的诱因保留。

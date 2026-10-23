@@ -80,7 +80,7 @@ LAP-15内容提交`632fdc5`已推送origin/main，2026-10-17 11:09用ls-remote�
 
 | ID | 单一任务 | 状态与已有证据 | 依赖/推荐顺序 | 执行session | 下一步/完成出口 |
 | --- | --- | --- | --- | --- | --- |
-| LAP-39 | 夜间不回复/疑似掉登录只读诊断 | 现场定位QQ/NapCat底层刷新请求回调超时、真实@无准入，在线标志仍true；夜间触发原因未证、未恢复；[HANDOFF](tasks/LAP-39/HANDOFF.md) | 保留现场；后续恢复须按项目身份重建会话并真实@验收 | LAP-39-overnight-no-reply-diagnostics，2026-10-23 18:40开始、19:46定位；独占同4份文档 | 管理页1h凭证与QQ分开；5条合成复现日志缺口，0代码/配置/启停/QQ登录/agent模型群发 |
+| LAP-39 | 夜间不回复/疑似掉登录诊断与恢复对照 | 旧QQ/NapCat会话异常已定位、现场恢复；同查询超时→250ms成功，3新准入完成/2条sent；风控诱因未确认/长稳未验；[HANDOFF](tasks/LAP-39/HANDOFF.md) | 后续补脱敏日志/健康识别，再长稳；不以管理凭证续期代替会话修复 | LAP-39-overnight-no-reply-diagnostics，2026-10-23 18:40开始、20:15恢复检查点；独占同4份文档 | agent stop/暂停channel启动，用户扫码并正常启动；无代码源配置改动、无agent模型群发/填凭据，保留具体诱因缺口 |
 | LAP-38 | 识图/网页补证与个人微信接入详细规划 | completed，仅规划；[HANDOFF](tasks/LAP-38/HANDOFF.md)/[PLAN](tasks/LAP-38/PLAN.md)/[指令](tasks/LAP-38/IMPLEMENTATION_GUIDE.md) | 补18C/28R；微信独立先WX-01，旧36/验收差额保留 | LAP-38-vision-web-wechat-plan，2026-10-22 23:19领取、23:50规划收口；18份文档独占 | 公共网络/正文质量新证据、路径/激活合同与微信七份引导/hash交付；0代码/配置/模型/QQ/微信/SSH/启停，Git见交接 |
 | LAP-37 | 清理容量阻断修复/人工恢复与弃用自启 | 已实现/105项离线通过/停机现场恢复通过；[HANDOFF](tasks/LAP-37/HANDOFF.md) | 既有31/33合同修复，不自动解锁unknown | LAP-37-cleanup-capacity-recovery，2026-10-22 21:20；归属见交接 | blocked=false，bot停机；清理cmd可复用；自启弃用，真实运行/31B差额保留 |
 | LAP-36 | 图片识别、轻量网页理解与B站总结详细规划 | completed，仅规划；[HANDOFF](tasks/LAP-36/HANDOFF.md)/[PLAN](tasks/LAP-36/PLAN.md)/[指引](tasks/LAP-36/IMPLEMENTATION_GUIDE.md) | 28入站→18网络/正文→28质量/容量→06字幕；07 ASR仍延期 | LAP-36-image-web-video-plan，2026-10-21 19:20领取、19:48规划交接；11份文档 | 配置/有限材料/开源复用/验收和失败出口落盘；不实施/启用，Git见交接 |

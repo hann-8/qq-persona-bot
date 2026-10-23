@@ -1,4 +1,4 @@
-2026-10-23 19:46（Asia/Shanghai）：LAP-39现场定位QQ/NapCat底层请求/消息事件异常：用户另一个QQ真实@无新增准入，机器人自身资料刷新10062ms回调超时，在线缓存仍true。网页凭证有效期1小时与QQ分开、5条合成复现日志过滤缺口；夜间触发原因未证、未恢复。0代码/配置/启停/QQ登录/agent模型或群发，证据/后续见[39交接](tasks/LAP-39/HANDOFF.md)。
+2026-10-23 20:15（Asia/Shanghai）：LAP-39旧QQ/NapCat会话异常已定位、现场恢复。agent按身份stop/暂停channel启动，用户扫码并另行正常启动；自身资料10062ms超时→250ms成功，3新消息completed/2条sent，bundle/源配置未变。腾讯风控仅候选，历史诱因/过夜长稳未证；管理凭证1h与QQ分开，agent无自行模型/群发或填凭据。证据与归属见[39交接](tasks/LAP-39/HANDOFF.md)。
 
 2026-10-23：LAP-18阶段C已实现/离线通过，session `LAP-18-C-body-selection-diagnostics`（00:01:00领取）。语义主体/代码表格、coverage默认及question相关整段、封闭PUBLIC_MATERIAL/default inspect交付；290单元/28组合346框架/20组合460关闭兼容、末次39专项通过。0真实公共取样/模型/QQ/SSH/启停/登录，本机配置/人设未改；搜索false。38部分公网成功且仍超时为历史，原页真实质量/旧差额保留，不自动28R/微信。 [18交接](tasks/LAP-18/HANDOFF.md)。
 
