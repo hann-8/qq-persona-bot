@@ -1,3 +1,5 @@
+2026-10-24 07:12：LAP-40按07:10唤醒恢复，300分钟额度剩100%，解除quota_hold。登记LAP-40-medium-stage4A-continuation，先完成唯一writer owner登记/启动spec合成路径/drain-stop ACK消费/Snow状态提示，根审后才4B/5。根agent独占3入口，medium拥有当前代码测试及40交接；真实Snow仍总拒，原运行态不动。
+
 2026-10-24 03:19：LAP-40 quota_hold，实际5h剩余4%，按用户指令停止新工作；本线程一次性07:10（北京时间）恢复已创建并view确认，automation lap-40-snowluma。阶段4A仅部分检查点根审，先读tasks/LAP-40/HANDOFF与QUOTA_WAIT的独立剩余清单再续4A，随后4B/5；真实Snow未切换、原运行态未动。
 
 2026-10-24 03:18：[LAP-40](tasks/LAP-40/HANDOFF.md)4A部分检查点c549ce3/交接802fac1已推送根审，41 Python/9 JS及前轮104回归通过；[报告](../../reports/lap-40-stage4A-2026-10-24.md)。独立owner登记/spec/优雅停止ACK/状态提示尚待4A续作，不能称完整生命周期；4B/5未做。1/2已实现离线通过、3仅固定源码核对，上游私有改动/构建/真实QQ仍未做，原运行态未动。当前额度6%，到5%交接后北京时间10月24日07:10续作；入口具体暂停记录以40交接为准。

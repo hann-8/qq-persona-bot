@@ -1,3 +1,5 @@
+2026-10-24 07:12：LAP-40按07:10唤醒恢复，300分钟额度剩100%，解除quota_hold。登记LAP-40-medium-stage4A-continuation，先完成唯一writer owner登记/启动spec合成路径/drain-stop ACK消费/Snow状态提示，根审后才4B/5。根agent独占3入口，medium拥有当前代码测试及40交接；真实Snow仍总拒，原运行态不动。
+
 2026-10-24 03:19：LAP-40 quota_hold，实际5h剩余4%，按用户指令停止新工作；本线程一次性07:10（北京时间）恢复已创建并view确认，automation lap-40-snowluma。阶段4A仅部分检查点根审，先读tasks/LAP-40/HANDOFF与QUOTA_WAIT的独立剩余清单再续4A，随后4B/5；真实Snow未切换、原运行态未动。
 
 2026-10-24 00:53（Asia/Shanghai）：LAP-39续作SnowLuma替换可行性调研，session `LAP-39-SnowLuma-longrun-assessment`；现调研完成，未实施。用户强调NapCat/SnowLuma最重要的是长期运行。仅官方源码/发布/故障记录与本项目兼容面只读核对，独占PROGRESS、工作线HANDOFF/TASKS、39 HANDOFF/RESEARCH与新SNOWLUMA_ASSESSMENT.md共6份文档；不安装、不启停/注入/登录、不改代码/运行配置、不调用模型/群/SSH。开始main/3ecd9a0、工作区干净；上一现场状态只作历史，不在本轮重新探活。原版补历史/存储/内置答复在gate前，须先解决再规划72h/7天试验，见[评估](tasks/LAP-39/SNOWLUMA_ASSESSMENT.md)。

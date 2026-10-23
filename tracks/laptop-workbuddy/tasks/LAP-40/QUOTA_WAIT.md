@@ -1,5 +1,7 @@
 # LAP-40 quota_hold：北京时间2026-10-24 07:10续作
 
+恢复记录：2026-10-24 07:10 heartbeat实际触发，300分钟额度剩余100%，worktree干净；07:12恢复4A独立剩余。以下为03:19历史保存状态，当前执行状态以HANDOFF为准，不重复创建唤醒。
+
 返回[HANDOFF](HANDOFF.md) / [PROGRESS](../../../../PROGRESS.md) / [PLAN](PLAN.md) / [实施指引](IMPLEMENTATION_GUIDE.md)。
 
 2026-10-24 03:19（Asia/Shanghai）：实际account usage的300分钟窗口used96%、remaining4%，触发用户“剩余<=5%即等待07:10”指令。停止新的规划/实施/模型工作，仅保存交接。没有使用reset credit或购买额度。

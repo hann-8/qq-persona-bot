@@ -2,7 +2,9 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md)。继承AGENTS。
 
-**当前：quota_hold。2026-10-24 03:19实际300分钟剩余4%，按用户指令停止新工作，本线程07:10一次性恢复已安排（automation `lap-40-snowluma`）。先读[额度交接与下一步](QUOTA_WAIT.md)。** 阶段1/2已根审；3仅静态核对；4A部分实现/离线/根审检查点通过，未全部完成、未部署。真实Snow启用总拒绝；[4A报告](../../../../reports/lap-40-stage4A-2026-10-24.md)区分项目侧独立剩余与外部前置。以下登记均为历史，不能跳到4B或称真实接线通过。
+**当前：2026-10-24 07:12已按计划恢复，300分钟剩余100%，quota_hold解除；继续4A独立剩余，未部署。** 阶段1/2已根审；3仅静态核对；4A先前部分检查点通过，尚未全部实现。真实Snow启用仍总拒绝；[4A报告](../../../../reports/lap-40-stage4A-2026-10-24.md)与[历史额度交接](QUOTA_WAIT.md)保留未完成分层，不能跳到4B或称真实接线通过。
+
+恢复领取登记：`LAP-40-medium-stage4A-continuation`，2026-10-24 07:12（Asia/Shanghai）；基线`79debb73bdfa6ec46cd90566fc18f1db9998bb79`、worktree干净，原medium子代理仍可用。根agent独占3共享入口，medium本阶段拥有manage/transport_owner及必要原创建进程spec模块、对应测试/说明/40交接报告。先唯一writer owner登记、启动spec合成路径、drain/stop ACK消费和Snow状态提示；每步复核、0真实QQ/端口/模型/群/SSH/本机配置操作，保持require_runtime生产总拒。完成再根审派4B。
 
 4A部分检查点已获根审接受，代码提交`c549ce3703dcec6f0f7a6976caaa1bdb04f19dfe`已推送且远端一致、代码工作区干净。追加续作待办：`manage.show_status`末尾对Snow/unknown阻断不得提示NapCat6099，应输出封闭对应状态并测试。其余4A未写项目侧能力见报告，未升级为完整完成。当前额度used94/remaining6%，不开始新实现，等待根agent续作安排。
 
