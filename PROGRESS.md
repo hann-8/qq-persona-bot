@@ -1,3 +1,5 @@
+2026-10-23 22:05（Asia/Shanghai）：按用户要求补[LAP-39背景与现象](tracks/laptop-workbuddy/tasks/LAP-39/CONTEXT_FOR_MAX.md)供max接续；含上轮人设预算断言的口径与未验证假设；仅记录观察、事实与不确定性，不预设为问题或修复任务。本轮仅文档，未探查/修改运行状态。
+
 2026-10-23 20:52（Asia/Shanghai）：LAP-39配置覆盖修复已实现/离线通过：项目text/channel/login-check-only启动仅备份NapCat全局/账号核心配置，不再重写或补建。14生命周期（新增12组合）/25入站通过；LAP-24另25通过、既有23393字节人设预算1失败保留。未启停/改运行配置/模型/群操作，真实重启待验；QQ诱因/长稳差额保留。[39交接](tracks/laptop-workbuddy/tasks/LAP-39/HANDOFF.md)。
 
 2026-10-23 20:15（Asia/Shanghai）：LAP-39旧QQ/NapCat会话异常已定位、现场恢复。agent按身份stop→login-check-only暂停启动，用户扫码并另行正常启动；同一自身资料查询10062ms超时→250ms成功、协议状态失败→在线，3新消息completed/2条sent。代码/配置/bundle未变；WebUI 1h凭证与QQ分开，腾讯风控仅候选、具体诱因/过夜长稳未证。0agent自行生成/群发/填凭据，正常群触发3次模型由用户恢复；归属/上游与证据见[39交接](tracks/laptop-workbuddy/tasks/LAP-39/HANDOFF.md)。

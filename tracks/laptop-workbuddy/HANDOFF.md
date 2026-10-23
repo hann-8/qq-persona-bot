@@ -1,3 +1,5 @@
+2026-10-23 22:05（Asia/Shanghai）：按用户要求补[LAP-39背景与现象](tasks/LAP-39/CONTEXT_FOR_MAX.md)供max接续；含上轮人设预算断言的口径与未验证假设；仅记录观察、事实与不确定性，不预设为问题或修复任务。本轮仅文档，未探查/修改运行状态。
+
 2026-10-23 20:52（Asia/Shanghai）：LAP-39配置覆盖修复已实现/离线通过：项目text/channel/login-check-only启动仅备份NapCat全局/账号核心配置，不再重写或补建。14生命周期（新增12组合）/25入站通过；LAP-24另25通过、既有23393字节人设预算1失败保留。未启停/改运行配置/模型/群操作，真实重启待验；QQ诱因/长稳差额保留。[39交接](tasks/LAP-39/HANDOFF.md)。
 
 2026-10-23 20:15（Asia/Shanghai）：LAP-39旧QQ/NapCat会话异常已定位、现场恢复。agent按身份stop/暂停channel启动，用户扫码并另行正常启动；自身资料10062ms超时→250ms成功，3新消息completed/2条sent，bundle/源配置未变。腾讯风控仅候选，历史诱因/过夜长稳未证；管理凭证1h与QQ分开，agent无自行模型/群发或填凭据。证据与归属见[39交接](tasks/LAP-39/HANDOFF.md)。
