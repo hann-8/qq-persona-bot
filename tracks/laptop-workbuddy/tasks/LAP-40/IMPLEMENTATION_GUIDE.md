@@ -45,6 +45,8 @@
 
 ## 阶段4：受管生命周期/恢复/操作CLI/试验采样
 
+根agent按2026-10-24阶段3结果将此阶段拆成4A/4B串行交付：4A先做provider-aware管理、唯一writer身份/锁/加载快照、独立秘密/固定nonce轮询/原创控制面与stop优先，缺G0/G1/上游私有接线证据硬拒真实启用；4B再接恢复预算、CLI停机事务和有界资源采样。原整体任务文本仍是总范围，不代表4A可自行越级实现全部。普通core构建同样复制native，protocol副作用/trace早于OneBot，详见[私有清单](PRIVATE_WIRING_CHECKLIST.md)，不得以项目侧控制面存在冒充已完成上游运行接线。
+
 > 继续LAP-40阶段4。实现provider-aware manage/process_host、单writer身份registry/stop优先、固定health控制面、持久write-ahead恢复预算、CLI prepare/verify/activate/trial/rollback和有界状态资源采样。G0/G1/私有证明缺失仍可用假进程假时钟验证全部项目侧代码，真实启动必须硬拒绝。recovery默认false，QQ重启另需3/3证明且默认false；每事故最多一个动作，24h Snow<=2/QQ<=1，冷却1800，grace30/drain150/ready180，stop和cleanup未知优先。禁名字kill/未知进程adopt/自动重登/自动NapCatfallback/Startup/自动群消息。activate及回滚只停机有限字段原子事务，源变化拒绝覆盖；不实际修改local配置。提交前受影响回归，报告精确文件/测试/缺口，commit/push核对SHA。
 
 不得启动真实组件作fixture、睡眠多分钟凑验证或将静态proof当实时。watch与manage共享锁唯一写registry，不分裂进程归属。停止按已加载provider与snapshot，不按当前磁盘settings猜旧实例身份。没有完整退出证据保留unknown，31B差额不清空。

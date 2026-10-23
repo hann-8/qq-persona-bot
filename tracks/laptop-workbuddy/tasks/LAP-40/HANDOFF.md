@@ -50,6 +50,12 @@ session `LAP-40-SnowLuma-trial-plan`，2026-10-24 01:19（Asia/Shanghai）开始
 
 阶段3登记`LAP-40-medium-stage3-private-preflight`，02:45，仍由sol medium执行。范围只读指定项目材料/固定上游接线与私有构建前置，允许的私有源码/JS仅在忽略区、原创核对说明和40报告/交接；禁止公开上游修改源/patch/bundle/native和自动原生部署。已有39/40证据复用，不重跑泛化版本调查。缺原包/合格运行时/数据范围或保护证明时明确未通过，继续独立阶段4，不空等操作者、不动原bot。
 
+## 2026-10-24 02:58 根agent阶段3复核/4A登记
+
+阶段3提交`c495e20a3ac0f4ca5e8f7c1feeb03e64e3e16686`已推送，medium核对完整远端SHA一致/干净；根agent审阅4文档差异、15项固定SHA接点清单与报告，diff --check通过。仅完成静态核对，**上游私有源改动/构建/执行级合成接线全部未做**。普通core构建也复制native；protocol副作用/enrichment/printEvent及raw trace早于OneBot；RKey/OIDB/server fallback和缓存上界需单独处理。原包/QQ/proof/private根八项不存在、Node24.22.0、实际inspect=false及文档检查为本阶段执行证据，没有拿旧测试冒充上游通过。提交前剩余31%。
+
+根agent据此定向更新PLAN/GUIDE：禁普通core build，明确最小原生信封须早于协议副作用，阶段4拆4A/4B；没有扩大账号/模型/真实触发范围。4A登记`LAP-40-medium-stage4A-runtime-owner`，02:58；归属manage/process_host、qq_transport/transport_health/必要健康owner模块、gate启动绑定/轮询、原创固定控制面JS、必要README及自造测试/40交接报告。共享3入口由根agent写，私有上游保持未完成，真实资格缺失硬拒启；4A结束先复核再派4B。新控制面不得变任意命令/路径/PID/API代理。
+
 阶段1实际领取：2026-10-24 02:05（Asia/Shanghai），session `LAP-40-medium-stage1-config`；已读规定入口/计划与codex-handoff，隔离分支HEAD `6556b24c5102e3bac21b6197a39902ae0c4a7334`、工作区干净。300分钟used=8%，remaining=92%。本阶段独占`src/qqbot_gateway/qq_transport.py`、`config.py`、`config_files.py`、`config_comments.py`、`scripts/transport.py`、`config/settings.example.yaml`、`config/examples/runtime.yaml`、`config/README.md`、`tests/test_qq_transport.py`及本HANDOFF/`reports/lap-40-stage1-2026-10-24.md`。按既定计划完成配置/provider/只读静态证据，成功标准是精确旧摘要兼容与自造离线边界通过；不触运行checkout、local/secrets/persona、不实现阶段2健康或恢复。
 
 阶段1交接（2026-10-24 02:12）：上述11归属文件完成；15新增/14配置/30分层/6注释/18菜单共83通过，0跳过，diff --check通过。缺节schema1/2/3精确语义摘要和旧snapshot raw摘要保持，经过实际load_consumer/迁移验证；NT junction、非法/碰撞/独立秘密引用、严格proof/摘要绑定/变动失效、inspect只读与--json均有自造证据。inspect永不放行实时ready/G0/G1；原包/干净QQ/原生数据/私有接线未验，原运行目录/配置/进程全未触及。提交前额度used20/remaining80%。根agent复核本阶段diff及报告，再按指引串行派阶段2；本session停在阶段1，不自行推进。Git提交/远端一致性待本阶段出口精确回报并由根agent同步共享入口。
