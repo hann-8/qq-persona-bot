@@ -138,6 +138,9 @@ class OneBotGate:
         self.good = None
         self.transport_health = None
         self.transport_monitor_task = None
+        self.transport_supervisor = None
+        self.transport_recovery_closed = False
+        self.transport_pending = set()
         self._transport_ready = False
         self.health_pending = {}
         self.admin_pending={}
@@ -160,6 +163,15 @@ class OneBotGate:
             raise ValueError('Independent context token required')
 
     def snow(self):return self.config.transport_provider == 'snowluma'
+
+    async def revoke_transport_epoch(self):
+        self.transport_recovery_closed=True;self.channel_ready()
+        self.connection_id=secrets.token_hex(32)
+        self.connected=False;self.online=None;self.good=None;self.online_at=None
+        self.materials.clear();self.members.clear();self.mention_pending.clear()
+        if self.transport_health:self.transport_health.invalidate()
+        if self.active is not None:await self.active.close(code=1001,message=b'TRANSPORT_RECOVERY')
+        self.publish_connection()
 
     def bind_transport_health(self, verifier):
         # Only a managed in-process owner may bind; no HTTP self-attestation route.
@@ -184,7 +196,7 @@ class OneBotGate:
     def channel_ready(self, *, publish=True):
         base = bool(self.connected and self.online is True and not (self.root and stopping(self.root)))
         if not self.snow():return base
-        ready = bool(base and self.good is True and self.online_at is not None and
+        ready = bool(base and not self.transport_recovery_closed and self.good is True and self.online_at is not None and
                      0 <= time.time()-self.online_at < self.config.transport_health_ttl and self.transport_health and self.transport_health.ready())
         previous = self._transport_ready
         self._transport_ready = ready
@@ -250,6 +262,7 @@ class OneBotGate:
                 'stopping': bool(self.root and stopping(self.root)),
                 'silence_enabled':self.silence.enabled,'muted_groups':sum(s['mode']=='muted' for s in self.silence.states.values()),
                 **(dict(channel_ready=ready,good=self.good,
+                    transport_recovery=self.transport_supervisor.status() if self.transport_supervisor else dict(enabled=False,phase='observe',operator_required=False),
                     transport_monitor=dict(running=bool(self.transport_monitor_task and not self.transport_monitor_task.done())),
                     transport_health=self.transport_health.safe_status() if self.transport_health else
                     dict(trusted=False,ready=False,sequence=0,armed=False)) if self.snow() else {})}
@@ -311,7 +324,7 @@ class OneBotGate:
                     self.materials.clear();self.members.clear();self.mention_pending.clear()
                     self.ever_connected = True
                     LOG.info('CHANNEL_CONNECTED_SELF_ID_VERIFIED')
-                    pending = set()
+                    pending = self.transport_pending if self.snow() else set()
                     tasks = [asyncio.create_task(self._incoming(downstream, upstream, pending)),
                              asyncio.create_task(self._outgoing(upstream, downstream, pending)),
                              asyncio.create_task(self._status_loop(downstream))]

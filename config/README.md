@@ -115,6 +115,8 @@ LAP-18B补充：`features.yaml`新增`public_network`（resolver=system、ca_bun
 
 当前LAP-40阶段1/2已交付配置/provider/静态检查，以及原创早期策略、独立健康协议、实际gate/router时效栅栏；4A补齐初始owner登记、固定spec、nonce轮询与drain/stop消费的项目侧离线闭环。上游私有接线、真实控制监听/受管启动、恢复和activate/rollback仍待后续阶段。默认没有受管健康绑定就关闭Snow准入，不能把文件存在当作已部署或切换。所有设置在显式停机保存、下次受管启动后才可生效，不热更新，不自动fallback。
 
+4B1恢复预算/监督已项目侧离线验证，默认`recovery.enabled=false`保持；启用但未明确停机准备的预算为closed，watch不补空账。首次准备API供后续4B2 CLI接入，本阶段没有activate/rollback/trial或采样命令。每事故一次动作，QQ恢复同时占Node与QQ预算；坏账、时钟回拨、cleanup/发送未知只转人工。原生/私有资格仍未满足，真实恢复与QQ3/3免扫码均未通过，不能因已有恢复代码或allow_qq_restart=true启动真实组件。
+
 只读检查：`python scripts/transport.py inspect --json`（可用`--root`指定项目根）。输出当前选择的provider及`snowluma_candidate`静态检查范围；`channel_ready`始终false，与现有NapCat在线状态无关。不联网、不启动进程、不读控制密钥、不读取QQ认证数据、不写配置/状态。缺包等返回封闭阻断码；CLI退出0表示检查完成，不表示真实准入。无有效配置时退出1，仅输出`transport_config_invalid`。
 
 `snowluma`路径相对项目根：官方包根在runtime，干净专用QQ入口在runtime，证明在state，独立控制密钥引用在secrets。拒绝越界、Windows设备名/备用数据流、链接/重解析点及端口碰撞（含6185/6099和现有gate/model端口）。控制密钥不能复用OneBot/SSH/B站凭据引用；其32字节内容与运行监听身份由后续阶段核验，本检查不打开秘密文件。默认控制端口5098、采样5秒/TTL15秒、等待180秒，TTL至少为采样的3倍。恢复默认false、QQ重启默认false；标志本身不能证明3/3免扫码或授予动作资格。

@@ -110,6 +110,22 @@ class RuntimeOwner:
         if self.artifact_witness is None:self.artifact_witness=tuple(witness)
         return tuple(witness)==self.artifact_witness
 
+    def component_state(self,component):
+        """NoSuchProcess/reused PID proves old identity gone, never adopts it."""
+        try:
+            record=owner_record(self.root)
+            if record['binding']!=self.binding.fields():return 'unknown'
+            ident=self.binding.node if component=='snowluma' else self.binding.qq
+            expected=self.node_executable if component=='snowluma' else self.qq_executable
+            rows=read_json(self.root,'state/managed-processes.json','state',128*1024)
+            matches=[e for e in rows if e['pid']==ident['pid']]
+            if len(matches)!=1 or matches[0]['component']!=component or round(matches[0]['created']*1000)!=ident['created']:return 'unknown'
+            proc=self.process(ident['pid'])
+            if not proc.is_running() or round(proc.create_time()*1000)!=ident['created']:return 'exited'
+            return 'owned' if Path(proc.exe()).resolve()==expected.resolve() else 'unknown'
+        except psutil.NoSuchProcess:return 'exited'
+        except (ValueError,OSError,KeyError,TypeError,AttributeError,psutil.Error):return 'unknown'
+
     def identity_current(self,binding,*,allow_stop=False):
         try:
             if binding!=self.binding or not allow_stop and stopping(self.root,binding.instance_id):return False
@@ -196,6 +212,17 @@ def reserve_control_sequences(root,binding,count=1,*,lease=None,clock=time.time)
     return tuple(range(seq+1,seq+count+1))
 
 
+def read_control_sequence(root,binding,*,clock=time.time):
+    obj=read_json(root,'state/qq-transport/control-sequence.local.json','state')
+    if (not isinstance(obj,dict) or set(obj)!={'binding','sequence','clock_ms'} or
+        type(obj['sequence']) is not int or not 0<=obj['sequence']<=9007199254740991 or
+        type(obj['clock_ms']) is not int or not 0<=obj['clock_ms']<=round(clock()*1000)):
+        raise ValueError('TRANSPORT_SEQUENCE_UNKNOWN')
+    binding_from_fields(obj['binding'])
+    if obj['binding']!=binding.fields():raise ValueError('TRANSPORT_SEQUENCE_UNKNOWN')
+    return obj
+
+
 def initialize_control_sequence(root,binding,lease,*,clock=time.time):
     require_configuration_lease(root,lease)
     path=Path(root)/'state/qq-transport/control-sequence.local.json';stamp=round(clock()*1000)
@@ -207,6 +234,21 @@ def initialize_control_sequence(root,binding,lease,*,clock=time.time):
         binding_from_fields(obj['binding'])
         if obj['binding']['instance_id']==binding.instance_id:raise ValueError('TRANSPORT_SEQUENCE_UNKNOWN')
     atomic_json(path,dict(binding=binding.fields(),sequence=0,clock_ms=stamp))
+
+
+def replace_control_sequence(root,binding,previous,action_id,ledger,lease,*,clock=time.time):
+    require_configuration_lease(root,lease)
+    ledger.require_action(action_id,previous,lease)
+    obj=read_control_sequence(root,previous,clock=clock)
+    stamp=round(clock()*1000)
+    if (not isinstance(obj,dict) or set(obj)!={'binding','sequence','clock_ms'} or
+        type(obj['sequence']) is not int or not 0<=obj['sequence']<=9007199254740991 or
+        type(obj['clock_ms']) is not int or not 0<=obj['clock_ms']<=stamp):raise ValueError('TRANSPORT_SEQUENCE_UNKNOWN')
+    binding_from_fields(obj['binding'])
+    if (obj['binding']!=previous.fields() or binding.instance_id!=previous.instance_id or
+        binding.transport_epoch==previous.transport_epoch or owner_record(root)['binding']!=binding.fields()):
+        raise ValueError('TRANSPORT_SEQUENCE_UNKNOWN')
+    atomic_json(Path(root)/'state/qq-transport/control-sequence.local.json',dict(binding=binding.fields(),sequence=0,clock_ms=stamp))
 
 
 def startup_unknown(root):
@@ -239,12 +281,40 @@ def verify_ack(content,binding,key,command):
 
 
 class HealthMonitor:
-    def __init__(self,gate,owner,key,*,session=None,sleep=asyncio.sleep):
+    def __init__(self,gate,owner,key,*,session=None,sleep=asyncio.sleep,clock=time.time,proof_clock=time.monotonic):
         self.gate,self.owner,self.key=gate,owner,key
-        self.verifier=HealthVerifier(owner.binding,key,owner.identity_current,ttl=gate.config.transport_health_ttl)
+        self.verifier=HealthVerifier(owner.binding,key,owner.identity_current,ttl=gate.config.transport_health_ttl,clock=proof_clock)
         self.session=session;self.owns_session=session is None;self.task=None;self.sequence=0
         self.sleep=sleep
+        self.clock=clock
+        self.proof_clock=proof_clock
+        self.supervisor=None
         gate.bind_transport_health(self.verifier)
+
+    def health_ready(self):
+        return bool(self.verifier.ready() and self.gate.connected and self.gate.online is True and self.gate.good is True and
+            self.gate.online_at is not None and 0<=self.clock()-self.gate.online_at<self.gate.config.transport_health_ttl)
+
+    async def replace_owner(self,owner,*,deadline=None):
+        if stopping(self.owner.root,self.owner.binding.instance_id) or owner.binding.instance_id!=self.owner.binding.instance_id:
+            raise ValueError('TRANSPORT_STOP_REQUESTED')
+        self.verifier.invalidate();self.owner=owner
+        self.verifier=HealthVerifier(owner.binding,self.key,owner.identity_current,ttl=self.gate.config.transport_health_ttl,clock=self.proof_clock)
+        self.gate.bind_transport_health(self.verifier)
+        deadline=deadline if deadline is not None else self.clock()*1000+self.gate.config.transport_ready_timeout*1000
+        mono_deadline=time.monotonic()+max(0,(deadline-self.clock()*1000)/1000);last=self.clock()
+        while True:
+            now=self.clock();remaining=min((deadline-now*1000)/1000,mono_deadline-time.monotonic())
+            mode=read_json(owner.root,'state/service-mode.json','state')
+            if (now<last or remaining<=0 or stopping(owner.root,owner.binding.instance_id) or
+                mode.get('instance_id')!=owner.binding.instance_id or owner_record(owner.root)['binding']!=owner.binding.fields()):
+                raise ValueError('TRANSPORT_BIND_UNKNOWN')
+            last=now
+            if owner.identity_current(owner.binding):
+                if self.clock()*1000>=deadline or time.monotonic()>=mono_deadline:raise ValueError('TRANSPORT_BIND_UNKNOWN')
+                if await self.command('bind'):return
+                if self.command_sent:raise ValueError('TRANSPORT_BIND_UNKNOWN')
+            await self.sleep(min(self.gate.config.transport_health_poll,remaining))
 
     async def exchange(self,method,path,body=None):
         if self.session is None:self.session=aiohttp.ClientSession(trust_env=False,timeout=aiohttp.ClientTimeout(total=3))
@@ -270,11 +340,13 @@ class HealthMonitor:
 
     async def command(self,action):
         self.sequence_busy=False
+        self.command_sent=False
         try:
             if not self.owner.identity_current(self.owner.binding,allow_stop=action in ('stop','drain')):return False
             if action=='bind' and stopping(self.owner.root,self.owner.binding.instance_id):return False
-            self.sequence=reserve_control_sequences(self.owner.root,self.owner.binding)[0]
-            body=sign_command(self.owner.binding,self.key,action,self.sequence)
+            self.sequence=reserve_control_sequences(self.owner.root,self.owner.binding,clock=self.clock)[0]
+            body=sign_command(self.owner.binding,self.key,action,self.sequence,now=self.clock)
+            self.command_sent=True
             content=await self.exchange('POST','/'+action,body)
             if action!='stop' and not self.owner.identity_current(self.owner.binding):return False
             return verify_ack(content,self.owner.binding,self.key,body)
@@ -292,10 +364,11 @@ class HealthMonitor:
             if await self.command('bind'):bound=True;break
             if not self.sequence_busy or time.monotonic()>=deadline:break
             await getattr(self,'sleep',asyncio.sleep)(self.gate.config.transport_health_poll)
-        if stopping(self.owner.root,self.owner.binding.instance_id) or not bound:
+        if stopping(self.owner.root,self.owner.binding.instance_id) or not bound and self.supervisor is None:
             self.verifier.invalidate();self.gate.channel_ready();return
         while not stopping(self.owner.root,self.owner.binding.instance_id):
             await self.poll_once()
+            if self.supervisor:await self.supervisor.step()
             await getattr(self,'sleep',asyncio.sleep)(self.gate.config.transport_health_poll)
         self.verifier.invalidate();self.gate.channel_ready()
 
@@ -315,16 +388,22 @@ def monitor_from_loaded(gate):
     owner=RuntimeOwner(gate.root,binding,record['node_executable'],record['qq_executable'])
     if not owner.identity_current(binding):raise ValueError('TRANSPORT_OWNER_INVALID')
     key=read_control_key(gate.root,settings,(gate.config.inbound_token,gate.config.upstream_token,gate.admin_token,gate.context_token))
-    return HealthMonitor(gate,owner,key)
+    monitor=HealthMonitor(gate,owner,key)
+    from .transport_supervisor import RecoverySupervisor
+    from .transport_launch import ManagementRecovery
+    monitor.supervisor=RecoverySupervisor(monitor,resolve_transport(settings)['recovery'],ManagementRecovery(gate))
+    gate.transport_supervisor=monitor.supervisor
+    return monitor
 
 
 class StopControl:
     """Prepared under the writer lock; only fixed drain/stop are sent outside it."""
     exchange=HealthMonitor.exchange
 
-    def __init__(self,owner,key,sequences,*,session=None):
+    def __init__(self,owner,key,sequences,*,session=None,clock=time.time):
         self.owner=owner;self.key=key;self.sequences=sequences
         self.session=session;self.owns_session=session is None
+        self.clock=clock
 
     async def run(self):
         results=[]
@@ -332,7 +411,7 @@ class StopControl:
             for action,sequence in zip(('drain','stop'),self.sequences):
                 if not self.owner.registered_identity_current(self.owner.binding,allow_stop=True):
                     results.append('IDENTITY_UNKNOWN');break
-                body=sign_command(self.owner.binding,self.key,action,sequence)
+                body=sign_command(self.owner.binding,self.key,action,sequence,now=self.clock)
                 try:
                     response=await self.exchange('POST','/'+action,body)
                     accepted=verify_ack(response,self.owner.binding,self.key,body)
@@ -346,7 +425,7 @@ class StopControl:
             if self.session and self.owns_session:await self.session.close()
 
 
-def prepare_stop_control(root,mode,lease,*,process=psutil.Process,session=None):
+def prepare_stop_control(root,mode,lease,*,process=psutil.Process,session=None,clock=time.time):
     """Use frozen owner reference, never the edited disk provider/secrets path."""
     require_configuration_lease(root,lease)
     record=owner_record(root)
@@ -357,5 +436,5 @@ def prepare_stop_control(root,mode,lease,*,process=psutil.Process,session=None):
     owner=RuntimeOwner(root,binding,record['node_executable'],record['qq_executable'],process=process)
     if not owner.registered_identity_current(binding,allow_stop=True):raise ValueError('TRANSPORT_OWNER_INVALID')
     key=read_key_reference(root,record['control_secret_file'])
-    sequences=reserve_control_sequences(root,binding,2,lease=lease)
-    return StopControl(owner,key,sequences,session=session)
+    sequences=reserve_control_sequences(root,binding,2,lease=lease,clock=clock)
+    return StopControl(owner,key,sequences,session=session,clock=clock)

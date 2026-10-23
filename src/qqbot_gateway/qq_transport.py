@@ -36,7 +36,7 @@ class Provider:
 
 
 PROVIDERS = {'napcat': Provider('napcat', ('napcat',), False),
-             'snowluma': Provider('snowluma', ('qq_client', 'snowluma', 'transport_watch'), True)}
+             'snowluma': Provider('snowluma', ('qq_client', 'snowluma'), True)}
 
 
 def _mapping(value, keys):

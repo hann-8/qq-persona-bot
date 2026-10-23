@@ -24,6 +24,10 @@ gate拥有单一monitor任务，`processes`只统计真实PID，任务是否运�
 
 manage stop先置marker，在锁内冻结owner/预占drain-stop序列，释放锁后消费签名ACK，再重新锁定核对实例/registry并回收已证明身份。stop-only核验允许snapshot损坏，但仍检查冻结owner、实际PID/创建毫秒/exe和固定listener；该较弱路径不用于健康、bind或channel_ready。marker后的drain/stop可通行，bind始终关闭；ACK未知不重试，未知身份/未确认退出仍保留原有失败语义。
 
-当前`require_runtime`仍明确总拒绝真实Snow启动（`private_runtime_entry_unavailable`），管理器在snapshot/状态/子进程创建前、gate在监听前检查，无配置开关或自填manifest绕过。真实私有入口/原生资格、listener挂接和armed/outbound观测仍未交付；`_wait_snow_owner`只确认身份/监听，不能代替armed/channel_ready。当前writer只完成初始创建，不宣称支持4B的新epoch恢复/跨重启预算。完整Snow生命周期及上游接线仍未真实验证。
+当前`require_runtime`仍明确总拒绝真实Snow启动（`private_runtime_entry_unavailable`），管理器在snapshot/状态/子进程创建前、gate在监听前检查，无配置开关或自填manifest绕过。真实私有入口/原生资格、listener挂接和armed/outbound观测仍未交付；`_wait_snow_owner`只确认身份/监听，不能代替armed/channel_ready。以下4B1虽补齐项目侧新epoch/预算，完整Snow生命周期及上游接线仍未真实验证。
+
+4B1现补齐原创恢复接口及离线闭环：原gate monitor任务消费当前独立健康观测，`RecoverySupervisor`持久记录grace30/drain150/一次动作/ready期限和短断计数，`ManagementRecovery`在原锁下经OwnerWriter替换已确认退出的身份、换epoch及控制seq、重绑verifier；网络等待不持锁，不另开nonce消费者。旧WS代际、材料和输出票撤销，未决ACK保留阻断；模型/cleanup未知、活动发送/历史repair未收敛时不kill。
+
+首次停机准备API为`RecoveryLedger.initialize(lease)`，供后续CLI调用，watch不会自动初始化。prepared哨兵、预算、事故与预占意图分开保存；缺失/坏账/回拨/写失败closed。失败/未知占用额度，watch或bot重启不再执行同一事故；QQ动作同时创建Node，故同时占Snow与QQ资源预算，24h Node最多2、QQ最多1，间隔至少1800秒。新Node可在本次ready期限内异步等待监听，只有尚未发出的bind可等待重试，ACK未知不重发。旧seq严格坏账不能借新epoch洗成0。生产仍因私有资格总拒；QQ另有固定3/3未证拒绝，配置true不放行，完整演练仅用测试依赖注入。
 
 测试：`node --test adapters/snowluma/project_policy.test.mjs`。本机Node24.22.0仅执行这些原创无依赖测试，不满足Snow实际运行引擎，不作为其构建/运行通过证据。

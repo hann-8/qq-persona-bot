@@ -2,6 +2,12 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md)。继承AGENTS。
 
+**当前4B1：持久预算/事故监督、原锁writer恢复与新epoch栅栏已实现/离线通过，待根审，未部署。** [4B1报告](../../../../reports/lap-40-stage4B1-2026-10-24.md)：29恢复用例，最终163核心组合、92框架/回归组合、9 JS通过（组合有重叠，不合算独立数量）。根预审四点已修：late drain True不越150s、新Node监听在ready期限内异步等且一次bind、旧seq坏账不洗、psutil权限异常持久operator。QQ动作同时占Node/QQ预算，生产资格总拒，4B2 CLI/采样未做；只等待根审。
+
+4B1文件归属实作：`src/qqbot_gateway/{transport_supervisor,transport_owner,transport_launch,onebot_gate,qq_transport}.py`、`tests/test_transport_recovery.py`、adapters/snowluma与config局部README、本HANDOFF/4B1报告。未改3共享入口/PLAN/GUIDE；未动原运行态/local/persona。预算首次停机初始化API已提供但watch不补空账，CLI留4B2。Git提交/远端一致和剩余配额在本阶段出口核对。
+
+4B1实际领取：`LAP-40-medium-stage4B1-recovery`，基线`1d5dafa38cdf15e9a57146544e551578da5d1cfa`、干净，已重读PLAN7/9/10、GUIDE阶段4与登记，usage used38/remaining62%。精确归属新增`transport_supervisor.py`/恢复测试、必要`transport_owner.py`/`transport_launch.py`/`manage.py`/`onebot_gate.py`，局部README、本HANDOFF及4B1报告；另定向修正`qq_transport.py` provider物理组件描述中遗留虚构watch名称及其测试。根3入口和PLAN/GUIDE不写。只预算/事故/唯一writer恢复与实际gate栅栏fake闭环，不做4B2 CLI/采样、不触原运行态。
+
 4A根审环境小修领取：仅`scripts/manage.py`、`tests/test_transport_lifecycle.py`、`adapters/snowluma/README.md`、4A续作报告与本HANDOFF；补Snow专用子进程环境封闭及实际fake创建验证，基线716dd47，usage used33/remaining67%。PLAN/GUIDE根端改动继续保留，不进4B。
 
 环境小修已实现/41受影响离线通过：QQ/Node专用副本清除全部继承SNOWLUMA_*、NODE_OPTIONS/NODE_PATH（大小写无关），固定HOOK_AUTOLOAD/TELEMETRY均0；实际fake管理创建带恶意继承/预加载值验证两组件，无key且源环境不变，framework/NapCat旧环境保持。待根审，不推进4B；未修改全局或真实运行态。

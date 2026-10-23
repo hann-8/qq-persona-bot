@@ -4,6 +4,10 @@ The production qualification function currently rejects every Snow launch. These
 specs describe our future private entry's CLI, not the upstream QQ/native loader.
 """
 from dataclasses import dataclass
+from contextlib import closing
+import asyncio
+import os
+import sqlite3
 from pathlib import Path
 import math
 import re
@@ -11,7 +15,7 @@ import time
 
 import psutil
 
-from .config import require_configuration_lease
+from .config import require_configuration_lease, configuration_lock
 from .config_files import canonical, sha, load_consumer, snapshot_environment
 from .lifecycle import atomic_json, stopping
 from .qq_transport import checked_path, resolve_transport, validate_static_proof
@@ -114,7 +118,7 @@ class OwnerWriter:
             atomic_json(intent_path,intent|dict(status='unknown'))
             raise
 
-    def register(self,settings,metadata,snapshot,layout,epoch):
+    def register(self,settings,metadata,snapshot,layout,epoch,*,replacement=None):
         self._held()
         if set(self.created)!={'qq_client','snowluma'}:raise ValueError('TRANSPORT_OWNER_INCOMPLETE')
         specs=snow_specs(self.root,settings,snapshot,metadata,layout)
@@ -129,6 +133,10 @@ class OwnerWriter:
             proof['private_build']['build_sha256'],node['pid'],round(node['created']*1000),qq['pid'],round(qq['created']*1000),cfg['control_port'])
         record=dict(format='qqbot-transport-owner-v2',binding=binding.fields(),node_executable=layout.node_executable,
             qq_executable=cfg['qq_executable'],control_secret_file=cfg['control_secret_file'])
+        if replacement:
+            previous,action_id,ledger=replacement
+            ledger.require_action(action_id,previous,self.lease)
+            if read_json(self.root,'state/qq-transport/runtime.local.json','state')['binding']!=previous.fields():raise ValueError('TRANSPORT_OWNER_INVALID')
         # Check actual hashes/process identities through the same consumer after write.
         path=self.root/'state/qq-transport/runtime.local.json';atomic_json(path,record)
         from .transport_owner import RuntimeOwner
@@ -136,5 +144,146 @@ class OwnerWriter:
         if not owner.artifacts_current(settings) or not owner.registered_identity_current(binding,require_listener=False):
             raise ValueError('TRANSPORT_OWNER_INVALID')
         from .transport_owner import initialize_control_sequence
-        initialize_control_sequence(self.root,binding,self.lease,clock=self.clock)
+        if replacement:
+            from .transport_owner import replace_control_sequence
+            replace_control_sequence(self.root,binding,previous,action_id,ledger,self.lease,clock=self.clock)
+        else:initialize_control_sequence(self.root,binding,self.lease,clock=self.clock)
         return owner
+
+
+class ManagementRecovery:
+    """Automatic actions use the same manager writer and short OS-lock scopes."""
+    def __init__(self,gate,*,qualify=None,qualify_qq=None,launch=None,process=psutil.Process,
+                 clock=time.time,sleep=asyncio.sleep,drain_check=None,control=None):
+        from .transport_owner import require_runtime
+        self.gate=gate;self.root=gate.root;self.qualify=qualify or require_runtime
+        self.qualify_qq=qualify_qq or self._qq_unavailable;self.launch=launch;self.process=process
+        self.clock=clock;self.sleep=sleep;self.drain_check=drain_check;self.control=control
+
+    @staticmethod
+    def _qq_unavailable(*args):raise ValueError('QQ_3_OF_3_UNVERIFIED')
+
+    def current(self,owner):
+        mode=read_json(self.root,'state/service-mode.json','state')
+        if stopping(self.root,owner.binding.instance_id) or mode.get('instance_id')!=owner.binding.instance_id:
+            raise ValueError('TRANSPORT_STOP_REQUESTED')
+        return mode
+
+    async def drain(self,monitor):
+        if self.drain_check:return await self.drain_check(monitor)
+        self.current(monitor.owner)
+        if self.gate.transport_pending or self.gate.admin_pending or self.gate.admin_busy:return False
+        from .cleanup_identity import CleanupOwner
+        if CleanupOwner(self.root).status().get('blocked') is not False:return None
+        path=Path(self.root)/'state/tasks.sqlite'
+        if path.exists():
+            try:
+                with closing(sqlite3.connect(path.resolve().as_uri()+'?mode=ro',uri=True,timeout=1)) as db:
+                    if db.execute("SELECT count(*) FROM tasks WHERE status NOT IN ('completed','failed','cancelled')").fetchone()[0]:return False
+                    if db.execute("SELECT count(*) FROM delivery WHERE state NOT IN ('sent','failed') OR repair IN ('pending','history_repair_required')").fetchone()[0]:return False
+            except sqlite3.Error:return None
+        mode=self.current(monitor.owner)
+        if mode.get('mode')=='channel_only':return True
+        # Inspect only registered model PIDs/listeners, never a global scan.
+        rows=read_json(self.root,'state/managed-processes.json','state',128*1024)
+        owned=None
+        for row in rows:
+            if row['component']!='model':continue
+            try:
+                proc=self.process(row['pid'])
+                if not proc.is_running() or round(proc.create_time()*1000)!=round(row['created']*1000):continue
+                if any(c.status==psutil.CONN_LISTEN and c.laddr and c.laddr.ip=='127.0.0.1' and c.laddr.port==8765 for c in proc.net_connections(kind='tcp')):owned=row
+            except psutil.Error:return None
+        if not owned:return None
+        import aiohttp
+        from .transport_health import strict_json
+        try:
+            async with aiohttp.ClientSession(trust_env=False,timeout=aiohttp.ClientTimeout(total=1)) as session:
+                async with session.get('http://127.0.0.1:8765/health',allow_redirects=False) as response:
+                    if response.status!=200:return None
+                    content=await response.content.read(16385)
+                    obj=strict_json(content,16384)
+            if not isinstance(obj,dict):return None
+            cleanup=obj.get('cli_cleanup',{})
+            if obj.get('alive') is not True or obj.get('remote_result_unknown') is not False:return None
+            if type(obj.get('active')) is not bool or type(obj.get('queue')) is not int or not 0<=obj['queue']<=10000:return None
+            if obj['active'] or obj['queue']!=0:return False
+            if obj.get('backend')=='codebuddy_cli' and (not isinstance(cleanup,dict) or cleanup.get('blocked') is not False or cleanup.get('coverage')!='job_complete' or cleanup.get('cleanup_outcome')!='observed_empty'):return None
+            if obj.get('backend') not in ('codebuddy_cli','ollama_ssh'):return None
+            proc=self.process(owned['pid'])
+            if not proc.is_running() or round(proc.create_time()*1000)!=round(owned['created']*1000):return None
+            if not any(c.status==psutil.CONN_LISTEN and c.laddr and c.laddr.ip=='127.0.0.1' and c.laddr.port==8765 for c in proc.net_connections(kind='tcp')):return None
+            self.current(monitor.owner);return True
+        except (ValueError,OSError,TimeoutError,aiohttp.ClientError,psutil.Error):return None
+
+    def choose(self,monitor,cfg):
+        owner=monitor.owner;qq=owner.component_state('qq_client');node=owner.component_state('snowluma')
+        if qq=='exited':return 'qq' if cfg['allow_qq_restart'] else None
+        if qq!='owned' or node=='unknown':return None
+        if node=='exited':return 'snowluma'
+        obs=monitor.verifier.observation if monitor.verifier.trusted else None
+        if not obs:return None
+        stalled=obs['rx_watch_armed'] and (not obs['receive_healthy'] or obs['last_rx_age_ms']>105000)
+        if stalled and cfg['allow_qq_restart']:return 'qq'
+        if stalled or not obs['pipe_connected']:return 'snowluma'
+        if (obs['rx_watch_armed'] and obs['receive_healthy'] and obs['outbound_healthy'] and
+            obs['account_match'] and obs['logged_in'] and
+            (not self.gate.connected or self.gate.online is False or self.gate.good is False)):return 'snowluma'
+        return None
+
+    async def execute(self,monitor,kind,action_id,ledger,deadline):
+        from .transport_owner import loaded_settings, prepare_stop_control, read_control_sequence
+        owner=monitor.owner
+        def current():
+            value=self.current(owner)
+            if self.clock()*1000>=deadline:raise ValueError('TRANSPORT_READY_TIMEOUT')
+            return value
+        mode=current();settings=loaded_settings(self.root,mode)
+        layout=self.qualify(self.root,settings)  # production still always closed
+        if kind=='qq':self.qualify_qq(self.root,owner)
+        if not isinstance(layout,PrivateLayout):raise ValueError('TRANSPORT_LAYOUT_UNAVAILABLE')
+        if not owner.artifacts_current(settings):raise ValueError('TRANSPORT_OWNER_INVALID')
+        node=owner.component_state('snowluma');qq=owner.component_state('qq_client')
+        if node=='unknown' or qq not in (('owned','exited') if kind=='qq' else ('owned',)):raise ValueError('TRANSPORT_OWNER_INVALID')
+        with configuration_lock(self.root) as lease:
+            current();ledger.require_action(action_id,owner.binding,lease)
+            read_control_sequence(self.root,owner.binding,clock=self.clock)
+            control=prepare_stop_control(self.root,mode,lease,process=self.process,clock=self.clock) if node=='owned' else None
+        if control:
+            if self.control:result=await self.control(control)
+            else:result=await control.run()
+            if result!='ACKED':raise ValueError('TRANSPORT_DRAIN_UNKNOWN')
+        if await self.drain(monitor) is not True:raise ValueError('TRANSPORT_DRAIN_UNKNOWN')
+        targets=('snowluma','qq_client') if kind=='qq' else ('snowluma',)
+        for component in targets:
+            with configuration_lock(self.root) as lease:
+                current();ledger.require_action(action_id,owner.binding,lease)
+                state=owner.component_state(component)
+                if state=='unknown':raise ValueError('TRANSPORT_OWNER_INVALID')
+                if state=='owned':
+                    ident=owner.binding.node if component=='snowluma' else owner.binding.qq
+                    self.process(ident['pid']).terminate()
+            while owner.component_state(component)!='exited':
+                current()
+                if self.clock()*1000>=deadline:raise ValueError('TRANSPORT_EXIT_UNKNOWN')
+                await self.sleep(.1)
+        with configuration_lock(self.root) as lease:
+            current();ledger.require_action(action_id,owner.binding,lease)
+            rows=read_json(self.root,'state/managed-processes.json','state',128*1024)
+            removed={owner.binding.node_pid}|({owner.binding.qq_pid} if kind=='qq' else set())
+            if any(owner.component_state(c)!='exited' for c in targets):raise ValueError('TRANSPORT_EXIT_UNKNOWN')
+            atomic_json(Path(self.root)/'state/managed-processes.json',[r for r in rows if r['pid'] not in removed])
+            writer=OwnerWriter(self.root,lease,owner.binding.instance_id,process=self.process,clock=self.clock)
+            if kind=='snowluma':writer.created['qq_client']=next(r for r in rows if r['pid']==owner.binding.qq_pid)
+            snapshot=Path(self.root)/'state/config-runtime'/owner.binding.instance_id/'settings.yaml'
+            specs=snow_specs(self.root,settings,snapshot,mode['configuration'],layout)
+            from scripts.manage import _launch_snow_component, _snow_environment
+            from .napcat_login import child_environment
+            env=child_environment(os.environ);env.update(snapshot_environment(self.root,snapshot,mode['configuration']))
+            env.update(PYTHONPATH=str(Path(self.root)/'src'),PYTHONUTF8='1');env=_snow_environment(env)
+            for spec in specs:
+                if spec.component not in targets:continue
+                current();ledger.require_action(action_id,owner.binding,lease)
+                writer.create(spec,lambda item:(self.launch or _launch_snow_component)(item,env))
+            epoch=__import__('secrets').token_hex(32)
+            return writer.register(settings,mode['configuration'],snapshot,layout,epoch,replacement=(owner.binding,action_id,ledger))
