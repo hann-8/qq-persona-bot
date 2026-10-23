@@ -26,6 +26,12 @@ session `LAP-40-SnowLuma-trial-plan`，2026-10-24 01:19（Asia/Shanghai）开始
 
 阶段1登记：`LAP-40-medium-stage1-config`，开始02:03，待根agent调用gpt-6.1-sol/medium。归属qq_transport/provider、config.py/config_files.py/config_comments.py/必要布局操作、scripts/transport.py只读inspect、模板/配置说明、对应测试及本任务交接/报告。共享3入口只由根agent写。完成后交根agent审阅，不自行越级启动真实阶段。
 
+## 2026-10-24 02:15 根agent阶段1复核/阶段2登记
+
+阶段1内容提交`cec6c2a`及测试LF修正`6ee3d0c72c4bd8d504734fd28dfb7f2e3b71c0eb`已推送origin/codex/lap-40-snowluma-impl，根agent再次ls-remote核对完整SHA一致；11文件，worktree干净。审阅实际配置/loader/注释/inspect/proof/测试差异及[报告](../../../../reports/lap-40-stage1-2026-10-24.md)，旧对象/语义/快照字节摘要对照、83离线通过、0skip、真实junction拒绝与只读/脱敏覆盖；控制端口6185和CLI --json两项预审问题已修复。git diff 6556b24..HEAD --check通过。没有真实部署/服务/模型/群，未清除旧差额。
+
+阶段2登记`LAP-40-medium-stage2-policy-health`，02:15，仍由同一gpt-6.1-sol/medium子代理串行执行。归属原创adapters/snowluma策略、transport_health.py、onebot_gate.py与必要GateConfig/router接线、对应JS/单元/框架替身测试及40交接/报告；根agent独占3共享入口。额外审阅点：Snow router mirror须独立在health TTL内到期，不能沿用原45秒；健康/控制帧可继续观测以避免启动死锁，用户入站/上下文/输出才关闭；NapCat原路径兼容。
+
 阶段1实际领取：2026-10-24 02:05（Asia/Shanghai），session `LAP-40-medium-stage1-config`；已读规定入口/计划与codex-handoff，隔离分支HEAD `6556b24c5102e3bac21b6197a39902ae0c4a7334`、工作区干净。300分钟used=8%，remaining=92%。本阶段独占`src/qqbot_gateway/qq_transport.py`、`config.py`、`config_files.py`、`config_comments.py`、`scripts/transport.py`、`config/settings.example.yaml`、`config/examples/runtime.yaml`、`config/README.md`、`tests/test_qq_transport.py`及本HANDOFF/`reports/lap-40-stage1-2026-10-24.md`。按既定计划完成配置/provider/只读静态证据，成功标准是精确旧摘要兼容与自造离线边界通过；不触运行checkout、local/secrets/persona、不实现阶段2健康或恢复。
 
 阶段1交接（2026-10-24 02:12）：上述11归属文件完成；15新增/14配置/30分层/6注释/18菜单共83通过，0跳过，diff --check通过。缺节schema1/2/3精确语义摘要和旧snapshot raw摘要保持，经过实际load_consumer/迁移验证；NT junction、非法/碰撞/独立秘密引用、严格proof/摘要绑定/变动失效、inspect只读与--json均有自造证据。inspect永不放行实时ready/G0/G1；原包/干净QQ/原生数据/私有接线未验，原运行目录/配置/进程全未触及。提交前额度used20/remaining80%。根agent复核本阶段diff及报告，再按指引串行派阶段2；本session停在阶段1，不自行推进。Git提交/远端一致性待本阶段出口精确回报并由根agent同步共享入口。
