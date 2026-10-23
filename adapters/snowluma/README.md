@@ -2,6 +2,8 @@
 
 这些文件是本项目原创合同与自造测试，不含上游修改源码/patch/native。阶段2只完成接口，尚未在固定上游v2.1.1接线，不能称Snow适配或真实部署通过。阶段3须在忽略runtime中按PLAN核对最早分支、所有store/logger/补史/内置答复及原生保护，缺证据保持阻断。
 
+阶段3已完成[固定版私有接线清单](../../tracks/laptop-workbuddy/tasks/LAP-40/PRIVATE_WIRING_CHECKLIST.md)的只读核对；指定原包/干净QQ/proof缺失，普通core构建也复制native，未准备私有改版或运行上游构建/合成测试。清单是后续具体待办，不能当接线通过。阶段4原创生命周期/健康owner/CLI离线部分可独立继续，真实启用仍须硬拒绝。
+
 `createProjectPolicy`要求已核对的受管实例/代际及实时`identityCurrent`回调，只有授权group新事件、匹配账号、非self/黑名单、合法ID与有界message通过。私有适配必须在任何转换/store/logger/history/model回调前调用`admitEnvelope/processEnvelope`，拒绝事件不会进入convert、metadata或forward回调。唯一forward只收到净化后的当前事件；引用只保留ID，当前image仅限长最小元数据，其余媒体/转发占位，无原始昵称/正文日志、内置#sl答复、文件写入或回拉API。`allowsRpc`是内部同样必须遵循的动作白名单，不能以其代替gate的参数、身份与最终发送许可校验。
 
 `admitEnvelope`不需要message数组，只核验原生身份信封；`processEnvelope`先准入，再调用convert，再限长sanitize/forward。time保留正整数Unix秒；image只透传当前事件限长file/url元数据给既有gate校验，不缓存/下载；非法at丢弃，合法all可保留。

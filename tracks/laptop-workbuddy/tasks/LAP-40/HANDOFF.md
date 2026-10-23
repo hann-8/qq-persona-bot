@@ -2,7 +2,7 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md)。继承AGENTS。
 
-状态：详细[PLAN](PLAN.md)与[分阶段实施指引](IMPLEMENTATION_GUIDE.md)已完成；阶段1配置/provider/只读静态检查已实现、83项离线测试通过并经根agent复核；阶段2项目侧原创策略/独立健康与实际gate/router栅栏已实现、离线通过，待根agent复核。尚未部署或切换，真实/G0/G1/上游私有接线/长稳未验。详见[阶段1报告](../../../../reports/lap-40-stage1-2026-10-24.md) / [阶段2报告](../../../../reports/lap-40-stage2-2026-10-24.md)。用户要求SnowLuma替换试运行，长期运行优先，允许branch；随后授权根agent逐步调用`gpt-6.1-sol / medium`实施复核。规划阶段仅只读源码/元数据与6份文档，0代码/配置/安装/依赖/注入/启停/登录/模型/群/SSH操作。
+状态：详细[PLAN](PLAN.md)与[分阶段实施指引](IMPLEMENTATION_GUIDE.md)已完成；阶段1/2项目侧实现与离线验证均经根agent复核。阶段3固定源码/指定材料只读核对与[私有接线清单](PRIVATE_WIRING_CHECKLIST.md)完成，原包/干净QQ/proof缺失且标准core构建复制native，未准备私有改版/构建/上游合成验证；待根agent复核后独立4A/4B。尚未部署或切换，真实/G0/G1/上游私有接线/长稳未验。详见[阶段1报告](../../../../reports/lap-40-stage1-2026-10-24.md) / [阶段2报告](../../../../reports/lap-40-stage2-2026-10-24.md) / [阶段3报告](../../../../reports/lap-40-stage3-2026-10-24.md)。用户要求SnowLuma替换试运行，长期运行优先，允许branch；随后授权根agent逐步调用`gpt-6.1-sol / medium`实施复核。规划阶段仅只读源码/元数据与6份文档，0代码/配置/安装/依赖/注入/启停/登录/模型/群/SSH操作。
 
 session `LAP-40-SnowLuma-trial-plan`，2026-10-24 01:19（Asia/Shanghai）开始；基线main/66eea49623b76766e0569614207c80c78e57115f，工作区干净。已按用户授权新建`codex/lap-40-snowluma-trial`；本轮仅该分支规划，保留main和原运行状态，不声称自动检测或切换会话模型/档位。
 
@@ -39,6 +39,12 @@ session `LAP-40-SnowLuma-trial-plan`，2026-10-24 01:19（Asia/Shanghai）开始
 阶段2登记`LAP-40-medium-stage2-policy-health`，02:15，仍由同一gpt-6.1-sol/medium子代理串行执行。归属原创adapters/snowluma策略、transport_health.py、onebot_gate.py与必要GateConfig/router接线、对应JS/单元/框架替身测试及40交接/报告；根agent独占3共享入口。额外审阅点：Snow router mirror须独立在配置health TTL内到期（默认15秒，支持15..30），不能沿用原45秒；健康/控制帧可继续观测以避免启动死锁，用户入站/上下文/输出才关闭；NapCat原路径兼容。
 
 ## 2026-10-24 02:45 根agent阶段2复核/阶段3登记
+
+阶段3实际领取：2026-10-24 02:46（Asia/Shanghai），session `LAP-40-medium-stage3-private-preflight`；基线`6c71bf72064b457ef409ec48058e7de5ed63c4ea`、worktree干净，已重读本交接/PLAN3、4、9与GUIDE阶段3。额度used57/remaining43%。本阶段归属`PRIVATE_WIRING_CHECKLIST.md`、`reports/lap-40-stage3-2026-10-24.md`、`adapters/snowluma/README.md`的接线清单链接及本HANDOFF；无代码改动预定，如需小修先另登记。指定两checkout的官方包根/QQ入口/proof/private根只读exists均false，未扫描其他位置。仅固定提交官方源码定点核对；不准备无原包/合格环境可验证的上游改版，不建伪manifest，不绕保护、不部署原生、不启停/登录/模型/群/SSH。根3入口不写。
+
+阶段3交接（2026-10-24 02:54）：四份归属Markdown完成；固定提交30份源码资源定点只读，八项指定路径exists=false、Node24.22.0、忽略规则与实际自造配置inspect保持channel_ready=false。清单15项列最早protocol副作用/日志、原生信封字段、#sl/补史/所有store/RAM/RKey fallback、扫描/额外网络、armed/outbound/控制面、native构建与保护/数据范围的固定源码位置、现有接口、未完成及具体待验。标准core build也复制native，未运行；本轮0私有改版/构建/上游测试/部署，不把清单称接线通过。缺口保留但不阻塞下一阶段4A/4B独立原创离线部分。未动原bot/配置/数据/凭据；本session只收尾3，待根agent复核再派4。
+
+阶段3提交前used69/remaining31%；4文档23相对链接/围栏及diff --check通过。Git仅四份原创Markdown，精确SHA及远端一致由本阶段出口回报根agent同步共享台账。
 
 阶段2提交`8f58b2e353cf64886262faf661231bbb039f5626`已推送origin/codex/lap-40-snowluma-impl，根agent再核对远端完整SHA一致，worktree干净；12文件，整阶段diff --check通过。审阅最终策略/健康、gate所有准入和上下文异步结果/代际检查、router mirror/原event、实际框架与跨语言测试和[阶段报告](../../../../reports/lap-40-stage2-2026-10-24.md)。20健康/gate、17实际框架（13是gate复跑）、6JS及161旧回归均通过，未将复跑算不同场景。已处理时间/sender/image兼容、非法at、envelope转换前拒绝、可配TTL15..30、deadline取代10Hz轮询、迟到proof不掩盖旧代际、socket调度后复查/unknown。项目侧阶段2通过；没有上游私有适配/实际监听/真实QQ证明。提交前额度remaining46%。
 
