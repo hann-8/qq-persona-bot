@@ -36,7 +36,13 @@ session `LAP-40-SnowLuma-trial-plan`，2026-10-24 01:19（Asia/Shanghai）开始
 
 阶段1内容提交`cec6c2a`及测试LF修正`6ee3d0c72c4bd8d504734fd28dfb7f2e3b71c0eb`已推送origin/codex/lap-40-snowluma-impl，根agent再次ls-remote核对完整SHA一致；11文件，worktree干净。审阅实际配置/loader/注释/inspect/proof/测试差异及[报告](../../../../reports/lap-40-stage1-2026-10-24.md)，旧对象/语义/快照字节摘要对照、83离线通过、0skip、真实junction拒绝与只读/脱敏覆盖；控制端口6185和CLI --json两项预审问题已修复。git diff 6556b24..HEAD --check通过。没有真实部署/服务/模型/群，未清除旧差额。
 
-阶段2登记`LAP-40-medium-stage2-policy-health`，02:15，仍由同一gpt-6.1-sol/medium子代理串行执行。归属原创adapters/snowluma策略、transport_health.py、onebot_gate.py与必要GateConfig/router接线、对应JS/单元/框架替身测试及40交接/报告；根agent独占3共享入口。额外审阅点：Snow router mirror须独立在health TTL内到期，不能沿用原45秒；健康/控制帧可继续观测以避免启动死锁，用户入站/上下文/输出才关闭；NapCat原路径兼容。
+阶段2登记`LAP-40-medium-stage2-policy-health`，02:15，仍由同一gpt-6.1-sol/medium子代理串行执行。归属原创adapters/snowluma策略、transport_health.py、onebot_gate.py与必要GateConfig/router接线、对应JS/单元/框架替身测试及40交接/报告；根agent独占3共享入口。额外审阅点：Snow router mirror须独立在配置health TTL内到期（默认15秒，支持15..30），不能沿用原45秒；健康/控制帧可继续观测以避免启动死锁，用户入站/上下文/输出才关闭；NapCat原路径兼容。
+
+## 2026-10-24 02:45 根agent阶段2复核/阶段3登记
+
+阶段2提交`8f58b2e353cf64886262faf661231bbb039f5626`已推送origin/codex/lap-40-snowluma-impl，根agent再核对远端完整SHA一致，worktree干净；12文件，整阶段diff --check通过。审阅最终策略/健康、gate所有准入和上下文异步结果/代际检查、router mirror/原event、实际框架与跨语言测试和[阶段报告](../../../../reports/lap-40-stage2-2026-10-24.md)。20健康/gate、17实际框架（13是gate复跑）、6JS及161旧回归均通过，未将复跑算不同场景。已处理时间/sender/image兼容、非法at、envelope转换前拒绝、可配TTL15..30、deadline取代10Hz轮询、迟到proof不掩盖旧代际、socket调度后复查/unknown。项目侧阶段2通过；没有上游私有适配/实际监听/真实QQ证明。提交前额度remaining46%。
+
+阶段3登记`LAP-40-medium-stage3-private-preflight`，02:45，仍由sol medium执行。范围只读指定项目材料/固定上游接线与私有构建前置，允许的私有源码/JS仅在忽略区、原创核对说明和40报告/交接；禁止公开上游修改源/patch/bundle/native和自动原生部署。已有39/40证据复用，不重跑泛化版本调查。缺原包/合格运行时/数据范围或保护证明时明确未通过，继续独立阶段4，不空等操作者、不动原bot。
 
 阶段1实际领取：2026-10-24 02:05（Asia/Shanghai），session `LAP-40-medium-stage1-config`；已读规定入口/计划与codex-handoff，隔离分支HEAD `6556b24c5102e3bac21b6197a39902ae0c4a7334`、工作区干净。300分钟used=8%，remaining=92%。本阶段独占`src/qqbot_gateway/qq_transport.py`、`config.py`、`config_files.py`、`config_comments.py`、`scripts/transport.py`、`config/settings.example.yaml`、`config/examples/runtime.yaml`、`config/README.md`、`tests/test_qq_transport.py`及本HANDOFF/`reports/lap-40-stage1-2026-10-24.md`。按既定计划完成配置/provider/只读静态证据，成功标准是精确旧摘要兼容与自造离线边界通过；不触运行checkout、local/secrets/persona、不实现阶段2健康或恢复。
 

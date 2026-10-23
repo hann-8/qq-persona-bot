@@ -1,4 +1,4 @@
-2026-10-24 02:15：[LAP-40](tasks/LAP-40/HANDOFF.md)阶段1实现/离线83通过/0skip，根agent复核通过，内容6ee3d0c已推送核对；[报告](../../reports/lap-40-stage1-2026-10-24.md)。隔离分支继续登记阶段2 `LAP-40-medium-stage2-policy-health`，范围原创策略/独立健康/实际gate-router；根agent独占3入口。原运行态未动，真实许可/QQ数据/私有接线及72h/7天未验；额度阈值与旧差额保留。 [PLAN](tasks/LAP-40/PLAN.md) / [指引](tasks/LAP-40/IMPLEMENTATION_GUIDE.md)。
+2026-10-24 02:45：[LAP-40](tasks/LAP-40/HANDOFF.md)阶段2项目策略/健康/gate-router实现离线通过、根审通过，8f58b2e已推送核对；[报告](../../reports/lap-40-stage2-2026-10-24.md)。20健康/gate、17框架（13重叠）、6JS+161旧回归通过；阶段1另83通过。登记阶段3 `LAP-40-medium-stage3-private-preflight`，固定上游私有接线/构建前置核对后继续可独立阶段4。原运行态未动，真实许可/QQ数据/上游接线/监听及72h/7天未验；额度阈值与旧差额保留。
 
 2026-10-24：用户明确以长期运行为首要标准；[LAP-39 SnowLuma评估](tasks/LAP-39/SNOWLUMA_ASSESSMENT.md)已完成，仅静态证据。v2.1.1有接收good/管道恢复，但原版gate前答复、补历史/存储及项目QQ归属尚需解决；现项目只读online/硬编码NapCat，不能原样切换。先详细规划，再72h/7天验收；6文档，0安装/注入/启停/登录/配置/模型/群/SSH，不重新探活，旧现场只作历史。[39交接](tasks/LAP-39/HANDOFF.md)。
 
