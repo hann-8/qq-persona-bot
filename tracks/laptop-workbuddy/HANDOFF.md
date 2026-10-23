@@ -1,4 +1,4 @@
-2026-10-23 18:46（Asia/Shanghai）：LAP-39夜间不回复只读诊断进行中，session `LAP-39-overnight-no-reply-diagnostics`。06:57仍生成成功、此后无授权群准入记录；当前项目QQ在线/账号匹配、组件存活、cleanup未阻断。历史掉线日志缺失，08:30根因未确认；0代码/配置/启停/QQ登录/模型/群发，保留现场。见[39交接](tasks/LAP-39/HANDOFF.md)。
+2026-10-23 19:26起（Asia/Shanghai）：LAP-39诊断续查，用户澄清仅登录NapCat管理页、未重新登录QQ；早上授权群真实@。当前QQ在线，06:57后无准入；QQ掉线/历史根因未证实。5条合成日志复现过滤缺口，等待用户手工@并只读观察；未改代码/配置、未启停/QQ登录/自行调用模型或群发。session与证据见[39交接](tasks/LAP-39/HANDOFF.md)。
 
 2026-10-23：LAP-18阶段C已实现/离线通过，session `LAP-18-C-body-selection-diagnostics`（00:01:00领取）。语义主体/代码表格、coverage默认及question相关整段、封闭PUBLIC_MATERIAL/default inspect交付；290单元/28组合346框架/20组合460关闭兼容、末次39专项通过。0真实公共取样/模型/QQ/SSH/启停/登录，本机配置/人设未改；搜索false。38部分公网成功且仍超时为历史，原页真实质量/旧差额保留，不自动28R/微信。 [18交接](tasks/LAP-18/HANDOFF.md)。
 
