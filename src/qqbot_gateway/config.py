@@ -108,8 +108,19 @@ class GateConfig:
     silence_aliases: tuple = ('肥鱼','大肥鱼','鱼鱼','鲸鱼娘','小鲸鱼','DSH')
     session_queue_timeout_seconds: int = 600
     message_max_chars: int = 2000
+    transport_provider: str = 'napcat'
+    transport_instance_id: str = ''
+    transport_config_digest: str = ''
+    transport_control_port: int = 5098
+    transport_health_ttl: int = 15
+    transport_health_poll: int = 5
 
     def __post_init__(self):
+        if self.transport_provider not in ('napcat','snowluma'):raise ValueError('Invalid transport provider')
+        if (type(self.transport_health_poll) is not int or not 5<=self.transport_health_poll<=10 or
+            type(self.transport_health_ttl) is not int or not 3*self.transport_health_poll<=self.transport_health_ttl<=30 or
+            type(self.transport_control_port) is not int or not 1<=self.transport_control_port<=65535):
+            raise ValueError('Invalid transport health configuration')
         if type(self.silence_enabled) is not bool:raise ValueError('Invalid silence enabled')
         if self.participation_mode not in ('mentions','free'):raise ValueError('Invalid participation mode')
         if not qq_id(self.bot_qq) or not self.allowed_groups or not self.admin_users:
@@ -316,6 +327,9 @@ def load_gate_config(path=None, *, root=None, settings=None):
         raise ValueError('Groups/admins must be explicit lists')
     from .meme_catalog import MemeCatalog
     from .members import suspend_unverified
+    from .qq_transport import resolve_transport
+    from .config_files import canonical, sha
+    transport = resolve_transport(data)
     return GateConfig(
         bot_qq=data['bot']['qq'], allowed_groups=frozenset(groups), admin_users=frozenset(admins),
         inbound_token=tokens['onebot_inbound'], upstream_token=tokens['onebot_upstream'],
@@ -334,6 +348,9 @@ def load_gate_config(path=None, *, root=None, settings=None):
         public_network=data['public_network'],
         attention_enabled=data['participation']['mode']=='free' and data['participation']['attention']['enabled'],
         media_catalog=MemeCatalog(root,data['memes']) if data['memes']['enabled'] else None,
+        transport_provider=transport['provider'], transport_instance_id=os.environ.get('QQBOT_INSTANCE_ID',''),
+        transport_config_digest=sha(canonical(data)), transport_control_port=transport['snowluma']['control_port'],
+        transport_health_ttl=transport['snowluma']['health_ttl_seconds'], transport_health_poll=transport['snowluma']['health_poll_seconds'],
     )
 
 

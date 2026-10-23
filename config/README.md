@@ -111,7 +111,7 @@ LAP-18B补充：`features.yaml`新增`public_network`（resolver=system、ca_bun
 
 `runtime.yaml`可选增加`qq_transport`，旧单文件也识别同名根节。缺少此节时仍为NapCat；消费层解析默认值，不向旧规范化对象或实例快照回填字段，因此旧schema1/2/3的语义摘要不变。只有实际存在的节参与校验；旧`legacy_extensions.qq_transport`会报冲突，须人工审阅。示例完整字段均有同行中文说明，现有local与人设不会自动重写。
 
-当前LAP-40阶段1只交付配置、provider描述和静态检查；受管Snow启动、实时健康、策略接线、恢复和activate/rollback尚待后续阶段。不要据此修改运行provider或把文件存在当作切换完成。所有设置在显式停机保存、下次受管启动后才可生效，不热更新，不自动fallback。
+当前LAP-40阶段1/2已交付配置/provider/静态检查，以及原创早期策略、独立健康协议、实际gate/router时效栅栏；上游私有接线、实际控制监听/轮询、受管Snow启动、恢复和activate/rollback尚待后续阶段。默认没有受管健康绑定就关闭Snow准入，不能把文件存在当作已部署或切换。所有设置在显式停机保存、下次受管启动后才可生效，不热更新，不自动fallback。
 
 只读检查：`python scripts/transport.py inspect --json`（可用`--root`指定项目根）。输出当前选择的provider及`snowluma_candidate`静态检查范围；`channel_ready`始终false，与现有NapCat在线状态无关。不联网、不启动进程、不读控制密钥、不读取QQ认证数据、不写配置/状态。缺包等返回封闭阻断码；CLI退出0表示检查完成，不表示真实准入。无有效配置时退出1，仅输出`transport_config_invalid`。
 
@@ -124,3 +124,5 @@ LAP-18B补充：`features.yaml`新增`public_network`（resolver=system、ca_bun
 - 其余四节必须有`evidence_file/evidence_sha256`，引用`state/qq-transport/`中的本机证据（每份最多1MiB）。`clean_qq`另有`executable_sha256`绑定配置QQ入口；`private_build`另有`build_file/build_sha256/policy_file/policy_sha256/policy_version`，文件须在忽略的`runtime/snowluma-private/`，策略版本固定`qqbot-snowluma-policy-v1`。
 
 `static_evidence_checked=true`仅表示所有所引文件的实际摘要匹配，不证明证据内容的真实性、许可适用、干净QQ/原生数据归属、真实私有接线或实时健康。检查始终保留`native_deployment_unverified/clean_qq_unverified/data_scope_unverified/private_build_unverified/operator_scan_required`；后续受控审阅与独立健康不能被静态JSON代替。没有预备材料时保持缺失，不生成或填写伪造证明；本机证明、原包、私有构建与账号资料不提交Git。
+
+Snow运行准入另要求online/good、已armed且pipe/login/rx/outbound健康、独立nonce/HMAC/严格seq、加载快照/策略/构建摘要及受管PID创建身份/监听归属共同成立。证明TTL按配置15..30秒，router镜像按同一证明剩余期限关闭，不沿用旧45秒。没有新WS帧时gate也按证明/online实际到期定时撤销能力并轮换事件代际；新证明不会复活旧事件或迟到模型结果。入站、free窗口、成员/视觉/收藏RPC、最终发送都检查同一准入；健康/控制ACK继续可观测。NapCat分支保留旧行为，不要求Snow证明。协议字段/接口与自造测试见[原创适配说明](../adapters/snowluma/README.md)，实际上游接线与真实验收仍未通过。

@@ -2,6 +2,7 @@ import json
 import asyncio
 from dataclasses import replace
 import logging
+import math
 import os
 from pathlib import Path
 import re
@@ -38,6 +39,13 @@ class QQRouter(Star):
         super().__init__(context)
         self.root=Path(os.environ['QQBOT_ROOT']).resolve()
         settings=load_consumer(self.root)
+        from qqbot_gateway.qq_transport import resolve_transport
+        from qqbot_gateway.config_files import canonical,sha
+        transport=resolve_transport(settings)
+        self.transport_provider=transport['provider']
+        self.transport_health_ttl=transport['snowluma']['health_ttl_seconds']
+        self.transport_config_digest=sha(canonical(settings))
+        self.transport_instance_id=os.environ.get('QQBOT_INSTANCE_ID','')
         from qqbot_gateway.vision import require_production
         require_production(settings,root=self.root)
         self.vision=settings['vision']
@@ -75,6 +83,15 @@ class QQRouter(Star):
             data=json.loads((self.root/'state/gate-connection.json').read_text(encoding='utf-8'))
             process=psutil.Process(data['pid'])
             if abs(process.create_time()-data['created'])>=.01 or not 0<=time.time()-data['updated']<=45:return None
+            if getattr(self,'transport_provider','napcat')=='snowluma':
+                health=data.get('health')
+                if (data.get('provider')!='snowluma' or data.get('channel_ready') is not True or
+                    not self.transport_instance_id or data.get('instance_id')!=self.transport_instance_id or
+                    data.get('config_digest')!=self.transport_config_digest or
+                    not isinstance(health,dict) or set(health)!={'ready','expires_mono','sequence'} or health['ready'] is not True or
+                    type(health['sequence']) is not int or health['sequence']<=0 or
+                    type(health['expires_mono']) not in (int,float) or not math.isfinite(health['expires_mono']) or
+                    not 0<health['expires_mono']-time.monotonic()<=self.transport_health_ttl):return None
             if self.silence_enabled():
                 from qqbot_gateway.group_silence import group_ref
                 mirror=data.get('silence')
@@ -94,7 +111,16 @@ class QQRouter(Star):
 
     def silence_enabled(self):return self.participation.get('silence',{}).get('enabled',True)
 
+    def transport_allowed(self,event):
+        if getattr(self,'transport_provider','napcat')!='snowluma':return True
+        connection=self.connection()
+        raw=getattr(event.message_obj,'raw_message',None)
+        original=event.get_extra('qq_transport_connection')
+        if original is None and isinstance(raw,dict):original=raw.get('qqbot_connection')
+        return bool(connection and original==connection)
+
     def silence_allowed(self,event):
+        if not self.transport_allowed(event):return False
         if not self.silence_enabled():return True
         from qqbot_gateway.group_silence import decode_ticket,group_ref
         try:
@@ -144,7 +170,7 @@ class QQRouter(Star):
 
     async def initialize(self):
         await self.tasks.recover_deliveries(self.context.conversation_manager)
-        if self.participation['mode']=='free' or self.silence_enabled():self.connection_watcher=asyncio.create_task(self.watch_connection())
+        if self.participation['mode']=='free' or self.silence_enabled() or self.transport_provider=='snowluma':self.connection_watcher=asyncio.create_task(self.watch_connection())
         manager=self.context.persona_manager
         try:await manager.get_persona(self.persona_id)
         except ValueError:
@@ -372,9 +398,12 @@ class QQRouter(Star):
             event.should_call_llm(False);event.stop_event();return
         self.observe_gate()
         raw=getattr(event.message_obj,'raw_message',None)
-        event.set_extra('qq_silence_enabled',self.silence_enabled())
+        snow=getattr(self,'transport_provider','napcat')=='snowluma'
+        if snow:event.set_extra('qq_transport_connection',raw.get('qqbot_connection') if isinstance(raw,dict) else None)
+        # The same signed event ticket also fences Snow epochs when muting is off.
+        event.set_extra('qq_silence_enabled',self.silence_enabled() or snow)
         event.set_extra('qq_output_ticket',raw.get('qqbot_output_ticket') if isinstance(raw,dict) else None)
-        event.set_extra('needs_guarded_delivery',self.silence_enabled())
+        event.set_extra('needs_guarded_delivery',self.silence_enabled() or snow)
         if not self.silence_allowed(event):
             event.should_call_llm(False);event.stop_event();return
         event.set_extra('qq_send_guard',EventSendGuard(event))
@@ -391,7 +420,7 @@ class QQRouter(Star):
             async for item in self.on_mentions(event):yield item
 
     async def on_mentions(self,event):
-        if stopping(self.root):
+        if stopping(self.root) or not self.transport_allowed(event):
             event.should_call_llm(False);event.stop_event();return
         if (str(event.get_self_id())!=self.bot or str(event.get_group_id()) not in self.groups or
                 str(event.get_sender_id())==self.bot or str(event.get_sender_id()) in self.blocked):
@@ -517,6 +546,7 @@ class QQRouter(Star):
             lease.release()
 
     async def on_attention_group(self,event):
+        if not self.transport_allowed(event):event.should_call_llm(False);event.stop_event();return
         from qqbot_gateway.attention import DIRECT,canonical
         from qqbot_gateway.turn_v2 import sha,fit
         event.should_call_llm(False)
@@ -662,6 +692,7 @@ class QQRouter(Star):
                 if ticket:self.group_turns.finish(ticket)
 
     async def on_free_group(self,event):
+        if not self.transport_allowed(event):event.should_call_llm(False);event.stop_event();return
         event.should_call_llm(False)
         components=event.get_messages()
         mention=any(isinstance(c,At) and str(c.qq)==self.bot for c in components)
