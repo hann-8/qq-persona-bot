@@ -1,3 +1,5 @@
+2026-10-24：用户明确NapCat/SnowLuma以长期运行为首要标准。[LAP-39 SnowLuma评估](tracks/laptop-workbuddy/tasks/LAP-39/SNOWLUMA_ASSESSMENT.md)完成，仅静态调研；v2.1.1有接收停滞good/Windows管道重接机制，不能当本机长稳通过。原版有gate前内置答复、引用补历史与新增存储，当前项目又只读online/硬编码NapCat，不能直接替换；先解决边界/干净QQ归属并详细规划，再72h初筛/7天验收。六份文档，0安装/注入/启停/登录/配置/模型/群/SSH；本轮未重新探活，[39交接](tracks/laptop-workbuddy/tasks/LAP-39/HANDOFF.md)，旧差额保留。
+
 2026-10-24：LAP-39复发只读诊断/上游调研完成，当前故障未恢复。00:30仍进程/WS/缓存在线，最后准入23日22:29:36；bot自身状态失败、原生资料刷新10031ms超时，模型空闲/cleanup未阻断。全局o3=1与账号0不同，早期Hook实际读全局；改0仅候选，旧故障亦可能默认0，不能归因或保证。优先受控单变量试验，再补诊断/评估接入替换，均未执行；0代码/运行配置/启停/QQ登录/模型/群/SSH，仅5份文档。[调研与验证路线](tracks/laptop-workbuddy/tasks/LAP-39/RESEARCH.md) / [39交接](tracks/laptop-workbuddy/tasks/LAP-39/HANDOFF.md)。
 
 2026-10-23 22:05（Asia/Shanghai）：按用户要求补[LAP-39背景与现象](tracks/laptop-workbuddy/tasks/LAP-39/CONTEXT_FOR_MAX.md)供max接续；含上轮人设预算断言的口径与未验证假设；仅记录观察、事实与不确定性，不预设为问题或修复任务。本轮仅文档，未探查/修改运行状态。
@@ -110,6 +112,8 @@ LAP-17已有SSH原生runner/schema3/切换及统一结果/版本；LAP-18安全�
 
 ## 阅读顺序与下一步
 
+用户当前关注先读[LAP-39交接](tracks/laptop-workbuddy/tasks/LAP-39/HANDOFF.md)与[SnowLuma长期运行评估](tracks/laptop-workbuddy/tasks/LAP-39/SNOWLUMA_ASSESSMENT.md)：目前仅调研，不直接迁移。先规划解决原版gate前答复/补历史/存储及干净QQ/单PID归属，再依用户指令做试运行；不以新协议端宣传替代本机72小时/7天验证。以下LAP-38等仍是原功能线后续入口，不因本轮调研自动推进。
+
 当前先读[LAP-38交接](tracks/laptop-workbuddy/tasks/LAP-38/HANDOFF.md)、[总计划](tracks/laptop-workbuddy/tasks/LAP-38/PLAN.md)与[medium指引](tracks/laptop-workbuddy/tasks/LAP-38/IMPLEMENTATION_GUIDE.md)：建议18续作C修已复现网页正文问题，再28续作R补实际路径/边界工具；微信在独立目录先WX-01离线核心。旧36的28A/18B/28C/06D已离线交付，不重做；本轮3公开正文成功/另一次超时与搜索质量未过分别记录。真实入站/家庭读取/模型/群/微信验收仍按明确批次，不因规划启用；07/31B/登录及旧差额保留。
 
 1. [AGENTS](AGENTS.md)→本入口→[笔记本HANDOFF](tracks/laptop-workbuddy/HANDOFF.md)与[TASKS](tracks/laptop-workbuddy/TASKS.md)。用户已于2026-10-22放弃开机自启；不再主动推进24自启部署/验收。历史自动登录材料见[LAP-24交接](tracks/laptop-workbuddy/tasks/LAP-24/HANDOFF.md)/[续作PLAN](tracks/laptop-workbuddy/tasks/LAP-24/AUTOSTART_PLAN.md)/[medium指引](tracks/laptop-workbuddy/tasks/LAP-24/AUTOSTART_IMPLEMENTATION_GUIDE.md)，P1/P3历史代码/离线交付完成，自启路线已弃用；登录独立缺口保留。配置/停言另读[LAP-34配置交接](tracks/laptop-workbuddy/tasks/LAP-34/HANDOFF.md)与[LAP-35停言交接](tracks/laptop-workbuddy/tasks/LAP-35/HANDOFF.md)；34/35已实现/离线通过，加载/真实验收差额分别保留。
@@ -121,7 +125,7 @@ LAP-17已有SSH原生runner/schema3/切换及统一结果/版本；LAP-18安全�
 
 | 工作线 | 状态 | 最近更新 | 下一步 | 交接入口 |
 | --- | --- | --- | --- | --- |
-| 笔记本 WorkBuddy / 共用网关 | active；38详细规划补18C/28R与个人微信独立路线；未实施 | 2026-10-22 | medium分别续18C/28R；微信独立目录先WX-01；真实批次及旧差额保留 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [38](tracks/laptop-workbuddy/tasks/LAP-38/HANDOFF.md) / [36](tracks/laptop-workbuddy/tasks/LAP-36/HANDOFF.md) / [24](tracks/laptop-workbuddy/tasks/LAP-24/HANDOFF.md) / [34](tracks/laptop-workbuddy/tasks/LAP-34/HANDOFF.md) / [35](tracks/laptop-workbuddy/tasks/LAP-35/HANDOFF.md) |
+| 笔记本 WorkBuddy / 共用网关 | active；39长期运行/SnowLuma评估完成，迁移未规划实施；18C已离线交付 | 2026-10-24 | 39先解决迁移前置再规划试运行；38的28R/微信仍待指令，旧差额保留 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [39](tracks/laptop-workbuddy/tasks/LAP-39/HANDOFF.md) / [38](tracks/laptop-workbuddy/tasks/LAP-38/HANDOFF.md) / [36](tracks/laptop-workbuddy/tasks/LAP-36/HANDOFF.md) / [24](tracks/laptop-workbuddy/tasks/LAP-24/HANDOFF.md) / [34](tracks/laptop-workbuddy/tasks/LAP-34/HANDOFF.md) / [35](tracks/laptop-workbuddy/tasks/LAP-35/HANDOFF.md) |
 | 家庭5070 PC本地模型 | active；17接入已实现/离线与元数据通过，真实生成未验 | 2026-10-17 15:52 | 17待真实范围；保留0生成/未改本机后端 | [HANDOFF](tracks/local-5070/HANDOFF.md) / [选型历史/最新快照](tracks/local-5070/MODEL_SELECTION.md) |
 
 已建立任务交接：[LAP-08规划](tracks/laptop-workbuddy/tasks/LAP-08/HANDOFF.md)、[09配置/准入](tracks/laptop-workbuddy/tasks/LAP-09/HANDOFF.md)、[10预算/参数](tracks/laptop-workbuddy/tasks/LAP-10/HANDOFF.md)、[11纯文本/人设](tracks/laptop-workbuddy/tasks/LAP-11/HANDOFF.md)、[12启停/状态](tracks/laptop-workbuddy/tasks/LAP-12/HANDOFF.md)、[13配置控制台](tracks/laptop-workbuddy/tasks/LAP-13/HANDOFF.md)、[14人设/分条规划](tracks/laptop-workbuddy/tasks/LAP-14/HANDOFF.md)、[15精简人设](tracks/laptop-workbuddy/tasks/LAP-15/HANDOFF.md)、[16一次生成/分条](tracks/laptop-workbuddy/tasks/LAP-16/HANDOFF.md)、[19双后端/联网规划](tracks/laptop-workbuddy/tasks/LAP-19/HANDOFF.md)、[17本地接入/配置切换](tracks/laptop-workbuddy/tasks/LAP-17/HANDOFF.md)、[18共用联网独立部分/搜索缺口](tracks/laptop-workbuddy/tasks/LAP-18/HANDOFF.md)；[LAP-20已实现/离线通过](tracks/laptop-workbuddy/tasks/LAP-20/HANDOFF.md)，未启用free；[LAP-21受控表情](tracks/laptop-workbuddy/tasks/LAP-21/HANDOFF.md)本轮已领取实施。
