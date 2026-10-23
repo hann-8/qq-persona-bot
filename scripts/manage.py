@@ -350,10 +350,10 @@ def _start_channel(full=False, paused=False):
     config['provider_settings']['computer_use_runtime']='none'
     config_path.write_text(json.dumps(config,ensure_ascii=False,indent=2),encoding='utf-8-sig')
     napcat_config=NAPCAT/'versions/9.9.33-52230/resources/app/napcat/config'
-    logging={'fileLog':False,'consoleLog':True,'consoleLogLevel':'warn','fileLogLevel':'warn'}
+    # WebUI owns core settings. Back up existing files without rewriting them;
+    # NapCat initializes missing files using its own defaults.
     for name in ('napcat.json','napcat_'+gate.bot_qq+'.json'):
         if (napcat_config/name).exists():(backup/name).write_bytes((napcat_config/name).read_bytes())
-        (napcat_config/name).write_text(json.dumps(logging),encoding='utf-8')
     entries=[]
     logs=ROOT/'logs';logs.mkdir(exist_ok=True)
     mode_record={'mode':'text' if full else 'channel_only','started':time.time(),'instance_id':instance_id,

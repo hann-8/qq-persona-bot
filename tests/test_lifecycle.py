@@ -87,6 +87,50 @@ class LifecycleTests(unittest.TestCase):
         cleanup.assert_called_once_with([created])
         self.assertEqual(manage.service_mode()['phase'],'failed')
 
+    def test_start_preserves_webui_core_files_and_does_not_create_missing_files(self):
+        from test_config_files import synthetic
+        import yaml
+        (self.root/'config').mkdir()
+        (self.root/'config/settings.local.yaml').write_text(yaml.safe_dump(synthetic()),encoding='utf-8')
+        napcat=self.root/'napcat'
+        config=napcat/'versions/9.9.33-52230/resources/app/napcat/config'
+        config.mkdir(parents=True)
+        path=self.root/'runtime/astrbot/data/cmd_config.json';path.parent.mkdir(parents=True)
+        gate=SimpleNamespace(upstream_token='test',allowed_groups={'111'},admin_users={'333'},bot_qq='222')
+        originals={
+            'napcat.json': b'{\r\n  "fileLog": true, "consoleLog": false, "autoTimeSync": false,\r\n'
+                           b'  "o3HookMode": 1, "bypass": {"hook": false, "window": true, "module": false,\r\n'
+                           b'  "process": true, "container": false, "js": true}, "futureOption": "keep"\r\n}\r\n',
+            'napcat_222.json': b'{ "fileLog": false, "consoleLog": true, "fileLogLevel": "debug",'
+                               b' "consoleLogLevel": "error", "autoTimeSync": true, "o3HookMode": 0 }\n',
+        }
+        for full,paused in ((True,False),(False,False),(False,True)):
+            for present in ((),('napcat.json',),('napcat_222.json',),tuple(originals)):
+                with self.subTest(full=full,paused=paused,present=present):
+                    atomic_json(path,{'platform_settings':{},'provider_settings':{'proactive_capability':{}}})
+                    for name,data in originals.items():
+                        (config/name).unlink(missing_ok=True)
+                        if name in present:(config/name).write_bytes(data)
+                    backups=set((self.root/'state/config-backups').glob('startup-*'))
+                    with patch.object(manage,'NAPCAT',napcat), \
+                         patch.object(manage,'load_gate_config',return_value=gate), \
+                         patch.object(manage,'check_port'), \
+                         patch.object(manage.subprocess,'run',return_value=SimpleNamespace(returncode=0)), \
+                         patch.object(manage.psutil,'Popen',side_effect=RuntimeError('synthetic launch boundary')), \
+                         patch.object(manage,'stop'):
+                        with self.assertRaisesRegex(RuntimeError,'synthetic launch boundary'):
+                            manage.start_channel(full=full,paused=paused)
+                    new_backups=set((self.root/'state/config-backups').glob('startup-*'))-backups
+                    self.assertEqual(len(new_backups),1)
+                    backup=new_backups.pop()
+                    for name,data in originals.items():
+                        if name in present:
+                            self.assertEqual((config/name).read_bytes(),data)
+                            self.assertEqual((backup/name).read_bytes(),data)
+                        else:
+                            self.assertFalse((config/name).exists())
+                            self.assertFalse((backup/name).exists())
+
     def test_stop_preserves_unknown_send_and_never_requeues_interrupted_tasks(self):
         from qqbot_gateway.task_store import TaskStore
         store=TaskStore(self.root/'state/tasks.sqlite')
