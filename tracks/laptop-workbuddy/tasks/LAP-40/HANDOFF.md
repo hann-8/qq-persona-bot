@@ -8,7 +8,9 @@
 
 2026-10-24 07:15实际续领：`LAP-40-medium-stage4A-continuation`，基线`052f0161473e926fb9ec7813ae6319d31af0ae72`且干净；已重读入口/QUOTA_WAIT/PLAN/GUIDE/4A报告与codex-handoff，usage300min used3/remaining97%。本轮精确归属`scripts/manage.py`、`src/qqbot_gateway/transport_owner.py`、必要`config.py`锁lease、`tests/test_transport_owner.py`与新增续作测试、必要`adapters/snowluma/control_plane.mjs`及测试/README、`config/README.md`、本HANDOFF/4A续作报告。只实现4A唯一writer登记/固定显式spec/fake管理创建/优雅控制消费与状态提示；生产require_runtime总拒保持。根3共享入口不写，0真实组件/端口/原运行态改动。成功标准是实际manage入口fake覆盖、未知身份保留/stop优先与协议互通，不自动4B。
 
-**当前：阶段4A独立剩余已实现/离线通过，待根agent复核，未部署。** [4A续作报告](../../../../reports/lap-40-stage4A-continuation-2026-10-24.md)记录唯一writer/固定spec/管理drain-stop ACK/状态提示与128 Python、9 JS通过。阶段1/2已根审，3仅静态核对；真实私有入口/监听/armed/outbound仍未完成，Snow生产启用总拒绝。等待根审，不自动4B，不称真实Snow生命周期通过；先前[4A部分报告](../../../../reports/lap-40-stage4A-2026-10-24.md)/[额度交接](QUOTA_WAIT.md)保留历史。
+**当前：2026-10-24 07:34独立4A续作已根审，登记4B1；未部署。** 已审716dd470730c61e69c66e082c565b7b884141d85与环境小修01af9820b6b0c98b2bfbf759300dd353b0ca750e，远端一致；128 Python/9 JS与小修41定向通过。[续作报告](../../../../reports/lap-40-stage4A-continuation-2026-10-24.md)分清初始writer、未来入口spec与未证真实能力，生产资格仍总拒。根审发现继承Snow/Node预加载环境未封闭，已退medium修正并复核；原NapCat/framework与全局环境未改。
+
+4B1登记：`LAP-40-medium-stage4B1-recovery`，2026-10-24 07:34，待根agent派同一gpt-6.1-sol/medium。独占transport_supervisor及必要transport_owner/transport_launch/manage/gate接线、对应原创假进程/时钟测试、本任务HANDOFF/4B1报告及必要局部README；根仍独占3共享入口与PLAN/GUIDE。持久预算/事故动作、grace/drain/ready、stop优先、唯一writer换epoch/owner与最终栅栏，实际项目调用路径须用fake验证；不先做4B2 CLI/采样，不动原运行态，不解除阶段3/G0/G1生产总拒。300分钟剩65%；一次性07:10唤醒已成功删除，[额度交接](QUOTA_WAIT.md)为历史。
 
 本轮实际文件归属补全：新增`src/qqbot_gateway/transport_launch.py`与`tests/test_transport_lifecycle.py`，必要`onebot_gate.py`的monitor任务状态、`control_plane.test.mjs`的stop后drain拒绝用例；连同本轮已登记文件共13项。根agent的PLAN/GUIDE已知未提交修改保留，不暂存、不夹带；共享3入口未改。最终128组合Python与9 JS、diffcheck通过，剩余配额在Git交付出口核对；下一步仅根审。
 

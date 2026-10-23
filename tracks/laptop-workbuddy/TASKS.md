@@ -1,3 +1,5 @@
+2026-10-24 07:34：LAP-40独立4A续作716dd47及环境封闭小修01af982已推送根审；最终128 Python/9 JS与小修41定向通过，报告见40交接。原锁writer/fake创建/持久控制seq/实际drain-stop ACK/状态提示完成，生产私有入口仍总拒。登记LAP-40-medium-stage4B1-recovery，先持久预算/事故状态/gate监督和唯一writer恢复，再根审派4B2 CLI/采样。根独占3入口，0真实启停/部署/模型/群/本机配置动作；07:10一次性唤醒已删除。300分钟剩65%。
+
 2026-10-24 07:12：LAP-40按07:10唤醒恢复，300分钟额度剩100%，解除quota_hold。登记LAP-40-medium-stage4A-continuation，先完成唯一writer owner登记/启动spec合成路径/drain-stop ACK消费/Snow状态提示，根审后才4B/5。根agent独占3入口，medium拥有当前代码测试及40交接；真实Snow仍总拒，原运行态不动。
 
 2026-10-24 03:19：LAP-40 quota_hold，实际5h剩余4%，按用户指令停止新工作；本线程一次性07:10（北京时间）恢复已创建并view确认，automation lap-40-snowluma。阶段4A仅部分检查点根审，先读tasks/LAP-40/HANDOFF与QUOTA_WAIT的独立剩余清单再续4A，随后4B/5；真实Snow未切换、原运行态未动。
@@ -88,7 +90,7 @@ LAP-15内容提交`632fdc5`已推送origin/main，2026-10-17 11:09用ls-remote�
 
 | ID | 单一任务 | 状态与已有证据 | 依赖/推荐顺序 | 执行session | 下一步/完成出口 |
 | --- | --- | --- | --- | --- | --- |
-| LAP-40 | SnowLuma替换试运行 | 1/2项目实现离线通过；3仅核对、上游未接线；4A部分c549ce3/交接802fac1根审，41 Python/9 JS通过，未完整；[HANDOFF](tasks/LAP-40/HANDOFF.md) | 长期运行优先，原生部署/干净QQ数据/私有接线先证，72h/7天分级，保留旧差额 | LAP-40-medium-stage4A-runtime-owner部分交付，03:18根审；codex/lap-40-snowluma-impl；下一阶段为4A独立剩余后4B，根仍独占3入口 | owner登记/spec/优雅停止ACK/状态提示仍可独立实施；当前6%，到5%暂停并北京时间10月24日07:10续作；真实前置未满足不动原bot |
+| LAP-40 | SnowLuma替换试运行 | 1/2与独立4A根审；4A续作716dd47/01af982、128 Python/9 JS及小修41通过；3仅核对，上游未接线；[HANDOFF](tasks/LAP-40/HANDOFF.md) | 长期运行优先，原生部署/干净QQ数据/私有接线先证，72h/7天分级，保留旧差额 | LAP-40-medium-stage4B1-recovery，07:34开始；codex/lap-40-snowluma-impl；根独占3入口，medium当前代码/测试/40交接 | 先持久预算/事故监督/唯一writer恢复，根审后4B2 CLI/采样及5；真实前置仍硬拒，不动原bot；07:10已恢复、一次性唤醒已删除 |
 | LAP-39 | 夜间不回复、配置保留与SnowLuma长期运行评估 | 既有修复/离线通过；复发诊断/SnowLuma调研完成，迁移未实施；[HANDOFF](tasks/LAP-39/HANDOFF.md) / [评估](tasks/LAP-39/SNOWLUMA_ASSESSMENT.md) | 用户以长期运行为首要标准；原版gate前答复/补历史/存储与干净QQ归属是迁移前置；保留o3候选/QQ诱因与旧差额 | 当前LAP-39-SnowLuma-longrun-assessment，2026-10-24 00:53登记，调研交付；独占6文档，23日归属见历史HANDOFF | 先解决前置能力缺口并详细规划，再72h/7天验证；本轮0安装/注入/启停/登录/模型/群/配置/SSH，不重新探活或默认切换 |
 | LAP-38 | 识图/网页补证与个人微信接入详细规划 | completed，仅规划；[HANDOFF](tasks/LAP-38/HANDOFF.md)/[PLAN](tasks/LAP-38/PLAN.md)/[指令](tasks/LAP-38/IMPLEMENTATION_GUIDE.md) | 补18C/28R；微信独立先WX-01，旧36/验收差额保留 | LAP-38-vision-web-wechat-plan，2026-10-22 23:19领取、23:50规划收口；18份文档独占 | 公共网络/正文质量新证据、路径/激活合同与微信七份引导/hash交付；0代码/配置/模型/QQ/微信/SSH/启停，Git见交接 |
 | LAP-37 | 清理容量阻断修复/人工恢复与弃用自启 | 已实现/105项离线通过/停机现场恢复通过；[HANDOFF](tasks/LAP-37/HANDOFF.md) | 既有31/33合同修复，不自动解锁unknown | LAP-37-cleanup-capacity-recovery，2026-10-22 21:20；归属见交接 | blocked=false，bot停机；清理cmd可复用；自启弃用，真实运行/31B差额保留 |
