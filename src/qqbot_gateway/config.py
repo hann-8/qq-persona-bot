@@ -10,6 +10,7 @@ import os
 import tempfile
 import time
 import uuid
+import threading
 
 import yaml
 import psutil
@@ -114,8 +115,11 @@ class GateConfig:
     transport_control_port: int = 5098
     transport_health_ttl: int = 15
     transport_health_poll: int = 5
+    transport_ready_timeout: int = 180
 
     def __post_init__(self):
+        if type(self.transport_ready_timeout) is not int or not 60<=self.transport_ready_timeout<=240:
+            raise ValueError('Invalid transport ready timeout')
         if self.transport_provider not in ('napcat','snowluma'):raise ValueError('Invalid transport provider')
         if (type(self.transport_health_poll) is not int or not 5<=self.transport_health_poll<=10 or
             type(self.transport_health_ttl) is not int or not 3*self.transport_health_poll<=self.transport_health_ttl<=30 or
@@ -351,7 +355,18 @@ def load_gate_config(path=None, *, root=None, settings=None):
         transport_provider=transport['provider'], transport_instance_id=os.environ.get('QQBOT_INSTANCE_ID',''),
         transport_config_digest=sha(canonical(data)), transport_control_port=transport['snowluma']['control_port'],
         transport_health_ttl=transport['snowluma']['health_ttl_seconds'], transport_health_poll=transport['snowluma']['health_poll_seconds'],
+        transport_ready_timeout=transport['snowluma']['ready_timeout_seconds'],
     )
+
+
+_configuration_leases = {}
+
+
+def require_configuration_lease(root, lease):
+    """Writer capability is valid only in the current OS-lock scope/thread."""
+    key = str(Path(root).resolve())
+    if _configuration_leases.get((key, threading.get_ident())) is not lease or lease is None:
+        raise ValueError('TRANSPORT_WRITER_LOCK_REQUIRED')
 
 
 @contextmanager
@@ -376,9 +391,13 @@ def configuration_lock(root):
                 fcntl.flock(stream, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except OSError:
             raise ValueError('Configuration/start/stop operation already in progress') from None
+        lease = object()
+        lease_key = (str(root), threading.get_ident())
+        _configuration_leases[lease_key] = lease
         try:
-            yield
+            yield lease
         finally:
+            _configuration_leases.pop(lease_key, None)
             stream.seek(0)
             if os.name == 'nt':
                 msvcrt.locking(stream.fileno(), msvcrt.LK_UNLCK, 1)

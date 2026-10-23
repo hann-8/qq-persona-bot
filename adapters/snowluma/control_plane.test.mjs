@@ -30,6 +30,8 @@ test('fixed bind/health/drain/stop are domain separated and replay resistant', a
     assert.equal((await handler.handle(request)).status, 403);
   }
   assert.deepEqual(calls, ['bind', 'drain', 'stop']);assert.equal(JSON.parse((await health()).body).phase, 'stopped');
+  assert.equal((await handler.handle({ method: 'POST', url: '/drain', body: sign('drain', 4) })).status, 403);
+  assert.deepEqual(calls, ['bind', 'drain', 'stop']);
 });
 test('bind side effect is once per lease, including concurrent retry and stop race', async () => {
   let release, calls = 0, lease;

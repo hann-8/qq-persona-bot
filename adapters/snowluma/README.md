@@ -16,6 +16,12 @@
 
 `control_plane.mjs`仅导出固定health/bind/drain/stop纯handler，不监听端口。控制命令与health/ACK分域，3秒有效、严格规范化JSON、单调seq和有界nonce去重；同owner lease的bind至多调用一次，未决重入拒绝，已成功bind可幂等ACK。`onBind(current)`必须在真实副作用前调用current，stop/drain会立即撤销该lease；失败/超时不允许重试注入。可信observe必须来自真实私有运行观测，不能拿handler自身状态冒充armed/outbound。
 
-当前`require_runtime`明确总拒绝真实Snow启动（`private_runtime_entry_unavailable`），管理器在snapshot/状态/子进程创建前、gate在监听前检查。尚未实现合格私有入口、Snow进程启动spec/owner记录生成、真实listener挂接、管理器优雅drain/stop ACK调用。现有stop通过同一管理锁先置stop marker，再依registry已证明的PID创建身份回收；快照损坏不阻止停止，身份未知保留原有失败语义。上述是项目侧接口及离线闭环，不能称完整Snow生命周期或上游接线完成。
+4A续作已实现`OwnerWriter`：原configuration_lock提供仅当前线程/作用域有效的lease，唯一管理writer从创建回调结果捕获PID+创建时间、写前置启动意图、验证exe/registry并冻结v2 owner记录与独立秘密引用。未取得创建身份时保留unknown意图，禁止另一provider继续启动。`snow_specs`只接受未来经核对的显式Node/私有入口路径，argv是本项目未来私有入口合同，**不是已知上游可运行包布局**；不搜索目录或推测启动器。
+
+gate拥有单一monitor任务，`processes`只统计真实PID，任务是否运行另列`transport_monitor`布尔。gate和manage共同从原锁内原子预占持久控制seq，网络不持锁；seq文件缺失/损坏/回拨closed。gate抢启动锁失败会异步等待至配置ready timeout，仅重试未发出的bind，未知ACK不再注入。命令时间戳保守向下取100ms，实际有效期至多3秒，不扩大期限。
+
+manage stop先置marker，在锁内冻结owner/预占drain-stop序列，释放锁后消费签名ACK，再重新锁定核对实例/registry并回收已证明身份。stop-only核验允许snapshot损坏，但仍检查冻结owner、实际PID/创建毫秒/exe和固定listener；该较弱路径不用于健康、bind或channel_ready。marker后的drain/stop可通行，bind始终关闭；ACK未知不重试，未知身份/未确认退出仍保留原有失败语义。
+
+当前`require_runtime`仍明确总拒绝真实Snow启动（`private_runtime_entry_unavailable`），管理器在snapshot/状态/子进程创建前、gate在监听前检查，无配置开关或自填manifest绕过。真实私有入口/原生资格、listener挂接和armed/outbound观测仍未交付；`_wait_snow_owner`只确认身份/监听，不能代替armed/channel_ready。当前writer只完成初始创建，不宣称支持4B的新epoch恢复/跨重启预算。完整Snow生命周期及上游接线仍未真实验证。
 
 测试：`node --test adapters/snowluma/project_policy.test.mjs`。本机Node24.22.0仅执行这些原创无依赖测试，不满足Snow实际运行引擎，不作为其构建/运行通过证据。

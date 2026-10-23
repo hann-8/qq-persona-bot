@@ -39,7 +39,7 @@ export function createControlHandler({ binding, key, observe, identityCurrent, s
             !Number.isSafeInteger(obj.issued_ms) || !Number.isSafeInteger(obj.expires_ms) ||
             obj.expires_ms - obj.issued_ms !== 3000 || now() < obj.issued_ms || now() > obj.expires_ms) return deny();
         for (const [nonce, expiry] of nonces) if (expiry < now()) nonces.delete(nonce);
-        if (nonces.has(obj.nonce) || nonces.size >= 128 || obj.action !== 'stop' && stop()) return deny();
+        if (nonces.has(obj.nonce) || nonces.size >= 128 || obj.action === 'bind' && stop() || obj.action === 'drain' && stopped) return deny();
         sequence = obj.seq;nonces.set(obj.nonce, obj.expires_ms);
         if (obj.action === 'bind') {
           if (draining || stopped || bindingStarted && !bound) return deny();

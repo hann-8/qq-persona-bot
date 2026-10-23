@@ -19,6 +19,8 @@ from .config_files import load_consumer, snapshot_environment, canonical as conf
 from .lifecycle import stopping
 from .qq_transport import checked_path, inspect_transport, resolve_transport, validate_static_proof, _file_digest
 from .transport_health import HealthBinding, HealthVerifier, canonical, strict_json, LIMIT
+from .config import configuration_lock, require_configuration_lease
+from .lifecycle import atomic_json
 
 CONTROL_DOMAIN = 'qqbot-snowluma-control-v1'
 ACK_DOMAIN = 'qqbot-snowluma-control-ack-v1'
@@ -59,18 +61,15 @@ def read_json(root, name, area, limit=16384):
     path=checked_path(root,name,area)
     if not path.is_file() or path.stat().st_size>limit:raise ValueError('TRANSPORT_LOCAL_RECORD_INVALID')
     with path.open('rb') as stream:content=stream.read(limit+1)
-    return strict_json(content,limit)
+    try:return strict_json(content,limit)
+    except (ValueError,UnicodeError,RecursionError,OverflowError):
+        raise ValueError('TRANSPORT_LOCAL_RECORD_INVALID') from None
 
 
 def read_control_key(root, settings, forbidden=()):
     cfg=resolve_transport(settings)['snowluma']
-    obj=read_json(root,cfg['control_secret_file'],'secrets',4096)
-    if not isinstance(obj,dict) or set(obj)!={'schema','key'} or type(obj['schema']) is not int or obj['schema']!=1:
-        raise ValueError('TRANSPORT_CONTROL_SECRET_INVALID')
-    key=obj['key']
-    import re
-    if not isinstance(key,str) or re.fullmatch('[a-f0-9]{64}',key) is None:raise ValueError('TRANSPORT_CONTROL_SECRET_INVALID')
-    binary=bytes.fromhex(key)
+    binary=read_key_reference(root,cfg['control_secret_file'])
+    key=binary.hex()
     # OneBot and model tokens are in the existing independent project token file.
     tokens=read_json(root,settings['secrets_file'],'secrets')
     if not isinstance(tokens,dict):raise ValueError('TRANSPORT_CONTROL_SECRET_INVALID')
@@ -78,6 +77,16 @@ def read_control_key(root, settings, forbidden=()):
         if isinstance(other,str) and (hmac.compare_digest(key.encode(),other.encode('utf-8')) or binary==other.encode('utf-8')):
             raise ValueError('TRANSPORT_CONTROL_SECRET_REUSED')
     return binary
+
+
+def read_key_reference(root,reference):
+    obj=read_json(root,reference,'secrets',4096)
+    if not isinstance(obj,dict) or set(obj)!={'schema','key'} or type(obj['schema']) is not int or obj['schema']!=1:
+        raise ValueError('TRANSPORT_CONTROL_SECRET_INVALID')
+    key=obj['key']
+    import re
+    if not isinstance(key,str) or re.fullmatch('[a-f0-9]{64}',key) is None:raise ValueError('TRANSPORT_CONTROL_SECRET_INVALID')
+    return bytes.fromhex(key)
 
 
 class RuntimeOwner:
@@ -108,9 +117,18 @@ class RuntimeOwner:
             settings=loaded_settings(self.root,mode)
             if (loaded_provider(self.root,mode)!='snowluma' or mode['instance_id']!=binding.instance_id or
                 sha(config_canonical(settings))!=binding.config_digest or not self.artifacts_current(settings)):return False
-            record=read_json(self.root,'state/qq-transport/runtime.local.json','state')
-            if (not isinstance(record,dict) or set(record)!={'format','binding','node_executable','qq_executable'} or
-                record['format']!='qqbot-transport-owner-v1' or record['binding']!=binding.fields() or
+            return self.registered_identity_current(binding,allow_stop=allow_stop)
+        except (ValueError,OSError,KeyError,TypeError,AttributeError,OverflowError,psutil.Error):return False
+
+    def registered_identity_current(self,binding,*,allow_stop=False,require_listener=True):
+        """Stop-only ownership check survives a damaged configuration snapshot.
+
+        This weaker check never grants channel admission, bind or health readiness.
+        """
+        try:
+            if binding!=self.binding or not allow_stop and stopping(self.root,binding.instance_id):return False
+            record=owner_record(self.root)
+            if (record['binding']!=binding.fields() or
                 checked_path(self.root,record['node_executable'],'runtime')!=self.node_executable or
                 checked_path(self.root,record['qq_executable'],'runtime')!=self.qq_executable):return False
             entries=read_json(self.root,'state/managed-processes.json','state',128*1024)
@@ -125,6 +143,7 @@ class RuntimeOwner:
                 proc=self.process(ident['pid'])
                 if (not proc.is_running() or round(proc.create_time()*1000)!=ident['created'] or
                     Path(proc.exe()).resolve()!=exe.resolve()):return False
+            if not require_listener:return True  # writer registration only; never ready/commands
             node=self.process(binding.node_pid)
             listeners=[c for c in node.net_connections(kind='tcp') if c.status==psutil.CONN_LISTEN and c.laddr and c.laddr.port==binding.listener_port]
             return (len(listeners)==1 and listeners[0].laddr.ip=='127.0.0.1' and
@@ -132,9 +151,79 @@ class RuntimeOwner:
         except (ValueError,OSError,KeyError,TypeError,AttributeError,OverflowError,psutil.Error):return False
 
 
+def binding_from_fields(fields):
+    if not isinstance(fields,dict) or type(fields.get('schema')) is not int or fields['schema']!=1:
+        raise ValueError('TRANSPORT_OWNER_INVALID')
+    result=HealthBinding(fields['instance_id'],fields['transport_epoch'],fields['config_digest'],fields['policy_digest'],fields['build_hash'],
+        fields['node']['pid'],fields['node']['created'],fields['qq']['pid'],fields['qq']['created'],fields['listener_port'])
+    if result.fields()!=fields:raise ValueError('TRANSPORT_OWNER_INVALID')
+    return result
+
+
+def owner_record(root):
+    obj=read_json(root,'state/qq-transport/runtime.local.json','state')
+    base={'format','binding','node_executable','qq_executable'}
+    if not isinstance(obj,dict):raise ValueError('TRANSPORT_OWNER_INVALID')
+    if obj.get('format')=='qqbot-transport-owner-v2':
+        if set(obj)!=base|{'control_secret_file'}:raise ValueError('TRANSPORT_OWNER_INVALID')
+        checked_path(root,obj['control_secret_file'],'secrets')
+    elif obj.get('format')!='qqbot-transport-owner-v1' or set(obj)!=base:raise ValueError('TRANSPORT_OWNER_INVALID')
+    binding_from_fields(obj['binding'])
+    checked_path(root,obj['node_executable'],'runtime');checked_path(root,obj['qq_executable'],'runtime')
+    return obj
+
+
+def reserve_control_sequences(root,binding,count=1,*,lease=None,clock=time.time):
+    """One write-ahead issuer for gate and manager; never hold lock over network."""
+    if lease is None:
+        with configuration_lock(root) as held:return reserve_control_sequences(root,binding,count,lease=held,clock=clock)
+    require_configuration_lease(root,lease)
+    if type(count) is not int or not 1<=count<=2:raise ValueError('TRANSPORT_SEQUENCE_INVALID')
+    if owner_record(root)['binding']!=binding.fields():raise ValueError('TRANSPORT_OWNER_INVALID')
+    path=Path(root)/'state/qq-transport/control-sequence.local.json'
+    stamp=round(clock()*1000);seq=0
+    if not path.exists():raise ValueError('TRANSPORT_SEQUENCE_UNKNOWN')
+    if path.exists():
+        obj=read_json(root,'state/qq-transport/control-sequence.local.json','state')
+        if (not isinstance(obj,dict) or set(obj)!={'binding','sequence','clock_ms'} or type(obj['sequence']) is not int or
+            not 0<=obj['sequence']<=9007199254740991 or type(obj['clock_ms']) is not int or stamp<obj['clock_ms']):
+            raise ValueError('TRANSPORT_SEQUENCE_UNKNOWN')
+        binding_from_fields(obj['binding'])
+        if obj['binding']!=binding.fields():raise ValueError('TRANSPORT_SEQUENCE_UNKNOWN')
+        seq=obj['sequence']
+    if seq+count>9007199254740991:raise ValueError('TRANSPORT_SEQUENCE_UNKNOWN')
+    atomic_json(path,dict(binding=binding.fields(),sequence=seq+count,clock_ms=stamp))
+    return tuple(range(seq+1,seq+count+1))
+
+
+def initialize_control_sequence(root,binding,lease,*,clock=time.time):
+    require_configuration_lease(root,lease)
+    path=Path(root)/'state/qq-transport/control-sequence.local.json';stamp=round(clock()*1000)
+    if path.exists():
+        obj=read_json(root,'state/qq-transport/control-sequence.local.json','state')
+        if (not isinstance(obj,dict) or set(obj)!={'binding','sequence','clock_ms'} or
+            type(obj['clock_ms']) is not int or stamp<obj['clock_ms'] or type(obj['sequence']) is not int or
+            not 0<=obj['sequence']<=9007199254740991):raise ValueError('TRANSPORT_SEQUENCE_UNKNOWN')
+        binding_from_fields(obj['binding'])
+        if obj['binding']['instance_id']==binding.instance_id:raise ValueError('TRANSPORT_SEQUENCE_UNKNOWN')
+    atomic_json(path,dict(binding=binding.fields(),sequence=0,clock_ms=stamp))
+
+
+def startup_unknown(root):
+    path=Path(root)/'state/qq-transport/startup.local.json'
+    if not path.exists():return False
+    try:
+        obj=read_json(root,'state/qq-transport/startup.local.json','state')
+        return (not isinstance(obj,dict) or set(obj)!={'instance_id','component','status'} or
+            obj['component'] not in ('qq_client','snowluma') or obj['status']!='recorded')
+    except (ValueError,OSError,KeyError,TypeError):return True
+
+
 def sign_command(binding,key,action,sequence,*,now=time.time,nonce=None):
     if action not in ('bind','drain','stop') or type(sequence) is not int or sequence<1:raise ValueError('TRANSPORT_CONTROL_INVALID')
-    issued=round(now()*1000)
+    # Conservative 100ms floor avoids a command looking future-dated across
+    # runtime clock precision. Its validity still ends 3s after this earlier time.
+    issued=(int(now()*1000)//100)*100
     obj=binding.fields()|dict(domain=CONTROL_DOMAIN,action=action,seq=sequence,nonce=nonce or secrets.token_hex(32),issued_ms=issued,expires_ms=issued+3000)
     obj['mac']=hmac.new(key,canonical(obj),hashlib.sha256).hexdigest()
     return canonical(obj)
@@ -146,14 +235,15 @@ def verify_ack(content,binding,key,command):
         expected=binding.fields()|dict(domain=ACK_DOMAIN,action=sent['action'],seq=sent['seq'],nonce=sent['nonce'],status={'bind':'bound','drain':'draining','stop':'stopped'}[sent['action']])
         if not isinstance(obj,dict) or set(obj)!=set(expected)|{'mac'} or any(obj[k]!=v for k,v in expected.items()):return False
         return hmac.compare_digest(obj['mac'],hmac.new(key,canonical(expected),hashlib.sha256).hexdigest())
-    except (ValueError,TypeError,KeyError,UnicodeError):return False
+    except (ValueError,TypeError,KeyError,UnicodeError,RecursionError,OverflowError):return False
 
 
 class HealthMonitor:
-    def __init__(self,gate,owner,key,*,session=None):
+    def __init__(self,gate,owner,key,*,session=None,sleep=asyncio.sleep):
         self.gate,self.owner,self.key=gate,owner,key
         self.verifier=HealthVerifier(owner.binding,key,owner.identity_current,ttl=gate.config.transport_health_ttl)
         self.session=session;self.owns_session=session is None;self.task=None;self.sequence=0
+        self.sleep=sleep
         gate.bind_transport_health(self.verifier)
 
     async def exchange(self,method,path,body=None):
@@ -179,21 +269,34 @@ class HealthMonitor:
             self.verifier.invalidate();self.gate.channel_ready();return False
 
     async def command(self,action):
+        self.sequence_busy=False
         try:
             if not self.owner.identity_current(self.owner.binding,allow_stop=action in ('stop','drain')):return False
-            if action!='stop' and stopping(self.owner.root,self.owner.binding.instance_id):return False
-            self.sequence+=1;body=sign_command(self.owner.binding,self.key,action,self.sequence)
+            if action=='bind' and stopping(self.owner.root,self.owner.binding.instance_id):return False
+            self.sequence=reserve_control_sequences(self.owner.root,self.owner.binding)[0]
+            body=sign_command(self.owner.binding,self.key,action,self.sequence)
             content=await self.exchange('POST','/'+action,body)
             if action!='stop' and not self.owner.identity_current(self.owner.binding):return False
             return verify_ack(content,self.owner.binding,self.key,body)
-        except (ValueError,OSError,TimeoutError,aiohttp.ClientError):return False
+        except ValueError as error:
+            self.sequence_busy=str(error)=='Configuration/start/stop operation already in progress'
+            return False
+        except (OSError,TimeoutError,aiohttp.ClientError):return False
 
     async def run(self):
-        if stopping(self.owner.root,self.owner.binding.instance_id) or not await self.command('bind'):
+        # OS-lock allocation is nonblocking. Only an allocation that sent nothing
+        # may wait/retry; an uncertain bind response never triggers reinjection.
+        deadline=time.monotonic()+self.gate.config.transport_ready_timeout;bound=False
+        while True:
+            if stopping(self.owner.root,self.owner.binding.instance_id):break
+            if await self.command('bind'):bound=True;break
+            if not self.sequence_busy or time.monotonic()>=deadline:break
+            await getattr(self,'sleep',asyncio.sleep)(self.gate.config.transport_health_poll)
+        if stopping(self.owner.root,self.owner.binding.instance_id) or not bound:
             self.verifier.invalidate();self.gate.channel_ready();return
         while not stopping(self.owner.root,self.owner.binding.instance_id):
             await self.poll_once()
-            await asyncio.sleep(self.gate.config.transport_health_poll)
+            await getattr(self,'sleep',asyncio.sleep)(self.gate.config.transport_health_poll)
         self.verifier.invalidate();self.gate.channel_ready()
 
     async def close(self):
@@ -204,13 +307,55 @@ class HealthMonitor:
 
 
 def monitor_from_loaded(gate):
-    settings=load_consumer(gate.root)
+    mode=read_json(gate.root,'state/service-mode.json','state')
+    settings=loaded_settings(gate.root,mode)
     require_runtime(gate.root,settings)  # always closed while stage-3 qualification is missing
-    record=read_json(gate.root,'state/qq-transport/runtime.local.json','state')
-    fields=record['binding']
-    binding=HealthBinding(fields['instance_id'],fields['transport_epoch'],fields['config_digest'],fields['policy_digest'],fields['build_hash'],
-        fields['node']['pid'],fields['node']['created'],fields['qq']['pid'],fields['qq']['created'],fields['listener_port'])
+    record=owner_record(gate.root)
+    binding=binding_from_fields(record['binding'])
     owner=RuntimeOwner(gate.root,binding,record['node_executable'],record['qq_executable'])
     if not owner.identity_current(binding):raise ValueError('TRANSPORT_OWNER_INVALID')
     key=read_control_key(gate.root,settings,(gate.config.inbound_token,gate.config.upstream_token,gate.admin_token,gate.context_token))
     return HealthMonitor(gate,owner,key)
+
+
+class StopControl:
+    """Prepared under the writer lock; only fixed drain/stop are sent outside it."""
+    exchange=HealthMonitor.exchange
+
+    def __init__(self,owner,key,sequences,*,session=None):
+        self.owner=owner;self.key=key;self.sequences=sequences
+        self.session=session;self.owns_session=session is None
+
+    async def run(self):
+        results=[]
+        try:
+            for action,sequence in zip(('drain','stop'),self.sequences):
+                if not self.owner.registered_identity_current(self.owner.binding,allow_stop=True):
+                    results.append('IDENTITY_UNKNOWN');break
+                body=sign_command(self.owner.binding,self.key,action,sequence)
+                try:
+                    response=await self.exchange('POST','/'+action,body)
+                    accepted=verify_ack(response,self.owner.binding,self.key,body)
+                    # Stop ACK may legitimately precede process exit. A changed
+                    # PID/listener during drain must never authorize a next send.
+                    if action=='drain' and not self.owner.registered_identity_current(self.owner.binding,allow_stop=True):accepted=False
+                    results.append('ACKED' if accepted else 'ACK_UNKNOWN')
+                except (ValueError,OSError,TimeoutError,aiohttp.ClientError):results.append('ACK_UNKNOWN')
+            return 'ACKED' if results==['ACKED','ACKED'] else 'ACK_UNKNOWN'
+        finally:
+            if self.session and self.owns_session:await self.session.close()
+
+
+def prepare_stop_control(root,mode,lease,*,process=psutil.Process,session=None):
+    """Use frozen owner reference, never the edited disk provider/secrets path."""
+    require_configuration_lease(root,lease)
+    record=owner_record(root)
+    if record['format']!='qqbot-transport-owner-v2':raise ValueError('TRANSPORT_CONTROL_UNAVAILABLE')
+    binding=binding_from_fields(record['binding'])
+    if mode.get('provider')!='snowluma' or mode.get('instance_id')!=binding.instance_id:
+        raise ValueError('TRANSPORT_OWNER_INVALID')
+    owner=RuntimeOwner(root,binding,record['node_executable'],record['qq_executable'],process=process)
+    if not owner.registered_identity_current(binding,allow_stop=True):raise ValueError('TRANSPORT_OWNER_INVALID')
+    key=read_key_reference(root,record['control_secret_file'])
+    sequences=reserve_control_sequences(root,binding,2,lease=lease)
+    return StopControl(owner,key,sequences,session=session)

@@ -137,6 +137,7 @@ class OneBotGate:
         self.online_at = None
         self.good = None
         self.transport_health = None
+        self.transport_monitor_task = None
         self._transport_ready = False
         self.health_pending = {}
         self.admin_pending={}
@@ -248,7 +249,9 @@ class OneBotGate:
                 'last_heartbeat': self.last_heartbeat, 'online': online, 'channel_state': channel,
                 'stopping': bool(self.root and stopping(self.root)),
                 'silence_enabled':self.silence.enabled,'muted_groups':sum(s['mode']=='muted' for s in self.silence.states.values()),
-                **(dict(channel_ready=ready,good=self.good,transport_health=self.transport_health.safe_status() if self.transport_health else
+                **(dict(channel_ready=ready,good=self.good,
+                    transport_monitor=dict(running=bool(self.transport_monitor_task and not self.transport_monitor_task.done())),
+                    transport_health=self.transport_health.safe_status() if self.transport_health else
                     dict(trusted=False,ready=False,sequence=0,armed=False)) if self.snow() else {})}
 
     def observe_online(self, data):
@@ -536,6 +539,7 @@ class OneBotGate:
                 from .transport_owner import monitor_from_loaded
                 monitor=monitor_from_loaded(self)
                 monitor.task=asyncio.create_task(monitor.run())
+                self.transport_monitor_task=monitor.task
         app.on_startup.append(start_transport)
 
         async def cleanup(app):

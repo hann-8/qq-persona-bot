@@ -213,6 +213,7 @@ const response=await handler.handle({method:'POST',url:'/bind',body});process.st
             root=Path(tmp);b=binding();calls=[]
             monitor=object.__new__(HealthMonitor);monitor.owner=SimpleNamespace(root=root,binding=b)
             monitor.verifier=Mock();monitor.gate=Mock()
+            monitor.gate.config.transport_ready_timeout=180
             async def command(action):
                 calls.append(action);atomic_json(root/'state/stop-request.json',dict(instance_id=b.instance_id));return True
             async def poll():calls.append('poll')
