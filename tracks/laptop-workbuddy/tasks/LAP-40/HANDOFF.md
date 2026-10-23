@@ -4,6 +4,8 @@
 
 **当前检查点：阶段1/2根审通过，阶段3静态核对根审通过；阶段4A项目侧部分实现/离线通过，待根审，未部署。** 当前真实Snow启动明确总拒绝，尚无完整Snow生命周期；[阶段4A报告](../../../../reports/lap-40-stage4A-2026-10-24.md)逐项列明已实现与未完成。以下规划和阶段登记保留历史，不代表真实接线通过。
 
+4A部分检查点已获根审接受，代码提交`c549ce3703dcec6f0f7a6976caaa1bdb04f19dfe`已推送且远端一致、代码工作区干净。追加续作待办：`manage.show_status`末尾对Snow/unknown阻断不得提示NapCat6099，应输出封闭对应状态并测试。其余4A未写项目侧能力见报告，未升级为完整完成。当前额度used94/remaining6%，不开始新实现，等待根agent续作安排。
+
 状态：详细[PLAN](PLAN.md)与[分阶段实施指引](IMPLEMENTATION_GUIDE.md)已完成；阶段1/2项目侧实现与离线验证均经根agent复核。阶段3固定源码/指定材料只读核对与[私有接线清单](PRIVATE_WIRING_CHECKLIST.md)完成，原包/干净QQ/proof缺失且标准core构建复制native，未准备私有改版/构建/上游合成验证；待根agent复核后独立4A/4B。尚未部署或切换，真实/G0/G1/上游私有接线/长稳未验。详见[阶段1报告](../../../../reports/lap-40-stage1-2026-10-24.md) / [阶段2报告](../../../../reports/lap-40-stage2-2026-10-24.md) / [阶段3报告](../../../../reports/lap-40-stage3-2026-10-24.md)。用户要求SnowLuma替换试运行，长期运行优先，允许branch；随后授权根agent逐步调用`gpt-6.1-sol / medium`实施复核。规划阶段仅只读源码/元数据与6份文档，0代码/配置/安装/依赖/注入/启停/登录/模型/群/SSH操作。
 
 session `LAP-40-SnowLuma-trial-plan`，2026-10-24 01:19（Asia/Shanghai）开始；基线main/66eea49623b76766e0569614207c80c78e57115f，工作区干净。已按用户授权新建`codex/lap-40-snowluma-trial`；本轮仅该分支规划，保留main和原运行状态，不声称自动检测或切换会话模型/档位。
