@@ -264,6 +264,10 @@ def normalize_settings(raw):
     secret = data.get('secrets_file')
     if not isinstance(secret, str) or not secret:
         raise ValueError('Missing secrets_file')
+    from .qq_transport import validate_transport
+    if isinstance(data.get('legacy_extensions'), dict) and 'qq_transport' in data['legacy_extensions']:
+        raise ValueError('Legacy qq_transport collision requires review')
+    validate_transport(data)
     return data
 
 
@@ -276,6 +280,8 @@ def read_settings(path, *, root=None):
         raise ValueError('Invalid UTF-8 YAML configuration') from None
     data = normalize_settings(raw)
     root = Path(root).resolve() if root is not None else path.parent.parent
+    from .qq_transport import validate_transport
+    validate_transport(data, root)
     from .ssh_transport import secrets_path
     secrets_path(root,data['llm']['profiles']['ollama_ssh']['access_file'])
     if not (root / data['secrets_file']).resolve().is_relative_to(root / 'secrets'):

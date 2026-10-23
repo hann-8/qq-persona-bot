@@ -20,7 +20,7 @@ LAYOUT = {
     'models.yaml': ('llm',),
     'chat.yaml': ('chat', 'participation', 'output'),
     'features.yaml': ('public_network', 'web', 'bilibili', 'memes', 'memory', 'vision', 'members'),
-    'runtime.yaml': ('layout_version', 'schema_version', 'onebot', 'secrets_file', 'legacy_extensions'),
+    'runtime.yaml': ('layout_version', 'schema_version', 'onebot', 'secrets_file', 'qq_transport', 'legacy_extensions'),
 }
 KNOWN = frozenset(k for keys in LAYOUT.values() for k in keys)
 FILE_LIMIT = 128 * 1024
@@ -113,6 +113,8 @@ def validate(root, raw):
     from .config import normalize_settings
     from .ssh_transport import secrets_path
     data = normalize_settings(raw)
+    from .qq_transport import validate_transport
+    validate_transport(data, root)
     try:secrets_path(root, data['llm']['profiles']['ollama_ssh']['access_file'])
     except ValueError:raise error('models.yaml', 'llm.profiles.ollama_ssh.access_file', reason='秘密引用必须位于项目secrets内') from None
     try:secrets_path(root, data['secrets_file'])

@@ -1,5 +1,24 @@
 """Fixed Chinese vocabulary; defaults describe new installs, never migration values."""
 DESCRIPTIONS = {
+    'qq_transport': '可选QQ传输；缺省NapCat，不回填旧快照；停机保存后下次受管启动生效',
+    'snowluma': '固定v2.1.1候选；静态证明不代表已部署或实时健康',
+    'runtime_root': '项目runtime内操作者准备的官方包根；禁止自动部署及链接',
+    'qq_executable': '项目runtime内干净专用QQ；不能复用已patched入口',
+    'proof_file': '项目state内严格静态证据JSON；不能填写valid=true绕过',
+    'control_secret_file': '独立32字节控制密钥的secrets引用；inspect不读取内容',
+    'control_port': '127.0.0.1独立控制端口1..65535；不得与现有端口冲突',
+    'health_poll_seconds': '独立采样周期5..10秒；不触发模型或群消息',
+    'health_ttl_seconds': '15..30秒且不少于3倍采样周期；过期不可准入',
+    'ready_timeout_seconds': '就绪等待60..240秒；超时转人工，不无限等待',
+    'recovery': '有界恢复配置；实现阶段未到时不生效，不自动切回NapCat',
+    'allow_qq_restart': '默认false；仅原生数据已证和3/3免扫码证据后可用',
+    'down_grace_seconds': '固定30秒，先等待原连接自恢复',
+    'drain_seconds': '固定150秒；未决清理未知保持阻断',
+    'max_snowluma_per_24h': '24小时Snow重启上限0..2，不是每事故次数',
+    'max_qq_per_24h': '24小时QQ重启上限0..1，还需独立免扫码证据',
+    'trial': '状态和资源观测；无模型和测试群消息',
+    'sample_seconds': '固定60秒采样', 'initial_hours': '固定72小时初筛，包含在总时长中',
+    'total_hours': '固定168小时完整验收；静态检查不能替代长稳',
     'bilibili': '轻量单P单轨字幕；默认关闭，无ASR/音视频/评论或平台AI摘要',
     'public_network': '项目公共网络；显式选择解析和CA，不改全局网络配置',
     'resolver': 'system或固定cloudflare_doh；失败不自动切换，默认system',
@@ -95,6 +114,9 @@ def comment(key, value=None):
 
 
 PATH_DESCRIPTIONS = {
+    ('qq_transport', 'provider'): 'napcat或snowluma；默认napcat，显式停机切换，不自动fallback',
+    ('qq_transport', 'recovery', 'enabled'): '默认false；首次真实手动验证后显式启用，不新增系统自启',
+    ('qq_transport', 'recovery', 'cooldown_seconds'): '持久冷却至少1800秒，进程重启不清零',
     'bilibili': '轻量单P单轨字幕；默认关闭，无ASR/音视频/评论或平台AI摘要',
     'public_network': '项目公共网络；显式选择解析和CA，不改全局网络配置',
     'resolver': 'system或固定cloudflare_doh；失败不自动切换，默认system',

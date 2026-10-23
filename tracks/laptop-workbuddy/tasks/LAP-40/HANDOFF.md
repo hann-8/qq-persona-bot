@@ -2,7 +2,7 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md)。继承AGENTS。
 
-状态：详细[PLAN](PLAN.md)与[分阶段实施指引](IMPLEMENTATION_GUIDE.md)已完成，尚未实施。用户要求SnowLuma替换试运行，长期运行优先，允许branch；随后授权根agent逐步调用`gpt-6.1-sol / medium`实施复核。规划阶段仅只读源码/元数据与6份文档，0代码/配置/安装/依赖/注入/启停/登录/模型/群/SSH操作。
+状态：详细[PLAN](PLAN.md)与[分阶段实施指引](IMPLEMENTATION_GUIDE.md)已完成；阶段1配置/provider/只读静态检查已实现、83项离线测试通过，待根agent复核后再派阶段2。尚未部署或切换，真实/G0/G1/私有接线/长稳未验。详见[阶段1报告](../../../../reports/lap-40-stage1-2026-10-24.md)。用户要求SnowLuma替换试运行，长期运行优先，允许branch；随后授权根agent逐步调用`gpt-6.1-sol / medium`实施复核。规划阶段仅只读源码/元数据与6份文档，0代码/配置/安装/依赖/注入/启停/登录/模型/群/SSH操作。
 
 session `LAP-40-SnowLuma-trial-plan`，2026-10-24 01:19（Asia/Shanghai）开始；基线main/66eea49623b76766e0569614207c80c78e57115f，工作区干净。已按用户授权新建`codex/lap-40-snowluma-trial`；本轮仅该分支规划，保留main和原运行状态，不声称自动检测或切换会话模型/档位。
 
@@ -25,3 +25,7 @@ session `LAP-40-SnowLuma-trial-plan`，2026-10-24 01:19（Asia/Shanghai）开始
 受管worktree `C:\Users\yutha\.codex\worktrees\lap-40-snowluma-impl\QQbot`，分支`codex/lap-40-snowluma-impl`从精确规划提交创建；不含原runtime/state/secrets/local，不复制认证/私改。原`E:\CodexWS\QQbot`仍为规划分支，运行代码/状态未动。可借原`.venv/Scripts/python.exe`作为只读解释器，测试工作目录/PYTHONPATH必须指向隔离worktree，禁止写原运行目录。
 
 阶段1登记：`LAP-40-medium-stage1-config`，开始02:03，待根agent调用gpt-6.1-sol/medium。归属qq_transport/provider、config.py/config_files.py/config_comments.py/必要布局操作、scripts/transport.py只读inspect、模板/配置说明、对应测试及本任务交接/报告。共享3入口只由根agent写。完成后交根agent审阅，不自行越级启动真实阶段。
+
+阶段1实际领取：2026-10-24 02:05（Asia/Shanghai），session `LAP-40-medium-stage1-config`；已读规定入口/计划与codex-handoff，隔离分支HEAD `6556b24c5102e3bac21b6197a39902ae0c4a7334`、工作区干净。300分钟used=8%，remaining=92%。本阶段独占`src/qqbot_gateway/qq_transport.py`、`config.py`、`config_files.py`、`config_comments.py`、`scripts/transport.py`、`config/settings.example.yaml`、`config/examples/runtime.yaml`、`config/README.md`、`tests/test_qq_transport.py`及本HANDOFF/`reports/lap-40-stage1-2026-10-24.md`。按既定计划完成配置/provider/只读静态证据，成功标准是精确旧摘要兼容与自造离线边界通过；不触运行checkout、local/secrets/persona、不实现阶段2健康或恢复。
+
+阶段1交接（2026-10-24 02:12）：上述11归属文件完成；15新增/14配置/30分层/6注释/18菜单共83通过，0跳过，diff --check通过。缺节schema1/2/3精确语义摘要和旧snapshot raw摘要保持，经过实际load_consumer/迁移验证；NT junction、非法/碰撞/独立秘密引用、严格proof/摘要绑定/变动失效、inspect只读与--json均有自造证据。inspect永不放行实时ready/G0/G1；原包/干净QQ/原生数据/私有接线未验，原运行目录/配置/进程全未触及。提交前额度used20/remaining80%。根agent复核本阶段diff及报告，再按指引串行派阶段2；本session停在阶段1，不自行推进。Git提交/远端一致性待本阶段出口精确回报并由根agent同步共享入口。

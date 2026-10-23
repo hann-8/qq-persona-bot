@@ -161,3 +161,28 @@ bilibili:  # 轻量单P单轨字幕；默认关闭，无ASR/音视频/评论或�
   max_subtitle_response_bytes: 1048576  # 65536..1048576字节，API/字幕压缩前后均有界
   max_evidence_bytes: 6000  # 1000..6000 UTF-8字节，元数据/范围共用且取最终剩余更小值
   cache_ttl_seconds: 600  # 0..600秒，0禁用；仅RAM最多32条/4MiB，不缓存回答
+
+# LAP-40：仅静态配置接口；真实切换须另行满足G0/G1，不自动安装或启用。
+qq_transport:  # 可选QQ传输；缺省NapCat，不回填旧快照；停机保存后下次受管启动生效
+  provider: napcat  # napcat或snowluma；默认napcat，显式停机切换，不自动fallback
+  snowluma:  # 固定v2.1.1候选；静态证明不代表已部署或实时健康
+    runtime_root: runtime/snowluma/v2.1.1  # 项目runtime内操作者准备的官方包根；禁止自动部署及链接
+    qq_executable: runtime/qq-snowluma/QQ.exe  # 项目runtime内干净专用QQ；不能复用已patched入口
+    proof_file: state/qq-transport/proof.local.json  # 项目state内严格静态证据JSON；不能填写valid=true绕过
+    control_secret_file: secrets/snowluma-control.local.json  # 独立32字节控制密钥的secrets引用；inspect不读取内容
+    control_port: 5098  # 127.0.0.1独立控制端口1..65535；不得与现有端口冲突
+    health_poll_seconds: 5  # 独立采样周期5..10秒；不触发模型或群消息
+    health_ttl_seconds: 15  # 15..30秒且不少于3倍采样周期；过期不可准入
+    ready_timeout_seconds: 180  # 就绪等待60..240秒；超时转人工，不无限等待
+  recovery:  # 有界恢复配置；实现阶段未到时不生效，不自动切回NapCat
+    enabled: false  # 默认false；首次真实手动验证后显式启用，不新增系统自启
+    allow_qq_restart: false  # 默认false；仅原生数据已证和3/3免扫码证据后可用
+    down_grace_seconds: 30  # 固定30秒，先等待原连接自恢复
+    drain_seconds: 150  # 固定150秒；未决清理未知保持阻断
+    cooldown_seconds: 1800  # 持久冷却至少1800秒，进程重启不清零
+    max_snowluma_per_24h: 2  # 24小时Snow重启上限0..2，不是每事故次数
+    max_qq_per_24h: 1  # 24小时QQ重启上限0..1，还需独立免扫码证据
+  trial:  # 状态和资源观测；无模型和测试群消息
+    sample_seconds: 60  # 固定60秒采样
+    initial_hours: 72  # 固定72小时初筛，包含在总时长中
+    total_hours: 168  # 固定168小时完整验收；静态检查不能替代长稳

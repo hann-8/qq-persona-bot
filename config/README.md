@@ -106,3 +106,21 @@ LAP-18B补充：`features.yaml`新增`public_network`（resolver=system、ca_bun
 字段随原五文件源摘要、语义摘要、实例快照、兼容导出和会话版本保存；下次正常启动生效，不热更新。readability模式内部升级为显式main/role=main/article优先，候选不合格/不确定才对同一RAM文档用readability；legacy仍为操作者显式回滚选择。full仅表示提取主体全部入包。公开模板/中文旁注已同步，本机local/persona未改；web默认false、搜索质量门槛false不变。
 
 当前网络证据以[LAP-38](../tracks/laptop-workbuddy/tasks/LAP-38/EVIDENCE.md)为准：部分公共正文成功且仍超时，不再沿用18B当时全非公网结论。18C仅代码/离线通过，真实材料质量、模型与QQ/ACK验收未完成，见[18C报告](../reports/lap-18-C-2026-10-23.md)。
+
+## LAP-40 QQ传输静态接口
+
+`runtime.yaml`可选增加`qq_transport`，旧单文件也识别同名根节。缺少此节时仍为NapCat；消费层解析默认值，不向旧规范化对象或实例快照回填字段，因此旧schema1/2/3的语义摘要不变。只有实际存在的节参与校验；旧`legacy_extensions.qq_transport`会报冲突，须人工审阅。示例完整字段均有同行中文说明，现有local与人设不会自动重写。
+
+当前LAP-40阶段1只交付配置、provider描述和静态检查；受管Snow启动、实时健康、策略接线、恢复和activate/rollback尚待后续阶段。不要据此修改运行provider或把文件存在当作切换完成。所有设置在显式停机保存、下次受管启动后才可生效，不热更新，不自动fallback。
+
+只读检查：`python scripts/transport.py inspect --json`（可用`--root`指定项目根）。输出当前选择的provider及`snowluma_candidate`静态检查范围；`channel_ready`始终false，与现有NapCat在线状态无关。不联网、不启动进程、不读控制密钥、不读取QQ认证数据、不写配置/状态。缺包等返回封闭阻断码；CLI退出0表示检查完成，不表示真实准入。无有效配置时退出1，仅输出`transport_config_invalid`。
+
+`snowluma`路径相对项目根：官方包根在runtime，干净专用QQ入口在runtime，证明在state，独立控制密钥引用在secrets。拒绝越界、Windows设备名/备用数据流、链接/重解析点及端口碰撞（含6185/6099和现有gate/model端口）。控制密钥不能复用OneBot/SSH/B站凭据引用；其32字节内容与运行监听身份由后续阶段核验，本检查不打开秘密文件。默认控制端口5098、采样5秒/TTL15秒、等待180秒，TTL至少为采样的3倍。恢复默认false、QQ重启默认false；标志本身不能证明3/3免扫码或授予动作资格。
+
+本机静态证明格式固定为`qqbot-snowluma-static-proof-v1`，JSON拒重复/未知/缺失字段，最多16KiB。根字段为`format/release/tag_sha/bundle/native_deployment/clean_qq/data_scope/private_build`：
+
+- `release=v2.1.1`、`tag_sha=f8cb15c27bca3d2d1bd044a921e55bfc44bb5e60`固定在代码；不允许配置跳过。
+- `bundle`严格含`file/sha256/size`，文件须为官方`SnowLuma-v2.1.1-win-x64.zip`，42,694,125字节、SHA256 `c739171f95c27706767e69ba36099707c222fcec639b46f4d59689997b527772`；只哈希操作者自行准备的原包，不下载/解压/复制。
+- 其余四节必须有`evidence_file/evidence_sha256`，引用`state/qq-transport/`中的本机证据（每份最多1MiB）。`clean_qq`另有`executable_sha256`绑定配置QQ入口；`private_build`另有`build_file/build_sha256/policy_file/policy_sha256/policy_version`，文件须在忽略的`runtime/snowluma-private/`，策略版本固定`qqbot-snowluma-policy-v1`。
+
+`static_evidence_checked=true`仅表示所有所引文件的实际摘要匹配，不证明证据内容的真实性、许可适用、干净QQ/原生数据归属、真实私有接线或实时健康。检查始终保留`native_deployment_unverified/clean_qq_unverified/data_scope_unverified/private_build_unverified/operator_scan_required`；后续受控审阅与独立健康不能被静态JSON代替。没有预备材料时保持缺失，不生成或填写伪造证明；本机证明、原包、私有构建与账号资料不提交Git。
