@@ -84,6 +84,7 @@ LAP-15内容提交`632fdc5`已推送origin/main，2026-10-17 11:09用ls-remote�
 
 | ID | 单一任务 | 状态与已有证据 | 依赖/推荐顺序 | 执行session | 下一步/完成出口 |
 | --- | --- | --- | --- | --- | --- |
+| LAP-40 | SnowLuma替换试运行 | 详细[PLAN](tasks/LAP-40/PLAN.md)/[medium指引](tasks/LAP-40/IMPLEMENTATION_GUIDE.md)完成，未实施；[HANDOFF](tasks/LAP-40/HANDOFF.md) | 继承39；长期运行优先，私有早期边界/许可/干净QQ数据先证，72h/7天分级，保留旧差额 | LAP-40-SnowLuma-trial-plan，2026-10-24 01:19领取/01:58规划完成；codex/lap-40-snowluma-trial；根agent独占3入口，medium按阶段领取代码/测试/40交接 | 规划提交推送后根agent按用户授权调用gpt-6.1-sol/medium隔离串行实施/复核；真实前置不足不动原bot；5h剩余<=5%交接并等北京时间10月24日07:10 |
 | LAP-39 | 夜间不回复、配置保留与SnowLuma长期运行评估 | 既有修复/离线通过；复发诊断/SnowLuma调研完成，迁移未实施；[HANDOFF](tasks/LAP-39/HANDOFF.md) / [评估](tasks/LAP-39/SNOWLUMA_ASSESSMENT.md) | 用户以长期运行为首要标准；原版gate前答复/补历史/存储与干净QQ归属是迁移前置；保留o3候选/QQ诱因与旧差额 | 当前LAP-39-SnowLuma-longrun-assessment，2026-10-24 00:53登记，调研交付；独占6文档，23日归属见历史HANDOFF | 先解决前置能力缺口并详细规划，再72h/7天验证；本轮0安装/注入/启停/登录/模型/群/配置/SSH，不重新探活或默认切换 |
 | LAP-38 | 识图/网页补证与个人微信接入详细规划 | completed，仅规划；[HANDOFF](tasks/LAP-38/HANDOFF.md)/[PLAN](tasks/LAP-38/PLAN.md)/[指令](tasks/LAP-38/IMPLEMENTATION_GUIDE.md) | 补18C/28R；微信独立先WX-01，旧36/验收差额保留 | LAP-38-vision-web-wechat-plan，2026-10-22 23:19领取、23:50规划收口；18份文档独占 | 公共网络/正文质量新证据、路径/激活合同与微信七份引导/hash交付；0代码/配置/模型/QQ/微信/SSH/启停，Git见交接 |
 | LAP-37 | 清理容量阻断修复/人工恢复与弃用自启 | 已实现/105项离线通过/停机现场恢复通过；[HANDOFF](tasks/LAP-37/HANDOFF.md) | 既有31/33合同修复，不自动解锁unknown | LAP-37-cleanup-capacity-recovery，2026-10-22 21:20；归属见交接 | blocked=false，bot停机；清理cmd可复用；自启弃用，真实运行/31B差额保留 |
