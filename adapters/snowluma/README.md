@@ -12,6 +12,10 @@
 
 `createHealthProducer`与Python `HealthProducer/HealthVerifier`使用同一8KiB、nonce挑战、HMAC-SHA256规范化JSON合同。创建时间是Unix整数毫秒，PID与创建时间均来自受管登记和实际进程核验；不从QQ事件接受自报身份。固定字段在PLAN基础上加入`config_digest`及`listener_port`，绑定加载快照与监听归属；每个nonce最多3秒、一次使用，seq严格增加，健康按配置TTL15..30秒生效，mirror不超过该证明剩余有效期。生产端必须从真实私有pipe/login/armed/rx/outbound观测取值，不得把初始good当armed。
 
-Python verifier的`identity_current(binding)`由后续唯一受管owner接入registry、实际PID创建身份及监听归属，每次accept/ready均重新核验。默认gate无verifier、无密钥或无受管绑定时closed；没有公开的“提交自己签名healthy就放行”HTTP接口。实际listener/poll与独立秘密读取尚属阶段4；阶段2通过函数接口和自造生产端连通验证，不打开真实端口。
+阶段4A的Python `RuntimeOwner`读取加载快照、唯一管理器registry、固定PID创建毫秒身份、exe路径和该Node进程的固定回环listener；build/policy首次验hash后文件身份/大小/时间变化即closed。monitor不写registry、不扫描或adopt进程、不恢复。`HealthMonitor`在gate应用startup绑定verifier、签名bind一次后按配置poll、每次accept/ready重新核验，cleanup撤销并关闭session；默认缺资格/秘密仍closed。
+
+`control_plane.mjs`仅导出固定health/bind/drain/stop纯handler，不监听端口。控制命令与health/ACK分域，3秒有效、严格规范化JSON、单调seq和有界nonce去重；同owner lease的bind至多调用一次，未决重入拒绝，已成功bind可幂等ACK。`onBind(current)`必须在真实副作用前调用current，stop/drain会立即撤销该lease；失败/超时不允许重试注入。可信observe必须来自真实私有运行观测，不能拿handler自身状态冒充armed/outbound。
+
+当前`require_runtime`明确总拒绝真实Snow启动（`private_runtime_entry_unavailable`），管理器在snapshot/状态/子进程创建前、gate在监听前检查。尚未实现合格私有入口、Snow进程启动spec/owner记录生成、真实listener挂接、管理器优雅drain/stop ACK调用。现有stop通过同一管理锁先置stop marker，再依registry已证明的PID创建身份回收；快照损坏不阻止停止，身份未知保留原有失败语义。上述是项目侧接口及离线闭环，不能称完整Snow生命周期或上游接线完成。
 
 测试：`node --test adapters/snowluma/project_policy.test.mjs`。本机Node24.22.0仅执行这些原创无依赖测试，不满足Snow实际运行引擎，不作为其构建/运行通过证据。

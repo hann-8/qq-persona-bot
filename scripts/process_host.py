@@ -43,6 +43,8 @@ def login_event(line):
 
 
 def safe_line(component,line):
+    if component in ('snowluma','qq_client','transport_watch'):
+        return line if re.fullmatch(r'TRANSPORT_EVENT code=(?:BOUND|DRAINING|STOPPED|HEALTH_UNAVAILABLE|IDENTITY_UNAVAILABLE|RUNTIME_BLOCKED)',line) else None
     if component=='model' and 'PUBLIC_MATERIAL ' in line:
         from qqbot_gateway.web_retrieval import safe_material_log
         return safe_material_log(line.rstrip())
@@ -81,7 +83,7 @@ def main():
                 if safe in events or len(events)>=32:continue
                 events.add(safe)
             if safe:print(time.strftime('%Y-%m-%d %H:%M:%S')+' '+safe,flush=True)
-            elif args.component!='napcat' and ('ERROR' in line or '[ERRO]' in line) and time.monotonic()-last_error>30:
+            elif args.component not in ('napcat','snowluma','qq_client','transport_watch') and ('ERROR' in line or '[ERRO]' in line) and time.monotonic()-last_error>30:
                 print('COMPONENT_ERROR component='+args.component+' details_suppressed',flush=True);last_error=time.monotonic()
     code=process.wait();print('HOST_EXIT component='+args.component+' code='+str(code),flush=True)
     raise SystemExit(code)

@@ -109,6 +109,8 @@ LAP-18B补充：`features.yaml`新增`public_network`（resolver=system、ca_bun
 
 ## LAP-40 QQ传输静态接口
 
+阶段4A补充：独立控制秘密文件只读接受`{"schema":1,"key":"64位小写十六进制"}`，32字节密钥不得复用模型/OneBot/admin/context token，不通过命令行或环境值传递。缺失/字段异常/复用均closed。当前真实Snow启用总拒绝，尚无合格私有入口与启动spec；不应为测试手写runtime owner或伪造proof。管理状态使用已加载snapshot的provider；snapshot丢失/损坏时报unknown且关闭准入，停止仍按已登记创建身份回收，不读磁盘provider猜测。
+
 `runtime.yaml`可选增加`qq_transport`，旧单文件也识别同名根节。缺少此节时仍为NapCat；消费层解析默认值，不向旧规范化对象或实例快照回填字段，因此旧schema1/2/3的语义摘要不变。只有实际存在的节参与校验；旧`legacy_extensions.qq_transport`会报冲突，须人工审阅。示例完整字段均有同行中文说明，现有local与人设不会自动重写。
 
 当前LAP-40阶段1/2已交付配置/provider/静态检查，以及原创早期策略、独立健康协议、实际gate/router时效栅栏；上游私有接线、实际控制监听/轮询、受管Snow启动、恢复和activate/rollback尚待后续阶段。默认没有受管健康绑定就关闭Snow准入，不能把文件存在当作已部署或切换。所有设置在显式停机保存、下次受管启动后才可生效，不热更新，不自动fallback。

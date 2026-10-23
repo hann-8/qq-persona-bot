@@ -529,7 +529,17 @@ class OneBotGate:
         app.router.add_post('/context/vision/resolve',self.resolve_vision)
         app.router.add_post('/context/vision/bind',self.resolve_vision)
 
+        monitor=None
+        async def start_transport(app):
+            nonlocal monitor
+            if self.snow():
+                from .transport_owner import monitor_from_loaded
+                monitor=monitor_from_loaded(self)
+                monitor.task=asyncio.create_task(monitor.run())
+        app.on_startup.append(start_transport)
+
         async def cleanup(app):
+            if monitor:await monitor.close()
             if self.active is not None:
                 await self.active.close(code=1001, message=b'SHUTDOWN')
             self.store.close()
@@ -650,14 +660,19 @@ def main():
     from .config_files import management_root
     root=management_root(args.config,args.root or os.environ.get('QQBOT_ROOT'))
     config = load_gate_config(args.config,root=root)
+    if config.transport_provider=='snowluma':
+        from .transport_owner import require_runtime
+        from .config_files import load_consumer
+        require_runtime(root,load_consumer(root,args.config))
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
     web.run_app(OneBotGate(config,root).application(), host=config.host, port=config.port, access_log=None)
 
 
 if __name__ == '__main__':
     from .config_files import ConfigError
+    from .transport_owner import TransportBlocked
     import sys
     try:main()
-    except ConfigError as error:
+    except (ConfigError,TransportBlocked) as error:
         print(str(error),file=sys.stderr)
         raise SystemExit(1) from None

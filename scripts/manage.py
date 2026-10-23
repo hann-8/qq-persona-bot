@@ -2,6 +2,7 @@
 import argparse
 from contextlib import closing
 import json
+import math
 import os
 from pathlib import Path
 import socket
@@ -24,12 +25,16 @@ from qqbot_gateway.config import load_settings, load_gate_config, configuration_
 from qqbot_gateway.config_files import (read_project, create_snapshot, snapshot_environment, load_consumer, prune_snapshots)
 from qqbot_gateway.lifecycle import atomic_json
 from qqbot_gateway.napcat_login import child_environment
+from qqbot_gateway.transport_owner import loaded_provider, loaded_settings, require_runtime, TransportBlocked
+from qqbot_gateway.qq_transport import resolve_transport
 
 
 def alive(entry):
     try:
         process = psutil.Process(entry['pid'])
-        return process if abs(process.create_time() - entry['created']) < .01 and process.is_running() else None
+        same=(round(process.create_time()*1000)==round(entry['created']*1000) if entry.get('component') in
+              ('snowluma','qq_client','transport_watch') else abs(process.create_time()-entry['created'])<.01)
+        return process if same and process.is_running() else None
     except psutil.NoSuchProcess:
         return None
 
@@ -38,7 +43,7 @@ def read_state():
     if not STATE.exists():return []
     entries=json.loads(STATE.read_text(encoding='utf-8'))
     if not isinstance(entries,list) or any(not isinstance(e,dict) or type(e.get('pid')) is not int or
-            type(e.get('created')) not in (int,float) or not isinstance(e.get('component'),str) for e in entries):
+            type(e.get('created')) not in (int,float) or not math.isfinite(e['created']) or not isinstance(e.get('component'),str) for e in entries):
         raise ValueError('Invalid managed process identities; inspect local state')
     return entries
 
@@ -139,14 +144,23 @@ def port_open(port):
 
 def status_report(*,disk_config=None):
     entries=read_state()
-    counts={name:sum(1 for e in entries if e['component']==name and alive(e) is not None)
-            for name in ('astrbot','model','gate','napcat')}
     mode_state=service_mode()
+    try:provider=loaded_provider(ROOT,mode_state)
+    except (ValueError,OSError):
+        return dict(provider='unknown',process_state='unknown',mode=mode_state.get('mode','unknown'),
+            processes={},channel={},channel_state='unknown',can_receive_group_messages=False,
+            configuration={'loaded':None,'disk':'unknown'},model={},configured_profile={'state':'unavailable'},
+            task_counts=task_counts(),napcat_login={'state':'unavailable'},qq_login_state='transport_unavailable',
+            qq_login_observation={'state':'not_applicable'},autostart=None,transport_code='LOADED_SNAPSHOT_INVALID')
+    components=('qq_client','snowluma','transport_watch') if provider=='snowluma' else ('napcat',)
+    counts={name:sum(1 for e in entries if e['component']==name and alive(e) is not None)
+            for name in ('astrbot','model','gate')+components}
     mode=mode_state.get('mode','text')
-    expected=('astrbot','gate','napcat','model') if mode=='text' else ('astrbot','gate','napcat')
+    expected=('astrbot','gate')+components+(('model',) if mode=='text' else ())
     model=fetch_health(8765) if counts['model'] else {'alive':False}
     gate=fetch_health(6200) if counts['gate'] else {'alive':False}
-    required_ports=(6185,6199,6200,6099,8765) if mode=='text' else (6185,6199,6200,6099)
+    transport_port=resolve_transport(loaded_settings(ROOT,mode_state))['snowluma']['control_port'] if provider=='snowluma' else 6099
+    required_ports=(6185,6199,6200,transport_port)+((8765,) if mode=='text' else ())
     complete=all(counts[name] for name in expected) and all(port_open(p) for p in required_ports)
     if mode=='text':complete=complete and model.get('router_ready') is True and model.get('alive') is True
     phase='running' if complete else 'partial' if any(counts.values()) else 'stopped'
@@ -161,14 +175,15 @@ def status_report(*,disk_config=None):
         cfg=resolve_backend(settings)
         configured={'backend':cfg['backend'],'model':cfg['model']}
         from qqbot_gateway.napcat_login import credential_status
-        login_status=credential_status(ROOT,settings['bot']['qq'])
+        login_status=credential_status(ROOT,settings['bot']['qq']) if provider=='napcat' else {'state':'not_applicable'}
     except (ValueError,OSError):configured={'state':'unavailable'};login_status={'state':'unavailable'};disk_config=False
     from qqbot_gateway.napcat_login_observer import gate_state, listener_identity, historical_status
-    current_gate=listener_identity(entries,'gate',6200) if counts['gate'] else None
+    current_gate=(listener_identity(entries,'gate',6200) if provider=='napcat' else gate.get('channel_ready') is True) if counts['gate'] else None
     qq_state=gate_state(gate,paused=mode_state.get('login_check_only') is True) if current_gate else 'transport_unavailable'
-    return {'autostart':autostart_status(),'qq_login_observation':historical_status(ROOT,mode_state.get('instance_id')),'qq_login_state':qq_state,'process_state':phase,'mode':mode,'processes':counts,'channel':gate,'channel_state':channel,
+    return {'provider':provider,'autostart':autostart_status(),'qq_login_observation':historical_status(ROOT,mode_state.get('instance_id')) if provider=='napcat' else {'state':'not_applicable'},'qq_login_state':qq_state,'process_state':phase,'mode':mode,'processes':counts,'channel':gate,'channel_state':channel,
             'can_receive_group_messages':bool(complete and gate.get('connected') is True and
-                 gate.get('self_id_verified') is True and gate.get('online') is True and not gate.get('stopping')),
+                 gate.get('self_id_verified') is True and gate.get('online') is True and not gate.get('stopping') and
+                 (provider=='napcat' or gate.get('channel_ready') is True)),
             'configuration':configuration_status(mode_state,disk_config=disk_config,running=phase!='stopped'),
             'model':model,'configured_profile':configured,'task_counts':task_counts(),'napcat_login':login_status}
 
@@ -247,11 +262,13 @@ def show_status(report=None):
 def stop_project(grace=5):
     # Same OS lock as start and configuration writes, held through all cleanup.
     with configuration_lock(ROOT):
+        mode=service_mode()
+        # Revocation precedes cleanup and does not depend on a readable snapshot.
+        # Only recorded PID/create identities authorize termination below.
+        atomic_json(ROOT/'state/stop-request.json',{'instance_id':mode.get('instance_id'),'time':time.time()})
         entries=read_state()
         if not any(alive(e) is not None for e in entries):
             save([]);print('已停止。');return
-        mode=service_mode()
-        atomic_json(ROOT/'state/stop-request.json',{'instance_id':mode.get('instance_id'), 'time':time.time()})
         print('停止接收新任务，等待当前请求退出（最多5秒）……',flush=True)
         deadline=time.monotonic()+grace
         while time.monotonic()<deadline:
@@ -282,6 +299,7 @@ def check_port(port):
 
 def start_channel(full=False, paused=False, *, login_diagnostics=False, wait_login_seconds=0):
     completed = False
+    snow_blocked=False
     try:
         with configuration_lock(ROOT):
             observation = _start_channel(full, paused)
@@ -298,8 +316,11 @@ def start_channel(full=False, paused=False, *, login_diagnostics=False, wait_log
             print('QQ_LOGIN_STATE '+result['state'],flush=True)
             return dict(state=result['state'],instance_id=instance)
         return {'state':'already_running' if observation is None else 'starting'}
+    except TransportBlocked:
+        snow_blocked=True
+        raise
     finally:
-        print(f'\nNapCat 登录/管理：{NAPCAT_URL}')
+        if not snow_blocked:print(f'\nNapCat 登录/管理：{NAPCAT_URL}')
         if not completed:print('本次启动未完成，页面可能暂不可访问。')
 
 
@@ -310,6 +331,9 @@ def _start_channel(full=False, paused=False):
             print('已运行，无需重复启动。');show_status(report);return
         raise RuntimeError('PARTIAL_RUNNING: 组件不完整或运行模式不同，请先关闭再启动')
     project_config=read_project(ROOT)
+    from qqbot_gateway.qq_transport import resolve_transport
+    transport=resolve_transport(project_config.settings)
+    if transport['provider']=='snowluma':require_runtime(ROOT,project_config.settings)
     if project_config.extensions:print('已保留旧顶层扩展字段；不保证扩展具有运行功能。')
     from qqbot_gateway.vision import require_production
     require_production(project_config.settings,root=ROOT)
@@ -357,6 +381,7 @@ def _start_channel(full=False, paused=False):
     entries=[]
     logs=ROOT/'logs';logs.mkdir(exist_ok=True)
     mode_record={'mode':'text' if full else 'channel_only','started':time.time(),'instance_id':instance_id,
+                 'provider':transport['provider'],
                  'login_check_only':paused and not full,'configuration':metadata,'phase':'starting','owner':{'pid':os.getpid(),'created':psutil.Process().create_time()}}
     atomic_json(ROOT/'state/service-mode.json',mode_record)
     if paused:
