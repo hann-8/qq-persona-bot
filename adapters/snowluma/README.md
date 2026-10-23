@@ -18,6 +18,8 @@
 
 4A续作已实现`OwnerWriter`：原configuration_lock提供仅当前线程/作用域有效的lease，唯一管理writer从创建回调结果捕获PID+创建时间、写前置启动意图、验证exe/registry并冻结v2 owner记录与独立秘密引用。未取得创建身份时保留unknown意图，禁止另一provider继续启动。`snow_specs`只接受未来经核对的显式Node/私有入口路径，argv是本项目未来私有入口合同，**不是已知上游可运行包布局**；不搜索目录或推测启动器。
 
+QQ/Node专用子进程环境大小写无关地清除继承的全部`SNOWLUMA_*`与`NODE_OPTIONS/NODE_PATH`，再强制`SNOWLUMA_HOOK_AUTOLOAD=0`、`SNOWLUMA_TELEMETRY=0`，无配置绕过。仅构造子进程副本，不改全局/HOME/APPDATA或既有framework/NapCat环境，不向该副本写独立控制key。
+
 gate拥有单一monitor任务，`processes`只统计真实PID，任务是否运行另列`transport_monitor`布尔。gate和manage共同从原锁内原子预占持久控制seq，网络不持锁；seq文件缺失/损坏/回拨closed。gate抢启动锁失败会异步等待至配置ready timeout，仅重试未发出的bind，未知ACK不再注入。命令时间戳保守向下取100ms，实际有效期至多3秒，不扩大期限。
 
 manage stop先置marker，在锁内冻结owner/预占drain-stop序列，释放锁后消费签名ACK，再重新锁定核对实例/registry并回收已证明身份。stop-only核验允许snapshot损坏，但仍检查冻结owner、实际PID/创建毫秒/exe和固定listener；该较弱路径不用于健康、bind或channel_ready。marker后的drain/stop可通行，bind始终关闭；ACK未知不重试，未知身份/未确认退出仍保留原有失败语义。

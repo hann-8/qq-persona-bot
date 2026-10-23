@@ -28,3 +28,9 @@ cwd与PYTHONPATH均为隔离worktree；`PYTHONDONTWRITEBYTECODE=1`，只读借�
 当前只完成4A已授权项目侧独立剩余的实现/离线验证，待根agent复核。阶段3缺口没有消失：原包/G0/G1、合格Node/专用QQ/原生数据、私有受保护入口/早期过滤/真实listener/armed/outbound接线、构建与执行级验证仍未交付；真实启动总拒绝。固定spec、合成创建或监听身份不应被称为上游适配/armed/免扫码/72h/7天通过。
 
 4B尚未做：新epoch恢复与跨重启预算、恢复门控监督、prepare/activate/rollback/trial事务和有界采样。由根agent审4A后再派，不自动推进。根agent已知未提交PLAN/GUIDE调整不属于本轮文件，提交时保留不夹带；三共享入口未改。Git精确SHA/远端一致与最终配额在阶段出口回报。
+
+## 根审环境封闭小修
+
+716dd47根审指出QQ/Node环境还可能继承autoload/telemetry和Node预加载。已仅对这两个组件使用专用环境副本：大小写无关删除全部SNOWLUMA_*、NODE_OPTIONS、NODE_PATH，再固定SNOWLUMA_HOOK_AUTOLOAD=0、SNOWLUMA_TELEMETRY=0。原系统环境、framework/NapCat行为不变，未写全局/HOME/APPDATA，无配置绕过，生产总拒保持。
+
+实际manage fake创建用例加入混合大小写恶意继承值、预加载值与SNOWLUMA_KEY自造密钥，QQ和Node两次创建均断言只含两项固定SNOWLUMA值、无Node预加载、无key值，PATH/APPDATA/HOME保留；framework仍收到原环境，输入mapping与os.environ在测试后未变。小修后执行`python -m unittest test_transport_lifecycle test_transport_owner test_process_host`及3项受影响NapCat安全启动/提示LifecycleTests，共41项通过；diffcheck通过。此前128/9是主体提交证据，不与本41重复合算。没有真实组件/端口或原运行态操作。

@@ -352,6 +352,14 @@ def _launch_snow_component(spec,env):
         stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,creationflags=subprocess.CREATE_NO_WINDOW)
 
 
+def _snow_environment(environment):
+    """Per-child policy, never a global/user environment mutation or override."""
+    env={key:value for key,value in child_environment(environment).items()
+        if not key.upper().startswith('SNOWLUMA_') and key.upper() not in ('NODE_OPTIONS','NODE_PATH')}
+    env.update(SNOWLUMA_HOOK_AUTOLOAD='0',SNOWLUMA_TELEMETRY='0')
+    return env
+
+
 def _wait_snow_owner(owner,timeout):
     deadline=time.monotonic()+timeout
     while time.monotonic()<deadline:
@@ -405,6 +413,7 @@ def _start_snow_channel(project,layout,full,paused,lease):
     for port in (6185,6199,6200,cfg['control_port'])+((8765,) if full else ()):check_port(port)
     env=child_environment(os.environ);env.update(snapshot_environment(ROOT,snapshot,metadata))
     env.update(PYTHONPATH=str(ROOT/'src'),PYTHONUTF8='1')
+    transport_env=_snow_environment(env)
     previous=ROOT/'runtime/astrbot/data/cmd_config.json'
     if previous.exists():
         backup=ROOT/'state/config-backups'/('startup-'+str(time.time_ns()))
@@ -417,7 +426,7 @@ def _start_snow_channel(project,layout,full,paused,lease):
     (ROOT/'state/stop-request.json').unlink(missing_ok=True)
     writer=OwnerWriter(ROOT,lease,instance,process=psutil.Process)
     try:
-        for spec in specs:writer.create(spec,lambda item:_launch_snow_component(item,env))
+        for spec in specs:writer.create(spec,lambda item:_launch_snow_component(item,transport_env))
         owner=writer.register(settings,metadata,snapshot,layout,epoch)
         _wait_snow_owner(owner,cfg['ready_timeout_seconds'])
         if paused:atomic_json(ROOT/'state/stop-request.json',dict(instance_id=instance,time=time.time()))

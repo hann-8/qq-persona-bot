@@ -7,6 +7,7 @@ from contextlib import ExitStack, redirect_stdout
 from dataclasses import replace
 from io import StringIO
 import json
+import os
 from pathlib import Path
 import subprocess
 import time
@@ -103,21 +104,36 @@ class WriterTests(Fixture):
         self.fresh()
         for pid,p in self.procs.items():p.pid=pid
         output=StringIO();framework=[]
+        original_environment=os.environ
+        inherited=dict(os.environ)|dict(SNOWLUMA_HOOK_AUTOLOAD='1',snowluma_telemetry='1',
+            SnowLuma_Unknown='unreviewed',SNOWLUMA_KEY=KEY.hex(),NODE_OPTIONS='--require fake-preload',node_path='fake-module-path')
+        before=inherited.copy()
         def writer(root,lease,instance,**kw):
             return OwnerWriter(root,lease,instance,process=self.procs.__getitem__,clock=lambda:1700000000.)
         def launch(spec,env):
-            self.assertNotIn(KEY.hex(),json.dumps(env));return self.procs[13 if spec.component=='qq_client' else 12]
+            self.assertNotIn(KEY.hex(),json.dumps(env))
+            self.assertEqual({k:v for k,v in env.items() if k.upper().startswith('SNOWLUMA_')},
+                dict(SNOWLUMA_HOOK_AUTOLOAD='0',SNOWLUMA_TELEMETRY='0'))
+            self.assertFalse(any(k.upper() in ('NODE_OPTIONS','NODE_PATH') for k in env))
+            for key in ('PATH','APPDATA','HOME'):
+                if key in inherited:self.assertEqual(env[key],inherited[key])
+            self.assertEqual(inherited,before)
+            return self.procs[13 if spec.component=='qq_client' else 12]
         with patch.object(manage,'ROOT',self.root),patch.object(manage,'STATE',self.root/'state/managed-processes.json'), \
              patch.object(manage,'require_runtime',return_value=self.layout),patch.object(manage,'OwnerWriter',side_effect=writer), \
              patch.object(manage.psutil,'Process',side_effect=self.procs.__getitem__),patch.object(manage.psutil,'Popen') as real_spawn, \
              patch.object(manage,'check_port'),patch.object(manage,'_configure_snow_framework'), \
              patch.object(manage,'_launch_snow_component',side_effect=launch) as create, \
-             patch.object(manage,'_launch_snow_framework',side_effect=lambda *args:framework.append(args)),redirect_stdout(output):
+             patch.object(manage,'_launch_snow_framework',side_effect=lambda *args:framework.append(args)), \
+             patch.object(manage.os,'environ',inherited),redirect_stdout(output):
             result=manage.start_channel()
             self.assertEqual(result['provider'],'snowluma');self.assertEqual(create.call_count,2);real_spawn.assert_not_called()
             record=owner_record(self.root);self.assertEqual(record['binding']['instance_id'],result['instance_id'])
             self.assertEqual([s[0] for s in framework[0][0]],['astrbot','gate'])
+            self.assertEqual(framework[0][1]['NODE_OPTIONS'],'--require fake-preload')
+            self.assertEqual(framework[0][1]['SNOWLUMA_HOOK_AUTOLOAD'],'1')
             self.assertNotIn('6099',output.getvalue());self.assertEqual(manage.service_mode()['phase'],'running')
+        self.assertIs(os.environ,original_environment);self.assertEqual(inherited,before)
 
     def test_status_hint_is_provider_aware_and_processes_are_only_real_pids(self):
         report=dict(provider='snowluma',process_state='partial',channel_state='unknown',channel={},model={},task_counts={},can_receive_group_messages=False)

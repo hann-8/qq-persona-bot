@@ -2,6 +2,10 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md)。继承AGENTS。
 
+4A根审环境小修领取：仅`scripts/manage.py`、`tests/test_transport_lifecycle.py`、`adapters/snowluma/README.md`、4A续作报告与本HANDOFF；补Snow专用子进程环境封闭及实际fake创建验证，基线716dd47，usage used33/remaining67%。PLAN/GUIDE根端改动继续保留，不进4B。
+
+环境小修已实现/41受影响离线通过：QQ/Node专用副本清除全部继承SNOWLUMA_*、NODE_OPTIONS/NODE_PATH（大小写无关），固定HOOK_AUTOLOAD/TELEMETRY均0；实际fake管理创建带恶意继承/预加载值验证两组件，无key且源环境不变，framework/NapCat旧环境保持。待根审，不推进4B；未修改全局或真实运行态。
+
 2026-10-24 07:15实际续领：`LAP-40-medium-stage4A-continuation`，基线`052f0161473e926fb9ec7813ae6319d31af0ae72`且干净；已重读入口/QUOTA_WAIT/PLAN/GUIDE/4A报告与codex-handoff，usage300min used3/remaining97%。本轮精确归属`scripts/manage.py`、`src/qqbot_gateway/transport_owner.py`、必要`config.py`锁lease、`tests/test_transport_owner.py`与新增续作测试、必要`adapters/snowluma/control_plane.mjs`及测试/README、`config/README.md`、本HANDOFF/4A续作报告。只实现4A唯一writer登记/固定显式spec/fake管理创建/优雅控制消费与状态提示；生产require_runtime总拒保持。根3共享入口不写，0真实组件/端口/原运行态改动。成功标准是实际manage入口fake覆盖、未知身份保留/stop优先与协议互通，不自动4B。
 
 **当前：阶段4A独立剩余已实现/离线通过，待根agent复核，未部署。** [4A续作报告](../../../../reports/lap-40-stage4A-continuation-2026-10-24.md)记录唯一writer/固定spec/管理drain-stop ACK/状态提示与128 Python、9 JS通过。阶段1/2已根审，3仅静态核对；真实私有入口/监听/armed/outbound仍未完成，Snow生产启用总拒绝。等待根审，不自动4B，不称真实Snow生命周期通过；先前[4A部分报告](../../../../reports/lap-40-stage4A-2026-10-24.md)/[额度交接](QUOTA_WAIT.md)保留历史。
