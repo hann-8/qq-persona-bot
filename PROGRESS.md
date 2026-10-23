@@ -1,3 +1,5 @@
+2026-10-24 03:19：LAP-40 quota_hold，实际5h剩余4%，按用户指令停止新工作；本线程一次性07:10（北京时间）恢复已创建并view确认，automation lap-40-snowluma。阶段4A仅部分检查点根审，先读tasks/LAP-40/HANDOFF与QUOTA_WAIT的独立剩余清单再续4A，随后4B/5；真实Snow未切换、原运行态未动。
+
 2026-10-24 03:18：[LAP-40](tracks/laptop-workbuddy/tasks/LAP-40/HANDOFF.md)medium阶段4A部分检查点c549ce3/交接802fac1已推送根审；[报告](reports/lap-40-stage4A-2026-10-24.md)：最终41项Python/9项JS通过，前轮104回归通过。未标完整生命周期；项目侧owner唯一writer登记、启动spec合成路径、manage drain/stop ACK及Snow状态6099提示尚待4A续作，随后4B/5。1/2项目实现离线通过，3仅核对而上游私有适配/构建未做；真实原包/干净QQ数据仍缺，0切换/模型/群/原运行态修改。03:17额度剩6%，到5%交接并安排北京时间07:10续作，具体暂停以40交接最新记录为准。原checkout仅PROGRESS指针提交a798e62，与实施分支文档分叉待部署前协调，勿在运行中合入代码。
 
 2026-10-24：用户明确NapCat/SnowLuma以长期运行为首要标准。[LAP-39 SnowLuma评估](tracks/laptop-workbuddy/tasks/LAP-39/SNOWLUMA_ASSESSMENT.md)完成，仅静态调研；v2.1.1有接收停滞good/Windows管道重接机制，不能当本机长稳通过。原版有gate前内置答复、引用补历史与新增存储，当前项目又只读online/硬编码NapCat，不能直接替换；先解决边界/干净QQ归属并详细规划，再72h初筛/7天验收。六份文档，0安装/注入/启停/登录/配置/模型/群/SSH；本轮未重新探活，[39交接](tracks/laptop-workbuddy/tasks/LAP-39/HANDOFF.md)，旧差额保留。
