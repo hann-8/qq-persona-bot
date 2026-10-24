@@ -4,7 +4,9 @@
 
 ## 当前状态与路径
 
-**独立集成与A0/A1已离线根审；A2部分组件已子测，根未审、整体未装配。** 本轮额度used95%/剩5%已触用户阈值，停止新实现/测试，只交接/Git交付；所有agent交付后释放写入。Snow尚未真实接入，完整适配/B资格/probe仍缺，72h/7天未开始，生产require_runtime仍总拒。
+**独立集成与A0/A1已离线根审；A2部分组件已子测，整体未装配。** 用户17:24指令“继续”，根`LAP-40-max-realentry-next`已重新领取A2复核/续作，额度余99%，b605d03与远端一致、Git干净；private暂根审/复现，后续逐阶段移交medium。上轮95%停工是历史检查点。Snow尚未真实接入，完整适配/B资格/probe仍缺，72h/7天未开始，生产require_runtime仍总拒。
+
+17:29根已重放A2既有315模块/61继承/10 Hook/20 control/2竞态/10 formal，原71/ZIP不变；但另复现异步bind越过3秒仍current=true/200/bound，不能接受为完整控制组件。见[根复核](../../../../reports/lap-40-stage3R-A2-root-review-2026-10-24.md)。已登记[medium续作归属](STAGE3_A2_CONTINUATION_HANDOFF.md)：先修期限/取消，再接Node装配/单PIDpipe/gate允许动作/最终栅栏ACK；private与原创control/test归medium，根独占共享入口。
 
 - 实际工作目录：`C:/Users/yutha/.codex/worktrees/lap-40-snowluma-impl/QQbot`，分支`codex/lap-40-snowluma-impl`。复用此worktree，不新建、不归档。
 - 原运行目录：`E:/CodexWS/QQbot`，`codex/lap-40-snowluma-trial` / `a798e62498a60b8d061e917d1d8242f42d564ef0`；保持不动。本轮两目录Git均干净。
