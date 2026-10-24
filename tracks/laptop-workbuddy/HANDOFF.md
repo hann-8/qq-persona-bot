@@ -1,4 +1,4 @@
-2026-10-24 22:35（Asia/Shanghai）：LAP-40根`LAP-40-max-E-worktree-user-test`重领；活动工作根改为`E:/CodexWS/QQbot_Snowluma`、`codex/lap-40-snowluma`，由8a431f1建立；旧C与原E运行根均保留不动。5h余98%/周余38%，未reset。[工作根/用户实测计划](tasks/LAP-40/WORKTREE_AND_USER_TEST_PLAN.md)/[A4交接](tasks/LAP-40/STAGE3_A4_HANDOFF.md)/[精简交接](tasks/LAP-40/HANDOFF.md)/[最小入口](tasks/LAP-40/MAX_START.md)是当前入口。根独占共享文档，串行medium独占新private/专属报告，先迁私有文本再补全链非阻塞scope。
+2026-10-24 22:35（Asia/Shanghai）：LAP-40根`LAP-40-max-E-worktree-user-test`重领；活动工作根改为`E:/CodexWS/QQbot_Snowluma`、`codex/lap-40-snowluma`，由8a431f1建立；旧C与原E运行根均保留不动。5h余98%/周余38%，未reset。[工作根/用户实测计划](tasks/LAP-40/WORKTREE_AND_USER_TEST_PLAN.md)/[A4交接](tasks/LAP-40/STAGE3_A4_HANDOFF.md)/[精简交接](tasks/LAP-40/HANDOFF.md)/[最小入口](tasks/LAP-40/MAX_START.md)是当前入口。根独占共享文档，串行medium独占新private/专属报告，私有2901文本/27内部junction迁移已根审，见[迁移根审](../../reports/lap-40-E-worktree-root-review-2026-10-24.md)，下一步补全链非阻塞scope。
 
 用户要求达到基本可启动阶段就交其测试，测试后拟Sol high调试；不预先宣称性能/长期稳定，也不以先过72h/7天阻挡可用试测。A2现仍有6077ms同步helper阻断/A4未集成，B代码/G1/真实收发未过，生产总拒。当前0真实启动/登录/模型/群/运行配置操作；原71/ZIP保留原位置。本条覆盖下列历史旧工作根与额度停工口径。
 

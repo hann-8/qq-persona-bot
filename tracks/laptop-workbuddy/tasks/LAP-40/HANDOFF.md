@@ -8,7 +8,7 @@
 
 用户要在Snow基本接口/隔离前提具备、能明确启动时自行实测，然后拟由Sol high调试。性能、实际功能效果与72h/7天留给真实使用分别记录；不能把AstrBot/自研层已有实现当Snow原生接线已完成。当前仍未可启动实测：A2全链尚缺、B资格/probe代码未写、G1真实机制未证，生产继续总拒。
 
-按[工作根与用户实测计划](WORKTREE_AND_USER_TEST_PLAN.md)先迁入私有纯文本闭包/重建内部junction，不搬原生包/ZIP、不迁运行配置/秘密/真实state。原官方包和旧检查点仅原位置只读使用，新根生产材料尚不齐备。随后串行medium完成[A4非阻塞全链](STAGE3_A4_HANDOFF.md)，根审通过才继续B；根独占共享入口、medium独占新private及A4专属文档。当前没有QQ/Snow真实启停、监听、登录、模型或群操作。
+按[工作根与用户实测计划](WORKTREE_AND_USER_TEST_PLAN.md)先迁入私有纯文本闭包/重建内部junction，不搬原生包/ZIP、不迁运行配置/秘密/真实state。原官方包和旧检查点仅原位置只读使用，新根生产材料尚不齐备。私有2901文本/27内部junction迁移已独立根审通过，见[迁移根审](../../../../reports/lap-40-E-worktree-root-review-2026-10-24.md)。接着串行medium完成[A4非阻塞全链](STAGE3_A4_HANDOFF.md)，根审通过才继续B；根独占共享入口、medium独占新private及A4专属文档。当前没有QQ/Snow真实启停、监听、登录、模型或群操作。
 
 ## 迁移前已验基线（历史，旧路径不再是活动工作根）
 
