@@ -156,15 +156,15 @@ def status_report(*,disk_config=None):
             configuration={'loaded':None,'disk':'unknown'},model={},configured_profile={'state':'unavailable'},
             task_counts=task_counts(),napcat_login={'state':'unavailable'},qq_login_state='transport_unavailable',
             qq_login_observation={'state':'not_applicable'},autostart=None,transport_code='LOADED_SNAPSHOT_INVALID')
-    components=('qq_client','snowluma') if provider=='snowluma' else ('napcat',)
+    # Official SnowLuma/QQ are operator-owned, outside our process registry.
+    components=() if provider=='snowluma' else ('napcat',)
     counts={name:sum(1 for e in entries if e['component']==name and alive(e) is not None)
             for name in ('astrbot','model','gate')+components}
     mode=mode_state.get('mode','text')
     expected=('astrbot','gate')+components+(('model',) if mode=='text' else ())
     model=fetch_health(8765) if counts['model'] else {'alive':False}
     gate=fetch_health(6200) if counts['gate'] else {'alive':False}
-    transport_port=resolve_transport(loaded_settings(ROOT,mode_state))['snowluma']['control_port'] if provider=='snowluma' else 6099
-    required_ports=(6185,6199,6200,transport_port)+((8765,) if mode=='text' else ())
+    required_ports=(6185,6199,6200)+((6099,) if provider=='napcat' else ())+((8765,) if mode=='text' else ())
     complete=all(counts[name] for name in expected) and all(port_open(p) for p in required_ports)
     if mode=='text':complete=complete and model.get('router_ready') is True and model.get('alive') is True
     phase='running' if complete else 'partial' if any(counts.values()) else 'stopped'
@@ -281,7 +281,7 @@ def stop_project(grace=5,*,expected_instance=None):
         if not any(alive(e) is not None for e in entries):
             if startup_unknown(ROOT):raise RuntimeError('TRANSPORT_CREATION_UNKNOWN')
             save([]);print('已停止。');return
-        if mode.get('provider')=='snowluma':
+        if mode.get('provider')=='snowluma' and mode.get('transport_mode')!='official_onebot':
             try:control=prepare_stop_control(ROOT,mode,lease,process=psutil.Process)
             except (ValueError,OSError,KeyError,TypeError,psutil.Error):control_code='CONTROL_UNAVAILABLE'
     if control is not None:
@@ -452,7 +452,7 @@ def start_channel(full=False, paused=False, *, login_diagnostics=False, wait_log
                     raise ValueError('TRIAL_START_SOURCE_CHANGED')
             observation = _start_channel(full, paused, lease=lease)
             observer=None
-            if observation and not isinstance(observation,dict) and (login_diagnostics or wait_login_seconds):
+            if observation and not isinstance(observation,dict) and service_mode().get('provider')=='napcat' and (login_diagnostics or wait_login_seconds):
                 from qqbot_gateway.napcat_login_observer import Observation
                 instance,account=observation
                 observer=Observation(ROOT,instance,account,entries=read_state,mode=service_mode,
@@ -485,9 +485,6 @@ def _start_channel(full=False, paused=False, *, lease=None):
     project_config=read_project(ROOT)
     from qqbot_gateway.qq_transport import resolve_transport
     transport=resolve_transport(project_config.settings)
-    if transport['provider']=='snowluma':
-        layout=require_runtime(ROOT,project_config.settings)
-        return _start_snow_channel(project_config,layout,full,paused,lease)
     if project_config.extensions:print('已保留旧顶层扩展字段；不保证扩展具有运行功能。')
     from qqbot_gateway.vision import require_production
     require_production(project_config.settings,root=ROOT)
@@ -498,7 +495,8 @@ def _start_channel(full=False, paused=False, *, lease=None):
     env=child_environment(os.environ);env.update(config_env)
     env['PYTHONPATH']=str(ROOT/'src');env['PYTHONUTF8']='1'
     gate=load_gate_config(root=ROOT,settings=project_config.settings)
-    for port in ((6185,6199,6200,6099,8765) if full else (6185,6199,6200,6099)):check_port(port)
+    ports=(6185,6199,6200)+((6099,) if transport['provider']=='napcat' else ())+((8765,) if full else ())
+    for port in ports:check_port(port)
     backup=ROOT/'state/config-backups'/('startup-'+str(time.time_ns()))
     backup.mkdir(parents=True,exist_ok=True)
     config_before=ROOT/'runtime/astrbot/data/cmd_config.json'
@@ -531,11 +529,12 @@ def _start_channel(full=False, paused=False, *, lease=None):
     # WebUI owns core settings. Back up existing files without rewriting them;
     # NapCat initializes missing files using its own defaults.
     for name in ('napcat.json','napcat_'+gate.bot_qq+'.json'):
-        if (napcat_config/name).exists():(backup/name).write_bytes((napcat_config/name).read_bytes())
+        if transport['provider']=='napcat' and (napcat_config/name).exists():(backup/name).write_bytes((napcat_config/name).read_bytes())
     entries=[]
     logs=ROOT/'logs';logs.mkdir(exist_ok=True)
     mode_record={'mode':'text' if full else 'channel_only','started':time.time(),'instance_id':instance_id,
                  'provider':transport['provider'],
+                 'transport_mode':'official_onebot' if transport['provider']=='snowluma' else 'managed_napcat',
                  'login_check_only':paused and not full,'configuration':metadata,'phase':'starting','owner':{'pid':os.getpid(),'created':psutil.Process().create_time()}}
     atomic_json(ROOT/'state/service-mode.json',mode_record)
     if paused:
@@ -543,10 +542,9 @@ def _start_channel(full=False, paused=False, *, lease=None):
         atomic_json(ROOT/'state/stop-request.json',{'instance_id':instance_id,'time':time.time()})
     else:
         (ROOT/'state/stop-request.json').unlink(missing_ok=True)
-    specs=[('astrbot',[str(ROOT/'runtime/astrbot-bin/astrbot.exe'),'run'],ROOT/'runtime/astrbot',(6185,6199),25),
-           ('gate',[str(ROOT/'.venv/Scripts/python.exe'),'-m','qqbot_gateway.onebot_gate','--root',str(ROOT),'--config',str(snapshot)],ROOT,(6200,),10),
-           ('napcat',[str(NAPCAT/'NapCatWinBootMain.exe'),gate.bot_qq],NAPCAT,(6099,),30)]
-    if full:specs.insert(1,('model',[str(ROOT/'.venv/Scripts/python.exe'),'-m','qqbot_gateway.model_gateway','--root',str(ROOT),'--config',str(snapshot)],ROOT,(8765,),30 if project_config.settings['llm']['backend']=='ollama_ssh' else 10))
+    specs=_snow_framework_specs(snapshot,full,project_config.settings)
+    if transport['provider']=='napcat':
+        specs.append(('napcat',[str(NAPCAT/'NapCatWinBootMain.exe'),gate.bot_qq],NAPCAT,(6099,),30))
     try:
         for component,args,cwd,ports,timeout in specs:
             load_consumer(ROOT,snapshot,environ=env)
@@ -582,7 +580,7 @@ def _start_channel(full=False, paused=False, *, lease=None):
         raise
     mode_record['phase']='running'
     atomic_json(ROOT/'state/service-mode.json',mode_record)
-    if not paused:
+    if not paused and transport['provider']=='napcat':
         from qqbot_gateway.napcat_login_client import startup_fallback
         def ready_channel():
             value=fetch_health(6200)

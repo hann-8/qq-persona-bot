@@ -1,42 +1,52 @@
 # LAP-40：官方原版SnowLuma最小文字接入
 
-返回[项目入口](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [任务台账](../../TASKS.md) / [当前计划](PLAN.md) / [Sol medium指令](SOL_MEDIUM_START.md)。继承本工作根AGENTS；用户最新决定优先。2026-10-25，Asia/Shanghai。
+返回[项目入口](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [任务台账](../../TASKS.md) / [计划](PLAN.md) / [准备与试用](TRYOUT.md)。继承本根AGENTS，用户最新决定优先。2026-10-25，Asia/Shanghai。
 
-## 当前决定与状态
+## 当前状态
 
-使用官方原版SnowLuma，通过其现成OneBot连接既有gate/AstrBot/gateway/CodeBuddy CLI，替换NapCat。首次试用只要求能启动、登录、在目标授权群接收并回复文字；优先官方能力和已有组件，仅处理实际阻断基本使用的问题，默认在项目外部接入层适配。
+**项目侧已实现，离线/合成通过，真实未验；本根运行材料缺失，当前不能直接启动。** 官方原版SnowLuma现成OneBot经gate→AstrBot/router→既有gateway/CodeBuddy CLI文字链；无需修改Snow内部或薄转换层。默认provider保持napcat，显式snowluma才走本路径。当前缺项与准确启停/一次试用/脱敏故障材料位置见[TRYOUT](TRYOUT.md)。
 
-**旧私有改造规划已被本次决定整体取代，B/C停止。A4已实现/合成通过，路线停止采用；代码、产物、证据原样保留，不删除、不回滚，不再追加独立复核或测试来决定是否采用。** 旧文档中的“待max复核”“审后B/C”“缺资格/probe所以不准首试”不再是执行安排。
+旧私有改造路线整体被取代，B/C停止。A4按历史交付为已实现/合成通过、路线停止采用；代码、产物、证据原样保留，本轮未复核、未重跑或修改。账号屏蔽由用户在QQ客户端拉黑，不新增内部过滤、零日志/存储、资格/proof/probe或原生数据证明。
 
-账号屏蔽由用户在QQ客户端拉黑处理。项目已有过滤可保留；不再要求证明被屏蔽消息绝不进入SnowLuma内部、日志、存储或引用路径，不扩建过滤/资格/证明系统，不把相关旧缺项转为新路线门槛。
+## 本次实现
 
-唯一工作根`E:/CodexWS/QQbot_Snowluma`，分支`codex/lap-40-snowluma`。原`E:/CodexWS/QQbot`运行根和旧C工作根不动。当前官方接入仅已重新规划，代码尚未适配，真实启动/登录/群文字闭环均未通过；文档变更没有放行现有拒启代码。
+session `LAP-40-official-onebot-implementation`，2026-10-25 00:16领取，起点`1702571`、工作区干净；分支`codex/lap-40-snowluma`，根`E:/CodexWS/QQbot_Snowluma`。TASKS登记后重读，发现router实际私有健康阻断后先扩登记再修改。无子代理、无模型切换。
 
-## 当前确证的阻断与最小剩余
+- `scripts/manage.py`：snow分支不再调用无条件拒绝的require_runtime，复用现有配置快照和AstrBot/gateway/gate启动流程，只创建这三个组件。状态不再要求QQ/Snow受管身份或5098监听；官方实例stop不调用私有控制。记录transport_mode=official_onebot。NapCat默认仍创建NapCat并保留原登录回退，Snow不运行NapCat登录观察/回退。
+- `src/qqbot_gateway/onebot_gate.py`：入口不再要求私有runtime；application不再创建私有monitor。Snow就绪来自标准get_status/heartbeat的online=true、good=true及45秒内状态，15秒轮询、失联/过期撤销当前连接；无私有health内容依赖。继续使用token、X-Self-ID、Universal、授权群、私聊关闭、既有票据/发送echo/ACK链。
+- `plugins/qq_router/main.py`：实际阻断文字链的gate_metadata不再要求HMAC健康序列/过期单调时钟证明；保留本项目gate进程身份、实例/配置摘要、连接代际和标准状态新鲜度验证。既有模型、额度、触发模式、人设、一次尝试和业务逻辑未改。
+- `tests/test_official_snowluma.py`：7项必要专项；仅临时根、自造身份/文字、动态回环测试服务及模拟创建/停止，不执行真实QQ/Snow/模型进程。实际导入AstrBot 4.29.0转换器与router，文字通过框架send和原gate ACK返回。
 
-- 项目代码仍绑定旧私有路线：`src/qqbot_gateway/transport_owner.py:35`的`require_runtime`无条件抛出`private_runtime_entry_unavailable`；`scripts/manage.py`的Snow分支和`onebot_gate.py`入口均调用它。`OneBotGate.channel_ready`还要求旧私有健康证明。需在项目侧改成官方OneBot接入，不能通过补旧proof或伪装NapCat解决。
-- 外部接入完成后，按官方正常方式准备/配置QQ与SnowLuma，把官方反向WS接入本根gate，再在用户授权试用时确认登录及目标群文字收发。新根依赖、运行材料和忽略配置的当前可用情况本轮未盘点；实施时只补实际缺项，不据此预建迁移、隔离或证明任务。
+`qq_transport.py/config.py`经定向检索无需改动；旧私有配置可兼容读取但不以其证明文件、控制秘密/端口或构建作为新路径运行依赖。保留停止采用的私有helper/适配器代码，不维护其运行兼容。没有新增provider、自动fallback、恢复或部署。
 
-既有配置例子的gate为`ws://127.0.0.1:6200/ws`，AstrBot上游为`ws://127.0.0.1:6199/ws`。复用回环、token、账号/授权群校验与既有模型链。官方配置字段/启动命令由实施方按官方包正常说明核对，不沿用私有入口argv或猜注入参数。
+## 验证证据与边界
 
-## 历史成果保留
+新根没有Python依赖环境，使用原根已有Python/框架库**只读作为测试运行时**，`-B`及PYTHONDONTWRITEBYTECODE=1禁写字节码；工作目录始终本根，AstrBot导入副作用和测试状态均在临时目录。没有修改原`E:/CodexWS/QQbot`或旧C根，也没有准备本根local/persona。
 
-[A4交接](STAGE3_A4_HANDOFF.md)与[实施报告](../../../../reports/lap-40-A4-implementation-2026-10-24.md)原样保留。按既有交付记录：21命令合成矩阵通过，慢120ms helper合法bind 1336ms/12次；这些是历史合成证据，本轮未重跑，未晋升为真实通过或max已接受。最终历史文档检查点为`cc247ce5c0c0192668fe22825ead65221386befc`。
+PowerShell验证环境：
 
-忽略的`runtime/snowluma-private/`中A4源、overlay、产物、依赖、归档及证据全部保留，不清理、不再追加摘要复核。旧A0—A3和其他原创适配代码也不在本次删除/回滚。它们不再作为官方接入依赖，不要求为历史私有路线继续提供运行兼容。
+```powershell
+$env:PYTHONDONTWRITEBYTECODE='1'
+$env:PYTHONPATH='E:/CodexWS/QQbot_Snowluma/src;E:/CodexWS/QQbot_Snowluma/tests'
+$env:QQBOT_TEST_ASTRBOT_SITE='E:/CodexWS/QQbot/runtime/astrbot-tool/astrbot/Lib/site-packages'
+$env:ASTRBOT_DISABLE_METRICS='1'
+# 首次25通过：7新专项+18gate；随后状态显示/测试资源清理小修后末次：
+& E:/CodexWS/QQbot/.venv/Scripts/python.exe -B -m unittest test_official_snowluma test_lifecycle -q
+# 21通过：7新专项+14生命周期，8.873秒
+```
 
-原官方v2.1.1包、QQ安装包核验和用户接受条款/手工解压已有[材料记录](../../../../reports/lap-40-stage3-materials-2026-10-24.md)，仅在实际准备需要时按明确位置查阅，不重新泛扫、索取同意或重建证明。使用官方正常方式不代表原有日常QQ/原运行根可以被修改。
+25项组合7.014秒通过；21项组合8.873秒通过；合计39项不同用例。后一次改动只纠正Snow明确offline应显示disconnected并消除新测试未关闭socket告警；NapCat gate代码未在两次之间变更。验证覆盖官方式握手、标准状态/失效、目标群文字事件、实际AstrBot转换/router连接判定/框架回复、匹配及不匹配echo、基本账号/授权群/私聊边界、显式free、项目组件启动停止归属、默认NapCat生命周期/配置保留。框架旧audioop/register弃用及异步调试慢导入提示不影响通过。
 
-## 下一步
+未运行A4矩阵、全量旧功能/极端竞态/性能/72h/7天；未安装、真实启停、登录/扫码、调用真实模型、发群或SSH。实际模型生成和目标群可见文字闭环未验，合成ACK不晋升为真实成功。
 
-用户在新会话选择`gpt-6.1-sol/medium`，发送[SOL_MEDIUM_START](SOL_MEDIUM_START.md)。只领取LAP-40官方OneBot最小接入：解除项目侧私有耦合、复用既有文字链、给出准确启动/停止和一次收发试用说明。官方端优先手动正常启动，不为首试新增受管注入、自动恢复或私有控制服务。
+## 实际准备阻断及下一步
 
-其他旧功能按实际需要恢复；极端竞态、性能、自动恢复、72h/7天长稳及完整旧功能验收不作首试前置。旧任务历史未验不改写为通过，也不自动汇入本次必做项。未确认的问题只记观察，不新增阻断任务。本轮不自动派实施代理。
+本根存在`config/persona.md`，但不存在`.venv`、AstrBot可执行/框架Python/实例cmd_config、官方Snow v2.1.1包、专用QQ可执行、五文件local/兼容单文件配置及token。仅列这些实查缺项，不从旧私有资格/长稳差额派生前置。没有原本机配置，不能宣称已继承其当前模式/模型/人设；准备时由操作者保留当前业务选择。准确路径/命令见[TRYOUT](TRYOUT.md)。
 
-## 本次文档交付与归属
+交付后停止并释放本session归属；下一步为用户准备材料或另行授权准备/真实试用。只有真实握手、事件或ACK不兼容才做外部薄适配；实际必须修改Snow内部时交回具体阻断与外部尝试结果。不自动推进旧B/C或其他功能。
 
-`LAP-40-official-onebot-doc-convergence`，2026-10-25 00:00开始；起点分支正确、Git干净。归属：PROGRESS/AGENTS、工作线HANDOFF/TASKS、本任务交接/计划/接续指令与旧规划停用标记、`adapters/snowluma/README.md`。本次未修改任何代码、A4产物/证据、local/persona或原运行根；未运行测试，未安装、启停、扫码、调用真实模型、发群消息或SSH。
+## 文件与Git交付
 
-文档收敛完成，共17份Markdown；仅做文档静态检查：`git diff --check`通过，本地链接目标无缺失，已替换旧G1失效锚点，当前入口/任务行/接续指令一致。A4交接/报告及代码/产物/证据未修改，不运行任何测试。交付后释放本session文档归属，官方接入实施仍待用户新指令。
+归属修改：PROGRESS、工作线HANDOFF/TASKS、本任务HANDOFF/PLAN、TRYOUT、三个上述生产文件和一个新测试文件，共10份。未改AGENTS、配置模板、local/persona、A4代码/产物/证据和Snow内部；原工作区干净，没有夹带他人修改。git diff --check及六份变更Markdown的本地链接存在性检查通过；提交推送结果见本次最终交付及Git日志。长期Git授权用于本任务交付，不代表部署或真实试用通过。
 
-按长期授权只提交本任务文档，push后核对`origin/codex/lap-40-snowluma`完整SHA；具体交付SHA和保留差异以本次Git日志/最终交付消息为准，不把Git交付当作部署或真实试用通过。
+回滚仅撤销本次项目侧接入提交并保持停机，不删除材料或自动启动原根。历史[A4交接](STAGE3_A4_HANDOFF.md)及[报告](../../../../reports/lap-40-A4-implementation-2026-10-24.md)保留；原官方材料记录见[历史报告](../../../../reports/lap-40-stage3-materials-2026-10-24.md)，不当作新根当前文件已存在的证据。

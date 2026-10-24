@@ -1,8 +1,6 @@
-2026-10-25（Asia/Shanghai）：LAP-40已按用户决定改走**官方原版SnowLuma现成OneBot接入既有gate/AstrBot/gateway/CodeBuddy CLI**。旧私有改造规划整体被取代，停止B/C；A4已实现/合成通过，代码、产物和证据原样保留，路线停止采用，不再追加复核/测试。账号屏蔽由操作者QQ客户端拉黑处理，取消围绕SnowLuma内部过滤/日志/存储的证明和首次试用前置。
+2026-10-25（Asia/Shanghai）：LAP-40官方原版SnowLuma最小OneBot外部接入已实现/离线与合成通过。manage复用既有组件启动，不创建/接管QQ/Snow；gate使用标准online/good及45秒新鲜度，router使用相同连接状态，解除旧私有runtime/health耦合。默认napcat、账号/群/token/私聊关闭、当前触发/模型/人设业务合同保留。7新专项+18gate+14生命周期检查通过；真实收发未验。
 
-当前工作根`E:/CodexWS/QQbot_Snowluma`、分支`codex/lap-40-snowluma`。本轮仅文档，未实施、未运行测试、未安装/启停/扫码/真实模型/发群、未改local/persona；原`E:/CodexWS/QQbot`运行根不动。后续由用户另开Sol medium执行[最小接入指令](tasks/LAP-40/SOL_MEDIUM_START.md)，不自动派代理。已确认的代码阻断是当前Snow provider仍要求旧私有runtime/健康合同，外部接入需解除这项耦合；官方启动/登录及目标群文字闭环尚未验证。其他旧功能、自动恢复、性能、72h/7天均不作首试门槛。
-
-当前入口：[LAP-40交接](tasks/LAP-40/HANDOFF.md) / [最小计划](tasks/LAP-40/PLAN.md) / [medium指令](tasks/LAP-40/SOL_MEDIUM_START.md)。[A4交接](tasks/LAP-40/STAGE3_A4_HANDOFF.md)及[LAP-39静态调研](tasks/LAP-39/SNOWLUMA_ASSESSMENT.md)保留为历史依据，不再从其中逐项派生新任务。以下其他任务记录按原归属保留；涉及本次路线或首试门槛的旧说法以顶部最新决定为准。
+工作根`E:/CodexWS/QQbot_Snowluma`、分支`codex/lap-40-snowluma`，session `LAP-40-official-onebot-implementation`。新根缺Python/AstrBot环境、官方Snow/专用QQ及本机配置/token，尚不能直接启动；准确命令/一次试用/脱敏故障材料见[TRYOUT](tasks/LAP-40/TRYOUT.md)，证据与归属见[交接](tasks/LAP-40/HANDOFF.md)/[台账](TASKS.md)。未安装/启停/登录/调用真实模型/发群，未改local/persona和原运行根；A4原样保留且未重跑，旧B/C停止。交付后停止，不自动执行真实试用或其他功能。
 
 2026-10-24：LAP-39只读复发诊断/调研完成，故障未恢复。最后准入23日22:29:36；00:30仍在线缓存正常但bot自身状态失败/资料刷新10031ms超时，模型空闲/无清理阻断。全局o3=1、账号0，早期Hook读全局；单变量改0只是候选，旧故障可能默认0，不能当根治。当前包已有SelfOffline恢复、最新版未列匹配修复；接入替换仅后备。5份文档，0代码/配置/启停/QQ登录/模型/群/SSH；[调研](tasks/LAP-39/RESEARCH.md) / [39交接](tasks/LAP-39/HANDOFF.md)，旧差额保留。
 

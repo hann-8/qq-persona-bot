@@ -1,3 +1,5 @@
+2026-10-25实施状态：本计划最小外部接入已实现/离线合成通过，真实未验；当前证据见[HANDOFF](HANDOFF.md)，实际准备缺项和操作入口见[TRYOUT](TRYOUT.md)。下文保留规划时依据；后续不再重复领取实施或恢复旧B/C。
+
 # LAP-40：官方OneBot最小接入计划
 
 返回[项目入口](../../../../PROGRESS.md) / [当前交接](HANDOFF.md) / [medium指令](SOL_MEDIUM_START.md) / [任务台账](../../TASKS.md)。2026-10-25，Asia/Shanghai。

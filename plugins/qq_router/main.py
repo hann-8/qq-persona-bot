@@ -84,14 +84,11 @@ class QQRouter(Star):
             process=psutil.Process(data['pid'])
             if abs(process.create_time()-data['created'])>=.01 or not 0<=time.time()-data['updated']<=45:return None
             if getattr(self,'transport_provider','napcat')=='snowluma':
-                health=data.get('health')
                 if (data.get('provider')!='snowluma' or data.get('channel_ready') is not True or
                     not self.transport_instance_id or data.get('instance_id')!=self.transport_instance_id or
                     data.get('config_digest')!=self.transport_config_digest or
-                    not isinstance(health,dict) or set(health)!={'ready','expires_mono','sequence'} or health['ready'] is not True or
-                    type(health['sequence']) is not int or health['sequence']<=0 or
-                    type(health['expires_mono']) not in (int,float) or not math.isfinite(health['expires_mono']) or
-                    not 0<health['expires_mono']-time.monotonic()<=self.transport_health_ttl):return None
+                    data.get('good') is not True or type(data.get('online_at')) not in (int,float) or
+                    not 0<=time.time()-data['online_at']<45):return None
             if self.silence_enabled():
                 from qqbot_gateway.group_silence import group_ref
                 mirror=data.get('silence')

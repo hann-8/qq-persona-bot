@@ -1,6 +1,8 @@
+2026-10-25 00:16（Asia/Shanghai）：`LAP-40-official-onebot-implementation`领取并完成代码/合成交付；起点1702571，分支codex/lap-40-snowluma，开始时工作区干净。归属scripts/manage.py、src/qqbot_gateway/qq_transport.py、onebot_gate.py、config.py（按实际需要）、plugins/qq_router/main.py（已确认gate_metadata私有健康阻断）、针对性测试、LAP-40试用说明/交接、PROGRESS及工作线HANDOFF/TASKS；不修改A4、local/persona或其他工作根。
+
 2026-10-25（Asia/Shanghai）：`LAP-40-official-onebot-doc-convergence`，00:00开始；文档收敛已完成，交付后释放本session归属。工作根`E:/CodexWS/QQbot_Snowluma`，分支`codex/lap-40-snowluma`，起点`cc247ce`，开始时工作区干净。只改PROGRESS、AGENTS、本工作线HANDOFF/TASKS、LAP-40交接/计划/接续指令及旧规划停用标记、adapters/snowluma/README共17份Markdown；不实施、不运行测试、不改local/persona/原运行根。领取登记已写后重读；按长期授权只交付本任务文档，Git号与远端核对见最终交付消息。
 
-用户最新决定：官方原版SnowLuma经现成OneBot连接既有组件；旧私有改造路线整体被取代，B/C停止，A4代码/产物/证据原样保留为已实现/合成通过的历史成果，不再追加复核/测试。当前仅收敛文档，后续由用户另开Sol medium领取[最小接入指令](tasks/LAP-40/SOL_MEDIUM_START.md)；不自动派实施、不恢复旧唤醒。当前状态见[LAP-40交接](tasks/LAP-40/HANDOFF.md)。
+用户最新决定：官方原版SnowLuma经现成OneBot连接既有组件；旧私有改造路线整体被取代，B/C停止，A4代码/产物/证据原样保留为已实现/合成通过的历史成果，不再追加复核/测试。项目侧最小外部接入已实现/合成通过，待用户按[准备与试用](tasks/LAP-40/TRYOUT.md)准备实际材料缺项、亲自或另行授权真实试用；不重复领取实施、不恢复旧唤醒。当前状态见[LAP-40交接](tasks/LAP-40/HANDOFF.md)。
 
 以下日期记录为历史，涉及SnowLuma私改、屏蔽证明或首试前置的旧结论均已被上述决定取代；未完成历史项不自动转为本次待办。
 
@@ -90,7 +92,7 @@ LAP-15内容提交`632fdc5`已推送origin/main，2026-10-17 11:09用ls-remote�
 
 | ID | 单一任务 | 状态与已有证据 | 依赖/推荐顺序 | 执行session | 下一步/完成出口 |
 | --- | --- | --- | --- | --- | --- |
-| LAP-40 | 官方原版SnowLuma最小文字接入 | 文档收敛完成，官方接入待用户另行领取；旧私改被取代，A4已实现/合成通过并停止采用；[HANDOFF](tasks/LAP-40/HANDOFF.md) | 官方OneBot外部接入；不续B/C，不以私有资格/probe/长稳为首试前置 | LAP-40-official-onebot-doc-convergence，2026-10-25 00:00领取；17份Markdown已完成，交付后释放 | 本轮不实施/测试/运行；下一步由用户交Sol medium执行[最小指令](tasks/LAP-40/SOL_MEDIUM_START.md)，原运行根不动 |
+| LAP-40 | 官方原版SnowLuma最小文字接入 | 项目侧已实现/离线合成通过，真实未验；[HANDOFF](tasks/LAP-40/HANDOFF.md) / [TRYOUT](tasks/LAP-40/TRYOUT.md) | 官方OneBot外部接入；旧B/C停止，A4原样保留且不复核 | LAP-40-official-onebot-implementation，2026-10-25 00:16领取；本次交付后释放归属 | 7新专项/18gate/14生命周期通过；本根运行材料和配置缺项见TRYOUT，待用户准备/另授权真实试用；不自动推进其他任务 |
 | LAP-39 | 夜间不回复、配置保留与SnowLuma长期运行评估 | 既有修复/离线通过；复发诊断/SnowLuma调研完成；[HANDOFF](tasks/LAP-39/HANDOFF.md) / [评估](tasks/LAP-39/SNOWLUMA_ASSESSMENT.md) | 调研时旧迁移前置已被LAP-40官方OneBot决定取代；o3候选/QQ诱因与历史差额保留 | 历史LAP-39-SnowLuma-longrun-assessment，2026-10-24 00:53登记，调研已交付；不新增本轮39任务 | 迁移仅按LAP-40当前计划，不再补内部存储/过滤证明或以72h/7天阻挡首试；39历史证据不晋升为真实通过 |
 | LAP-38 | 识图/网页补证与个人微信接入详细规划 | completed，仅规划；[HANDOFF](tasks/LAP-38/HANDOFF.md)/[PLAN](tasks/LAP-38/PLAN.md)/[指令](tasks/LAP-38/IMPLEMENTATION_GUIDE.md) | 补18C/28R；微信独立先WX-01，旧36/验收差额保留 | LAP-38-vision-web-wechat-plan，2026-10-22 23:19领取、23:50规划收口；18份文档独占 | 公共网络/正文质量新证据、路径/激活合同与微信七份引导/hash交付；0代码/配置/模型/QQ/微信/SSH/启停，Git见交接 |
 | LAP-37 | 清理容量阻断修复/人工恢复与弃用自启 | 已实现/105项离线通过/停机现场恢复通过；[HANDOFF](tasks/LAP-37/HANDOFF.md) | 既有31/33合同修复，不自动解锁unknown | LAP-37-cleanup-capacity-recovery，2026-10-22 21:20；归属见交接 | blocked=false，bot停机；清理cmd可复用；自启弃用，真实运行/31B差额保留 |

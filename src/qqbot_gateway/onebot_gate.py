@@ -218,8 +218,9 @@ class OneBotGate:
     def channel_ready(self, *, publish=True):
         base = bool(self.connected and self.online is True and not (self.root and stopping(self.root)))
         if not self.snow():return base
-        ready = bool(base and not self.transport_recovery_closed and self.good is True and self.online_at is not None and
-                     0 <= time.time()-self.online_at < self.config.transport_health_ttl and self.transport_health and self.transport_health.ready())
+        # Official OneBot get_status/heartbeat, with no private owner/proof service.
+        ready = bool(base and self.good is True and self.online_at is not None and
+                     0 <= time.time()-self.online_at < 45)
         previous = self._transport_ready
         self._transport_ready = ready
         if previous and not ready:
@@ -229,14 +230,10 @@ class OneBotGate:
         return ready
 
     async def _transport_expiry_loop(self):
-        # TTL expiry revokes capabilities without needing another WS frame.
+        # Expire a stale OneBot status even when no WS frames arrive.
         while True:
             self.channel_ready()
-            delay=self.config.transport_health_poll
-            if self._transport_ready:
-                delay=min(delay,max(.001,self.transport_health.expires-self.transport_health.clock()),
-                          max(.001,self.config.transport_health_ttl-(time.time()-self.online_at)))
-            await asyncio.sleep(delay)
+            await asyncio.sleep(1)
 
     async def _send_current(self, downstream, event, connection):
         # Recheck inside the scheduled coroutine, after wait_for's scheduling gap.
@@ -252,7 +249,7 @@ class OneBotGate:
                 ready=self.channel_ready(publish=False)
                 transport=(dict(provider='snowluma',channel_ready=ready,
                     instance_id=self.config.transport_instance_id,config_digest=self.config.transport_config_digest,
-                    health=self.transport_health.mirror() if self.transport_health else dict(ready=False,expires_mono=0.,sequence=0))
+                    good=self.good,online_at=self.online_at)
                     if self.snow() else {})
                 path.parent.mkdir(parents=True,exist_ok=True)
                 temp.write_text(json.dumps(dict(id=self.connection_id,connected=self.connected,online=self.online,
@@ -278,7 +275,7 @@ class OneBotGate:
         online = self.online if self.connected and self.online_at and time.time()-self.online_at < 45 else None
         channel = ('connected' if online is True else 'disconnected' if online is False else 'unknown') if self.connected else (
             'disconnected' if self.ever_connected else 'waiting_login')
-        if self.snow() and self.connected and not ready:channel='unknown'
+        if self.snow() and self.connected and online is True and not ready:channel='unknown'
         return {'alive': True, 'connected': self.connected, 'self_id_verified': self.connected,
                 'last_heartbeat': self.last_heartbeat, 'online': online, 'channel_state': channel,
                 'stopping': bool(self.root and stopping(self.root)),
@@ -286,8 +283,7 @@ class OneBotGate:
                 **(dict(channel_ready=ready,good=self.good,
                     transport_recovery=self.transport_supervisor.status() if self.transport_supervisor else dict(enabled=False,phase='observe',operator_required=False),
                     transport_monitor=dict(running=bool(self.transport_monitor_task and not self.transport_monitor_task.done())),
-                    transport_health=self.transport_health.safe_status() if self.transport_health else
-                    dict(trusted=False,ready=False,sequence=0,armed=False)) if self.snow() else {})}
+                    transport_mode='official_onebot') if self.snow() else {})}
 
     def observe_online(self, data):
         if self.snow():self.channel_ready()
@@ -312,7 +308,7 @@ class OneBotGate:
                 except TimeoutError:self.observe_online(None)
             finally:
                 self.health_pending.pop(echo_key(echo), None)
-            await asyncio.sleep(self.config.transport_health_poll if self.snow() else 15)
+            await asyncio.sleep(15)
 
     async def handle(self, request):
         if (len(request.headers.getall('Authorization', [])) != 1 or
@@ -393,10 +389,7 @@ class OneBotGate:
                     await downstream.close(code=1003, message=b'TEXT_JSON_REQUIRED')
                 break
             try:
-                if self.snow():
-                    from .transport_health import strict_json
-                    event = strict_json(frame.data, MAX_FRAME)
-                else:event = json.loads(frame.data)
+                event = json.loads(frame.data)
             except (ValueError,UnicodeError,RecursionError):
                 LOG.info('DROP_INVALID_JSON')
                 continue
@@ -574,18 +567,7 @@ class OneBotGate:
         app.router.add_post('/context/vision/resolve',self.resolve_vision)
         app.router.add_post('/context/vision/bind',self.resolve_vision)
 
-        monitor=None
-        async def start_transport(app):
-            nonlocal monitor
-            if self.snow():
-                from .transport_owner import monitor_from_loaded
-                monitor=monitor_from_loaded(self)
-                monitor.task=asyncio.create_task(monitor.run())
-                self.transport_monitor_task=monitor.task
-        app.on_startup.append(start_transport)
-
         async def cleanup(app):
-            if monitor:await monitor.close()
             if self.active is not None:
                 await self.active.close(code=1001, message=b'SHUTDOWN')
             self.store.close()
@@ -706,10 +688,6 @@ def main():
     from .config_files import management_root
     root=management_root(args.config,args.root or os.environ.get('QQBOT_ROOT'))
     config = load_gate_config(args.config,root=root)
-    if config.transport_provider=='snowluma':
-        from .transport_owner import require_runtime
-        from .config_files import load_consumer
-        require_runtime(root,load_consumer(root,args.config))
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
     web.run_app(OneBotGate(config,root).application(), host=config.host, port=config.port, access_log=None)
 
