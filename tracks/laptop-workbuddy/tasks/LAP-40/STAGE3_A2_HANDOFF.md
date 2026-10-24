@@ -22,11 +22,11 @@
 当前：2026-10-24 13:40（Asia/Shanghai）session `LAP-40-medium-stage3R-A2` 已领取，基线3c4bff9，Git干净。目标为正式绑定、观测、control壳及受许可动作；仅私有新A2 overlay，fake依赖离线验证，原A1可复现。首次额度300min used86%/余14%，按阈值检查。A2实施中，尚无通过声明。B资格合同已独立规划但未实现，Windows原生数据机制/干净QQ/probe/生产/长稳未通过。
 
 
-## A2可恢复中间检查点（2026-10-24 13:45）
+## A2可恢复中间检查点（2026-10-24 13:44）
 
 私有`prepare-a2.py`复制A1文本到独立`a2-work`，`build-a2.mjs`输出`a2-dist`315模块；A1源/产物未覆盖。HookSession/HookManager已加定PID只读分源观测，`check-a2-hook.mjs`真实client emitter→上游login/packet/heartbeat/reset路径10项合成通过；`src/a2-control.mjs`接原control handler的fake-factory壳20项通过，0真实端口。`check-a2-inherited.mjs`在A2产物重放原A1 61项通过。
 
-`src/a2-formal.py`正式loader复用现有load_consumer/owner/RuntimeOwner，测试首次默认Python缺yaml，改只读借原项目venv；第二次发现Windows相对路径反斜线被已有checked_path拒绝，已改as_posix，待重跑。`check-a2-formal.py`只用现有OwnerTests临时目录合成，无真实local/secrets。
+`src/a2-formal.py`正式loader复用现有load_consumer/owner/RuntimeOwner，测试首次默认Python缺yaml，改只读借原项目venv；第二次发现Windows相对路径反斜线被已有checked_path拒绝，已改as_posix，重跑10项通过。`check-a2-formal.py`只用现有OwnerTests临时目录合成，无真实local/secrets。
 
 尚未：Node正式快照消费/控制与Hook整体装配、实测Windows单PID/pipe提供器、同一受认证gate连接最终许可与允许RPC、native提交栅栏/ACK。当前A2只部分实现，所有RPC及生产require_runtime仍closed，不构成A2完整通过。依次补正式loader合成、控制超时/stop竞态与HMAC源连线证据；余量<=5%停止，不开后续RPC大块。当前私有产物未根审，不公开源码/patch/bundle。
 
