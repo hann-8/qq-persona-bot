@@ -1,3 +1,5 @@
+检查点二：全链A4已接；316模块、channel/control15项、框架ACK13项和定向允许/撤销场景通过；慢120ms合法bind约1.2秒，11次helper启动。正在固定源码/产物并跑最终矩阵。生产closed、B/C未开始。
+
 检查点一：新异步channel合成8/8通过；其余全链待接。报告见 [A4实施](../../../../reports/lap-40-A4-implementation-2026-10-24.md)。旧仅规划状态按历史理解。
 
 2026-10-24 23:03:15（Asia/Shanghai）：用户授权新session LAP-40-A4-medium-implementation 领取A4；归属 runtime/snowluma-private 下新增/未审A4草稿（先审后改）、本任务报告/交接及PROGRESS/工作线HANDOFF/TASKS归属段。保留旧2901基线、A0-A3、原C/原E运行根。仅合成验证，生产closed，不进入B/C。
