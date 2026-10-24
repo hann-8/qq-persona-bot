@@ -1,8 +1,8 @@
-2026-10-24 12:38：LAP-40新会话`LAP-40-max-realentry-next`已领取材料核验与阶段3续作规划；根独占本入口、PROGRESS、TASKS及40交接/规划，旧根/medium已释放。先读[精简交接](tasks/LAP-40/HANDOFF.md)/[最小接续入口](tasks/LAP-40/MAX_START.md)，按缺口检索，不加载全部历史。
+2026-10-24：LAP-40本轮触发剩余<=5%阈值，停止新实现/测试并交接。A0/A1已根审，A2 f23eac6部分检查点未根审/未装配；下次先核额度和Git，再读[精简交接](tasks/LAP-40/HANDOFF.md)/[最小入口](tasks/LAP-40/MAX_START.md)接续A2。本轮结束后所有agent释放写入。
 
 独立项目集成1/2/4A/4B及离线根审已交付（代码0250f54、总审144b968）；真实阶段3私有接线/probe/资格缺失、生产总拒、未切换，72h/7天未开始。用户已提供两包路径并接受EULA/PRIVACY、手工解压Snow；ZIP固定SHA256匹配，解压后Node v24.22.1及原生摘要通过，QQ安装包腾讯签名Valid。[阶段3续作计划](tasks/LAP-40/STAGE3_CONTINUATION_PLAN.md)/[材料报告](../../reports/lap-40-stage3-materials-2026-10-24.md)区分代码缺项与原生数据前置；先A0私有入口/JS-only，QQ安装/真实probe仍待可信数据机制。实际工作C:/Users/yutha/.codex/worktrees/lap-40-snowluma-impl/QQbot、codex/lap-40-snowluma-impl，基线f2bdb0c已核对远端；原运行E:/CodexWS/QQbot不动。07:10一次性唤醒已删除，不重建。
 
-13:31续作：A0 `871e3de`、A1入站/隐私检查点`add12af`已推送，根重放315模块构建、61 A1/10路径及A0 21+5通过；原版71文件及ZIP不变。A1所有动作暂closed、正式owner/观测未接，不能称完整transport；下一步[A2归属](tasks/LAP-40/STAGE3_A2_HANDOFF.md)。[B资格/probe合同](tasks/LAP-40/STAGE3_QUALIFICATION_SPEC.md)已规划未实施；真实总拒不变，Windows数据机制仍缺。
+本轮：A0 871e3de/A1 add12af根重放315模块/61 A1/10路径/A0 21+5通过；A2 f23eac6仅组件自测（继承61/control20/formal10/Hook10/竞态2），未根审。缺Node装配、实际单PID/pipe、gate允许RPC与最终栅栏ACK；[A2交接](tasks/LAP-40/STAGE3_A2_HANDOFF.md)/[B合同](tasks/LAP-40/STAGE3_QUALIFICATION_SPEC.md)是下一入口，B仅规划。原71/ZIP未变，真实总拒、QQ未安装/登录/切换、72h/7天未开始；E运行态不动。
 
 2026-10-24：用户明确以长期运行为首要标准；[LAP-39 SnowLuma评估](tasks/LAP-39/SNOWLUMA_ASSESSMENT.md)已完成，仅静态证据。v2.1.1有接收good/管道恢复，但原版gate前答复、补历史/存储及项目QQ归属尚需解决；现项目只读online/硬编码NapCat，不能原样切换。先详细规划，再72h/7天验收；6文档，0安装/注入/启停/登录/配置/模型/群/SSH，不重新探活，旧现场只作历史。[39交接](tasks/LAP-39/HANDOFF.md)。
 
