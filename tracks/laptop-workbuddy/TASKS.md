@@ -1,6 +1,6 @@
-2026-10-24 12:32：LAP-40准备新`gpt-6.1-sol/max` session接续，标识`LAP-40-max-realentry-next`。先读本worktree入口/AGENTS、工作线当前段与TASKS的40行，再读[精简交接](tasks/LAP-40/HANDOFF.md)/[最小接续入口](tasks/LAP-40/MAX_START.md)，按缺口再检索PLAN/报告，不加载整个旧聊天或历史。
+2026-10-24 12:38：LAP-40新会话`LAP-40-max-realentry-next`已领取材料核验与阶段3续作规划；根独占PROGRESS、工作线HANDOFF、TASKS及40交接/规划，旧根/medium已释放。先读[精简交接](tasks/LAP-40/HANDOFF.md)/[最小接续入口](tasks/LAP-40/MAX_START.md)，按缺口检索，不加载全部历史。
 
-独立项目集成1/2/4A/4B及离线根审已交付（代码0250f54、总审144b968）；真实阶段3私有接线/probe/资格缺失，waiting_operator、生产总拒、未切换，72h/7天未开始。12:32两checkout指定材料4路径均不存在，用户未给下载路径/协议确认/扫码窗口。原运行E:/CodexWS/QQbot仍a798且干净；实际工作C:/Users/yutha/.codex/worktrees/lap-40-snowluma-impl/QQbot、codex/lap-40-snowluma-impl。此次仅压缩归属文档，旧根/medium交接后不再写，新max领取后接管共享3入口；原运行态不动。07:10一次性唤醒已删除，不重建。
+独立项目集成1/2/4A/4B及离线根审已交付（代码0250f54、总审144b968）；真实阶段3私有接线/probe/资格缺失、生产总拒、未切换，72h/7天未开始。用户已提供两包路径并接受EULA/PRIVACY、手工解压Snow；ZIP固定SHA256匹配，解压后Node v24.22.1及原生摘要通过，QQ安装包腾讯签名Valid。[阶段3续作计划](tasks/LAP-40/STAGE3_CONTINUATION_PLAN.md)/[材料报告](../../reports/lap-40-stage3-materials-2026-10-24.md)区分代码缺项与原生数据前置；先A0私有入口/JS-only，QQ安装/真实probe仍待可信数据机制。实际工作C:/Users/yutha/.codex/worktrees/lap-40-snowluma-impl/QQbot、codex/lap-40-snowluma-impl，基线f2bdb0c已核对远端；原运行E:/CodexWS/QQbot不动。07:10一次性唤醒已删除，不重建。
 
 2026-10-24 00:53（Asia/Shanghai）：LAP-39续作SnowLuma替换可行性调研，session `LAP-39-SnowLuma-longrun-assessment`；现调研完成，未实施。用户强调NapCat/SnowLuma最重要的是长期运行。仅官方源码/发布/故障记录与本项目兼容面只读核对，独占PROGRESS、工作线HANDOFF/TASKS、39 HANDOFF/RESEARCH与新SNOWLUMA_ASSESSMENT.md共6份文档；不安装、不启停/注入/登录、不改代码/运行配置、不调用模型/群/SSH。开始main/3ecd9a0、工作区干净；上一现场状态只作历史，不在本轮重新探活。原版补历史/存储/内置答复在gate前，须先解决再规划72h/7天试验，见[评估](tasks/LAP-39/SNOWLUMA_ASSESSMENT.md)。
 
@@ -88,7 +88,7 @@ LAP-15内容提交`632fdc5`已推送origin/main，2026-10-17 11:09用ls-remote�
 
 | ID | 单一任务 | 状态与已有证据 | 依赖/推荐顺序 | 执行session | 下一步/完成出口 |
 | --- | --- | --- | --- | --- | --- |
-| LAP-40 | SnowLuma替换试运行 | 独立集成/离线根审完成；0250f54代码、144b968总审；[精简HANDOFF](tasks/LAP-40/HANDOFF.md)/[MAX入口](tasks/LAP-40/MAX_START.md) | 长期运行优先；真实私有接线/probe/资格缺失，72h/7天未开始，旧差额保留 | LAP-40-max-realentry-next，12:32文档交接待新max领取；原根/medium停止写；codex/lap-40-snowluma-impl | 先核对用户材料路径/许可/干净QQ数据范围，细化阶段3再派medium；当前waiting_operator、生产总拒，原运行a798不动 |
+| LAP-40 | SnowLuma替换试运行 | 独立集成/离线根审完成；0250f54代码、144b968总审；现已核验两包/手工解压/同意/合格Node；[HANDOFF](tasks/LAP-40/HANDOFF.md)/[续作计划](tasks/LAP-40/STAGE3_CONTINUATION_PLAN.md) | 长期运行优先；私有接线/probe/资格缺失，72h/7天未开始，旧差额保留 | LAP-40-max-realentry-next，2026-10-24 12:38领取；根独占共享3入口及40交接/阶段3规划报告；基线f2bdb0c；旧根/medium已释放 | 计划交付后先medium A0私有入口/JS-only；真实QQ数据机制仍缺，未安装/扫码、生产总拒，原运行a798不动 |
 | LAP-39 | 夜间不回复、配置保留与SnowLuma长期运行评估 | 既有修复/离线通过；复发诊断/SnowLuma调研完成，迁移未实施；[HANDOFF](tasks/LAP-39/HANDOFF.md) / [评估](tasks/LAP-39/SNOWLUMA_ASSESSMENT.md) | 用户以长期运行为首要标准；原版gate前答复/补历史/存储与干净QQ归属是迁移前置；保留o3候选/QQ诱因与旧差额 | 当前LAP-39-SnowLuma-longrun-assessment，2026-10-24 00:53登记，调研交付；独占6文档，23日归属见历史HANDOFF | 先解决前置能力缺口并详细规划，再72h/7天验证；本轮0安装/注入/启停/登录/模型/群/配置/SSH，不重新探活或默认切换 |
 | LAP-38 | 识图/网页补证与个人微信接入详细规划 | completed，仅规划；[HANDOFF](tasks/LAP-38/HANDOFF.md)/[PLAN](tasks/LAP-38/PLAN.md)/[指令](tasks/LAP-38/IMPLEMENTATION_GUIDE.md) | 补18C/28R；微信独立先WX-01，旧36/验收差额保留 | LAP-38-vision-web-wechat-plan，2026-10-22 23:19领取、23:50规划收口；18份文档独占 | 公共网络/正文质量新证据、路径/激活合同与微信七份引导/hash交付；0代码/配置/模型/QQ/微信/SSH/启停，Git见交接 |
 | LAP-37 | 清理容量阻断修复/人工恢复与弃用自启 | 已实现/105项离线通过/停机现场恢复通过；[HANDOFF](tasks/LAP-37/HANDOFF.md) | 既有31/33合同修复，不自动解锁unknown | LAP-37-cleanup-capacity-recovery，2026-10-22 21:20；归属见交接 | blocked=false，bot停机；清理cmd可复用；自启弃用，真实运行/31B差额保留 |

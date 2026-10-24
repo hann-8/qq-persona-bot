@@ -2,7 +2,7 @@
 
 这些文件是本项目原创合同与自造测试，不含上游修改源码/patch/native。阶段2只完成接口，尚未在固定上游v2.1.1接线，不能称Snow适配或真实部署通过。阶段3须在忽略runtime中按PLAN核对最早分支、所有store/logger/补史/内置答复及原生保护，缺证据保持阻断。
 
-阶段3已完成[固定版私有接线清单](../../tracks/laptop-workbuddy/tasks/LAP-40/PRIVATE_WIRING_CHECKLIST.md)的只读核对；指定原包/干净QQ/proof缺失，普通core构建也复制native，未准备私有改版或运行上游构建/合成测试。清单是后续具体待办，不能当接线通过。阶段4原创生命周期/健康owner/CLI离线部分可独立继续，真实启用仍须硬拒绝。
+阶段3已完成[固定版私有接线清单](../../tracks/laptop-workbuddy/tasks/LAP-40/PRIVATE_WIRING_CHECKLIST.md)的只读核对；随后操作者已准备原包/手工解压并接受两份条款，自带Node v24.22.1通过。新增[阶段3续作计划](../../tracks/laptop-workbuddy/tasks/LAP-40/STAGE3_CONTINUATION_PLAN.md)先私有JS-only/早期入口，再实际隐私接线/观测、资格及probe；干净QQ/原生数据与私有执行证据仍缺。普通core构建仍禁止直接运行；清单/规划不是接线通过，真实启用仍硬拒绝。
 
 `createProjectPolicy`要求已核对的受管实例/代际及实时`identityCurrent`回调，只有授权group新事件、匹配账号、非self/黑名单、合法ID与有界message通过。私有适配必须在任何转换/store/logger/history/model回调前调用`admitEnvelope/processEnvelope`，拒绝事件不会进入convert、metadata或forward回调。唯一forward只收到净化后的当前事件；引用只保留ID，当前image仅限长最小元数据，其余媒体/转发占位，无原始昵称/正文日志、内置#sl答复、文件写入或回拉API。`allowsRpc`是内部同样必须遵循的动作白名单，不能以其代替gate的参数、身份与最终发送许可校验。
 

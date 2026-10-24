@@ -1,6 +1,6 @@
 # LAP-40 SnowLuma：max接续交接
 
-返回[项目入口](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [任务台账](../../TASKS.md) / [新会话入口](MAX_START.md)。继承AGENTS。2026-10-24 12:32，Asia/Shanghai；本次仅文档交接。
+返回[项目入口](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [任务台账](../../TASKS.md) / [新会话入口](MAX_START.md) / [阶段3续作计划](STAGE3_CONTINUATION_PLAN.md) / [材料报告](../../../../reports/lap-40-stage3-materials-2026-10-24.md)。继承AGENTS。2026-10-24，Asia/Shanghai；session `LAP-40-max-realentry-next`已接手材料核验与阶段3续作规划，根独占共享3入口及本任务交接/规划报告。首个可审检查点前不派代码实施。
 
 ## 当前状态与路径
 
@@ -8,7 +8,7 @@
 
 - 实际工作目录：`C:/Users/yutha/.codex/worktrees/lap-40-snowluma-impl/QQbot`，分支`codex/lap-40-snowluma-impl`。复用此worktree，不新建、不归档。
 - 原运行目录：`E:/CodexWS/QQbot`，`codex/lap-40-snowluma-trial` / `a798e62498a60b8d061e917d1d8242f42d564ef0`；保持不动。本轮两目录Git均干净。
-- 交接前HEAD：`144b96861462d839e519cd8bedcfe97316cac0bd`；最终代码`0250f548f4e96484bef12096895e337e103bdd44`，已推送核对。新交接文档提交以Git/远端为准。
+- 接手基线：`f2bdb0c7096ea8f606e18f18f2926e5c8b680025`，2026-10-24 12:35已核对对应远端分支SHA、工作区干净；最终代码仍`0250f548f4e96484bef12096895e337e103bdd44`，总审`144b96861462d839e519cd8bedcfe97316cac0bd`。
 - 原规划分叉已由`1d5dafa38cdf15e9a57146544e551578da5d1cfa`协调；a798已是实现分支祖先，未部署到原checkout。
 - 当前无实施子代理运行。旧根agent在交接交付后停止编辑；新max session领取LAP-40后负责共享3入口。实施仍按原授权逐阶段派`gpt-6.1-sol/medium`，串行根审，不创建额外用户chat作子任务。
 
@@ -16,9 +16,9 @@
 
 用户要试用SnowLuma替代NapCat，**长期运行优先**；已授权branch、详细规划后由根agent逐步派sol/medium实施复核，以及本项目归属修改commit/push。当前请求换一个max session以减少上下文，不是批准立即启动/扫码或接受许可。
 
-上次已向用户说明准备官方Windows完整版ZIP与QQ官方安装包，再提供完整路径。**用户尚未提供文件路径、协议确认或扫码窗口。** 2026-10-24 12:32只读检查两目录的以下4处均不存在：`runtime/snowluma/v2.1.1`、`runtime/qq-snowluma/QQ.exe`、`runtime/snowluma-private`、`state/qq-transport/proof.local.json`；没有搜索其他QQ/下载目录。
+用户本会话已提供Downloads内`SnowLuma-v2.1.1-win-x64.zip`和`QQ_9.9.36_260924_x64_01.exe`两个明确路径。Snow ZIP大小/固定SHA256匹配，QQ安装包腾讯签名Valid/版本9.9.36.53644。随后用户明确接受EULA/PRIVACY并手动解压；12:43指定runtime的官方index/两协议/Node/5原生摘要均与ZIP一致，Node实际`--version`为v24.22.1。原ZIP仍仅Downloads，runtime内未保留；干净QQ/私有入口/proof仍无、扫码窗口未定。**只通过材料/同意/Node前置，未运行Snow或QQ、未取得私有接线/数据范围/生产资格。** 详情见材料报告；不泛扫其他目录。
 
-用户要求5h剩余<=5%交接；历史07:10等待已执行，一次性automation `lap-40-snowluma`已删除。12:30的300分钟窗口剩94%；新session重查当前额度，不循环按已过期07:10唤醒，不reset credit/购买。
+用户要求5h剩余<=5%交接；历史07:10等待已执行，一次性automation `lap-40-snowluma`已删除。12:34重查300分钟窗口used11%/剩89%、周窗口used33%/剩67%；不循环按已过期07:10唤醒，不reset credit/购买。额度仅本次采样，后续按阶段检查。
 
 ## 已交付和验证
 
@@ -35,9 +35,9 @@
 
 ## 下一步顺序
 
-1. 新session按[MAX_START](MAX_START.md)读取最少入口，核对Git/最新用户消息并登记接手；先读取用户给出的材料路径。未给路径则简短说明需要什么，勿泛扫磁盘。
-2. 核验操作者准备的原包/合格项目内Node/干净专用QQ及许可与数据归属。完整包自带Node，但仍需核验实际版本；不改全局Node。
-3. 根据[PLAN第3/4/9/14节](PLAN.md)及[私有清单](PRIVATE_WIRING_CHECKLIST.md)细化阶段3续作：JS-only受保护私有入口、早期过滤/无旁路/无历史和磁盘消息、固定PID加载、真实armed/outbound观测、控制面；补真实probe执行与可信资格判定。有材料可验证后再派medium，不重做1/2/4/5。上游改版只在忽略runtime，不进public仓库。
+1. 接手/材料核验/阶段3续作规划已完成，读取本交接与[续作计划](STAGE3_CONTINUATION_PLAN.md)即可续作。操作者后续手动将原ZIP保留到runtime检查器指定位置，agent不自动搬运原生包。
+2. 根审/交付计划后串行派medium A0私有bootstrap/同意/固定native解析/JS-only，再A1隐私接线、A2真实观测控制源；均先执行级合成，不重做1/2/4/5。改版只在忽略runtime，不进public。
+3. 再B补资格/probe实现并先落精确schema根审。当前require_runtime总拒、capability-probe只调用总拒，属于代码未写；Windows默认账号检测共享路径、可信原生重定向机制未证，属于真实前置，不能混为安装包缺失。不得改共享ini/HOME/APPDATA或猜参数；QQ安装包暂保留。
 4. 原生数据范围需可信依据及一次受控探针，最多240秒、全入站DROP、无模型/发群；需要扫码就等操作者，不循环登录。QQ3/3免扫码未证，QQ自动重启保持false。
 5. 所有真实前置通过后，才停机/干净快进部署、显式activate、一次正常trial-start并验实际收发。随后72h初筛包含于168h；安静群不判失败，也不能冒充7天实际收发通过。扫码变化观测与8h资源趋势自动判断尚未交付。
 

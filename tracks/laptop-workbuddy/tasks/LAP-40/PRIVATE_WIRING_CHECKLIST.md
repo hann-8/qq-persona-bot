@@ -1,6 +1,8 @@
 # LAP-40 固定版私有接线清单
 
-返回[HANDOFF](HANDOFF.md) / [PLAN](PLAN.md) / [原创接口](../../../../adapters/snowluma/README.md) / [阶段3报告](../../../../reports/lap-40-stage3-2026-10-24.md)。2026-10-24，Asia/Shanghai。
+返回[HANDOFF](HANDOFF.md) / [PLAN](PLAN.md) / [续作计划](STAGE3_CONTINUATION_PLAN.md) / [原创接口](../../../../adapters/snowluma/README.md) / [阶段3报告](../../../../reports/lap-40-stage3-2026-10-24.md)。2026-10-24，Asia/Shanghai。
+
+12:43续作材料更新：用户已提供两安装包路径，接受EULA/PRIVACY并手工解压Snow；原ZIP/解压组件摘要和自带Node v24.22.1已核对。干净QQ/数据机制/私有接线仍缺；下表15项的执行未验状态不变。新增同意/Windows路径与分阶段出口见续作计划，早先02:46缺包检查只作历史。
 
 固定版本为v2.1.1，全部上游链接固定到提交`f8cb15c27bca3d2d1bd044a921e55bfc44bb5e60`，不随main/tag漂移。本表是本轮实际定点阅读形成的接线与验证待办，**不是已经修改上游、完成接线、构建或合成验收的证明**。本轮未准备私有改版、未保存上游源码到工作区、未生成适配manifest/proof；public仅保留原创说明和引用。
 
@@ -11,7 +13,7 @@
 | 项目原创policy/健康协议/gate/router | 阶段2已实现、离线通过；见对应报告 |
 | 固定上游接点及旁路 | 本轮只读核对；下表源码位置可复查 |
 | 私有源改动/上游执行级合成测试 | 未实现、未执行，不以源码表代替 |
-| 原包/干净专用QQ/本机proof | 指定两checkout均缺失；未搜索其他位置 |
+| 原包/干净专用QQ/本机proof | Snow原件/用户手工解压/同意/Node已核对；runtime内ZIP/干净QQ/proof仍缺；仅检查用户指定路径 |
 | 保护允许的私有JS-only构建 | 未证；标准core构建会复制native，未运行 |
 | 真实owner/listener/QQ/WS/armed/ACK/免扫码/长稳 | 均未验证、尚未部署/切换 |
 
