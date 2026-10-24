@@ -27,3 +27,28 @@
 验证：公开8+private12=20项JS通过，旧control20/races2通过，Python owner16/lifecycle20通过；原71/ZIP与A1一致、private无native。旧103 helper仅核原件/既有证据，本次不称完整103重跑。文件/命令与缺项见[续作报告](../../../../reports/lap-40-stage3R-A2-continuation-2026-10-24.md)，摘要在忽略`a2-cancellation-checkpoint.json`。
 
 本次修改仅public control_plane.mjs/test、本交接/报告和private src/a2-control.mjs、新check-a2-cancellation.test.mjs/摘要。停止于可审小检查点等根审；不继续Node消费/整体装配/PIDpipe/RPC/最终栅栏ACK，不实施B/C。原运行状态未动，生产总拒。领取used12%，检查点used17%，剩余阈值仍按用户<=5%。
+
+
+## 根审后继续（2026-10-24 17:50）
+
+根已接受9162d2c期限小检查点并交付6c2c432；本session继续同一A2剩余接线。重查used25%/余75%。独占归属不变；先实现private正式Python验证器→Node限定管道消费及单PID/目标pipe提供器，再Hook/control装配与gate动作。数据身份和stop-only分离；无生产资格/真实行为。
+
+
+## A3装配可恢复检查点（2026-10-24 18:25）
+
+独立`a3-work/a3-dist`316模块，保留A0/A1/A2路径；新增private a3-broker/channel/material/entry/native-factories/runtime/actions及对应检查。正式Python loader经当前Node父身份绑定的继承管道给Node固定结构/秘密，-I/-B/固定root.src与root/.venv解释器；env清全部Python/Snow/Node预载。单次短helper并发1、2秒/16KiB（登记meme12MiB）、无缓存，返回OS自捕获helper PID/created/parent并和spawnSync实际pid/退出核对，RAM仅最近16；异常不可再启动helper。无常驻/watch/registry写。Node异常退出下helper完整归属/退出覆盖仍未证，B须纳入helper与依赖闭包，不能称已受管。
+
+已实际执行：Provider10项；Node通道/生命周期/argv11项；整体runtime七场景stop/epoch/socket/account/disconnect/put/put-fence各27项（大部分重复基线，非189个独立合同）。真实Hook/Onebot/WS、info、文字/alias、授权群metadata、self资料/成员、固定favorites、登记image NTV2 fast/实际TCP PUT fake链已执行；原QqHookClient控制写队列及Highway connect/write前最终transport栅栏，禁自动重试；stop marker后合法stop ACK保持通。图片PUT中途撤销零后续body写/零消息提交。
+
+实际gate/CQHTTP/AstrBot Event.send→Proxy/Delivery/TaskStore→history repair与QQRouter/MemoryStore另10项通过：Node的ok+1500+null为unknown，不是已发送成功，无助手历史/记忆晋升；native前拒绝/成功分别核，pending收束，不重发。群停言以gate有界WS写线性化为准，Node不承诺撤回gate已提交后新停言；transport stop/换代仍在native前撤销。
+
+组件代码仍待根审，本轮A2整体未宣称通过。正在收敛登记meme提供器和固定Python隔离检查、最终原件/构建摘要；当前额度used80%/余20%。真实pipe/原生保护/QQ/生产/B/C未执行；短helper异常退出覆盖及G1另待资格路线。
+
+
+## 当前安全检查点（2026-10-24 18:34）
+
+最终private `check-a3-final.py`退出0：316模块、七场景各29项（大部重复）、channel11/provider10/catalog隔离6/真实框架ACK-history-memory10，原71/ZIP不变、private无native。详见[续作报告](../../../../reports/lap-40-stage3R-A2-continuation-2026-10-24.md)新增A3/A4节；旧27项/884调用为早期，最终29项940调用。
+
+**未解决阻断**：A3同步helper热路径，120ms慢helper bind共51次、6077ms后403；不能称3秒响应通过。新`src/a4-scoped-broker.mjs`异步operation scope候选5项通过但未接入A3，真实runtime/控制/入站包/注入/最终native仍须改造。当前A2整体未完成、待根审；不将此未写接线归为用户缺材料。短helper自捕获PID/created/parent+spawn退出证据已补，Node异常退出下完整归属仍未证；B需纳入helper/解释器及依赖闭包，生产总拒不变。
+
+本轮只归属修改本交接和续作报告，所有A3/A4源码/产物/fixture/证据均在忽略private。根dirty（总HANDOFF、续作规划、根复核、QQ静态报告）保留不提交。先交此可审检查点；下一首项为A4全链异步scope及慢helper端到端测试，不开始B/C。最新额度used92%/余8%，<=5%立即停止新实现/测试。
