@@ -17,4 +17,13 @@
 
 本任务每个实际里程碑及时写本交接。先交可审的小检查点（期限修复）供根审，再继续较大接线；允许同一A2任务串行推进，禁止并行写private。仅提交自己归属的原创代码/test/报告/本交接，不夹带根未提交文件；push核对远端，给可复现命令/原件不变/差额，等根审不自动B/C。
 
-当前：登记待派，期限修复与剩余接线未实施。
+当前：2026-10-24 17:36 session `LAP-40-medium-stage3R-A2-continuation`已领取；基线e5b1e3a92729680ddb48019d038331a1ee057f84，Git干净，额度used12%/余88%。先修单次请求期限/不可逆撤销并新增fake clock/server回归，保持持续owner lease独立；本小检查点交付根审后再继续整体接线。
+
+
+## 期限/取消小检查点（2026-10-24 17:41）
+
+已修公开原创handler单次期限/内部请求撤销与await后检查，签名wire不变；commandCurrent与成功后的持续ownerLease分开。private壳统一timeout/abort/error/异常close/service.close，不允许late body/end执行；正常完整request close保留操作。独立fake timers/server执行，无真实端口。
+
+验证：公开8+private12=20项JS通过，旧control20/races2通过，Python owner16/lifecycle20通过；原71/ZIP与A1一致、private无native。旧103 helper仅核原件/既有证据，本次不称完整103重跑。文件/命令与缺项见[续作报告](../../../../reports/lap-40-stage3R-A2-continuation-2026-10-24.md)，摘要在忽略`a2-cancellation-checkpoint.json`。
+
+本次修改仅public control_plane.mjs/test、本交接/报告和private src/a2-control.mjs、新check-a2-cancellation.test.mjs/摘要。停止于可审小检查点等根审；不继续Node消费/整体装配/PIDpipe/RPC/最终栅栏ACK，不实施B/C。原运行状态未动，生产总拒。领取used12%，检查点used17%，剩余阈值仍按用户<=5%。

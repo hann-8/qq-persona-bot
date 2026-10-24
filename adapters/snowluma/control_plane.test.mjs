@@ -57,3 +57,49 @@ test('stop marker wins, wrong identity/path/key/domain/unknown/duplicate/oversiz
   revoke();assert.equal((await handler.handle({ method: 'GET', url: '/health?nonce=' + 'f'.repeat(64) })).status, 403);
   assert.deepEqual(calls, ['stop']);assert.doesNotMatch(JSON.stringify(handler.status()), /pid|key|QQ|token/);
 });
+test('expired async bind cannot commit, revive its command or retry the uncertain bind', async () => {
+  let stamp = 1000, release, current, afterWait, effects = 0;
+  const { handler } = setup({ now: () => stamp, onBind: async permit => {
+    current = permit;await new Promise(resolve => { release = resolve; });
+    afterWait = permit();if (afterWait) effects++;
+  } });
+  const pending = handler.handle({ method: 'POST', url: '/bind', body: sign('bind', 1) });
+  stamp = 4000;assert.equal(current(), false);stamp = 1001;assert.equal(current(), false);
+  release();assert.equal((await pending).status, 403);assert.equal(afterWait, false);assert.equal(effects, 0);
+  assert.equal(handler.status().bound, false);
+  assert.equal((await handler.handle({ method: 'POST', url: '/bind', body: sign('bind', 2) })).status, 403);
+});
+test('internal cancellation is irreversible after await and cannot be supplied by JSON', async () => {
+  let active = true, release, permit, effects = 0;
+  const { handler } = setup({ onBind: async current => {
+    permit = current;await new Promise(resolve => { release = resolve; });if (current()) effects++;
+  } });
+  const pending = handler.handle({ method: 'POST', url: '/bind', body: sign('bind', 1) }, { requestCurrent: () => active });
+  active = false;assert.equal(permit(), false);active = true;assert.equal(permit(), false);
+  release();assert.equal((await pending).status, 403);assert.equal(effects, 0);
+  const fresh = setup();
+  assert.equal((await fresh.handler.handle({ method: 'POST', url: '/bind', body: sign('bind', 1, { requestCurrent: true }) })).status, 403);
+  assert.deepEqual(fresh.calls, []);
+});
+test('successful owner lease outlives command deadline and response, then drain revokes it', async () => {
+  let stamp = 1000, command, lease;
+  const { handler } = setup({ now: () => stamp, onBind: (current, ownerLease) => { command = current;lease = ownerLease;assert.equal(current(), true); } });
+  assert.equal((await handler.handle({ method: 'POST', url: '/bind', body: sign('bind', 1) })).status, 200);
+  assert.equal(command(), false);assert.equal(lease(), true);stamp = 9000;assert.equal(lease(), true);
+  assert.equal((await handler.handle({ method: 'POST', url: '/drain', body: sign('drain', 2, { issued_ms: 9000, expires_ms: 12000 }) })).status, 200);
+  assert.equal(lease(), false);assert.equal(handler.status().draining, true);
+});
+test('expired safety action keeps stop state and emits no success ACK', async () => {
+  let stamp = 1000, release;
+  const { handler } = setup({ now: () => stamp, onStop: async () => { await new Promise(resolve => { release = resolve; }); } });
+  const pending = handler.handle({ method: 'POST', url: '/stop', body: sign('stop', 1) });
+  stamp = 4001;release();assert.equal((await pending).status, 403);assert.equal(handler.status().stopped, true);
+});
+test('await completion alone rechecks both exact and exceeded signed deadline', async () => {
+  for (const expiry of [4000, 4001]) {
+    let stamp = 1000, release;
+    const { handler } = setup({ now: () => stamp, onBind: async () => { await new Promise(resolve => { release = resolve; }); } });
+    const pending = handler.handle({ method: 'POST', url: '/bind', body: sign('bind', 1) });
+    stamp = expiry;release();assert.equal((await pending).status, 403);assert.equal(handler.status().bound, false);
+  }
+});
