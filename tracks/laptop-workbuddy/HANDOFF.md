@@ -2,7 +2,7 @@
 
 独立项目集成1/2/4A/4B及离线根审已交付（代码0250f54、总审144b968）；真实阶段3私有接线/probe/资格缺失、生产总拒、未切换，72h/7天未开始。用户已提供两包路径并接受EULA/PRIVACY、手工解压Snow；ZIP固定SHA256匹配，解压后Node v24.22.1及原生摘要通过，QQ安装包腾讯签名Valid。[阶段3续作计划](tasks/LAP-40/STAGE3_CONTINUATION_PLAN.md)/[材料报告](../../reports/lap-40-stage3-materials-2026-10-24.md)区分代码缺项与原生数据前置；先A0私有入口/JS-only，QQ安装/真实probe仍待可信数据机制。实际工作C:/Users/yutha/.codex/worktrees/lap-40-snowluma-impl/QQbot、codex/lap-40-snowluma-impl，基线f2bdb0c已核对远端；原运行E:/CodexWS/QQbot不动。07:10一次性唤醒已删除，不重建。
 
-本轮：A0 871e3de/A1 add12af根重放315模块/61 A1/10路径/A0 21+5通过；A2 f23eac6仅组件自测（继承61/control20/formal10/Hook10/竞态2），未根审。缺Node装配、实际单PID/pipe、gate允许RPC与最终栅栏ACK；[A2交接](tasks/LAP-40/STAGE3_A2_HANDOFF.md)/[B合同](tasks/LAP-40/STAGE3_QUALIFICATION_SPEC.md)是下一入口，B仅规划。原71/ZIP未变，真实总拒、QQ未安装/登录/切换、72h/7天未开始；E运行态不动。
+17:44续作：A2既有组件已根重放，bind期限漏洞9162d2c修复并根审，20新JS/既有control20+竞态2及Python16+20通过。[A2续作](tasks/LAP-40/STAGE3_A2_CONTINUATION_HANDOFF.md)继续Node装配/实际PIDpipe/认证gate允许RPC/最终栅栏ACK，整体未完成、生产总拒；B仅规划，G1与真实/72h/7天未过。原71/ZIP与E运行态不变。
 
 2026-10-24：用户明确以长期运行为首要标准；[LAP-39 SnowLuma评估](tasks/LAP-39/SNOWLUMA_ASSESSMENT.md)已完成，仅静态证据。v2.1.1有接收good/管道恢复，但原版gate前答复、补历史/存储及项目QQ归属尚需解决；现项目只读online/硬编码NapCat，不能原样切换。先详细规划，再72h/7天验收；6文档，0安装/注入/启停/登录/配置/模型/群/SSH，不重新探活，旧现场只作历史。[39交接](tasks/LAP-39/HANDOFF.md)。
 

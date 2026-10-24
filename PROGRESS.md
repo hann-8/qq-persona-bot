@@ -2,7 +2,7 @@
 
 独立项目集成1/2/4A/4B及离线根审已交付（代码0250f54、总审144b968）；真实阶段3私有接线/probe/资格缺失、生产总拒、未切换，72h/7天未开始。用户已提供两包路径并接受EULA/PRIVACY、手工解压Snow；ZIP固定SHA256匹配，解压后Node v24.22.1及原生摘要通过，QQ安装包腾讯签名Valid。[阶段3续作计划](tracks/laptop-workbuddy/tasks/LAP-40/STAGE3_CONTINUATION_PLAN.md)/[材料报告](reports/lap-40-stage3-materials-2026-10-24.md)区分代码缺项与原生数据前置；先A0私有入口/JS-only，QQ安装/真实probe仍待可信数据机制。实际工作C:/Users/yutha/.codex/worktrees/lap-40-snowluma-impl/QQbot、codex/lap-40-snowluma-impl，基线f2bdb0c已核对远端；原运行E:/CodexWS/QQbot不动。07:10一次性唤醒已删除，不重建。
 
-本轮：A0 `871e3de`、A1 `add12af`已推送，根重放315模块/61 A1/10路径/A0 21+5通过。A2 `f23eac6`组件自测为继承61/control20/formal10/Hook10/竞态2，根未重放；缺Node装配、实际单PID/pipe、gate允许RPC与最终栅栏ACK，生产总拒。[A2交接](tracks/laptop-workbuddy/tasks/LAP-40/STAGE3_A2_HANDOFF.md)/[B合同](tracks/laptop-workbuddy/tasks/LAP-40/STAGE3_QUALIFICATION_SPEC.md)为下一入口，B仅规划。原71/ZIP不变，Windows数据机制/干净QQ/真实probe/72h/7天未过，E运行态未改。07:10旧唤醒不重建，配额工具本次预计17:18重置，下次先重查。
+17:44续作：根已重放A2既有组件，bind期限漏洞由9162d2c修复并根审（20新JS/既有control20+竞态2、Python16+20）。[A2续作](tracks/laptop-workbuddy/tasks/LAP-40/STAGE3_A2_CONTINUATION_HANDOFF.md)继续Node装配/实际单PIDpipe/认证gate允许RPC/最终栅栏ACK；整体仍未完成，生产总拒。[B合同](tracks/laptop-workbuddy/tasks/LAP-40/STAGE3_QUALIFICATION_SPEC.md)仅规划，G1/真实probe/72h/7天未过，原71/ZIP与E运行态不变；旧07:10唤醒不重建。
 
 2026-10-24：用户明确NapCat/SnowLuma以长期运行为首要标准。[LAP-39 SnowLuma评估](tracks/laptop-workbuddy/tasks/LAP-39/SNOWLUMA_ASSESSMENT.md)完成，仅静态调研；v2.1.1有接收停滞good/Windows管道重接机制，不能当本机长稳通过。原版有gate前内置答复、引用补历史与新增存储，当前项目又只读online/硬编码NapCat，不能直接替换；先解决边界/干净QQ归属并详细规划，再72h初筛/7天验收。六份文档，0安装/注入/启停/登录/配置/模型/群/SSH；本轮未重新探活，[39交接](tracks/laptop-workbuddy/tasks/LAP-39/HANDOFF.md)，旧差额保留。
 

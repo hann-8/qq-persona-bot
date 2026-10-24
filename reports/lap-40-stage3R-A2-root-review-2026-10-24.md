@@ -23,3 +23,11 @@
 先修期限与取消，再继续A2 Node正式快照消费/整体装配、单PID创建时间及目标pipe提供器、受认证gate允许动作、最终lease/epoch/native栅栏和一次ACK。现有load_formal本身尚非完整Node入口；合法动作不能永久all-closed。平台/上游真实能力缺口精确记录，但不把尚未写代码当用户缺包。
 
 B仍仅规划，C真实前置仍未证。0原生加载/QQ/Snow/真实监听/模型/群/SSH/local/persona/原运行配置动作。根不直接改实施代码，不覆盖其他session；后续实施归属/提交见续作交接。
+
+## 期限修复根审（17:44）
+
+medium检查点9162d2cc823ff74dd3c7701e17d0040f9592af31已提交/推送。根审实际diff及HTTP壳：命令请求current在期限/取消/完成后失效，ownerLease只在成功绑定后生效且独立于3秒；超时/abort/error/异常close及service.close不可逆取消，迟到body不再进入handler；wire字段不变。
+
+根实际重跑公开+private取消Node20项、既有control20/竞态2、Python owner16/lifecycle20，全部退出0（17:44:47）。这些验证含无监听跨语言wire与持久seq，停机文字来自临时合成fixture。本缺陷修复可接受，组件复核不代表A2总体通过。
+
+按原归属续派同一medium补Node装配/单PIDpipe/认证gate允许动作/最终栅栏ACK。成功控制请求的持续lease与请求期限不得混用；停止时控制面身份核验可沿用原stop-only合同完成ACK，不能因为数据准入已关闭就误丢合法stop ACK，也不能把stop-only核验用于bind/发送。

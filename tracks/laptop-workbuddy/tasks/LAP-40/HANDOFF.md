@@ -6,11 +6,11 @@
 
 **独立集成与A0/A1已离线根审；A2部分组件已子测，整体未装配。** 用户17:24指令“继续”，根`LAP-40-max-realentry-next`已重新领取A2复核/续作，额度余99%，b605d03与远端一致、Git干净；private暂根审/复现，后续逐阶段移交medium。上轮95%停工是历史检查点。Snow尚未真实接入，完整适配/B资格/probe仍缺，72h/7天未开始，生产require_runtime仍总拒。
 
-17:29根已重放A2既有315模块/61继承/10 Hook/20 control/2竞态/10 formal，原71/ZIP不变；但另复现异步bind越过3秒仍current=true/200/bound，不能接受为完整控制组件。见[根复核](../../../../reports/lap-40-stage3R-A2-root-review-2026-10-24.md)。已登记[medium续作归属](STAGE3_A2_CONTINUATION_HANDOFF.md)：先修期限/取消，再接Node装配/单PIDpipe/gate允许动作/最终栅栏ACK；private与原创control/test归medium，根独占共享入口。
+17:29根已重放A2既有组件并发现异步bind期限漏洞；9162d2c已修复，根17:44重跑20新JS/旧control20+竞态2及Python16+20均过。见[根复核](../../../../reports/lap-40-stage3R-A2-root-review-2026-10-24.md)。[同一medium续作](STAGE3_A2_CONTINUATION_HANDOFF.md)继续Node装配/单PIDpipe/gate允许动作/最终栅栏ACK；private与原创control/test归medium，根独占共享入口，整体仍未完成。
 
 - 实际工作目录：`C:/Users/yutha/.codex/worktrees/lap-40-snowluma-impl/QQbot`，分支`codex/lap-40-snowluma-impl`。复用此worktree，不新建、不归档。
 - 原运行目录：`E:/CodexWS/QQbot`，`codex/lap-40-snowluma-trial` / `a798e62498a60b8d061e917d1d8242f42d564ef0`；保持不动。本轮两目录Git均干净。
-- 接手基线：`f2bdb0c7096ea8f606e18f18f2926e5c8b680025`，2026-10-24 12:35已核对对应远端分支SHA、工作区干净；最终代码仍`0250f548f4e96484bef12096895e337e103bdd44`，总审`144b96861462d839e519cd8bedcfe97316cac0bd`。
+- 初次接手基线f2bdb0c、原独立集成代码0250f54/总审144b968；17:24重领基线b605d03，公开原创控制期限修复9162d2c已根审。精确当前HEAD/远端以Git为准。
 - 原规划分叉已由`1d5dafa38cdf15e9a57146544e551578da5d1cfa`协调；a798已是实现分支祖先，未部署到原checkout。
 - A0 871e3de/A1 add12af已推送；根13:30:43完整重放315模块/61 A1/10路径/A0 21+5通过、生产入口退出1。A2最终`f23eac6642523f720504f0b0745d6157edb62607`已推送核对，部分组件自测，根因额度阈值未审/未重放；详见[A2交接](STAGE3_A2_HANDOFF.md)/[报告](../../../../reports/lap-40-stage3R-A2-2026-10-24.md)。本轮全部agent释放写入；下次重新领取后再改共享文件/private。
 
