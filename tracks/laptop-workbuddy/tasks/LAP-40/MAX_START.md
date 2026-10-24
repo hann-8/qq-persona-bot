@@ -15,6 +15,6 @@
 
 当前：独立项目集成代码/离线验证完成；真实Snow适配/探针/资格仍缺，未切换，72h/7天未开始。生产准入仍总拒；原运行态不动。新会话已领取，用户现已提供两包路径、接受EULA/PRIVACY并手工解压Snow；原包/解压摘要和自带Node v24.22.1通过。QQ安装/数据范围/扫码仍未完成，不能假定已准备。
 
-首动作已完成：`LAP-40-max-realentry-next`于12:38接手、f2bdb0c远端核对。下一步按[阶段3续作计划](STAGE3_CONTINUATION_PLAN.md)根审后派medium A0，实际进度看HANDOFF；不重复最初材料索取。继承原已授权的逐阶段sol/medium实施与commit/push；根独占共享3入口，实施代理按阶段独占代码，先根审再续派。旧根/medium不再写此worktree。
+首动作已完成：`LAP-40-max-realentry-next`于12:38接手、f2bdb0c远端核对；材料计划282527e/A0最小闭包871e3de已交付，根21+5复现通过。下一步按[阶段3续作计划](STAGE3_CONTINUATION_PLAN.md)/[A1归属](STAGE3_A1_HANDOFF.md)推进，实际进度看HANDOFF；不重复最初材料索取。继承原已授权的逐阶段sol/medium实施与commit/push；根独占共享3入口，实施代理按阶段独占代码，先根审再续派。旧根/medium不再写此worktree。
 
 接续不是从零调研Snow，也不是立即运行activate/trial或补填proof。按精简HANDOFF的真实前置与阶段3续作路线推进；没有材料先给用户最小待办。

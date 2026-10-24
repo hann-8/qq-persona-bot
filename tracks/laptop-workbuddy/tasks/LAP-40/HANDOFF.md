@@ -4,13 +4,13 @@
 
 ## 当前状态与路径
 
-**项目侧独立集成已实现、离线通过并根审；SnowLuma尚未真实接入，waiting_operator。** 阶段3上游私有适配、真实probe执行与资格判定仍未交付；72h/7天未开始，生产`require_runtime`仍总拒，不能填true放行。
+**项目侧独立集成及A0最小bootstrap已实现、离线通过并根审；SnowLuma尚未真实接入。** 完整私有适配、真实probe执行与资格判定仍未交付；A1可独立继续，真实前置waiting_operator，72h/7天未开始，生产`require_runtime`仍总拒，不能填true放行。
 
 - 实际工作目录：`C:/Users/yutha/.codex/worktrees/lap-40-snowluma-impl/QQbot`，分支`codex/lap-40-snowluma-impl`。复用此worktree，不新建、不归档。
 - 原运行目录：`E:/CodexWS/QQbot`，`codex/lap-40-snowluma-trial` / `a798e62498a60b8d061e917d1d8242f42d564ef0`；保持不动。本轮两目录Git均干净。
 - 接手基线：`f2bdb0c7096ea8f606e18f18f2926e5c8b680025`，2026-10-24 12:35已核对对应远端分支SHA、工作区干净；最终代码仍`0250f548f4e96484bef12096895e337e103bdd44`，总审`144b96861462d839e519cd8bedcfe97316cac0bd`。
 - 原规划分叉已由`1d5dafa38cdf15e9a57146544e551578da5d1cfa`协调；a798已是实现分支祖先，未部署到原checkout。
-- 当前无实施子代理运行。旧根agent在交接交付后停止编辑；新max session领取LAP-40后负责共享3入口。实施仍按原授权逐阶段派`gpt-6.1-sol/medium`，串行根审，不创建额外用户chat作子任务。
+- A0最小同意/bootstrap闭包`871e3deba308dee3cce7a10d92130f2bfd0df721`已推送，12:56根实际重跑21执行/5构建拒绝及生产入口退出1通过；无完整core/protobuf。已释放A0写入，12:57登记[A1 HANDOFF](STAGE3_A1_HANDOFF.md)，medium接管私有根/A1交接/报告，根独占共享3入口及总交接/规划。材料计划`282527e1a0b98e29c4ae602f34efd7e96bd50b90`已推送核对，逐阶段串行根审。
 
 ## 用户意图与最新输入
 
@@ -25,7 +25,7 @@
 | 范围 | 实现/证据 |
 | --- | --- |
 | 1/2 | 可选provider/旧snapshot摘要兼容；原创早期policy、独立HMAC健康、gate/router统一时效/最终发送栅栏；见[阶段1](../../../../reports/lap-40-stage1-2026-10-24.md)、[阶段2](../../../../reports/lap-40-stage2-2026-10-24.md) |
-| 3 | 仅固定源码核对和[15项私有清单](PRIVATE_WIRING_CHECKLIST.md)，无私有改版/构建/执行级接线；见[阶段3](../../../../reports/lap-40-stage3-2026-10-24.md) |
+| 3 | 初轮仅固定源码/[15项清单](PRIVATE_WIRING_CHECKLIST.md)；续作A0最小同意/bootstrap执行通过，完整上游消息/健康接线仍缺；[初轮报告](../../../../reports/lap-40-stage3-2026-10-24.md)/[A0](../../../../reports/lap-40-stage3R-A0-2026-10-24.md) |
 | 4A | 原锁lease唯一writer、fake管理创建/spec、跨客户端持久控制seq、drain/stop ACK、封闭Snow环境；716dd47/01af982；[续作报告](../../../../reports/lap-40-stage4A-continuation-2026-10-24.md)：128 Python/9 JS，小修41定向 |
 | 4B1 | 持久事故/预算、gate任务监督、唯一writer恢复/新epoch；fff64b7；[报告](../../../../reports/lap-40-stage4B1-2026-10-24.md)：163核心/92框架组合/9 JS |
 | 4B2 | 有限配置事务/回滚、正常text trial入口、封闭ACK/unknown指标与有界采样；0250f54；[报告](../../../../reports/lap-40-stage4B2-2026-10-24.md)：最终23专项、此前145受影响组合 |
@@ -33,10 +33,12 @@
 
 上述测试组合有重叠，不能累加。均是temp/fake离线；实际AstrBot库仅只读导入，无真实服务/端口/模型/QQ群消息/SSH/native动作。旧PersonaMatrix 23393字节对8192断言失败与LAP-18/24/28/29/31B差额保留，未改人设凑绿。
 
+阶段3续作已增加[A0报告](../../../../reports/lap-40-stage3R-A0-2026-10-24.md)：固定官方同意纯函数精确片段+原创bootstrap的最小JS闭包，21项执行/5项构建拒绝，根已复现。私有入口只接受synthetic snapshot/owner且永远拒绝生产；所有sink为0仅表示A0没有导入它们，不代表15项上游sink已验证。根审修复清除环境后漏补AUTOLOAD/TELEMETRY及NODE_OPTIONS/NODE_PATH的问题，恶意大小写继承用例通过。完整core/parser/protobuf/Bridge/OneBot、正式owner/观测和真实资格仍缺。
+
 ## 下一步顺序
 
 1. 接手/材料核验/阶段3续作规划已完成，读取本交接与[续作计划](STAGE3_CONTINUATION_PLAN.md)即可续作。操作者后续手动将原ZIP保留到runtime检查器指定位置，agent不自动搬运原生包。
-2. 根审/交付计划后串行派medium A0私有bootstrap/同意/固定native解析/JS-only，再A1隐私接线、A2真实观测控制源；均先执行级合成，不重做1/2/4/5。改版只在忽略runtime，不进public。
+2. A0最小闭包已交付并根审，当前按A1唯一归属推进完整消息/隐私接线，再A2真实观测控制源；均先执行级合成，不重做1/2/4/5。完整core/protobuf路径须另证，不能用A0去类型代替。改版只在忽略runtime，不进public。
 3. 再B补资格/probe实现并先落精确schema根审。当前require_runtime总拒、capability-probe只调用总拒，属于代码未写；Windows默认账号检测共享路径、可信原生重定向机制未证，属于真实前置，不能混为安装包缺失。不得改共享ini/HOME/APPDATA或猜参数；QQ安装包暂保留。
 4. 原生数据范围需可信依据及一次受控探针，最多240秒、全入站DROP、无模型/发群；需要扫码就等操作者，不循环登录。QQ3/3免扫码未证，QQ自动重启保持false。
 5. 所有真实前置通过后，才停机/干净快进部署、显式activate、一次正常trial-start并验实际收发。随后72h初筛包含于168h；安静群不判失败，也不能冒充7天实际收发通过。扫码变化观测与8h资源趋势自动判断尚未交付。

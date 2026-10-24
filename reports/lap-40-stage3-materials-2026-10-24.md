@@ -15,6 +15,8 @@ ZIP目录72项，无绝对/上级/反斜杠/冒号路径、大小写冲突或sym
 
 用户确认后12:43复核工作worktree的`runtime/snowluma/v2.1.1`，实际执行其中`node.exe --version`返回**v24.22.1**。这只验证Node，未运行Snow index/launcher、未dlopen/inject任何Snow组件。
 
+12:50追加对整个指定解压根逐文件流式核验：原ZIP内71个文件全部SHA256一致，missing/changed/unsafe/extra均0。只遍历该已指定原包根，不涉及其他QQ/用户目录。
+
 | 原包成员 | 解压后与原ZIP相同的SHA256 |
 | --- | --- |
 | node.exe | `d702daa815eabbff763c7d3808e235cf031cf2ca70211b56847bc72f51e240e5` |
@@ -43,4 +45,4 @@ ZIP目录72项，无绝对/上级/反斜杠/冒号路径、大小写冲突或sym
 
 本检查点只改本任务规划/报告/入口文档。实际命令类别：Get-Item、Get-FileHash、Get-AuthenticodeSignature、VersionInfo、ZipFile/zipfile内存目录与哈希、用户解压后的固定Node `--version`、限定Test-Path、git状态/分支/HEAD/ls-remote/ignore。初次PowerShell foreach直接接管道发生解析错误，未执行文件操作；改为赋值后管道，核验成功。
 
-0agent原生下载/解压/复制部署、0QQ安装/注入/启停/登录/扫码、0Snow运行/真实端口/模型/群消息/SSH；原运行目录未修改。用户手工解压与agent只读核验分别记录，不称为已切换；长期/免扫码及全部旧差额保留。检查点9份Markdown/404个本地链接及围栏通过，git diff --check通过；12:48额度300分钟used21%/剩79%。只交付本任务9份文档，Git提交/推送后核对对应分支SHA，实际回执以Git及后续HANDOFF记录为准。
+0agent原生下载/解压/复制部署、0QQ安装/注入/启停/登录/扫码、0Snow运行/真实端口/模型/群消息/SSH；原运行目录未修改。用户手工解压与agent只读核验分别记录，不称为已切换；长期/免扫码及全部旧差额保留。检查点9份Markdown/404个本地链接及围栏通过，git diff --check通过；12:48额度300分钟used21%/剩79%。材料与续作规划9文档已由`282527e1a0b98e29c4ae602f34efd7e96bd50b90`推送，对应远端分支SHA相同、当时工作区干净；随后仅本追加核验/阶段登记等待下一检查点交付。

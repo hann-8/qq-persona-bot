@@ -2,6 +2,8 @@
 
 独立项目集成1/2/4A/4B及离线根审已交付（代码0250f54、总审144b968）；真实阶段3私有接线/probe/资格缺失、生产总拒、未切换，72h/7天未开始。用户已提供两包路径并接受EULA/PRIVACY、手工解压Snow；ZIP固定SHA256匹配，解压后Node v24.22.1及原生摘要通过，QQ安装包腾讯签名Valid。[阶段3续作计划](tasks/LAP-40/STAGE3_CONTINUATION_PLAN.md)/[材料报告](../../reports/lap-40-stage3-materials-2026-10-24.md)区分代码缺项与原生数据前置；先A0私有入口/JS-only，QQ安装/真实probe仍待可信数据机制。实际工作C:/Users/yutha/.codex/worktrees/lap-40-snowluma-impl/QQbot、codex/lap-40-snowluma-impl，基线f2bdb0c已核对远端；原运行E:/CodexWS/QQbot不动。07:10一次性唤醒已删除，不重建。
 
+12:56续作：A0最小同意/bootstrap闭包`871e3de`已推送，根实际重跑21执行/5构建拒绝及入口退出1通过；封闭环境遗漏修复。仅最小闭包，完整core/protobuf/消息接线未完成；私有产物忽略，原版71文件及ZIP前后一致。下一步[A1唯一归属](tasks/LAP-40/STAGE3_A1_HANDOFF.md)，真实总拒不变。
+
 2026-10-24：用户明确以长期运行为首要标准；[LAP-39 SnowLuma评估](tasks/LAP-39/SNOWLUMA_ASSESSMENT.md)已完成，仅静态证据。v2.1.1有接收good/管道恢复，但原版gate前答复、补历史/存储及项目QQ归属尚需解决；现项目只读online/硬编码NapCat，不能原样切换。先详细规划，再72h/7天验收；6文档，0安装/注入/启停/登录/配置/模型/群/SSH，不重新探活，旧现场只作历史。[39交接](tasks/LAP-39/HANDOFF.md)。
 
 2026-10-24：LAP-39只读复发诊断/调研完成，故障未恢复。最后准入23日22:29:36；00:30仍在线缓存正常但bot自身状态失败/资料刷新10031ms超时，模型空闲/无清理阻断。全局o3=1、账号0，早期Hook读全局；单变量改0只是候选，旧故障可能默认0，不能当根治。当前包已有SelfOffline恢复、最新版未列匹配修复；接入替换仅后备。5份文档，0代码/配置/启停/QQ登录/模型/群/SSH；[调研](tasks/LAP-39/RESEARCH.md) / [39交接](tasks/LAP-39/HANDOFF.md)，旧差额保留。
