@@ -1,3 +1,5 @@
+2026-10-24 2026-10-24 23:03:15（Asia/Shanghai）：用户授权新session LAP-40-A4-medium-implementation 领取A4；归属 runtime/snowluma-private 下新增/未审A4草稿（先审后改）、本任务报告/交接及PROGRESS/工作线HANDOFF/TASKS归属段。保留旧2901基线、A0-A3、原C/原E运行根。仅合成验证，生产closed，不进入B/C。
+
 2026-10-24 12:38：LAP-40新会话`LAP-40-max-realentry-next`已领取材料核验与阶段3续作规划；根独占PROGRESS、工作线HANDOFF、TASKS及40交接/规划，旧根/medium已释放。先读[精简交接](tasks/LAP-40/HANDOFF.md)/[最小接续入口](tasks/LAP-40/MAX_START.md)，按缺口检索，不加载全部历史。
 
 独立项目集成1/2/4A/4B及离线根审已交付（代码0250f54、总审144b968）；真实阶段3私有接线/probe/资格缺失、生产总拒、未切换，72h/7天未开始。用户已提供两包路径并接受EULA/PRIVACY、手工解压Snow；ZIP固定SHA256匹配，解压后Node v24.22.1及原生摘要通过，QQ安装包腾讯签名Valid。[阶段3续作计划](tasks/LAP-40/STAGE3_CONTINUATION_PLAN.md)/[材料报告](../../reports/lap-40-stage3-materials-2026-10-24.md)区分代码缺项与原生数据前置；先A0私有入口/JS-only，QQ安装/真实probe仍待可信数据机制。实际工作C:/Users/yutha/.codex/worktrees/lap-40-snowluma-impl/QQbot、codex/lap-40-snowluma-impl，基线f2bdb0c已核对远端；原运行E:/CodexWS/QQbot不动。07:10一次性唤醒已删除，不重建。

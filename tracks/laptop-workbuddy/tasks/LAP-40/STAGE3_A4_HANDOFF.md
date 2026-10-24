@@ -1,4 +1,8 @@
-# LAP-40 / A4：当前仅规划，待用户指令实施
+检查点一：新异步channel合成8/8通过；其余全链待接。报告见 [A4实施](../../../../reports/lap-40-A4-implementation-2026-10-24.md)。旧仅规划状态按历史理解。
+
+2026-10-24 23:03:15（Asia/Shanghai）：用户授权新session LAP-40-A4-medium-implementation 领取A4；归属 runtime/snowluma-private 下新增/未审A4草稿（先审后改）、本任务报告/交接及PROGRESS/工作线HANDOFF/TASKS归属段。保留旧2901基线、A0-A3、原C/原E运行根。仅合成验证，生产closed，不进入B/C。
+
+# LAP-40 / A4：用户已授权实施，检查点一
 
 返回[项目入口](../../../../PROGRESS.md) / [总交接](HANDOFF.md) / [A4详细规划](STAGE3_A4_PLAN.md) / [medium指令](SOL_MEDIUM_START.md) / [TASKS](../../TASKS.md) / [原A2续作](STAGE3_A2_CONTINUATION_HANDOFF.md)。2026-10-24 22:49，Asia/Shanghai。
 

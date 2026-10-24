@@ -1,3 +1,5 @@
+2026-10-24：LAP-40 A4 已获用户实施授权，检查点一channel8项通过，其余待接；[A4交接](tasks/LAP-40/STAGE3_A4_HANDOFF.md)。本session归属A4私有代码与共享入口归属段。
+
 2026-10-24 22:49（Asia/Shanghai）：LAP-40当前仅Sol max详细规划；用户另开Sol medium并给实施指令，不自动派发。A4代理已interrupted，无活动实施写入。[A4详细规划](tasks/LAP-40/STAGE3_A4_PLAN.md)/[medium指令](tasks/LAP-40/SOL_MEDIUM_START.md)/[精简交接](tasks/LAP-40/HANDOFF.md)/[最小入口](tasks/LAP-40/MAX_START.md)是当前入口。
 
 新根`E:/CodexWS/QQbot_Snowluma`、分支`codex/lap-40-snowluma`，72536d3已push；2901文本/27内部junction迁移已根审，另有未审424文件overlay及7准备文件、无A4产物/执行验证，基线未改。A2/B/G1仍缺、生产总拒；原C/原E运行态不动。用户流程为基本可启动条件通过即自行实测，后拟Sol high调试，性能/72h/7天分别后验。本条覆盖历史自动续派/旧工作根口径。
