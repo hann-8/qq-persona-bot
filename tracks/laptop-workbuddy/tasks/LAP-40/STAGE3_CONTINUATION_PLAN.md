@@ -1,4 +1,6 @@
-# LAP-40 阶段3续作：真实材料、私有入口与probe资格
+# LAP-40 阶段3续作：真实材料、私有入口与probe资格（旧路线，已被取代）
+
+> 2026-10-25用户决定：本私有改造续作规划已整体被[官方OneBot最小接入计划](PLAN.md)取代，以下仅为历史。不再领取其中A4复核、B/C或probe/资格任务，不把缺项转为首次试用前置。A4代码、产物和证据原样保留，不追加复核/测试；当前下一步只看[Sol medium最小指令](SOL_MEDIUM_START.md)。
 
 返回[项目入口](../../../../PROGRESS.md) / [任务交接](HANDOFF.md) / [总计划](PLAN.md) / [私有清单](PRIVATE_WIRING_CHECKLIST.md) / [材料核验报告](../../../../reports/lap-40-stage3-materials-2026-10-24.md) / [B资格/probe合同](STAGE3_QUALIFICATION_SPEC.md)。2026-10-24，Asia/Shanghai；`LAP-40-max-realentry-next`。本文件细化总计划阶段3，1/2/4/5已有独立交付不重做。属于规划，未宣称私有接线、probe或真实切换通过。
 

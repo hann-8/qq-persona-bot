@@ -1,8 +1,8 @@
-2026-10-24 23:34：LAP-40 A4 session LAP-40-A4-medium-implementation（23:03:15领取）已交付/释放实施归属；private A4代码/证据和本任务文档完成，待Sol max独立复核。只做A4，不自动B/C。
+2026-10-25（Asia/Shanghai）：`LAP-40-official-onebot-doc-convergence`，00:00开始；文档收敛已完成，交付后释放本session归属。工作根`E:/CodexWS/QQbot_Snowluma`，分支`codex/lap-40-snowluma`，起点`cc247ce`，开始时工作区干净。只改PROGRESS、AGENTS、本工作线HANDOFF/TASKS、LAP-40交接/计划/接续指令及旧规划停用标记、adapters/snowluma/README共17份Markdown；不实施、不运行测试、不改local/persona/原运行根。领取登记已写后重读；按长期授权只交付本任务文档，Git号与远端核对见最终交付消息。
 
-2026-10-24 12:38：LAP-40新会话`LAP-40-max-realentry-next`已领取材料核验与阶段3续作规划；根独占PROGRESS、工作线HANDOFF、TASKS及40交接/规划，旧根/medium已释放。先读[精简交接](tasks/LAP-40/HANDOFF.md)/[最小接续入口](tasks/LAP-40/MAX_START.md)，按缺口检索，不加载全部历史。
+用户最新决定：官方原版SnowLuma经现成OneBot连接既有组件；旧私有改造路线整体被取代，B/C停止，A4代码/产物/证据原样保留为已实现/合成通过的历史成果，不再追加复核/测试。当前仅收敛文档，后续由用户另开Sol medium领取[最小接入指令](tasks/LAP-40/SOL_MEDIUM_START.md)；不自动派实施、不恢复旧唤醒。当前状态见[LAP-40交接](tasks/LAP-40/HANDOFF.md)。
 
-独立项目集成1/2/4A/4B及离线根审已交付（代码0250f54、总审144b968）；真实阶段3私有接线/probe/资格缺失、生产总拒、未切换，72h/7天未开始。用户已提供两包路径并接受EULA/PRIVACY、手工解压Snow；ZIP固定SHA256匹配，解压后Node v24.22.1及原生摘要通过，QQ安装包腾讯签名Valid。[阶段3续作计划](tasks/LAP-40/STAGE3_CONTINUATION_PLAN.md)/[材料报告](../../reports/lap-40-stage3-materials-2026-10-24.md)区分代码缺项与原生数据前置；先A0私有入口/JS-only，QQ安装/真实probe仍待可信数据机制。实际工作C:/Users/yutha/.codex/worktrees/lap-40-snowluma-impl/QQbot、codex/lap-40-snowluma-impl，基线f2bdb0c已核对远端；原运行E:/CodexWS/QQbot不动。07:10一次性唤醒已删除，不重建。
+以下日期记录为历史，涉及SnowLuma私改、屏蔽证明或首试前置的旧结论均已被上述决定取代；未完成历史项不自动转为本次待办。
 
 2026-10-24 00:53（Asia/Shanghai）：LAP-39续作SnowLuma替换可行性调研，session `LAP-39-SnowLuma-longrun-assessment`；现调研完成，未实施。用户强调NapCat/SnowLuma最重要的是长期运行。仅官方源码/发布/故障记录与本项目兼容面只读核对，独占PROGRESS、工作线HANDOFF/TASKS、39 HANDOFF/RESEARCH与新SNOWLUMA_ASSESSMENT.md共6份文档；不安装、不启停/注入/登录、不改代码/运行配置、不调用模型/群/SSH。开始main/3ecd9a0、工作区干净；上一现场状态只作历史，不在本轮重新探活。原版补历史/存储/内置答复在gate前，须先解决再规划72h/7天试验，见[评估](tasks/LAP-39/SNOWLUMA_ASSESSMENT.md)。
 
@@ -90,8 +90,8 @@ LAP-15内容提交`632fdc5`已推送origin/main，2026-10-17 11:09用ls-remote�
 
 | ID | 单一任务 | 状态与已有证据 | 依赖/推荐顺序 | 执行session | 下一步/完成出口 |
 | --- | --- | --- | --- | --- | --- |
-| LAP-40 | SnowLuma替换试运行 | A4已实现/合成21命令通过，待max独立复核；[HANDOFF](tasks/LAP-40/HANDOFF.md)/[A4交接](tasks/LAP-40/STAGE3_A4_HANDOFF.md)/[复核入口](tasks/LAP-40/SOL_MAX_REVIEW_START.md) | 只交Sol max审阅A4；B/G1/真实仍缺，不自动推进 | session LAP-40-A4-medium-implementation，23:03:15领取、23:34交付释放；归属private A4及本任务报告/交接/共享入口归属段 | E:/CodexWS/QQbot_Snowluma、codex/lap-40-snowluma；慢120ms bind1336ms/12helper，原件/原运行根不变；生产closed |
-| LAP-39 | 夜间不回复、配置保留与SnowLuma长期运行评估 | 既有修复/离线通过；复发诊断/SnowLuma调研完成，迁移未实施；[HANDOFF](tasks/LAP-39/HANDOFF.md) / [评估](tasks/LAP-39/SNOWLUMA_ASSESSMENT.md) | 用户以长期运行为首要标准；原版gate前答复/补历史/存储与干净QQ归属是迁移前置；保留o3候选/QQ诱因与旧差额 | 当前LAP-39-SnowLuma-longrun-assessment，2026-10-24 00:53登记，调研交付；独占6文档，23日归属见历史HANDOFF | 先解决前置能力缺口并详细规划，再72h/7天验证；本轮0安装/注入/启停/登录/模型/群/配置/SSH，不重新探活或默认切换 |
+| LAP-40 | 官方原版SnowLuma最小文字接入 | 文档收敛完成，官方接入待用户另行领取；旧私改被取代，A4已实现/合成通过并停止采用；[HANDOFF](tasks/LAP-40/HANDOFF.md) | 官方OneBot外部接入；不续B/C，不以私有资格/probe/长稳为首试前置 | LAP-40-official-onebot-doc-convergence，2026-10-25 00:00领取；17份Markdown已完成，交付后释放 | 本轮不实施/测试/运行；下一步由用户交Sol medium执行[最小指令](tasks/LAP-40/SOL_MEDIUM_START.md)，原运行根不动 |
+| LAP-39 | 夜间不回复、配置保留与SnowLuma长期运行评估 | 既有修复/离线通过；复发诊断/SnowLuma调研完成；[HANDOFF](tasks/LAP-39/HANDOFF.md) / [评估](tasks/LAP-39/SNOWLUMA_ASSESSMENT.md) | 调研时旧迁移前置已被LAP-40官方OneBot决定取代；o3候选/QQ诱因与历史差额保留 | 历史LAP-39-SnowLuma-longrun-assessment，2026-10-24 00:53登记，调研已交付；不新增本轮39任务 | 迁移仅按LAP-40当前计划，不再补内部存储/过滤证明或以72h/7天阻挡首试；39历史证据不晋升为真实通过 |
 | LAP-38 | 识图/网页补证与个人微信接入详细规划 | completed，仅规划；[HANDOFF](tasks/LAP-38/HANDOFF.md)/[PLAN](tasks/LAP-38/PLAN.md)/[指令](tasks/LAP-38/IMPLEMENTATION_GUIDE.md) | 补18C/28R；微信独立先WX-01，旧36/验收差额保留 | LAP-38-vision-web-wechat-plan，2026-10-22 23:19领取、23:50规划收口；18份文档独占 | 公共网络/正文质量新证据、路径/激活合同与微信七份引导/hash交付；0代码/配置/模型/QQ/微信/SSH/启停，Git见交接 |
 | LAP-37 | 清理容量阻断修复/人工恢复与弃用自启 | 已实现/105项离线通过/停机现场恢复通过；[HANDOFF](tasks/LAP-37/HANDOFF.md) | 既有31/33合同修复，不自动解锁unknown | LAP-37-cleanup-capacity-recovery，2026-10-22 21:20；归属见交接 | blocked=false，bot停机；清理cmd可复用；自启弃用，真实运行/31B差额保留 |
 | LAP-36 | 图片识别、轻量网页理解与B站总结详细规划 | completed，仅规划；[HANDOFF](tasks/LAP-36/HANDOFF.md)/[PLAN](tasks/LAP-36/PLAN.md)/[指引](tasks/LAP-36/IMPLEMENTATION_GUIDE.md) | 28入站→18网络/正文→28质量/容量→06字幕；07 ASR仍延期 | LAP-36-image-web-video-plan，2026-10-21 19:20领取、19:48规划交接；11份文档 | 配置/有限材料/开源复用/验收和失败出口落盘；不实施/启用，Git见交接 |

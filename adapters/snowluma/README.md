@@ -1,4 +1,6 @@
-# 原创SnowLuma私有接线接口
+# 原创SnowLuma私有接线接口（历史，路线停止采用）
+
+> 2026-10-25用户决定：官方原版SnowLuma经现成OneBot连接现有组件，整体取代以下私有接线路线；B/C停止，A4已实现/合成通过但停止采用，代码、产物、证据原样保留，不再追加复核/测试。以下过滤/健康/控制/资格合同不再是官方接入依赖或首试门槛，也不要求继续维护为可用私有分支。当前入口为[LAP-40最小计划](../../tracks/laptop-workbuddy/tasks/LAP-40/PLAN.md)和[medium指令](../../tracks/laptop-workbuddy/tasks/LAP-40/SOL_MEDIUM_START.md)。
 
 这些文件是本项目原创合同与自造测试，不含上游修改源码/patch/native。阶段2只完成接口，尚未在固定上游v2.1.1接线，不能称Snow适配或真实部署通过。阶段3须在忽略runtime中按PLAN核对最早分支、所有store/logger/补史/内置答复及原生保护，缺证据保持阻断。
 

@@ -1,4 +1,6 @@
-# LAP-40 / A4：全链非阻塞接线详细规划
+# LAP-40 / A4：全链非阻塞接线详细规划（历史，路线停止采用）
+
+> 2026-10-25用户决定：A4保持已实现/合成通过，代码、产物及证据原样保留，不删除、不回滚、不再追加复核或测试。以下私有路线规划已被[官方OneBot最小计划](PLAN.md)整体取代，不再作为接续指令；旧B/C停止，当前下一步见[SOL_MEDIUM_START](SOL_MEDIUM_START.md)。本标记仅更新规划状态，未修改A4交接、报告或私有证据。
 
 返回[项目入口](../../../../PROGRESS.md) / [总交接](HANDOFF.md) / [工作根与用户实测流程](WORKTREE_AND_USER_TEST_PLAN.md) / [medium实施指令](SOL_MEDIUM_START.md) / [A4交接](STAGE3_A4_HANDOFF.md)。2026-10-24，Asia/Shanghai；Sol max规划，**当前不实施、不自动派代理**。
 

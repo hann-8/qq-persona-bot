@@ -1,4 +1,6 @@
-# LAP-40 固定版私有接线清单
+# LAP-40 固定版私有接线清单（历史，不再补齐）
+
+> 2026-10-25用户决定：官方原版SnowLuma + 现成OneBot已整体取代私有改造。以下过滤、内部日志/存储、资格和证明清单不再补齐，不作为首次试用门槛，不从未确认项派生新任务。A4代码、产物、证据原样保留，不再复核/测试；当前以[PLAN](PLAN.md)和[SOL_MEDIUM_START](SOL_MEDIUM_START.md)为准。
 
 返回[HANDOFF](HANDOFF.md) / [PLAN](PLAN.md) / [续作计划](STAGE3_CONTINUATION_PLAN.md) / [原创接口](../../../../adapters/snowluma/README.md) / [阶段3报告](../../../../reports/lap-40-stage3-2026-10-24.md)。2026-10-24，Asia/Shanghai。
 
@@ -41,7 +43,7 @@
 | 12. armed/outbound观测来源 | [HookSession L113](https://github.com/SnowLuma/SnowLuma/blob/f8cb15c27bca3d2d1bd044a921e55bfc44bb5e60/packages/bridge/src/hook-session.ts#L113)初始healthy=true但armed=false，public receiveHealthy合并rx/outbound；[L1015](https://github.com/SnowLuma/SnowLuma/blob/f8cb15c27bca3d2d1bd044a921e55bfc44bb5e60/packages/bridge/src/hook-session.ts#L1015)首次SsoHeartBeat才armed；[L611](https://github.com/SnowLuma/SnowLuma/blob/f8cb15c27bca3d2d1bd044a921e55bfc44bb5e60/packages/bridge/src/hook-session.ts#L611)绑定outbound观察，L1111更新 | 只在允许的私有JS模式暴露固定受管会话观测：pipe/login/account-match、armed、rx/outbound分别取真实源；不要从good反推armed，不伪造未知为true | 首次无心跳、正常armed、90+15秒停滞、pipe断、outbound失败、切账号/换PID/重连时的独立快照及epoch。**未接线/未执行** |
 | 13. health控制面/受管owner | 固定上游没有本项目所需nonce/HMAC/owner绑定控制面；现有[原创producer/verifier](../../../../src/qqbot_gateway/transport_health.py)与[JS producer](../../../../adapters/snowluma/project_policy.mjs)是项目接口 | 私有侧把上行真实观测送入producer；阶段4 owner提供真实registry/PID/listener检查及独立秘密读取，nonce3秒/8KiB/seq/TTL，bind/drain/stop仅同一预登记身份；无任意命令/路径/PID/action | 两端源码级合成连通、实际监听归属/stop优先/不可自签放行；阶段2接口跨语言已验，**上游观测接线及真实owner/监听均未实现/未验** |
 | 14. JS构建与native/保护 | [core package build](https://github.com/SnowLuma/SnowLuma/blob/f8cb15c27bca3d2d1bd044a921e55bfc44bb5e60/packages/core/package.json#L36)也走Vite；[vite L63](https://github.com/SnowLuma/SnowLuma/blob/f8cb15c27bca3d2d1bd044a921e55bfc44bb5e60/packages/core/vite.config.ts#L63)要求native存在，[L148](https://github.com/SnowLuma/SnowLuma/blob/f8cb15c27bca3d2d1bd044a921e55bfc44bb5e60/packages/core/vite.config.ts#L148)复制native/ffmpeg；[L79](https://github.com/SnowLuma/SnowLuma/blob/f8cb15c27bca3d2d1bd044a921e55bfc44bb5e60/packages/core/vite.config.ts#L79)保留同意文档guard。[runtime-integrity.ts](https://github.com/SnowLuma/SnowLuma/blob/f8cb15c27bca3d2d1bd044a921e55bfc44bb5e60/packages/bridge/src/runtime-integrity.ts#L27)是Windows进程完整性级别诊断，不能当私有JS保护允许证据 | 不运行普通core build或build:all；需有符合条款且保留原生原位置/摘要/合法初始化的JS-only构建方式及合格Node。不得修改保护/激活/完整性机制或删除guard“让它能build” | 原包精确摘要、适用部署证据、native不变、JS-only产物摘要、保护允许且固定源码级合成执行记录。**未准备/未构建/未执行，硬阻断真实启用** |
-| 15. 数据范围与本机验收 | [PLAN G1](PLAN.md#g1-专用qq与数据范围)要求干净QQ及原生数据互证；安装位置/package main/环境变量均不能独自证明 | 不复用NapCat已patched QQ，不查日常认证。未来另在全部前置满足、全链DROP且操作者可扫码时做一次有界探针；本阶段不探测 | 真实受管exe/创建链/加载组件、允许的数据目录与访问证据；缺材料waiting_operator，不循环扫码。**未执行/未验** |
+| 15. 数据范围与本机验收 | [历史PLAN G1](https://github.com/hann-8/qq-persona-bot/blob/cc247ce5c0c0192668fe22825ead65221386befc/tracks/laptop-workbuddy/tasks/LAP-40/PLAN.md#g1-专用qq与数据范围)曾要求干净QQ及原生数据互证；已被当前官方接入决定取代 | 原有DROP探针安排停止，不再作为首次试用前置 | 原有证明未执行/未验，保持历史状态；不再补齐 |
 
 ## 后续执行出口
 

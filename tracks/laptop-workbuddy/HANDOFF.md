@@ -1,10 +1,8 @@
-2026-10-24 23:34：LAP-40 A4已实现/合成矩阵21命令通过，慢120ms bind1336ms/12次；当前待Sol max独立复核，本实施session释放归属，不自动B/C，生产closed。[A4交接](tasks/LAP-40/STAGE3_A4_HANDOFF.md) / [复核入口](tasks/LAP-40/SOL_MAX_REVIEW_START.md)。
+2026-10-25（Asia/Shanghai）：LAP-40已按用户决定改走**官方原版SnowLuma现成OneBot接入既有gate/AstrBot/gateway/CodeBuddy CLI**。旧私有改造规划整体被取代，停止B/C；A4已实现/合成通过，代码、产物和证据原样保留，路线停止采用，不再追加复核/测试。账号屏蔽由操作者QQ客户端拉黑处理，取消围绕SnowLuma内部过滤/日志/存储的证明和首次试用前置。
 
-2026-10-24 22:49（Asia/Shanghai）：LAP-40当前仅Sol max详细规划；用户另开Sol medium并给实施指令，不自动派发。A4代理已interrupted，无活动实施写入。[A4详细规划](tasks/LAP-40/STAGE3_A4_PLAN.md)/[medium指令](tasks/LAP-40/SOL_MEDIUM_START.md)/[精简交接](tasks/LAP-40/HANDOFF.md)/[最小入口](tasks/LAP-40/MAX_START.md)是当前入口。
+当前工作根`E:/CodexWS/QQbot_Snowluma`、分支`codex/lap-40-snowluma`。本轮仅文档，未实施、未运行测试、未安装/启停/扫码/真实模型/发群、未改local/persona；原`E:/CodexWS/QQbot`运行根不动。后续由用户另开Sol medium执行[最小接入指令](tasks/LAP-40/SOL_MEDIUM_START.md)，不自动派代理。已确认的代码阻断是当前Snow provider仍要求旧私有runtime/健康合同，外部接入需解除这项耦合；官方启动/登录及目标群文字闭环尚未验证。其他旧功能、自动恢复、性能、72h/7天均不作首试门槛。
 
-新根`E:/CodexWS/QQbot_Snowluma`、分支`codex/lap-40-snowluma`，72536d3已push；2901文本/27内部junction迁移已根审，另有未审424文件overlay及7准备文件、无A4产物/执行验证，基线未改。A2/B/G1仍缺、生产总拒；原C/原E运行态不动。用户流程为基本可启动条件通过即自行实测，后拟Sol high调试，性能/72h/7天分别后验。本条覆盖历史自动续派/旧工作根口径。
-
-2026-10-24：用户明确以长期运行为首要标准；[LAP-39 SnowLuma评估](tasks/LAP-39/SNOWLUMA_ASSESSMENT.md)已完成，仅静态证据。v2.1.1有接收good/管道恢复，但原版gate前答复、补历史/存储及项目QQ归属尚需解决；现项目只读online/硬编码NapCat，不能原样切换。先详细规划，再72h/7天验收；6文档，0安装/注入/启停/登录/配置/模型/群/SSH，不重新探活，旧现场只作历史。[39交接](tasks/LAP-39/HANDOFF.md)。
+当前入口：[LAP-40交接](tasks/LAP-40/HANDOFF.md) / [最小计划](tasks/LAP-40/PLAN.md) / [medium指令](tasks/LAP-40/SOL_MEDIUM_START.md)。[A4交接](tasks/LAP-40/STAGE3_A4_HANDOFF.md)及[LAP-39静态调研](tasks/LAP-39/SNOWLUMA_ASSESSMENT.md)保留为历史依据，不再从其中逐项派生新任务。以下其他任务记录按原归属保留；涉及本次路线或首试门槛的旧说法以顶部最新决定为准。
 
 2026-10-24：LAP-39只读复发诊断/调研完成，故障未恢复。最后准入23日22:29:36；00:30仍在线缓存正常但bot自身状态失败/资料刷新10031ms超时，模型空闲/无清理阻断。全局o3=1、账号0，早期Hook读全局；单变量改0只是候选，旧故障可能默认0，不能当根治。当前包已有SelfOffline恢复、最新版未列匹配修复；接入替换仅后备。5份文档，0代码/配置/启停/QQ登录/模型/群/SSH；[调研](tasks/LAP-39/RESEARCH.md) / [39交接](tasks/LAP-39/HANDOFF.md)，旧差额保留。
 
@@ -185,4 +183,4 @@ LAP-09历史检查点：配置菜单及groups/blacklist命令、共享校验/迁
 4. LAP-06/07视频/ASR仍延期；当前代码遇链接只说明未支持，未来LAP-18按新计划调整网页分支。已有BV178JX6wEaa样本，进入视频阶段再补其余样本/登录意愿；PC已有模型但本轮不启停/生成，接入按LAP-19计划由后续LAP-17实施。
 5. 任务归属见台账；LAP-09交付后按用户明确指令转入LAP-10，LAP-11本轮已独立交付，LAP-12本轮已交付且后台最终关闭。真实@入口、无工具/主动任务/项目自动重试/fallback保持，成功路径不stop_event；CLI内部强制压缩/恢复仍未排除，不冒充上游严格单次推理。
 
-当前恢复顺序：PROGRESS→本文件/TASKS→LAP-19 HANDOFF/PLAN/GROUP_CHAT_PLAN/IMPLEMENTATION_GUIDE→17已实现/离线完成，后续按指令18→20→21。不必重读全部历史报告；旧“最终全停”为历史，当前bot状态未探测，新功能仅规划，真实群和旧验收差额保留。
+当前恢复顺序：PROGRESS→本文件/TASKS的LAP-40行→LAP-40 HANDOFF/最小接入指令。LAP-19及其他功能线仅在用户另行指定时按需读取，不作为本次首试补齐清单。不必重读全部历史报告；旧“最终全停”为历史，当前bot状态未探测，真实未验仍如实保留。

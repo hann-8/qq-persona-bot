@@ -1,4 +1,6 @@
-# LAP-40 / 3R-B：资格与单次DROP探针精确合同
+# LAP-40 / 3R-B：资格与单次DROP探针精确合同（停止）
+
+> 2026-10-25用户决定：停止旧私有路线B/C，本合同不再实施。以下资格、proof、DROP probe与原生数据范围证明均不再是官方OneBot首次试用前置，也不转为新任务。当前仅按[官方最小计划](PLAN.md)及[medium指令](SOL_MEDIUM_START.md)推进必要外部接入；历史内容不构成执行许可。
 
 返回[项目入口](../../../../PROGRESS.md) / [任务交接](HANDOFF.md) / [续作计划](STAGE3_CONTINUATION_PLAN.md) / [总计划](PLAN.md)。2026-10-24，Asia/Shanghai；`LAP-40-max-realentry-next`。本文件是A1实施期间独立细化的B规划，**尚未实施，不授予真实启动资格**；实际B领取须等待A1/A2根审。
 
