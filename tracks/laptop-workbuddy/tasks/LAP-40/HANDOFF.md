@@ -1,8 +1,16 @@
 # LAP-40 SnowLuma：max接续交接
 
-返回[项目入口](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [任务台账](../../TASKS.md) / [新会话入口](MAX_START.md) / [阶段3续作计划](STAGE3_CONTINUATION_PLAN.md) / [材料报告](../../../../reports/lap-40-stage3-materials-2026-10-24.md)。继承AGENTS。2026-10-24，Asia/Shanghai；session `LAP-40-max-realentry-next`已接手材料核验与阶段3续作规划，根独占共享3入口及本任务交接/规划报告。首个可审检查点前不派代码实施。
+返回[项目入口](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [任务台账](../../TASKS.md) / [新会话入口](MAX_START.md) / [阶段3续作计划](STAGE3_CONTINUATION_PLAN.md) / [材料报告](../../../../reports/lap-40-stage3-materials-2026-10-24.md)。继承AGENTS。2026-10-24，Asia/Shanghai；session `LAP-40-max-E-worktree-user-test`接续，根独占共享3入口及本任务总交接/计划。
 
 ## 当前状态与路径
+
+2026-10-24 22:35根已重查Git/远端/额度，建立用户指定的`E:/CodexWS/QQbot_Snowluma`，分支`codex/lap-40-snowluma`，基线8a431f1。旧C工作根与原E运行根保持原状，不归档、不删除。5小时余98%/周余38%，未使用reset credits。用户本次新建worktree指令覆盖旧入口“不新建/复用旧根”。
+
+用户要在Snow基本接口/隔离前提具备、能明确启动时自行实测，然后拟由Sol high调试。性能、实际功能效果与72h/7天留给真实使用分别记录；不能把AstrBot/自研层已有实现当Snow原生接线已完成。当前仍未可启动实测：A2全链尚缺、B资格/probe代码未写、G1真实机制未证，生产继续总拒。
+
+按[工作根与用户实测计划](WORKTREE_AND_USER_TEST_PLAN.md)先迁入私有纯文本闭包/重建内部junction，不搬原生包/ZIP、不迁运行配置/秘密/真实state。原官方包和旧检查点仅原位置只读使用，新根生产材料尚不齐备。随后串行medium完成[A4非阻塞全链](STAGE3_A4_HANDOFF.md)，根审通过才继续B；根独占共享入口、medium独占新private及A4专属文档。当前没有QQ/Snow真实启停、监听、登录、模型或群操作。
+
+## 迁移前已验基线（历史，旧路径不再是活动工作根）
 
 **A0/A1与旧A2组件、控制期限修复已根审；A2整体仍未完成。** 17:24续作后，18:37额度used96%/剩4%触阈值，停止新实现/测试，仅交接/Git交付。A3同步helper路径被6077ms慢bind阻断，A4异步scope候选仅子测5项、未根审/未集成；057441e已交付。所有agent交付后释放写入。Snow未真实接入，B仅规划，G1/probe/72h/7天未过，生产总拒。
 
@@ -12,7 +20,7 @@
 
 最终续作检查点`057441e406c340074fa1fcbdecf100a5634fc2f2`已push核对，仅原创续作报告/交接；root阅读了候选源但阈值后未执行新测试，尚未接受候选。A3 `check-a3-final.py`分项：316模块、7场景各29（多数重复）、channel11/provider10/catalog6/实际框架10，均子测，不能宣称响应性通过；29项940次helper、慢120ms bind51次/6077ms。A4 `src/a4-scoped-broker.mjs`与`check-a4-scoped.test.mjs`非阻塞5项仅局部，未替换A3控制/入站/pipe/注入/native链。原71/ZIP不变；全部源/产物/依赖仍仅忽略private，勿归档/删除worktree导致忽略材料丢失。
 
-- 实际工作目录：`C:/Users/yutha/.codex/worktrees/lap-40-snowluma-impl/QQbot`，分支`codex/lap-40-snowluma-impl`。复用此worktree，不新建、不归档。
+- 迁移前工作目录：`C:/Users/yutha/.codex/worktrees/lap-40-snowluma-impl/QQbot`，分支`codex/lap-40-snowluma-impl`。保留检查点，只读，不归档；新活动根见上。
 - 原运行目录：`E:/CodexWS/QQbot`，`codex/lap-40-snowluma-trial` / `a798e62498a60b8d061e917d1d8242f42d564ef0`；保持不动。本轮两目录Git均干净。
 - 初次接手基线f2bdb0c、原独立集成代码0250f54/总审144b968；17:24重领基线b605d03，公开原创控制期限修复9162d2c已根审。精确当前HEAD/远端以Git为准。
 - 原规划分叉已由`1d5dafa38cdf15e9a57146544e551578da5d1cfa`协调；a798已是实现分支祖先，未部署到原checkout。
@@ -48,6 +56,8 @@
 A2阈值检查点：独立a2-work/a2-dist 315模块；上游HookSession/HookManager定PID分源只读观测10项、control壳20项+竞态2项、Python正式快照/owner/RuntimeOwner loader10项、继承A1 61项子测通过，计数单位分列且非真实运行。原71/ZIP不变，无真实native/网络/QQ/模型/群操作。**根尚未审，也未重放。** 私有a2-checkpoint-evidence.json及报告记录精确文件/摘要；缺Node正式消费/整体装配、实际Windows单PID创建/pipe提供器、受认证gate允许RPC、最终native提交栅栏/ACK。不要把这些缺项写成“只差用户扫码”。
 
 ## 下一步顺序
+
+当前首步以[工作根/实测计划](WORKTREE_AND_USER_TEST_PLAN.md)和[A4交接](STAGE3_A4_HANDOFF.md)为准：新根迁移与非阻塞全链先行。以下A/B/C能力先后关系保留，旧路径只作历史复现。
 
 1. 接手/材料核验/阶段3续作规划已完成，读取本交接与[续作计划](STAGE3_CONTINUATION_PLAN.md)即可续作。操作者后续手动将原ZIP保留到runtime检查器指定位置，agent不自动搬运原生包。
 2. 查额度/Git并重领后，先读A2续作交接/报告和根复核的同步helper阻断，审A4候选5项；再完成全链异步scope：控制计时前身份/原始包有界排队/pipe与注入/native敏感边界fresh及超时/取消/ACK收束。未整体重放慢helper/隐私/允许动作/实际框架unknown前不能接受A2。过期证明与逻辑操作许可须分清，不得恢复已撤销scope，也不能让长图片操作绕过提交前fresh。保持无常驻watch/唯一registry writer、历史/store/raw日志/广域发现关闭。
