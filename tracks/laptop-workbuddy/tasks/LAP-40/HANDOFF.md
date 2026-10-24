@@ -2,7 +2,11 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md)。继承AGENTS。
 
-**当前4B1：持久预算/事故监督、原锁writer恢复与新epoch栅栏已实现/离线通过，待根审，未部署。** [4B1报告](../../../../reports/lap-40-stage4B1-2026-10-24.md)：29恢复用例，最终163核心组合、92框架/回归组合、9 JS通过（组合有重叠，不合算独立数量）。根预审四点已修：late drain True不越150s、新Node监听在ready期限内异步等且一次bind、旧seq坏账不洗、psutil权限异常持久operator。QQ动作同时占Node/QQ预算，生产资格总拒，4B2 CLI/采样未做；只等待根审。
+**当前：4B1 fff64b735aa19afe6ac88e3ba345c6347b2fc402已推送根审，登记4B2，未部署。** [4B1报告](../../../../reports/lap-40-stage4B1-2026-10-24.md)：29恢复用例，最终163核心组合、92框架/回归组合、9 JS通过（有重叠）。根审四点修验与实际gate→writer→新epoch/旧输出拒绝路径通过；QQ动作同时占Node/QQ资源预算已同步PLAN。3/G0/G1缺口与31B observed_only未解除，生产资格总拒。
+
+4B2登记：`LAP-40-medium-stage4B2-cli-trial`，2026-10-24 08:01，基线fff64b7干净，待同一sol/medium续领。归属scripts/transport.py、必要原创transport配置事务/transport_trial模块、gate采样接线/管理入口、测试、根README/config与adapter说明、本HANDOFF/4B2报告；根3入口和PLAN/GUIDE仍独占。只停机prepare/verify/activate/rollback/trial入口与有界状态采样，所有真实资格总拒保持；不写本机local/secrets/persona，不实际启停/登录/模型/群/native/SSH。完成根审/5总审，不自行部署。300分钟剩34%。
+
+分支文档祖先已协调：1d5dafa38cdf15e9a57146544e551578da5d1cfa合并a798规划指针祖先；先核对该分叉只有本任务PROGRESS两行过时指针，再以当前活动入口取代，未引入其他代码/覆盖原checkout。原运行a798现为实现分支祖先，未来仍须停机/干净才可快进部署；本轮没有部署。
 
 4B1文件归属实作：`src/qqbot_gateway/{transport_supervisor,transport_owner,transport_launch,onebot_gate,qq_transport}.py`、`tests/test_transport_recovery.py`、adapters/snowluma与config局部README、本HANDOFF/4B1报告。未改3共享入口/PLAN/GUIDE；未动原运行态/local/persona。预算首次停机初始化API已提供但watch不补空账，CLI留4B2。Git提交/远端一致和剩余配额在本阶段出口核对。
 

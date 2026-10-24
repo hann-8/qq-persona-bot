@@ -132,7 +132,7 @@ SnowLuma的channel_ready要求：当前受管身份有效、stop marker=false、
 2. 正常WS/管道断线先给30秒上游重连；期间关准入/旧代际输出。恢复则记录一次短暂中断，不另重启。
 3. 未恢复且recovery已显式启用，先drain最多150秒；模型或cleanup未知、活动发送未决则不杀、不重试，转operator_required。现有unknown/partial账本保持。
 4. 每事故至多一个恢复动作：Node退出/管道断而QQ身份健康可尝试重启Snow并重绑原受管QQ；已armed接收停滞且管道仍在，只有allow_qq_restart及3/3免扫码证明有效时才可重启该QQ，否则至多一次Snow动作后转人工。禁止“Snow→QQ→重登”的升级重试循环。
-5. 动作前write-ahead预占持久预算，失败/结果未知也消耗；24小时滑动窗Snow<=2、QQ<=1，动作间至少1800秒。账本损坏/时钟回拨不能补额度或清空。watch自身重启不重置预算。
+5. 动作前write-ahead预占持久预算，失败/结果未知也消耗；24小时滑动窗Snow<=2、QQ<=1，动作间至少1800秒。QQ动作同时创建Node，单次事故动作同时占Snow/QQ两个资源预算，不能额外产生第三次Node创建。账本损坏/时钟回拨不能补额度或清空。watch自身重启不重置预算。
 6. 完成动作后180秒等待独立健康/armed；从30秒确认到drain/ready上限合计360秒。失败则停止自动动作、保持gate关闭，记录waiting_operator/原因类别。需扫码时等待人工，不保存密码、不反复快速登录。
 7. 手动stop、shutdown、rollback优先，停机标志使所有watch/延迟回调失效，确认自有注册身份退出。管理端退出不丢子进程归属；无证据进程只报告，不按QQ.exe/Node/Python名称批量结束。未收敛身份不得报告停止成功或启动另一provider。
 

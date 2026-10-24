@@ -1,3 +1,5 @@
+2026-10-24 08:01：LAP-40独立4B1 fff64b7已推送根审，29恢复用例/163核心、92框架回归、9 JS通过（组合有重叠）。新owner监听等待/一次bind、150秒drain期限、旧seq坏账与权限未知均已修验；原生/私有入口仍总拒。登记LAP-40-medium-stage4B2-cli-trial：停机有限字段CLI事务/有界资源采样后再5总审；根独占3入口，medium当前代码/测试/40交接。原运行checkout未改，文档祖先已在1d5dafa协调，仍未部署；300分钟剩34%。
+
 2026-10-24 07:34：LAP-40独立4A续作716dd47及环境封闭小修01af982已推送根审；最终128 Python/9 JS与小修41定向通过，报告见40交接。原锁writer/fake创建/持久控制seq/实际drain-stop ACK/状态提示完成，生产私有入口仍总拒。登记LAP-40-medium-stage4B1-recovery，先持久预算/事故状态/gate监督和唯一writer恢复，再根审派4B2 CLI/采样。根独占3入口，0真实启停/部署/模型/群/本机配置动作；07:10一次性唤醒已删除。300分钟剩65%。
 
 2026-10-24 07:12：LAP-40按07:10唤醒恢复，300分钟额度剩100%，解除quota_hold。登记LAP-40-medium-stage4A-continuation，先完成唯一writer owner登记/启动spec合成路径/drain-stop ACK消费/Snow状态提示，根审后才4B/5。根agent独占3入口，medium拥有当前代码测试及40交接；真实Snow仍总拒，原运行态不动。
