@@ -2,7 +2,18 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md)。继承AGENTS。
 
-**当前：4B2项目侧CLI/有限事务/采样已实现，23条最终目标及145受影响组合通过（有重叠），待根审，未部署/切换。** [4B2报告](../../../../reports/lap-40-stage4B2-2026-10-24.md)分清原创离线通过、真实probe/私有接线/扫码观测和长稳未验；生产require_runtime仍总拒，0原运行态操作。 [4B1报告](../../../../reports/lap-40-stage4B1-2026-10-24.md)：29恢复用例，最终163核心组合、92框架/回归组合、9 JS通过（有重叠）。根审四点修验与实际gate→writer→新epoch/旧输出拒绝路径通过；QQ动作同时占Node/QQ资源预算已同步PLAN。3/G0/G1缺口与31B observed_only未解除，生产资格总拒。
+**当前：2026-10-24 08:17，独立项目集成与阶段5总审完成，waiting_operator；未部署/切换。** 最终代码`0250f548f4e96484bef12096895e337e103bdd44`已推送并根核远端一致。根审[4B2报告](../../../../reports/lap-40-stage4B2-2026-10-24.md)及实际候选字节验证/精确有限回滚、封闭采样状态、QQ ACK与unknown指标、full=True正常text和源竞争/坏备份不泄漏修验；最终23专项与此前145回归有重叠。此前[4B1](../../../../reports/lap-40-stage4B1-2026-10-24.md)163核心/92框架组合及9 JS证据保持，不能相加冒充独立数量。阶段1/2/4A/4B均经根审；3只完成固定源码核对，没有私有改版/构建/执行级接线。
+
+阶段5根核对：全分支`git diff 09ad5a4 HEAD --check`通过；467本地Markdown链接0断链；47变更路径无runtime/state/secrets/logs/config/local或上游patch/bundle/native。原运行checkout仍`a798e62498a60b8d061e917d1d8242f42d564ef0`且干净，本轮未启停/登录/端口/模型/群/SSH或改本机配置/人设。原planning文档祖先已在1d5dafa协调，但没有把代码部署回原checkout。一次性07:10唤醒已删除；没有新建其他automation。
+
+后续具体出口（不是补填true后直接启动）：
+
+1. 操作者按既有条款准备固定原版SnowLuma包、合格项目内Node及可信干净专用QQ，提供原生部署/数据范围证据；只检查已指定项目runtime，不搬日常QQ资料或自动部署native。
+2. 补[私有接线清单](PRIVATE_WIRING_CHECKLIST.md)中的受保护早期过滤/无旁路/无历史与磁盘消息/armed/outbound实际接线和合成执行证据；当前还缺真实probe执行分支与可信资格判定。保持`require_runtime`生产总拒，不能以manifest或自报计数替代；这部分需在材料可验证后继续规划/实施，当前未交付。
+3. 数据范围/扫码观测需有操作者可用窗口，单次受控探针；遇扫码等待人工，不循环登录。3/3免扫码未证，QQ自动重启保持关闭；31B observed_only等旧差额保留。
+4. 资格齐全后才停机/干净快进部署、一次显式activate与正常trial-start。首次真实channel_ready后开始72h/168h，当前两者均未开始；扫码变化观测与8h资源趋势自动判断仍未交付，采样可供人工复核。没有自然新消息/ACK对照不能声称7天实际收发通过。
+
+medium已停止新工作；根不再派独立阶段或在缺前置时尝试真实启动。后续从本节waiting_operator续做，不重做已通过阶段；精确最终文档提交/远端状态由根出口报告。
 
 4B2追加精确归属：scripts/manage.py启动源摘要/停止instance前置、onebot_gate.py仅Snow封闭发送ACK/失败/unknown计数；同阶段新增测试覆盖实际假发送/回执/采样，无重试。
 
