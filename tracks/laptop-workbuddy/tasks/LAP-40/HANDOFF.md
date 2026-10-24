@@ -10,7 +10,7 @@
 - 原运行目录：`E:/CodexWS/QQbot`，`codex/lap-40-snowluma-trial` / `a798e62498a60b8d061e917d1d8242f42d564ef0`；保持不动。本轮两目录Git均干净。
 - 接手基线：`f2bdb0c7096ea8f606e18f18f2926e5c8b680025`，2026-10-24 12:35已核对对应远端分支SHA、工作区干净；最终代码仍`0250f548f4e96484bef12096895e337e103bdd44`，总审`144b96861462d839e519cd8bedcfe97316cac0bd`。
 - 原规划分叉已由`1d5dafa38cdf15e9a57146544e551578da5d1cfa`协调；a798已是实现分支祖先，未部署到原checkout。
-- A0最小同意/bootstrap闭包`871e3deba308dee3cce7a10d92130f2bfd0df721`已推送，12:56根实际重跑21执行/5构建拒绝及生产入口退出1通过；无完整core/protobuf。已释放A0写入，12:57登记[A1 HANDOFF](STAGE3_A1_HANDOFF.md)，medium接管私有根/A1交接/报告，根独占共享3入口及总交接/规划。材料计划`282527e1a0b98e29c4ae602f34efd7e96bd50b90`已推送核对，逐阶段串行根审。
+- A0 `871e3de`、A1 `add12af8e127265693de029ea4890f3cb16dc450`已推送；13:30:43根按原Python313完整重放315模块/61 A1/10路径/A0 21+5，生产入口退出1。A1已释放，13:35登记[A2 HANDOFF](STAGE3_A2_HANDOFF.md)，medium接管private/A2交接/报告，根独占共享3入口和总交接/规划；材料计划282527e和A0根审b765663已交付。13:33配额used81%/剩19%，<=5%保存停止，不建旧07:10唤醒。
 
 ## 用户意图与最新输入
 
@@ -35,11 +35,13 @@
 
 阶段3续作已增加[A0报告](../../../../reports/lap-40-stage3R-A0-2026-10-24.md)：固定官方同意纯函数精确片段+原创bootstrap的最小JS闭包，21项执行/5项构建拒绝，根已复现。私有入口只接受synthetic snapshot/owner且永远拒绝生产；所有sink为0仅表示A0没有导入它们，不代表15项上游sink已验证。根审修复清除环境后漏补AUTOLOAD/TELEMETRY及NODE_OPTIONS/NODE_PATH的问题，恶意大小写继承用例通过。完整core/parser/protobuf/Bridge/OneBot、正式owner/观测和真实资格仍缺。
 
+随后[A1报告](../../../../reports/lap-40-stage3R-A1-2026-10-24.md)已完成官方Proton转换和315模块私有图，实际Bridge/parser/OneBot/network/Hook构造链61项执行+10路径元数据，根重放通过；419固定文本blob核验、原版71+ZIP不变。只有TypeScript6.0.2本地禁脚本依赖，private inventory SHA `f3a6e3b33c79af5aaeb2a175eea9699b4cae1866f383564576e6a3f7c0101105`；完整原/修改源/产物摘要在忽略证据及报告。当前入站隐私中间态，所有RPC仍closed，正式snapshot/owner/健康/允许动作留A2，不称1..11最终全过或transport可用。
+
 ## 下一步顺序
 
 1. 接手/材料核验/阶段3续作规划已完成，读取本交接与[续作计划](STAGE3_CONTINUATION_PLAN.md)即可续作。操作者后续手动将原ZIP保留到runtime检查器指定位置，agent不自动搬运原生包。
-2. A0最小闭包已交付并根审，当前按A1唯一归属推进完整消息/隐私接线，再A2真实观测控制源；均先执行级合成，不重做1/2/4/5。完整core/protobuf路径须另证，不能用A0去类型代替。改版只在忽略runtime，不进public。
-3. 再B补资格/probe实现并先落精确schema根审。当前require_runtime总拒、capability-probe只调用总拒，属于代码未写；Windows默认账号检测共享路径、可信原生重定向机制未证，属于真实前置，不能混为安装包缺失。不得改共享ini/HOME/APPDATA或猜参数；QQ安装包暂保留。
+2. A0/A1检查点已交付并根审，按A2唯一归属推进正式snapshot/owner/真实观测控制源和gate原有允许动作。必须继续关闭历史/默认APIHub/磁盘store/原始日志/广域发现，A1全closed动作不能直接当最终可用运输。改版只在忽略runtime，不进public，不重做1/2/4/5。
+3. B的[资格/probe合同](STAGE3_QUALIFICATION_SPEC.md)已独立细化，尚未实施，领取须等待A1/A2根审；区别probe前置与生产资格、固定受审构建profile及单次DROP证据。当前require_runtime总拒、capability-probe只调用总拒，属于代码未写；Windows默认账号检测共享路径、可信原生重定向机制未证，属于真实前置。不得改共享ini/HOME/APPDATA或猜参数；QQ安装包暂保留。
 4. 原生数据范围需可信依据及一次受控探针，最多240秒、全入站DROP、无模型/发群；需要扫码就等操作者，不循环登录。QQ3/3免扫码未证，QQ自动重启保持false。
 5. 所有真实前置通过后，才停机/干净快进部署、显式activate、一次正常trial-start并验实际收发。随后72h初筛包含于168h；安静群不判失败，也不能冒充7天实际收发通过。扫码变化观测与8h资源趋势自动判断尚未交付。
 

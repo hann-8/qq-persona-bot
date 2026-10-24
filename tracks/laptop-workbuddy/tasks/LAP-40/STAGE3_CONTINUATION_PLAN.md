@@ -1,6 +1,6 @@
 # LAP-40 阶段3续作：真实材料、私有入口与probe资格
 
-返回[项目入口](../../../../PROGRESS.md) / [任务交接](HANDOFF.md) / [总计划](PLAN.md) / [私有清单](PRIVATE_WIRING_CHECKLIST.md) / [材料核验报告](../../../../reports/lap-40-stage3-materials-2026-10-24.md)。2026-10-24，Asia/Shanghai；`LAP-40-max-realentry-next`。本文件细化总计划阶段3，1/2/4/5已有独立交付不重做。属于规划，未宣称私有接线、probe或真实切换通过。
+返回[项目入口](../../../../PROGRESS.md) / [任务交接](HANDOFF.md) / [总计划](PLAN.md) / [私有清单](PRIVATE_WIRING_CHECKLIST.md) / [材料核验报告](../../../../reports/lap-40-stage3-materials-2026-10-24.md) / [B资格/probe合同](STAGE3_QUALIFICATION_SPEC.md)。2026-10-24，Asia/Shanghai；`LAP-40-max-realentry-next`。本文件细化总计划阶段3，1/2/4/5已有独立交付不重做。属于规划，未宣称私有接线、probe或真实切换通过。
 
 ## 目标、范围与现状
 
@@ -42,12 +42,14 @@
 | 顺序 | medium本次任务 | 验收/停止出口 |
 | --- | --- | --- |
 | 3R-A0 | 核实并实现私有早期bootstrap/合法同意/固定native解析与JS-only构建路径；先完成最小可执行合成检查，不接真实QQ | 实际私有源与JS产物/依赖摘要；合成副作用计数、原包摘要前后一致；不能合法分离就给精确缺口，不运行标准build试错；不生成已合格manifest |
-| 3R-A1 | 在A0通过后完成原清单1..11的纯投影/早期访问控制、关闭旁路/历史/磁盘消息/全sink，以及有界RAM与单一反向WS | 固定上游实际parser/dispatch/handler执行级合成，拒绝路径convert/store/log/history/send=0；正常授权新事件可达净化forward；public policy测试不替代此证据 |
-| 3R-A2 | 完成原清单12..14实际armed/rx/outbound、控制handler/listener和owner/spec接线 | 固定观测源、身份/seq/nonce/stop及失效测试；无真实native动作，保护允许仍待真实受控验证 |
+| 3R-A1 | 在A0通过后完成原清单1..11的纯投影/早期访问控制、关闭旁路/历史/磁盘消息/全sink，以及有界RAM与单一反向WS入站；当前WS动作可全closed | 固定上游实际parser/dispatch/handler执行级合成，拒绝路径convert/store/log/history/send=0；正常授权新事件可达净化forward。全closed动作只是中间检查点，不等于完整1..11或可用运输 |
+| 3R-A2 | 完成原清单12..14实际armed/rx/outbound、控制handler/listener、正式snapshot/owner/spec及受认证gate原有允许动作的实际执行接线 | 固定观测源、身份/seq/nonce/stop/失效及允许动作参数校验；未绑定时全closed，合法允许动作不能永久省略；无真实native动作，保护允许仍待真实受控验证 |
 | 3R-B | 实现下面的资格分层与真实probe执行器，先全部fake验证 | preflight不依赖probe结果，probe不放生产；缺G0/数据机制/身份时创建数0；正常启动仍closed，直至C真实证据全部存在 |
 | 3R-C | 经根审确认Windows数据机制/候选干净QQ/唯一运行归属及人工窗口后，一次真实DROP probe，最多240秒 | 真实创建链/组件/数据访问互证；没有扫描窗口则waiting_operator，不自动扫码/重登/发消息；失败/未知保留账本并精确回规划 |
 
 A0当前材料已足以开始，不等待QQ安装。A1/A2一般实现细节可自主处理；若需要改变原生保护、公开修改版、Windows用户/系统数据配置或原定项目边界，应先完成独立部分、记录能力缺口并回根，不自行扩大授权。3R-C不是本轮自动执行事项。
+
+阶段划分补充：A1验证固定OneBot/Network构造链的隐私时，可暂时拒绝来自反向WS/debug的全部动作，不引入无owner身份的发送入口。A2必须补回总计划已有的gate允许动作：以当前owner/epoch、受认证的固定gate连接、加载快照和最终参数/许可为准，不能仅检查`allowsRpc`字符串。读取现有onebot_gate实际白名单及独立成员/收藏固定RPC合同；普通任意成员list仍拒绝，旧成员/视觉资格不解锁，收藏不自动导入。`send_msg`若兼容，仅接受现有group别名后规范化为send_group_msg，不增加私聊/其他参数。群metadata结果限制在授权群，受控表情只接受现有登记图片，不接任意URL/文件；引用/媒体不得通过允许发送分支触发历史或入站回拉。ACK按原成功/partial/unknown单次合同，不重试。A1/A2最终映射需同时保留“已关闭旁路”与“已实现允许路径”，两者不能互相替代。
 
 ## 资格与probe的分层合同（待实现）
 
