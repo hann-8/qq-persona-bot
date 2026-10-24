@@ -1,10 +1,10 @@
 # LAP-40：E盘工作根与用户实测交付
 
-返回[项目入口](../../../../PROGRESS.md) / [总交接](HANDOFF.md) / [TASKS](../../TASKS.md) / [A4执行交接](STAGE3_A4_HANDOFF.md)。2026-10-24 22:35，Asia/Shanghai；`LAP-40-max-E-worktree-user-test`。本次用户最新指令覆盖旧入口中“不新建worktree”的限制。
+返回[项目入口](../../../../PROGRESS.md) / [总交接](HANDOFF.md) / [TASKS](../../TASKS.md) / [A4执行交接](STAGE3_A4_HANDOFF.md)。2026-10-24 22:35，Asia/Shanghai；`LAP-40-max-E-worktree-user-test`。用户指定新根覆盖旧“不新建worktree”限制。22:49用户进一步明确：当前Sol max只做详细规划，实施指令交用户另开Sol medium执行；不自动派实施。
 
 ## 需求与交付顺序
 
-用户指定SnowLuma代码在`E:/CodexWS/QQbot_Snowluma`独立worktree推进。先让SnowLuma与现有AstrBot/自研gate、router、模型链完成基本接线，达到可以明确启动、收发和记录故障的阶段就交给用户实测。实际性能、回复效果和长稳由真实使用验证；用户测试后拟由Sol high调试。本次根按用户指定Sol max接续规划/复核，既有计划内实施仍串行派gpt-6.1-sol/medium；没有自动检测或切换会话设置。
+用户指定SnowLuma代码在`E:/CodexWS/QQbot_Snowluma`独立worktree推进。先让SnowLuma与现有AstrBot/自研gate、router、模型链完成基本接线，达到可以明确启动、收发和记录故障的阶段就交给用户实测。实际性能、回复效果和长稳由真实使用验证；用户测试后拟由Sol high调试。本次根按用户指定Sol max只做规划；实施由用户另开gpt-6.1-sol/medium会话并明确指令，测试后Sol high亦由用户选择。没有自动检测或切换会话设置。
 
 可启动实测不要求预先完成72小时或7天。实际可启动、基础真实收发通过、性能满足、72小时初筛、7天完整验收分别记录。用户实测之前仍须具备合法可运行私有入口、可信受管QQ身份和原生数据范围、黑名单/私聊/授权群前置及单次发送语义；这些是接线与隔离前提，不能用离线成功代替。
 
@@ -39,10 +39,10 @@
 
 ## 任务顺序、涉及文件与验收
 
-1. 根登记新根与用户测试流程，更新PROGRESS/工作线HANDOFF/TASKS/总HANDOFF/MAX_START；本计划落盘后才派实施。
-2. 一个medium独占新private、[A4交接](STAGE3_A4_HANDOFF.md)和专属原创报告，先完成无native迁移/路径复核和现候选审查，再集成完整异步链；根独占共享文档，不并写private。
-3. 实际固定上游overlay中穿过控制、入站、单PIDpipe、注入、允许动作、最后native和ACK。慢helper至少覆盖120ms基线、总期限超时、取消/换代/停机、并发高频有界准入、长图片fresh和stop ACK；实际框架unknown不得写助手历史/记忆或重发。分别记录测试合同与重复组合，不累加虚大计数。
-4. 根审实际diff/证据并重放决定性测试后，才能接受A2；B仍按[资格合同](STAGE3_QUALIFICATION_SPEC.md)串行实施并fake验证。真实机制缺口准确记录，不把未写代码推成用户待办。
+1. 本次max只登记新根/用户流程并完成[A4详细规划](STAGE3_A4_PLAN.md)和[可复制medium指令](SOL_MEDIUM_START.md)，更新共享入口后交付Git，不自动派实施。
+2. 用户另行指令的medium会话重新领取A4，先审未审准备稿，再按详细规划完成完整异步链；当前没有活动实施归属。私有迁移已完成，历史证据与源码准备稿不当全链通过。
+3. 后续实施需在实际固定上游overlay中穿过控制、入站、单PIDpipe、注入、允许动作、最后native和ACK。慢helper至少覆盖120ms基线、总期限超时、取消/换代/停机、并发高频有界准入、长图片fresh和stop ACK；实际框架unknown不得写助手历史/记忆或重发。分别记录测试合同与重复组合，不累加虚大计数。
+4. A4完成后由用户交max审阅实际diff/证据与决定性测试；接受A2后，B仍须用户另行指令按[资格合同](STAGE3_QUALIFICATION_SPEC.md)实施/fake验证。真实机制缺口准确记录，不把未写代码推成用户待办。
 5. 满足真实前置后，给用户明确的安装/准备最小待办、启动/停止方式、当前支持功能、一次基础收发步骤及日志位置，再由用户启动实测。测试后的Sol high只接具体故障与可复现材料；未测性能和长稳保持未验证。
 
 迁移文档只检查Git归属、链接、路径和差异；实现只跑受影响/决定性验证，已过旧全量不为计数重跑。public不应出现上游派生源码、凭据或私有消息。按长期Git授权分可审检查点commit/push，核对应远端分支；Git交付不等于运行部署。

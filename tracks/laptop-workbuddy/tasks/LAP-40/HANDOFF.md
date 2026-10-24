@@ -1,14 +1,18 @@
 # LAP-40 SnowLuma：max接续交接
 
-返回[项目入口](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [任务台账](../../TASKS.md) / [新会话入口](MAX_START.md) / [阶段3续作计划](STAGE3_CONTINUATION_PLAN.md) / [材料报告](../../../../reports/lap-40-stage3-materials-2026-10-24.md)。继承AGENTS。2026-10-24，Asia/Shanghai；session `LAP-40-max-E-worktree-user-test`接续，根独占共享3入口及本任务总交接/计划。
+返回[项目入口](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [任务台账](../../TASKS.md) / [新会话入口](MAX_START.md) / [阶段3续作计划](STAGE3_CONTINUATION_PLAN.md) / [材料报告](../../../../reports/lap-40-stage3-materials-2026-10-24.md)。继承AGENTS。2026-10-24，Asia/Shanghai；session `LAP-40-max-E-worktree-user-test`当前只做规划，根独占共享3入口及本任务规划/指令/复核文档。
 
 ## 当前状态与路径
 
-2026-10-24 22:35根已重查Git/远端/额度，建立用户指定的`E:/CodexWS/QQbot_Snowluma`，分支`codex/lap-40-snowluma`，基线8a431f1。旧C工作根与原E运行根保持原状，不归档、不删除。5小时余98%/周余38%，未使用reset credits。用户本次新建worktree指令覆盖旧入口“不新建/复用旧根”。
+用户22:49最新明确：**Sol max只做详细规划；实施指令交用户，让用户另开Sol medium执行。** 根已停止误自动续派的A4代理（状态interrupted）；无活动实施写入。AGENTS第12行原已要求“按照用户后续实施指令执行”，本次不改该规则，当前入口和旧续派安排以本条覆盖。
 
-用户要在Snow基本接口/隔离前提具备、能明确启动时自行实测，然后拟由Sol high调试。性能、实际功能效果与72h/7天留给真实使用分别记录；不能把AstrBot/自研层已有实现当Snow原生接线已完成。当前仍未可启动实测：A2全链尚缺、B资格/probe代码未写、G1真实机制未证，生产继续总拒。
+活动根`E:/CodexWS/QQbot_Snowluma`、分支`codex/lap-40-snowluma`。新worktree/流程计划b890bd9及迁移根审72536d3均已push核对；旧C工作根和`E:/CodexWS/QQbot`原运行根保留不动。私有2901文本/27内部junction迁移已独立逐项核验，原官方包/ZIP及接受记录留原位置。
 
-按[工作根与用户实测计划](WORKTREE_AND_USER_TEST_PLAN.md)先迁入私有纯文本闭包/重建内部junction，不搬原生包/ZIP、不迁运行配置/秘密/真实state。原官方包和旧检查点仅原位置只读使用，新根生产材料尚不齐备。私有2901文本/27内部junction迁移已独立根审通过，见[迁移根审](../../../../reports/lap-40-E-worktree-root-review-2026-10-24.md)。接着串行medium完成[A4非阻塞全链](STAGE3_A4_HANDOFF.md)，根审通过才继续B；根独占共享入口、medium独占新private及A4专属文档。当前没有QQ/Snow真实启停、监听、登录、模型或群操作。
+停止后只读盘点：迁移2901基线未改；未审`a4-work/`424文件、prepare/build两个脚本及5个src/a4-*准备稿保留，无a4-dist/A4执行证据。当前没有公开业务代码修改，不删除或把草稿冒充已实现。详见[A4交接](STAGE3_A4_HANDOFF.md)/[迁移根审与纠正记录](../../../../reports/lap-40-E-worktree-root-review-2026-10-24.md)。
+
+本次详细规划见[A4_PLAN](STAGE3_A4_PLAN.md)，用户可复制[SOL_MEDIUM_START](SOL_MEDIUM_START.md)给新medium会话；[工作根与用户实测计划](WORKTREE_AND_USER_TEST_PLAN.md)解释后续交付流程。基本接口/隔离前提通过、可明确启动即交用户测；性能/效果/72h/7天分别后验，后拟Sol high调试。A2整体/B资格代码/G1真实机制仍缺，生产总拒，尚不能说只差扫码。
+
+当前只读核对/文档/Git交付；没有QQ/Snow真实启停、监听、登录、模型或群操作。22:49采样5h余79%/周余35%，未reset；后续额度以新查为准。
 
 ## 迁移前已验基线（历史，旧路径不再是活动工作根）
 
@@ -57,13 +61,11 @@ A2阈值检查点：独立a2-work/a2-dist 315模块；上游HookSession/HookMana
 
 ## 下一步顺序
 
-当前首步以[工作根/实测计划](WORKTREE_AND_USER_TEST_PLAN.md)和[A4交接](STAGE3_A4_HANDOFF.md)为准：新根迁移与非阻塞全链先行。以下A/B/C能力先后关系保留，旧路径只作历史复现。
-
-1. 接手/材料核验/阶段3续作规划已完成，读取本交接与[续作计划](STAGE3_CONTINUATION_PLAN.md)即可续作。操作者后续手动将原ZIP保留到runtime检查器指定位置，agent不自动搬运原生包。
-2. 查额度/Git并重领后，先读A2续作交接/报告和根复核的同步helper阻断，审A4候选5项；再完成全链异步scope：控制计时前身份/原始包有界排队/pipe与注入/native敏感边界fresh及超时/取消/ACK收束。未整体重放慢helper/隐私/允许动作/实际框架unknown前不能接受A2。过期证明与逻辑操作许可须分清，不得恢复已撤销scope，也不能让长图片操作绕过提交前fresh。保持无常驻watch/唯一registry writer、历史/store/raw日志/广域发现关闭。
-3. B的[资格/probe合同](STAGE3_QUALIFICATION_SPEC.md)已独立细化，尚未实施，领取须等待A1/A2根审；区别probe前置与生产资格、固定受审构建profile及单次DROP证据。当前require_runtime总拒、capability-probe只调用总拒，属于代码未写；Windows默认账号检测共享路径、可信原生重定向机制未证，属于真实前置。不得改共享ini/HOME/APPDATA或猜参数；QQ安装包暂保留。
-4. 原生数据范围需可信依据及一次受控探针，最多240秒、全入站DROP、无模型/发群；需要扫码就等操作者，不循环登录。QQ3/3免扫码未证，QQ自动重启保持false。
-5. 所有真实前置通过后，才停机/干净快进部署、显式activate、一次正常trial-start并验实际收发。随后72h初筛包含于168h；安静群不判失败，也不能冒充7天实际收发通过。扫码变化观测与8h资源趋势自动判断尚未交付。
+1. 本次max仅完成详细规划和可复制实施指令、文档验证与commit/push；不启动实施代理，不跑A4实施测试。
+2. 用户在新会话选择gpt-6.1-sol/medium，发送[SOL_MEDIUM_START](SOL_MEDIUM_START.md)。该会话重新领取A4，先审未审草稿，再按[A4详细规划](STAGE3_A4_PLAN.md)实现/合成验证；完成后停止并交max复核，不自动B/C。
+3. A4/A2审阅通过后，用户再指令medium按[B资格/probe合同](STAGE3_QUALIFICATION_SPEC.md)实施代码/fake验证。Windows数据机制未证是独立真实前置；不猜参数、改共享数据或以proof布尔放行。
+4. 可信原生机制、干净QQ与唯一执行归属就绪后，才按另行真实授权一次DROP probe（总<=240秒、0模型/发群），需要扫码由操作者操作；未知不重试。当前不执行。
+5. 基础可运行前提通过即提供明确启动/停止、当前功能、基础收发和脱敏故障材料步骤，交用户实测；后由用户选择Sol high调试。72h初筛/7天验收分别后验，不阻挡具备前提的首次试用。
 
 ## 必须保留的决定
 

@@ -1,6 +1,6 @@
-2026-10-24 22:35（Asia/Shanghai）：LAP-40根`LAP-40-max-E-worktree-user-test`重领；活动工作根改为`E:/CodexWS/QQbot_Snowluma`、`codex/lap-40-snowluma`，由8a431f1建立；旧C与原E运行根均保留不动。5h余98%/周余38%，未reset。[工作根/用户实测计划](tasks/LAP-40/WORKTREE_AND_USER_TEST_PLAN.md)/[A4交接](tasks/LAP-40/STAGE3_A4_HANDOFF.md)/[精简交接](tasks/LAP-40/HANDOFF.md)/[最小入口](tasks/LAP-40/MAX_START.md)是当前入口。根独占共享文档，串行medium独占新private/专属报告，私有2901文本/27内部junction迁移已根审，见[迁移根审](../../reports/lap-40-E-worktree-root-review-2026-10-24.md)，下一步补全链非阻塞scope。
+2026-10-24 22:49（Asia/Shanghai）：LAP-40当前仅Sol max详细规划；用户另开Sol medium并给实施指令，不自动派发。A4代理已interrupted，无活动实施写入。[A4详细规划](tasks/LAP-40/STAGE3_A4_PLAN.md)/[medium指令](tasks/LAP-40/SOL_MEDIUM_START.md)/[精简交接](tasks/LAP-40/HANDOFF.md)/[最小入口](tasks/LAP-40/MAX_START.md)是当前入口。
 
-用户要求达到基本可启动阶段就交其测试，测试后拟Sol high调试；不预先宣称性能/长期稳定，也不以先过72h/7天阻挡可用试测。A2现仍有6077ms同步helper阻断/A4未集成，B代码/G1/真实收发未过，生产总拒。当前0真实启动/登录/模型/群/运行配置操作；原71/ZIP保留原位置。本条覆盖下列历史旧工作根与额度停工口径。
+新根`E:/CodexWS/QQbot_Snowluma`、分支`codex/lap-40-snowluma`，72536d3已push；2901文本/27内部junction迁移已根审，另有未审424文件overlay及7准备文件、无A4产物/执行验证，基线未改。A2/B/G1仍缺、生产总拒；原C/原E运行态不动。用户流程为基本可启动条件通过即自行实测，后拟Sol high调试，性能/72h/7天分别后验。本条覆盖历史自动续派/旧工作根口径。
 
 2026-10-24：用户明确以长期运行为首要标准；[LAP-39 SnowLuma评估](tasks/LAP-39/SNOWLUMA_ASSESSMENT.md)已完成，仅静态证据。v2.1.1有接收good/管道恢复，但原版gate前答复、补历史/存储及项目QQ归属尚需解决；现项目只读online/硬编码NapCat，不能原样切换。先详细规划，再72h/7天验收；6文档，0安装/注入/启停/登录/配置/模型/群/SSH，不重新探活，旧现场只作历史。[39交接](tasks/LAP-39/HANDOFF.md)。
 

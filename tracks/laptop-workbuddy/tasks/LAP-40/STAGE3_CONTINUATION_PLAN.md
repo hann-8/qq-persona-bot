@@ -2,6 +2,8 @@
 
 返回[项目入口](../../../../PROGRESS.md) / [任务交接](HANDOFF.md) / [总计划](PLAN.md) / [私有清单](PRIVATE_WIRING_CHECKLIST.md) / [材料核验报告](../../../../reports/lap-40-stage3-materials-2026-10-24.md) / [B资格/probe合同](STAGE3_QUALIFICATION_SPEC.md)。2026-10-24，Asia/Shanghai；`LAP-40-max-realentry-next`。本文件细化总计划阶段3，1/2/4/5已有独立交付不重做。属于规划，未宣称私有接线、probe或真实切换通过。
 
+2026-10-24 22:49最新执行边界：当前Sol max仅做详细规划，用户另开Sol medium并下实施指令；此前根自动派发/续派的工作安排已被用户纠正，不能沿用。新根与当前A4范围见[A4详细规划](STAGE3_A4_PLAN.md)/[medium指令](SOL_MEDIUM_START.md)，以下技术合同仍作为按需参考。
+
 ## 目标、范围与现状
 
 先得到符合固定版本/许可/项目隐私合同的私有JS入口及执行级合成证据，再补可信资格判定和受控probe。QQ原生数据范围另证，满足前置才一次真实试验。账号、模型、触发范围、默认配置及恢复预算不变；不增后端、WebUI动作台、自动登录、无新消息主动任务或其他环境。

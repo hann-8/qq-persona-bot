@@ -1,3 +1,9 @@
+## LAP-40 SnowLuma工作线
+
+本worktree位于`E:/CodexWS/QQbot_Snowluma`，分支`codex/lap-40-snowluma`。项目当前入口是[PROGRESS](PROGRESS.md)，接续工作见[LAP-40交接](tracks/laptop-workbuddy/tasks/LAP-40/HANDOFF.md)。私有文本源码已迁移并通过逐文件摘要复核，[A4详细规划](tracks/laptop-workbuddy/tasks/LAP-40/STAGE3_A4_PLAN.md)已落盘，等待用户另行指令Sol medium实施；[可复制指令](tracks/laptop-workbuddy/tasks/LAP-40/SOL_MEDIUM_START.md)。当前尚未交付SnowLuma的可用启动环境。
+
+按[用户实测流程](tracks/laptop-workbuddy/tasks/LAP-40/WORKTREE_AND_USER_TEST_PLAN.md)，基础接线和必要的运行隔离前提通过后，就提供启动/停止与基础收发步骤交用户测试；实际性能和长稳由使用验证，之后拟由Sol high调试。原NapCat运行目录为`E:/CodexWS/QQbot`。以下日常命令及历史状态保留其原有上下文，不能据此认定新worktree已完成SnowLuma部署。
+
 ## 日常使用与清理恢复
 
 2026-10-22：已修复已退出子进程身份不回收、累计耗尽128条清理台账容量的问题。当前旧阻断已停机核验、完整备份归档并独立确认blocked=false，bot保持关闭。正常使用请双击根目录`启动机器人.cmd`，按需手动保持24h运行。

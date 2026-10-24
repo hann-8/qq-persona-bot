@@ -37,3 +37,15 @@ medium `/root/snowluma_a4` 于2026-10-24 22:40:31 +08:00领取新private/A4交�
 根依据忽略a4-migration-evidence.json独立重新计算2901个源文件及对应目标文件的字节数/SHA256，检查UTF-8/NUL、相对路径唯一与根内解析；合计101173397字节，集合SHA256 a500823f5096cd560cb2edc54c0a4b3c5c4d76f81ae05276bc46f1e4a87e8a30。27个实际reparse点均分别核对源/目标指向与根内真实目录，不仅相信JSON布尔。全部通过，源字节不变。
 
 operator-acceptance.local.json和旧pyc未复制；新根没有官方runtime或venv链接，private的源/证据仍被git check-ignore排除，diffcheck通过。迁移可接受；A4改造尚未发生，A2仍未通过。根完成本小检查点Git后再准medium串行继续独立A4 overlay，不能据迁移成功放开真实启动。
+
+## 用户纠正后的当前边界（22:49）
+
+用户明确Sol max当前只做详细规划，实施指令交用户另开Sol medium执行。根已interrupt自动续派代理，状态interrupted，无活动实施写入；本报告此前“根续派/等根核后继续”安排不再适用。本次后续只读盘点/文档/Git，没有继续改代码、构建或实施测试。
+
+只读盘点2901迁移基线未改；忽略区另有a4-work 424文件、prepare-a4.py/build-a4.mjs及5个src/a4-*准备文件，没有a4-dist或A4执行证据。保留为未审准备稿，不删除、不算已实现/离线通过。公开业务代码未在本轮修改，原运行根未动。
+
+详细规划与用户可复制指令已单独落盘，见LAP-40/STAGE3_A4_PLAN.md与SOL_MEDIUM_START.md；不自动resume、派代理或进入B/C。Git文档交付沿长期授权执行，不构成实施或部署。
+
+## 规划收口验证（22:58）
+
+本次13份归属Markdown的495个本地链接全部存在、LF/UTF-8与diffcheck通过；对8a431f1基线核对，新分支所有已跟踪差异均为Markdown。旧C工作根仍8a431f1、原E运行根仍a798e62，两者Git干净。A4实施代理状态interrupted，当前不续派；私有未审草稿保持原样，后续由用户另行指令medium先审。只提交本次规划/指令/边界纠正文档，未运行后续实现验证。
