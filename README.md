@@ -302,3 +302,9 @@ LAP-18C：readability模式内优先合格main/role=main，再article；无合�
 `web.selection_policy`新增coverage/question，默认coverage兼容旧配置；question只用当前问题最多32词项本地选整段和相邻上下文，优先预留70%正文预算给相关材料，余量覆盖前中后。纯总结或无词项走coverage，有词项但无可靠命中/整段不足1200字节则明确材料不足。完整要求超预算仍0生成。五文件双摘要、导出、快照、会话版本包含该字段，操作者保存后下次正常启动生效，本轮未修改本机配置。
 
 `scripts/diagnose_public_materials.py`默认inspect，0网络/模型/bot；`--public-samples`是需另行明确授权的四份固定公开材料批次，每份一次请求，输出统计/事实位置/保留标记，不保存正文或据关键词自动判质量。process_host仅放行封闭PUBLIC_MATERIAL元数据（随机关联、阶段、提取方式/范围、数量/字节/耗时、固定失败枚举），不含问题、URL、正文或身份；旧日志缺WEB行不证明无网络请求。
+
+## LAP-40 SnowLuma试运行入口（未切换）
+
+项目侧CLI、恢复和采样已经离线实现；当前仍使用原选择，未部署或切换SnowLuma。原包、原生许可/干净QQ数据范围、受保护私有早期接线与真实armed/outbound观测尚缺，生产`activate`、`capability-probe`、`trial-start`均硬拒，静态摘要或自填true不能解除。不要执行普通core构建或复制native。
+
+可只读运行`python scripts/transport.py inspect --json`、`verify --offline`、`trial-status --json`。offline通过只代表原创合成协议夹具通过；不代表上游接线、QQ登录/免扫码、真实收发或72/168小时通过。停机`prepare-policy`会创建独立随机控制key、原创policy与候选/首次恢复预算，部分失败不自动清账重试。有限provider切换与回滚保留无关配置/注释；源竞争或同字段后改拒绝覆盖。操作合同见[配置说明](config/README.md)与[4B2报告](reports/lap-40-stage4B2-2026-10-24.md)。

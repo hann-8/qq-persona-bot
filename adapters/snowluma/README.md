@@ -31,3 +31,5 @@ manage stop先置marker，在锁内冻结owner/预占drain-stop序列，释放�
 首次停机准备API为`RecoveryLedger.initialize(lease)`，供后续CLI调用，watch不会自动初始化。prepared哨兵、预算、事故与预占意图分开保存；缺失/坏账/回拨/写失败closed。失败/未知占用额度，watch或bot重启不再执行同一事故；QQ动作同时创建Node，故同时占Snow与QQ资源预算，24h Node最多2、QQ最多1，间隔至少1800秒。新Node可在本次ready期限内异步等待监听，只有尚未发出的bind可等待重试，ACK未知不重发。旧seq严格坏账不能借新epoch洗成0。生产仍因私有资格总拒；QQ另有固定3/3未证拒绝，配置true不放行，完整演练仅用测试依赖注入。
 
 测试：`node --test adapters/snowluma/project_policy.test.mjs`。本机Node24.22.0仅执行这些原创无依赖测试，不满足Snow实际运行引擎，不作为其构建/运行通过证据。
+
+4B2新增`scripts/transport.py`停机prepare/有限provider事务与rollback、离线verify及trial入口。生产资格仍无配置绕过；probe/activate/trial不执行真实QQ或私有入口。`transport_trial.py`仅由同一gate健康task调用，不增加PID/nonce消费者；原生观测与扫码变更信号仍需未来私有接线。发送统计来自实际gate转发/回执：RAM中至多128个关联时间，15秒无有效ACK或断线计unknown，不重试，不将echo/消息ID写进采样；control ACK指标另列。数据格式/边界见config/README，未证明真实长稳。

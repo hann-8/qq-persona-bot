@@ -266,12 +266,14 @@ def show_status(report=None):
     return report
 
 
-def stop_project(grace=5):
+def stop_project(grace=5,*,expected_instance=None):
     # Freeze identities and reserve command sequence under the unique writer lock.
     # Network never holds that lock; admission is already revoked by the marker.
     control=None;control_code=None
     with configuration_lock(ROOT) as lease:
         mode=service_mode()
+        if expected_instance is not None and (mode.get('instance_id')!=expected_instance or mode.get('provider')!='snowluma'):
+            raise ValueError('TRIAL_STOP_INSTANCE_CHANGED')
         # Revocation precedes cleanup and does not depend on a readable snapshot.
         # Only recorded PID/create identities authorize termination below.
         atomic_json(ROOT/'state/stop-request.json',{'instance_id':mode.get('instance_id'),'time':time.time()})
@@ -439,11 +441,15 @@ def _start_snow_channel(project,layout,full,paused,lease):
     return dict(provider='snowluma',instance_id=instance,state='starting')
 
 
-def start_channel(full=False, paused=False, *, login_diagnostics=False, wait_login_seconds=0):
+def start_channel(full=False, paused=False, *, login_diagnostics=False, wait_login_seconds=0, expected_source_digest=None):
     completed = False
     snow_blocked=False
     try:
         with configuration_lock(ROOT) as lease:
+            if expected_source_digest is not None:
+                project=read_project(ROOT)
+                if project.source_digest!=expected_source_digest or resolve_transport(project.settings)['provider']!='snowluma':
+                    raise ValueError('TRIAL_START_SOURCE_CHANGED')
             observation = _start_channel(full, paused, lease=lease)
             observer=None
             if observation and not isinstance(observation,dict) and (login_diagnostics or wait_login_seconds):

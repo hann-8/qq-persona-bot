@@ -4,6 +4,7 @@ import json
 import logging
 from pathlib import Path
 import random
+import re
 import secrets
 import sqlite3
 import time
@@ -141,6 +142,8 @@ class OneBotGate:
         self.transport_supervisor = None
         self.transport_recovery_closed = False
         self.transport_pending = set()
+        self.send_observations={}
+        self.send_counts=dict(acked=0,failed=0,unknown=0,latency_ms=None)
         self._transport_ready = False
         self.health_pending = {}
         self.admin_pending={}
@@ -164,7 +167,26 @@ class OneBotGate:
 
     def snow(self):return self.config.transport_provider == 'snowluma'
 
+    def send_metrics(self,*,disconnect=False):
+        now=time.monotonic()
+        for key,at in list(self.send_observations.items()):
+            if disconnect or not 0<=now-at<=15:
+                self.send_observations.pop(key,None)
+                self.send_counts['unknown']=min(9007199254740991,self.send_counts['unknown']+1)
+        return dict(self.send_counts)
+
+    def _observe_send_ack(self,key,event):
+        self.send_metrics()
+        at=self.send_observations.pop(key,None)
+        if at is None:return
+        mid=event.get('data',{}).get('message_id') if isinstance(event.get('data'),dict) else None
+        valid=(type(mid) is int and mid!=0) or (isinstance(mid,str) and re.fullmatch('-?[0-9]{1,32}',mid) and int(mid)!=0)
+        state='acked' if event['status']=='ok' and event['retcode']==0 and valid else 'failed' if event['status']=='failed' else 'unknown'
+        self.send_counts[state]=min(9007199254740991,self.send_counts[state]+1)
+        if state=='acked':self.send_counts['latency_ms']=max(0,min(15000,int((time.monotonic()-at)*1000)))
+
     async def revoke_transport_epoch(self):
+        self.send_metrics(disconnect=True)
         self.transport_recovery_closed=True;self.channel_ready()
         self.connection_id=secrets.token_hex(32)
         self.connected=False;self.online=None;self.good=None;self.online_at=None
@@ -344,6 +366,7 @@ class OneBotGate:
             # Release ownership before fallible file I/O, including when the
             # metadata error itself is why the channel is closing.
             self.active = None
+            if self.snow():self.send_metrics(disconnect=True)
             self.connected = False
             self.materials.clear();self.members.clear();self.mention_pending.clear()
             self.online = None
@@ -462,6 +485,7 @@ class OneBotGate:
                     if not future.done():future.set_result(None)
                 elif key in pending:
                     pending.remove(key)
+                    if self.snow():self._observe_send_ack(key,event)
                     # Strip any transport-supplied claim; only this gate can attest @.
                     applied=self.mention_pending.pop(key,None)
                     if isinstance(event.get('data'),dict):
@@ -524,8 +548,13 @@ class OneBotGate:
                             pending.discard(key);self.mention_pending.pop(key,None)
                             await upstream.send_json(dict(status='failed',retcode=1403,message=DENIED,data=None,echo=event.get('echo')))
                             continue
-                        try:await asyncio.wait_for(self._send_current(downstream,event,self.connection_id),3)
+                        try:
+                            if self.snow():
+                                self.send_metrics()
+                                if len(self.send_observations)<128:self.send_observations[key]=time.monotonic()
+                            await asyncio.wait_for(self._send_current(downstream,event,self.connection_id),3)
                         except ChannelNotReady:
+                            self.send_observations.pop(key,None)
                             pending.discard(key);self.mention_pending.pop(key,None)
                             await upstream.send_json(dict(status='failed',retcode=1403,message=DENIED,data=None,echo=event.get('echo')))
                 else:await downstream.send_json(event)

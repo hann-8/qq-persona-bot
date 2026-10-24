@@ -130,3 +130,15 @@ LAP-18B补充：`features.yaml`新增`public_network`（resolver=system、ca_bun
 `static_evidence_checked=true`仅表示所有所引文件的实际摘要匹配，不证明证据内容的真实性、许可适用、干净QQ/原生数据归属、真实私有接线或实时健康。检查始终保留`native_deployment_unverified/clean_qq_unverified/data_scope_unverified/private_build_unverified/operator_scan_required`；后续受控审阅与独立健康不能被静态JSON代替。没有预备材料时保持缺失，不生成或填写伪造证明；本机证明、原包、私有构建与账号资料不提交Git。
 
 Snow运行准入另要求online/good、已armed且pipe/login/rx/outbound健康、独立nonce/HMAC/严格seq、加载快照/策略/构建摘要及受管PID创建身份/监听归属共同成立。证明TTL按配置15..30秒，router镜像按同一证明剩余期限关闭，不沿用旧45秒。没有新WS帧时gate也按证明/online实际到期定时撤销能力并轮换事件代际；新证明不会复活旧事件或迟到模型结果。入站、free窗口、成员/视觉/收藏RPC、最终发送都检查同一准入；健康/控制ACK继续可观测。NapCat分支保留旧行为，不要求Snow证明。协议字段/接口与自造测试见[原创适配说明](../adapters/snowluma/README.md)，实际上游接线与真实验收仍未通过。
+
+### LAP-40 有限CLI事务与采样
+
+尚未切换SnowLuma；生产资格仍总拒。命令均为`python scripts/transport.py <command>`，可加`--json`；`--root`是项目根目录。inspect/`verify --offline`/trial-status只读本项目配置与封闭证据，不读登录资料或调用模型。
+
+- `prepare-policy`：必须停止自有实例；仅写原创policy、全新32字节独立控制key、候选记录和首次预算。已准备或部分失败不能自动重置预算/事故，不复用现有凭据，不复制原生组件。
+- `activate --provider snowluma`：资格齐全且停止后才可提交。当前私有入口缺失，资格总拒在任何激活状态/配置写入之前；无自填manifest旁路。未来事务仅拥有provider标量，原字节备份在忽略state，五文件只改runtime.yaml，单文件也支持；实际候选字节整体校验，源摘要变化拒绝。
+- `capability-probe --authorize-owned-qq --timeout 240`：当前前置缺失直接返回阻断；尚未交付真实QQ探测执行，不扫描/绑定现有QQ。
+- `trial-start`：仅已选Snow、旧实例确认退出和真实资格才调用既有管理创建一次；源摘要在管理锁内再查。当前总拒，无实际试验。trial-status报告UNKNOWN/连续段及封闭计数，不能把安静群当故障。
+- `rollback`：只接受本任务完整激活账本；若有已完成登记的trial，仅停止该instance的受管进程，再核验确退。未知/部分/实例变化拒绝。恢复仅本次provider字段；无后改时原字节还原（含BOM/引号/无尾换行），无关后改保留，provider后改拒绝覆盖。不自动启动NapCat，不清理登录、人设、记忆或事故预算。
+
+采样由gate既有健康任务消费，没有新增进程/监听/nonce客户端。从首次真实channel_ready开始，每60秒记录封闭布尔/计数、核验PID的RSS/句柄与允许项目目录的元数据字节；不存QQ号、消息ID/echo、正文或栈。每条<=512B，采样日志总<=16MiB，按日桶保留至多14天；容量/资源/时钟/覆盖缺口UNKNOWN并断开连续段。QQ/Node/epoch/build/policy/配置摘要变化另起段，旧失败计数保留。QQ发送ACK/失败/unknown及延迟与控制ACK分开；未知不重试。72h包含于168h，但这些时间标记仍不能替代真实新消息驱动的7天收发验收。8小时中位数资源趋势须由操作者评估，不自动重启抹平；真实重新扫码的观测接线仍受阶段3缺口阻断。

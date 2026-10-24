@@ -2,7 +2,11 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md)。继承AGENTS。
 
-**当前：4B1 fff64b735aa19afe6ac88e3ba345c6347b2fc402已推送根审，登记4B2，未部署。** [4B1报告](../../../../reports/lap-40-stage4B1-2026-10-24.md)：29恢复用例，最终163核心组合、92框架/回归组合、9 JS通过（有重叠）。根审四点修验与实际gate→writer→新epoch/旧输出拒绝路径通过；QQ动作同时占Node/QQ资源预算已同步PLAN。3/G0/G1缺口与31B observed_only未解除，生产资格总拒。
+**当前：4B2项目侧CLI/有限事务/采样已实现，23条最终目标及145受影响组合通过（有重叠），待根审，未部署/切换。** [4B2报告](../../../../reports/lap-40-stage4B2-2026-10-24.md)分清原创离线通过、真实probe/私有接线/扫码观测和长稳未验；生产require_runtime仍总拒，0原运行态操作。 [4B1报告](../../../../reports/lap-40-stage4B1-2026-10-24.md)：29恢复用例，最终163核心组合、92框架/回归组合、9 JS通过（有重叠）。根审四点修验与实际gate→writer→新epoch/旧输出拒绝路径通过；QQ动作同时占Node/QQ资源预算已同步PLAN。3/G0/G1缺口与31B observed_only未解除，生产资格总拒。
+
+4B2追加精确归属：scripts/manage.py启动源摘要/停止instance前置、onebot_gate.py仅Snow封闭发送ACK/失败/unknown计数；同阶段新增测试覆盖实际假发送/回执/采样，无重试。
+
+4B2实际领取：基线a10c8a7ed3f4043f056419b80b7e4b4c6df7000c、干净，usage used69/remaining31%；已重读PLAN8/11/12、GUIDE和任务登记。精确归属scripts/transport.py、新增src/qqbot_gateway/transport_cli.py与transport_trial.py、必要transport_owner.py采样接线、新增tests/test_transport_cli.py与test_transport_trial.py、README.md/config/README.md/adapters/snowluma/README.md、本HANDOFF和reports/lap-40-stage4B2-2026-10-24.md。根5共享/规划文件不写；所有测试仅temp/fake，生产总拒保持。
 
 4B2登记：`LAP-40-medium-stage4B2-cli-trial`，2026-10-24 08:01，基线fff64b7干净，待同一sol/medium续领。归属scripts/transport.py、必要原创transport配置事务/transport_trial模块、gate采样接线/管理入口、测试、根README/config与adapter说明、本HANDOFF/4B2报告；根3入口和PLAN/GUIDE仍独占。只停机prepare/verify/activate/rollback/trial入口与有界状态采样，所有真实资格总拒保持；不写本机local/secrets/persona，不实际启停/登录/模型/群/native/SSH。完成根审/5总审，不自行部署。300分钟剩34%。
 

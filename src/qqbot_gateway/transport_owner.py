@@ -289,6 +289,7 @@ class HealthMonitor:
         self.clock=clock
         self.proof_clock=proof_clock
         self.supervisor=None
+        self.control_ack_count=0;self.control_ack_latency_ms=None
         gate.bind_transport_health(self.verifier)
 
     def health_ready(self):
@@ -347,9 +348,14 @@ class HealthMonitor:
             self.sequence=reserve_control_sequences(self.owner.root,self.owner.binding,clock=self.clock)[0]
             body=sign_command(self.owner.binding,self.key,action,self.sequence,now=self.clock)
             self.command_sent=True
+            began=time.monotonic()
             content=await self.exchange('POST','/'+action,body)
             if action!='stop' and not self.owner.identity_current(self.owner.binding):return False
-            return verify_ack(content,self.owner.binding,self.key,body)
+            accepted=verify_ack(content,self.owner.binding,self.key,body)
+            if accepted:
+                self.control_ack_count=min(9007199254740991,self.control_ack_count+1)
+                self.control_ack_latency_ms=max(0,min(3000,int((time.monotonic()-began)*1000)))
+            return accepted
         except ValueError as error:
             self.sequence_busy=str(error)=='Configuration/start/stop operation already in progress'
             return False
@@ -369,6 +375,8 @@ class HealthMonitor:
         while not stopping(self.owner.root,self.owner.binding.instance_id):
             await self.poll_once()
             if self.supervisor:await self.supervisor.step()
+            sampler=getattr(self,'trial_sampler',None)
+            if sampler:sampler.sample()
             await getattr(self,'sleep',asyncio.sleep)(self.gate.config.transport_health_poll)
         self.verifier.invalidate();self.gate.channel_ready()
 
@@ -393,6 +401,13 @@ def monitor_from_loaded(gate):
     from .transport_launch import ManagementRecovery
     monitor.supervisor=RecoverySupervisor(monitor,resolve_transport(settings)['recovery'],ManagementRecovery(gate))
     gate.transport_supervisor=monitor.supervisor
+    from .transport_trial import TrialSampler
+    if (gate.root/'state/qq-transport/trial-request.local.json').exists():
+        request=read_json(gate.root,'state/qq-transport/trial-request.local.json','state')
+        if (set(request)!={'format','source_digest','instance_id'} or request['format']!='qqbot-trial-request-v1' or
+            request['instance_id'] not in (None,binding.instance_id) or request['source_digest']!=mode.get('configuration',{}).get('source_digest')):
+            raise ValueError('TRIAL_REQUEST_UNKNOWN')
+        monitor.trial_sampler=TrialSampler(monitor)
     return monitor
 
 
