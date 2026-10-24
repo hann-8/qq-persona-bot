@@ -4,9 +4,13 @@
 
 ## 当前状态与路径
 
-**独立集成与A0/A1已离线根审；A2部分组件已子测，整体未装配。** 用户17:24指令“继续”，根`LAP-40-max-realentry-next`已重新领取A2复核/续作，额度余99%，b605d03与远端一致、Git干净；private暂根审/复现，后续逐阶段移交medium。上轮95%停工是历史检查点。Snow尚未真实接入，完整适配/B资格/probe仍缺，72h/7天未开始，生产require_runtime仍总拒。
+**A0/A1与旧A2组件、控制期限修复已根审；A2整体仍未完成。** 17:24续作后，18:37额度used96%/剩4%触阈值，停止新实现/测试，仅交接/Git交付。A3同步helper路径被6077ms慢bind阻断，A4异步scope候选仅子测5项、未根审/未集成；057441e已交付。所有agent交付后释放写入。Snow未真实接入，B仅规划，G1/probe/72h/7天未过，生产总拒。
 
 17:29根已重放A2既有组件并发现异步bind期限漏洞；9162d2c已修复，根17:44重跑20新JS/旧control20+竞态2及Python16+20均过。见[根复核](../../../../reports/lap-40-stage3R-A2-root-review-2026-10-24.md)。[同一medium续作](STAGE3_A2_CONTINUATION_HANDOFF.md)继续Node装配/单PIDpipe/gate允许动作/最终栅栏ACK；private与原创control/test归medium，根独占共享入口，整体仍未完成。
+
+续作分项已执行部分316模块整体链/允许动作/框架unknown验证，但根发现Python spawnSync在health/native许可链中重复阻塞，现有零延迟fake不足以证明3秒/高频响应性。medium正在改非阻塞短helper/原子scope方案，未整体集成前旧分项不能算A2通过；helper异常退出的真实覆盖/31B仍未证。准确当前代码/候选与已验范围以续作交接为准。
+
+最终续作检查点`057441e406c340074fa1fcbdecf100a5634fc2f2`已push核对，仅原创续作报告/交接；root阅读了候选源但阈值后未执行新测试，尚未接受候选。A3 `check-a3-final.py`分项：316模块、7场景各29（多数重复）、channel11/provider10/catalog6/实际框架10，均子测，不能宣称响应性通过；29项940次helper、慢120ms bind51次/6077ms。A4 `src/a4-scoped-broker.mjs`与`check-a4-scoped.test.mjs`非阻塞5项仅局部，未替换A3控制/入站/pipe/注入/native链。原71/ZIP不变；全部源/产物/依赖仍仅忽略private，勿归档/删除worktree导致忽略材料丢失。
 
 - 实际工作目录：`C:/Users/yutha/.codex/worktrees/lap-40-snowluma-impl/QQbot`，分支`codex/lap-40-snowluma-impl`。复用此worktree，不新建、不归档。
 - 原运行目录：`E:/CodexWS/QQbot`，`codex/lap-40-snowluma-trial` / `a798e62498a60b8d061e917d1d8242f42d564ef0`；保持不动。本轮两目录Git均干净。
@@ -20,7 +24,9 @@
 
 用户本会话已提供Downloads内`SnowLuma-v2.1.1-win-x64.zip`和`QQ_9.9.36_260924_x64_01.exe`两个明确路径。Snow ZIP大小/固定SHA256匹配，QQ安装包腾讯签名Valid/版本9.9.36.53644。随后用户明确接受EULA/PRIVACY并手动解压；12:43指定runtime的官方index/两协议/Node/5原生摘要均与ZIP一致，Node实际`--version`为v24.22.1。原ZIP仍仅Downloads，runtime内未保留；干净QQ/私有入口/proof仍无、扫码窗口未定。**只通过材料/同意/Node前置，未运行Snow或QQ、未取得私有接线/数据范围/生产资格。** 详情见材料报告；不泛扫其他目录。
 
-用户要求5h剩余<=5%交接；本轮从used11%推进到used95%已停止。13:43工具预计该窗口2026-10-24 17:18:47（Asia/Shanghai）重置，仅为当时账户采样，下次必须重查。旧07:10等待已执行、一次性automation已删除，不重建/不自动安排后续，不reset credit或购买。
+17点续作根另作[QQ安装包静态核验](../../../../reports/lap-40-qq-package-static-2026-10-24.md)：同一原件SHA不变、7z目录/ASAR header与入口元数据可读；launcher内容无法作为UTF-8源码读取，未进一步解码或绕保护。未找到可信Windows数据重定向机制，G1继续未证；没有安装/写出QQ文件、碰日常登录资料或以此解除真实门槛。
+
+用户要求5h剩余<=5%交接；前一窗口已停，17:24新窗口余99%后按“继续”恢复，本轮18:37采样used96%/剩4%已停新实现/测试。该次工具预计2026-10-24 22:24:02（Asia/Shanghai）重置，下次必须重查，不依赖预测。旧automation不重建，不自动安排后续，不reset credit/购买。
 
 ## 已交付和验证
 
@@ -44,7 +50,7 @@ A2阈值检查点：独立a2-work/a2-dist 315模块；上游HookSession/HookMana
 ## 下一步顺序
 
 1. 接手/材料核验/阶段3续作规划已完成，读取本交接与[续作计划](STAGE3_CONTINUATION_PLAN.md)即可续作。操作者后续手动将原ZIP保留到runtime检查器指定位置，agent不自动搬运原生包。
-2. 新接续先核额度/Git，重新领取后先读A2交接/报告，根审已交付部分及必要复现；再继续Node正式消费/整体装配、实际单PID/pipe、gate允许动作和最终栅栏ACK。健康/控制壳存在不等于装配完成；保持历史/普通APIHub/磁盘store/原始日志/广域发现关闭。改版只留忽略runtime，不进public，不重做1/2/4/5。
+2. 查额度/Git并重领后，先读A2续作交接/报告和根复核的同步helper阻断，审A4候选5项；再完成全链异步scope：控制计时前身份/原始包有界排队/pipe与注入/native敏感边界fresh及超时/取消/ACK收束。未整体重放慢helper/隐私/允许动作/实际框架unknown前不能接受A2。过期证明与逻辑操作许可须分清，不得恢复已撤销scope，也不能让长图片操作绕过提交前fresh。保持无常驻watch/唯一registry writer、历史/store/raw日志/广域发现关闭。
 3. B的[资格/probe合同](STAGE3_QUALIFICATION_SPEC.md)已独立细化，尚未实施，领取须等待A1/A2根审；区别probe前置与生产资格、固定受审构建profile及单次DROP证据。当前require_runtime总拒、capability-probe只调用总拒，属于代码未写；Windows默认账号检测共享路径、可信原生重定向机制未证，属于真实前置。不得改共享ini/HOME/APPDATA或猜参数；QQ安装包暂保留。
 4. 原生数据范围需可信依据及一次受控探针，最多240秒、全入站DROP、无模型/发群；需要扫码就等操作者，不循环登录。QQ3/3免扫码未证，QQ自动重启保持false。
 5. 所有真实前置通过后，才停机/干净快进部署、显式activate、一次正常trial-start并验实际收发。随后72h初筛包含于168h；安静群不判失败，也不能冒充7天实际收发通过。扫码变化观测与8h资源趋势自动判断尚未交付。

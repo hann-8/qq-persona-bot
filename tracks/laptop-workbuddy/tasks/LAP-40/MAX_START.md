@@ -15,8 +15,8 @@
 
 当前：独立项目集成代码/离线验证完成；真实Snow适配/探针/资格仍缺，未切换，72h/7天未开始。生产准入仍总拒；原运行态不动。新会话已领取，用户现已提供两包路径、接受EULA/PRIVACY并手工解压Snow；原包/解压摘要和自带Node v24.22.1通过。QQ安装/数据范围/扫码仍未完成，不能假定已准备。
 
-本轮已到用户剩<=5%阈值，停止新实现/测试并交接；原07:10一次唤醒不重建。下次先重查额度（本次工具预计17:18重置）、Git及归属后重新领取。A0/A1已根复现，A2 f23eac6只是部分组件自测、根未审/未重放；先读A2交接/报告核验，再补Node装配/实际PIDpipe/gate允许RPC/最终栅栏ACK。不要把当前状态理解成只差扫码，不再重做A0/A1。
+最新18:37：第二窗口used96%/剩4%停工，工具预计22:24重置需再查；9162d2c控制期限修复已根审，旧A2组件也已重放。当前入口改读[A2续作](STAGE3_A2_CONTINUATION_HANDOFF.md)/[根复核](../../../../reports/lap-40-stage3R-A2-root-review-2026-10-24.md)。057441e分项装配仍有同步helper阻断：慢bind6077ms；A4异步5项仅候选未集成/未根审。下次先核该候选，再全链scope与慢helper验证，不重放旧零延迟总数冒充修好。B未实施，G1/QQ/真实/72h/7天全未过；全部agent已释放，下次重领。
 
-首动作已完成：`LAP-40-max-realentry-next`于12:38接手；材料计划282527e/A0 871e3de/A1 add12af已交付，根重放315模块/61 A1/10路径/A0 21+5通过。下一步按[阶段3续作计划](STAGE3_CONTINUATION_PLAN.md)/[A2归属](STAGE3_A2_HANDOFF.md)推进，[B资格合同](STAGE3_QUALIFICATION_SPEC.md)仅规划。实际进度看HANDOFF；不重复材料索取。根独占共享3入口，实施代理按阶段独占代码，先根审再续派；旧根/medium不再写此worktree。
+历史首动作与材料已完成，不重复索取/重做。下一步按[阶段3续作计划](STAGE3_CONTINUATION_PLAN.md)/[A2续作](STAGE3_A2_CONTINUATION_HANDOFF.md)推进，[B资格合同](STAGE3_QUALIFICATION_SPEC.md)仅规划。重查额度/Git并重新领取后，根独占共享3入口、实施代理按阶段独占代码，先根审再续派。旧07:10 automation不重建，不reset credits。
 
 接续不是从零调研Snow，也不是立即运行activate/trial或补填proof。按精简HANDOFF的真实前置与阶段3续作路线推进；没有材料先给用户最小待办。

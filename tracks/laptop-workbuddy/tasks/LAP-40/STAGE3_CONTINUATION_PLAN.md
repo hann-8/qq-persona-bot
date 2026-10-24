@@ -51,6 +51,10 @@ A0当前材料已足以开始，不等待QQ安装。A1/A2一般实现细节可�
 
 阶段划分补充：A1验证固定OneBot/Network构造链的隐私时，可暂时拒绝来自反向WS/debug的全部动作，不引入无owner身份的发送入口。A2必须补回总计划已有的gate允许动作：以当前owner/epoch、受认证的固定gate连接、加载快照和最终参数/许可为准，不能仅检查`allowsRpc`字符串。读取现有onebot_gate实际白名单及独立成员/收藏固定RPC合同；普通任意成员list仍拒绝，旧成员/视觉资格不解锁，收藏不自动导入。`send_msg`若兼容，仅接受现有group别名后规范化为send_group_msg，不增加私聊/其他参数。群metadata结果限制在授权群，受控表情只接受现有登记图片，不接任意URL/文件；引用/媒体不得通过允许发送分支触发历史或入站回拉。ACK按原成功/partial/unknown单次合同，不重试。A1/A2最终映射需同时保留“已关闭旁路”与“已实现允许路径”，两者不能互相替代。
 
+发送提交边界澄清：沿用[LAP-35第84/102行](../LAP-35/PLAN.md)及onebot_gate._outgoing现有实现，群mode/generation在同群锁内最后校验，以gate有界WS写向下游提交为线性化点；内部qqbot_output_ticket在此前校验并剥离，不透传QQ。A2原生提交前栅栏复核的是当前transport owner lease/epoch/身份/健康、受认证的当前gate socket及冻结后的已验证最终参数，不宣称能撤销gate已经提交的在途帧。提交后发生群停言可晚到的既有在途消息仍据实ACK，不重发；transport stop/身份或epoch失效则继续撤销尚未native提交的旧回调。不得以伪造实时群票、自报authenticated或新增旁路接口补一个不存在的强保证；当前无须增加onebot_gate写权限。验证须区分提交前停言零下游提交、提交后延迟ACK，以及延迟native期间transport失效取消。
+
+身份提供器集成补充：禁止在Node控制/入站/发送关键路径中层层spawnSync阻塞事件循环。可用非阻塞短helper，限定并发、缓冲与各场景既有总deadline（控制3秒含前置身份校验）；一次请求/原始包可复用同一已核原子scope，不能变成全局永久trusted缓存。scope绑定owner/epoch/pinned pipe及socket，进入敏感native提交、新pipe或注入前须新鲜复核；停止/失效不可因后续快照恢复旧scope。未经准入消息不能进入新增历史/群窗口/正文缓存，异步排队仍须遵守原有界内存/数量。新增慢helper/高频回调及总超时测试，不以零延迟fake证明响应性。无额外常驻watch/registry writer；短helper创建身份、退出/超时与Node异常退出限制必须公开说明，31B真实覆盖不因自报元数据而通过。
+
 ## 资格与probe的分层合同（待实现）
 
 - **原版材料核验**只读文件/摘要/Node/协议。下载路径核验和项目内原包准备分开，核验不写配置、不登记启动、不打开任何端口。

@@ -1,8 +1,8 @@
-2026-10-24 17:24：用户指令“继续”，LAP-40由`LAP-40-max-realentry-next`重新领取A2根审/续作；300分钟额度剩99%，b605d03与远端一致、工作区干净。根独占共享3入口/40总交接与续作规划，private暂由根复核/复现，后续按阶段交给medium。先读[精简交接](tracks/laptop-workbuddy/tasks/LAP-40/HANDOFF.md)/[最小入口](tracks/laptop-workbuddy/tasks/LAP-40/MAX_START.md)，不重做A0/A1或加载全部历史。
+2026-10-24 18:37：LAP-40续作额度used96%/剩4%，按用户<=5%阈值停止新实现/测试并交接。本轮控制期限修复9162d2c已根审；A2装配仍被同步helper阻断，异步scope候选未集成，057441e已交付。全部agent交付后释放写入；下次先查额度/Git，再读[精简交接](tracks/laptop-workbuddy/tasks/LAP-40/HANDOFF.md)/[最小入口](tracks/laptop-workbuddy/tasks/LAP-40/MAX_START.md)，不重读全部历史。
 
 独立项目集成1/2/4A/4B及离线根审已交付（代码0250f54、总审144b968）；真实阶段3私有接线/probe/资格缺失、生产总拒、未切换，72h/7天未开始。用户已提供两包路径并接受EULA/PRIVACY、手工解压Snow；ZIP固定SHA256匹配，解压后Node v24.22.1及原生摘要通过，QQ安装包腾讯签名Valid。[阶段3续作计划](tracks/laptop-workbuddy/tasks/LAP-40/STAGE3_CONTINUATION_PLAN.md)/[材料报告](reports/lap-40-stage3-materials-2026-10-24.md)区分代码缺项与原生数据前置；先A0私有入口/JS-only，QQ安装/真实probe仍待可信数据机制。实际工作C:/Users/yutha/.codex/worktrees/lap-40-snowluma-impl/QQbot、codex/lap-40-snowluma-impl，基线f2bdb0c已核对远端；原运行E:/CodexWS/QQbot不动。07:10一次性唤醒已删除，不重建。
 
-17:44续作：根已重放A2既有组件，bind期限漏洞由9162d2c修复并根审（20新JS/既有control20+竞态2、Python16+20）。[A2续作](tracks/laptop-workbuddy/tasks/LAP-40/STAGE3_A2_CONTINUATION_HANDOFF.md)继续Node装配/实际单PIDpipe/认证gate允许RPC/最终栅栏ACK；整体仍未完成，生产总拒。[B合同](tracks/laptop-workbuddy/tasks/LAP-40/STAGE3_QUALIFICATION_SPEC.md)仅规划，G1/真实probe/72h/7天未过，原71/ZIP与E运行态不变；旧07:10唤醒不重建。
+本轮根已重放旧A2组件并审过期限修复；medium新增316模块装配/允许动作/实际框架unknown等分项合成，但零延迟29项实际940次helper，慢120ms bind51次耗6077ms，不能算3秒/可用通过。A4异步候选5项仅子测、未根审/未替换A3；下一步[A2续作](tracks/laptop-workbuddy/tasks/LAP-40/STAGE3_A2_CONTINUATION_HANDOFF.md)先审候选并完成全链非阻塞scope/慢helper验证。B仅规划，G1/真实/72h/7天未过，生产总拒、QQ未启用。原71/ZIP与E运行态不变；旧automation不重建，额度本次预计22:24重置需再查。
 
 2026-10-24：用户明确NapCat/SnowLuma以长期运行为首要标准。[LAP-39 SnowLuma评估](tracks/laptop-workbuddy/tasks/LAP-39/SNOWLUMA_ASSESSMENT.md)完成，仅静态调研；v2.1.1有接收停滞good/Windows管道重接机制，不能当本机长稳通过。原版有gate前内置答复、引用补历史与新增存储，当前项目又只读online/硬编码NapCat，不能直接替换；先解决边界/干净QQ归属并详细规划，再72h初筛/7天验收。六份文档，0安装/注入/启停/登录/配置/模型/群/SSH；本轮未重新探活，[39交接](tracks/laptop-workbuddy/tasks/LAP-39/HANDOFF.md)，旧差额保留。
 
