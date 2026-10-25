@@ -1,6 +1,6 @@
-2026-10-25（Asia/Shanghai）：**LAP-40官方原版SnowLuma最小OneBot接入已实现/离线与合成通过，真实未验。** 显式snowluma复用既有gate/AstrBot/gateway，解除启动入口、gate监控及router对旧私有runtime/health的依赖；只管理项目三个组件，QQ/Snow由操作者正常启动停止，默认napcat保留。7项新专项、18项gate、14项生命周期检查通过（39项不同用例）；未运行A4矩阵。[当前交接](tracks/laptop-workbuddy/tasks/LAP-40/HANDOFF.md) / [准备与一次文字试用](tracks/laptop-workbuddy/tasks/LAP-40/TRYOUT.md)。
+2026-10-25（Asia/Shanghai）：**LAP-40交付只读复核与准备规划完成；下一轮优先实际补环境和链路，先跑通文字。** 本地/远端重新核对均为`89b7dfae0efcd1949fe8289aa76ed1492bdfd8ab`，开始时工作区干净；未发现新增的基本收发接入代码阻断，不新增代码/测试任务。项目侧已实现/39项上次离线合成通过，真实未验，本轮不重跑。[当前交接](tracks/laptop-workbuddy/tasks/LAP-40/HANDOFF.md) / [准备与一次文字试用](tracks/laptop-workbuddy/tasks/LAP-40/TRYOUT.md) / [下一轮最小执行指令](tracks/laptop-workbuddy/tasks/LAP-40/NEXT_SESSION.md)。
 
-工作根`E:/CodexWS/QQbot_Snowluma`、分支`codex/lap-40-snowluma`。本根实查缺项目Python、AstrBot环境/实例、官方Snow包/专用QQ、本机业务配置/token，当前不能直接启动。仅交付代码、针对性验证和操作说明；0真实安装/启停/登录/模型/群操作，不改local/persona或原运行根。旧B/C停止，A4代码/产物/证据原样保留且不复核；不增加过滤/proof/probe/长稳前置。交付后停止，等待用户准备或另行授权真实试用，不自动推进其他任务。
+工作根`E:/CodexWS/QQbot_Snowluma`、分支`codex/lap-40-snowluma`。新根仍缺Python/AstrBot环境与基础实例、官方Snow/专用QQ、本机配置/token；uv绝对路径存在、锁定Node/CodeBuddy文件及摘要匹配，不能等同登录/额度可用。人设19,256字节大于新装16,384输入预算，准备时须保留用户现用预算并零模型核对，不能套模板或改人设。已补精确环境/init/基础配置步骤及分开的材料准备、真实启动/登录、模型/群答授权边界。本轮仅6份文档，0安装/测试/启停/登录/模型/群/SSH，不改local/persona或其他根。旧B/C停止，A4原样保留且不复核；不增过滤/proof/probe/长稳前置，交付后停止。
 
 2026-10-24：LAP-39复发只读诊断/上游调研完成，当前故障未恢复。00:30仍进程/WS/缓存在线，最后准入23日22:29:36；bot自身状态失败、原生资料刷新10031ms超时，模型空闲/cleanup未阻断。全局o3=1与账号0不同，早期Hook实际读全局；改0仅候选，旧故障亦可能默认0，不能归因或保证。优先受控单变量试验，再补诊断/评估接入替换，均未执行；0代码/运行配置/启停/QQ登录/模型/群/SSH，仅5份文档。[调研与验证路线](tracks/laptop-workbuddy/tasks/LAP-39/RESEARCH.md) / [39交接](tracks/laptop-workbuddy/tasks/LAP-39/HANDOFF.md)。
 

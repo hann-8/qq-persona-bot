@@ -1,44 +1,124 @@
-# LAP-40 官方OneBot文字试用
+# LAP-40 官方OneBot准备与一次文字试用
 
-返回[交接](HANDOFF.md) / [项目入口](../../../../PROGRESS.md)。2026-10-25，Asia/Shanghai。
+返回[交接](HANDOFF.md) / [下一轮可复制指令](NEXT_SESSION.md) / [项目入口](../../../../PROGRESS.md)。2026-10-25，Asia/Shanghai。
 
-## 当前能做什么
+## 当前结论与授权边界
 
-项目侧接入已实现，7项新专项、18项既有gate、14项生命周期离线/合成检查通过。真实安装、启动、QQ登录、CodeBuddy生成、群收发均未执行。**本根运行材料尚缺，当前不能直接双击启动并试用。** 以下是材料齐备后的准确入口，不是已经运行成功的记录。
+10:31起只读复核：本地HEAD与远端分支均为`89b7dfae0efcd1949fe8289aa76ed1492bdfd8ab`，开始时工作区干净。必要接入调用未发现新增的基本文字收发代码阻断，详见[交接中的调用证据](HANDOFF.md#本轮只读复核)。7新专项、18gate、14生命周期共39项是上次离线/合成证据，本轮没有重跑或晋升为真实通过。
 
-本根实查缺项（只检查存在性，没有读取原运行根配置）：
+**下一步优先实际补环境和链路。** 本轮仅复核和文档规划，以下命令全部未执行。下一轮粘贴[NEXT_SESSION](NEXT_SESSION.md)才授权材料准备；该准备授权与真实启动/登录、真实模型/群操作分开。
 
-| 缺项 | 项目需要的位置/内容 |
+| 动作 | 下一轮材料准备指令的范围 | 仍需用户亲自操作或明确授权 |
+| --- | --- | --- |
+| Python/AstrBot环境、官方Snow完整包 | 可下载、解压、安装到本根，执行不启动服务的AstrBot init和基础配置生成 | 不因安装完成自动run/start |
+| 专用QQ | 可下载官方安装材料；能确认仅写新根且不自动启动时才安装，否则留给用户正常安装 | 启动QQ、选择进程、加载官方Snow、登录/扫码；不读日常密码或登录资料 |
+| 本根业务配置与秘密 | 仅在用户提供当前选择后写新根；新token可经准备指令授权在本机生成、不回显 | 未提供的账号/群/管理员、当前触发与模型预算由用户提供或手工保留；不猜值、不用模板覆盖 |
+| 项目start-channel/start-text | 都属于真实启停，材料准备不执行 | start-text接通已登录账号后即可能按既有规则触发真实模型和群输出，必须同时覆盖这些操作的授权 |
+
+## 当前材料实查
+
+只查有关文件存在性、非秘密程序摘要和本根人设字节量；不读原运行根配置或日常QQ/WorkBuddy登录资料，不查询在线服务。
+
+| 材料 | 2026-10-25本轮结果与处理 |
 | --- | --- |
-| 项目Python环境 | `.venv/Scripts/python.exe`，Python 3.12，依赖按根`uv.lock`；操作者准备时可用`uv sync --frozen --python 3.12` |
-| AstrBot运行环境和实例 | `runtime/astrbot-bin/astrbot.exe`、`runtime/astrbot-tool/astrbot/Scripts/python.exe`、`runtime/astrbot/data/cmd_config.json`，现有项目版本为4.29.0；需正常准备该隔离实例的基础配置、data/plugins目录和运行依赖，不能把私有A4目录当框架环境 |
-| 官方SnowLuma、QQ | `runtime/snowluma/v2.1.1/launcher.bat`及原包其余文件、专用`runtime/qq-snowluma/QQ.exe`均缺；使用官方v2.1.1完整包和正常QQ安装方式，不使用`runtime/snowluma-private`产物 |
-| 本根业务配置和token | `config/local/`、兼容入口`config/settings.local.yaml`及`secrets/local-tokens.json`均缺；必须由操作者准备账号、授权群、管理员和三个独立token `onebot_inbound`、`onebot_upstream`、`model_gateway`（至少32字符），秘密仅放忽略文件 |
+| 项目Python | `.venv/Scripts/python.exe`缺失，根`uv.lock`存在；项目要求Python 3.12，不能使用PATH上的3.13代替 |
+| uv | PATH未找到uv，但`C:/Users/yutha/.local/bin/uv.exe`存在，可用绝对路径，无需先改全局PATH；本轮未运行它 |
+| AstrBot | `runtime/astrbot-bin/astrbot.exe`、`runtime/astrbot-tool/astrbot/Scripts/python.exe`、`runtime/astrbot/.astrbot`、`runtime/astrbot/data/cmd_config.json`及`data/plugins`均缺失；准备4.29.0隔离实例 |
+| 官方Snow/QQ | `runtime/snowluma/v2.1.1/launcher.bat`、`runtime/qq-snowluma/QQ.exe`缺失；旧材料报告不证明本根已具备，勿取私有A4产物 |
+| Node/CodeBuddy | `config/versions.lock.json`引用的Node、CLI入口和headless文件存在，headless SHA256与锁一致；不需要另装一套CLI。未验证登录、站点、额度或真实生成 |
+| 业务配置/token | `config/local/`、兼容`config/settings.local.yaml`、`secrets/local-tokens.json`均缺失；不能宣称继承了原根当前选择 |
+| 人设 | `config/persona.md`存在，UTF-8正文19,256字节，本轮未改；须保留，不能用短模板替换 |
 
-`config/persona.md`存在，本轮未改。由于本根没有当前本机配置，不能宣称已继承原运行根的free/mentions、模型或人设实际值。操作者准备配置时保留其当前选择及人设；仅把`qq_transport.provider`显式设为`snowluma`，私聊维持false。不使用新装模板默认值覆盖现有业务选择。若确为全新配置，五文件入口和校验见[配置说明](../../../../config/README.md)，`scripts/config_files.py init`仅创建模板，不会生成身份/token；本轮没有执行。
+**模板预算不能直接沿用。** [新装models模板](../../../../config/examples/models.yaml)的CLI输入上限16,384，另计2,048开销；本根人设正文已超过该上限，拼接固定政策只会更大。[router的select_history调用](../../../../plugins/qq_router/main.py)（455行）进入[InputBudget.check](../../../../src/qqbot_gateway/token_budget.py)（53行）时会触发`INPUT_TOO_LONG`。这是“当前人设+新装默认配置”的确定不兼容，尚无本机配置，不能说已有运行配置存在此故障。准备时先保留用户现用预算；未提供或仍不够则只报告所需字节量与可选参数变更，由用户决定，不改人设、不静默调预算。无需新代码或测试任务。
 
-旧`snowluma.proof_file/control_secret_file/control_port`、recovery/trial配置可保持已有兼容值；官方运行不读取证明/控制密钥内容、不访问控制端口，也不启动私有健康、恢复或长稳任务。无需准备这些文件或填写proof=true。默认provider仍是napcat，不能漏设provider后直接启动本根。
+## 下一轮材料准备顺序
 
-当前没有在本根试装AstrBot，因此不提供未经验证的安装器参数或跨根复制命令。上述四类是已确认的准备缺项；不追加资格、probe、A4或长稳前置。CodeBuddy继续使用现有显式配置和既有账号/额度来源，本轮没有验证其当前登录、模型额度或真实生成。
+1. 复核根、分支、HEAD/状态并登记session/文件归属。先补齐能独立准备的环境、官方包和框架基础实例，不因缺业务值退回纯规划。
+2. 用以下命令创建本根两个Python环境；uv工具、Python下载目录和缓存仅定向本根，不修改全局PATH或原运行根。每条外部命令非零即停止该步骤、保留错误；网络/包准备失败只处理实际错误，不改锁或自动升级后端。
 
-## 官方端正常启动、配置与停止
+```powershell
+$taskRoot = 'E:/CodexWS/QQbot_Snowluma'
+$taskUv = 'C:/Users/yutha/.local/bin/uv.exe'
+Set-Location $taskRoot
+$env:UV_CACHE_DIR = "$taskRoot/cache/uv"
+$env:UV_PYTHON_INSTALL_DIR = "$taskRoot/runtime/python"
+$env:UV_PYTHON_BIN_DIR = "$taskRoot/runtime/python-bin"
+$env:UV_TOOL_DIR = "$taskRoot/runtime/astrbot-tool"
+$env:UV_TOOL_BIN_DIR = "$taskRoot/runtime/astrbot-bin"
+& $taskUv sync --frozen --python 3.12
+if ($LASTEXITCODE -ne 0) { throw 'Project environment preparation failed' }
+& $taskUv tool install --python 3.12 --with 'PyYAML==6.0.3' --with 'markdown-it-py==4.2.0' 'astrbot==4.29.0'
+if ($LASTEXITCODE -ne 0) { throw 'AstrBot environment preparation failed' }
+```
 
-依据[官方v2.1.1 README](https://github.com/SnowLuma/SnowLuma/blob/v2.1.1/README.md)和[官方配置参考](https://snowluma.github.io/zh/docs/guide/configuration)，Windows完整包运行`launcher.bat`，再在本机WebUI `http://127.0.0.1:5099`按正常引导选取专用QQ进程、登录并设置账号连接。本项目不启动/接管QQ或Snow，不新增加载器。保留官方默认的手动选择方式，只选择bot专用QQ。
+AstrBot独立工具环境也要能导入项目使用的yaml/markdown_it；安装到`.venv`不会使工具环境自动可见。依据[uv工具安装](https://docs.astral.sh/uv/guides/tools/)、[uv目录环境变量](https://docs.astral.sh/uv/reference/environment/)及[AstrBot 4.29.0包入口](https://github.com/AstrBotDevs/AstrBot/blob/v4.29.0/pyproject.toml)。这两条安装命令是已核对语法的待执行步骤，不是本根安装成功记录。
 
-材料准备好后，在PowerShell中正常启动专用QQ：
+3. 仅对新建空AstrBot实例做官方初始化。`init --yes`建立`.astrbot`和data目录；它不保证单独生成`cmd_config.json`，所以再通过官方配置类生成基础配置并把dashboard约束到回环6185。现有实例若已出现，先检查归属并保留，不覆盖。
+
+```powershell
+New-Item -ItemType Directory -Path "$taskRoot/runtime/astrbot" -Force | Out-Null
+$env:ASTRBOT_ROOT = "$taskRoot/runtime/astrbot"
+$env:ASTRBOT_DISABLE_METRICS = '1'
+Push-Location "$taskRoot/runtime/astrbot"
+try {
+    & "$taskRoot/runtime/astrbot-bin/astrbot.exe" init --yes *> bootstrap.local.log
+    if ($LASTEXITCODE -ne 0) { throw 'AstrBot init failed; inspect local bootstrap log' }
+    & "$taskRoot/runtime/astrbot-tool/astrbot/Scripts/python.exe" -B -c "from astrbot.core import astrbot_config; astrbot_config['dashboard']['host']='127.0.0.1'; astrbot_config['dashboard']['port']=6185; astrbot_config.save_config()" >> bootstrap.local.log 2>&1
+    if ($LASTEXITCODE -ne 0) { throw 'AstrBot base configuration failed; inspect local bootstrap log' }
+}
+finally { Pop-Location }
+```
+
+[官方init](https://github.com/AstrBotDevs/AstrBot/blob/v4.29.0/astrbot/cli/commands/cmd_init.py)、[基础配置生成](https://github.com/AstrBotDevs/AstrBot/blob/v4.29.0/astrbot/core/config/astrbot_config.py)及[run的实例标记要求](https://github.com/AstrBotDevs/AstrBot/blob/v4.29.0/astrbot/cli/utils/basic.py)支持上述准备方法。此处只生成本机实例材料，不调用`run`、配置项目provider或启动监听；初始密码等输出留本根忽略日志，由操作者本机查看。
+
+4. 下载[官方v2.1.1完整Windows x64包](https://github.com/SnowLuma/SnowLuma/releases/tag/v2.1.1)中的`SnowLuma-v2.1.1-win-x64.zip`，展开到`runtime/snowluma/v2.1.1`，确认launcher就在该层且保留全包。本轮重新查到官方asset：42,694,125字节，SHA256 `c739171f95c27706767e69ba36099707c222fcec639b46f4d59689997b527772`；这只是下载核对，不是运行/proof或真实兼容证据。[官方打包流程](https://github.com/SnowLuma/SnowLuma/blob/v2.1.1/.github/workflows/release.yml)给完整Windows包加入node.exe，不先安装Lite所需Node或构建Snow。QQ从[腾讯官方Windows入口](https://im.qq.com/pcqq/)正常准备为新根专用安装；不能把已patched的旧QQ目录复制过来，也不猜静默安装参数。若安装器不能保证只写新根且不自动启动，先完成其他材料，由用户完成专用安装到`runtime/qq-snowluma/QQ.exe`。
+5. 用户提供业务值后准备本根local与秘密，完成下节校验。交付材料就绪/缺项和脱敏结果后停止；不会自动进入真实启动。
+
+## 业务配置交接与零模型校验
+
+用户需提供或亲自在新根保留：bot QQ、目标授权群、管理员，既有blocked_users（如有则原样保留，无需新增）、当前mentions/free、模型/推理强度/输入预算/超时/输出与功能开关。可由用户手工带入五份local或兼容单文件；不复制旧state、聊天历史、QQ登录数据或日常密码。若确为全新配置，明确允许后才运行`scripts/config_files.py init`，按[配置说明](../../../../config/README.md)补齐五文件；目录一旦存在就不再回退单文件，不能留下半套。
+
+仅将`config/local/runtime.yaml`中的`qq_transport.provider`明确改为`snowluma`；私聊维持false，模型和额度来源保持既有CodeBuddy。本根token文件中保留三个独立键`onebot_inbound`、`onebot_upstream`、`model_gateway`，各至少32字符。新根无token时，下一轮准备指令允许在本机生成三个随机值并只写忽略文件，不打印或提交；已有文件不得覆盖。用户在Snow WebUI中手工填本根inbound值，不能把upstream/model token填过去。
+
+兼容的旧proof/control/recovery/trial字段保持合法默认或已有值，不准备其证明/控制密钥文件，不启私有服务。runtime示例里的旧G0/G1/72h注释以LAP-40当前[PLAN](PLAN.md)为准，不形成首试门槛。
+
+配置保存后仅做本地校验：
+
+```powershell
+Set-Location E:/CodexWS/QQbot_Snowluma
+.\.venv/Scripts/python.exe scripts/config_files.py check
+```
+
+`check`不读取token，不能代替token存在/长度、框架材料或预算可容纳性的核对。准备方用本根Python加载`read_project`，按router参数调用`compose_persona`，再用`InputBudget.from_settings(settings, validate_model_settings(settings)).select_history(system, '你好', [])`做一次零模型容量核对，仅报告用量/上限/通过与否，不输出人设或配置值。该调用只计算本地字节预算，无CLI/SSH/QQ/模型调用。预算是可见UTF-8字节保守值，不是原生token或credits承诺。若不通过，保留人设和现有选择，将具体差额交用户；不修改代码或新增测试矩阵。
+
+## 明确授权真实启动后：项目与官方端
+
+真实文字试用应在用户准备好的安静目标群时间窗执行。保留free时，一旦接通就可能被其他新消息正常触发，不能承诺总共只消耗一次模型；若要严格限制次数，须由用户决定临时触发设置/试用窗口，不能由agent擅改模式。材料检查和健康查询不需要模型调用。
+
+先启动项目三个组件，在本根执行，任何命令失败都先看本机错误，不继续后续启动：
+
+```powershell
+Set-Location E:/CodexWS/QQbot_Snowluma
+.\.venv/Scripts/python.exe scripts/manage.py start-text --no-pause
+.\.venv/Scripts/python.exe scripts/manage.py status --json
+```
+
+`start-text`为隔离AstrBot准备项目provider/插件，然后依次启动AstrBot（6185/6199）、gateway（8765）、gate（6200），使用同一实例快照。不另起单组件，不启动NapCat，不访问6099/私有5098。此时官方端尚未连接可以显示等待连接，三个项目组件running不代表QQ已登录。原根本轮未探活；若端口被旧根或其他进程占用，只按错误报告归属，由用户决定如何释放，不能擅停其他根。
+
+操作者正常启动专用QQ，再另开前台终端运行官方包：
 
 ```powershell
 Start-Process -FilePath 'E:/CodexWS/QQbot_Snowluma/runtime/qq-snowluma/QQ.exe'
 ```
-
-另开终端启动官方Snow：
 
 ```powershell
 Set-Location E:/CodexWS/QQbot_Snowluma/runtime/snowluma/v2.1.1
 .\launcher.bat
 ```
 
-WebUI密码按官方启动输出由操作者本机查看，不贴进交接。账号OneBot连接只需一条反向WS，目标是**gate** `ws://127.0.0.1:6200/ws`，不直连AstrBot。填入本根`onebot_inbound` token，角色`Universal`，消息格式`array`，自身消息上报false。账号级`config/onebot_<uin>.json`覆盖全局，确认改的是实际bot账号。官方`networks.wsClients`条目示例（占位token须在本机替换）：
+依据[官方v2.1.1 README](https://github.com/SnowLuma/SnowLuma/blob/v2.1.1/README.md)，操作者在`http://127.0.0.1:5099`用启动日志中的初始密码按正常引导选择bot专用QQ进程并完成登录/扫码；官方端由操作者管理，项目不接管。保持官方手动选进程方式，不设置自动加载到日常QQ。
+
+按[官方配置参考](https://snowluma.github.io/zh/docs/guide/configuration)，实际bot账号`config/onebot_<uin>.json`覆盖全局。通过WebUI将一条反向WS连接接到gate；`networks.wsClients`内的单条配置示例如下，占位值仅在本机替换，不把此对象当成整个配置文件覆盖：
 
 ```json
 {
@@ -53,36 +133,28 @@ WebUI密码按官方启动输出由操作者本机查看，不贴进交接。账
 }
 ```
 
-来源：[v2.1.1反向WS实现](https://github.com/SnowLuma/SnowLuma/blob/v2.1.1/packages/onebot/src/network/ws-client-adapter.ts)使用Bearer、X-Self-ID及X-Client-Role，与现有gate一致，无需转换层。实例配置保存/应用遵循官方WebUI；若连接未刷新，操作者正常重启官方Snow。停止时在其前台终端Ctrl+C，专用QQ通过客户端正常退出；项目stop只停止项目登记进程，不替你关闭这两者，不按进程名批量结束。
+Snow不直连AstrBot。gate用本根upstream token连接`ws://127.0.0.1:6199/ws`，模型token只用于8765。官方[反向WS实现](https://github.com/SnowLuma/SnowLuma/blob/v2.1.1/packages/onebot/src/network/ws-client-adapter.ts)发出Bearer、X-Self-ID、Universal；[get_status实现](https://github.com/SnowLuma/SnowLuma/blob/v2.1.1/packages/onebot/src/actions/info.ts)提供online/good，未发现需要先改Snow的理由。保存/应用按官方WebUI，未刷新时由操作者正常重启官方端。
 
-## 项目组件启动和停止
+再执行`manage.py status --json`，确认provider为snowluma、process_state为running，`channel.connected=true`、`channel.channel_ready=true`、顶层`can_receive_group_messages=true`。标准get_status每15秒轮询，45秒过期；false、缺失、超时或断线均不算就绪。状态就绪仍不是群收发成功证明。
 
-配置与依赖准备好后，在本根执行：
+只有另行授权仅验证通道时才用`start-channel --no-pause`；它不启动模型答复，仍是真实启停。换成text前先正常stop再start-text，不把分阶段通道检查设为首次试用的额外前置。
 
-```powershell
-Set-Location E:/CodexWS/QQbot_Snowluma
-.\.venv/Scripts/python.exe scripts/config_files.py check
-.\.venv/Scripts/python.exe scripts/manage.py start-text --no-pause
-.\.venv/Scripts/python.exe scripts/manage.py status --json
-```
+## 一次目标群文字与准确停止
 
-`start-text`一起准备隔离AstrBot配置/插件并启动AstrBot（6185/6199）、model gateway（8765）、gate（6200），沿用同一实例快照，不另起第二套手工进程。不启动NapCat、不访问6099或私有5098。状态中的项目进程running只表示这三个组件；QQ/Snow由操作者另管。等待gate `connected=true`、`channel_ready=true`及`can_receive_group_messages=true`，然后才做群试用。Snow通过标准get_status/heartbeat报告online/good，状态15秒轮询，45秒过期；false、缺失、超时或断线不算就绪，这不是群收发成功证明。
+1. 由允许成员在目标授权群发一条**新文字并真实@bot**，例如“你好，请用一句话回复”；不发图片/链接，不用普通free消息是否回复判成功。
+2. 观察同一时间窗：入口已接入/在线、该次任务是否进入模型、发送回执是否成功、群里是否看到纯文字回复。只做一次人工触发，不自动重复发消息或重试生成。只有真实模型链和群内可见回复都成立，才记“最小文字真实试用通过”。
+3. 失败则保留脱敏类别和时间，先区分材料/配置、握手/状态、AstrBot/router、gateway/CLI或发送ACK哪一段；不把无模型任务直接当Snow内部问题。其他功能和长稳保持未验。
 
-只准备无模型通道时可用`start-channel --no-pause`，但该模式不生成答复；试用文字回复请直接使用`start-text`。已启动另一模式时先正常stop，再换模式；不要重复运行单组件入口或另开多个bot。
-
-停止本根gate/AstrBot/gateway：
+停止顺序：先停止本根项目组件以关闭模型/群输出，再由操作者停止官方端和专用QQ。
 
 ```powershell
 Set-Location E:/CodexWS/QQbot_Snowluma
 .\.venv/Scripts/python.exe scripts/manage.py stop --no-pause
+.\.venv/Scripts/python.exe scripts/manage.py status --json
 ```
 
-也可用本根`启动机器人.cmd`、`查看状态.cmd`、`关闭机器人.cmd`。这些命令未在本轮真实执行。端口冲突时按错误定位现有归属；原运行根本轮未探活或启停，不为新根清理旧根进程。
+项目stop按登记PID/创建身份只停止gate/AstrBot/gateway；不关闭QQ/Snow。[官方launcher](https://github.com/SnowLuma/SnowLuma/blob/v2.1.1/packages/runtime/launcher.bat)在前台运行Node入口，操作者在该终端Ctrl+C结束；随后若停在批处理pause提示，按提示退出，专用QQ从客户端正常退出。也可使用本根`启动机器人.cmd`、`查看状态.cmd`、`关闭机器人.cmd`；关闭启动窗口不会停后台。禁止按QQ/Node/Python进程名批量结束，不清理旧根进程。停止后的官方进程是否退出由操作者确认，项目status不证明它们已退出。
 
-## 一次目标群文字试用与故障材料
+故障材料仅留本根忽略目录：`logs/gate.log`、`logs/astrbot.log`、`logs/model.log`；配置准备失败看`runtime/astrbot/configure-error.log`，初始化看`runtime/astrbot/bootstrap.local.log`。`state/gate-connection.json`、`state/service-mode.json`核对本机连接/实例，`state/tasks.sqlite`仅本机核对该次任务和发送状态，不上传整库。官方日志从WebUI/前台查看，不假定磁盘路径。对外交接仅含时间窗、脱敏错误类别、组件状态、ACK结果；不含token、账号群号、原始群消息、模型正文或初始密码。
 
-由用户亲自操作或另行明确授权后：按上面步骤准备/启动并确认gate就绪；从允许成员在目标授权群发送一条新文字，明确真实@bot（兼容mentions/free；free的普通消息允许决定不说话）；观察是否经既有模型链产生可见纯文字回复。只做一次，不用重复发消息来自动重试。记录时间、是否已接入/在线、是否有模型任务、是否收到发送回执和群内可见回复。只有该次真实闭环成功才记“最小文字真实试用通过”；其余功能和长稳仍未验。
-
-失败材料留在本根忽略目录：`logs/gate.log`（固定握手/协议类别）、`logs/astrbot.log`、`logs/model.log`，准备失败另看`runtime/astrbot/configure-error.log`；`state/gate-connection.json`和`state/service-mode.json`用于本机核对连接/实例。`state/tasks.sqlite`仅本机检查该次任务和发送状态，不直接上传整库。官方日志使用官方WebUI/前台输出，本轮未假定其磁盘路径。对外只给该时间窗的脱敏错误类别、组件状态、ACK结果；删去token、账号群号、原始群消息、模型正文和WebUI初始密码，不提交原始日志/配置/数据库。
-
-不重复跑A4，不扩建私有过滤/证明或恢复系统。只有实测握手、事件或ACK不兼容才补外部薄适配；必须改Snow内部才能继续时，将具体失败与外部尝试结果交回用户决定。
+不重跑A4或全量回归，不增加资格/proof/probe、内部过滤/零存储、恢复或72h/7天前置。实际握手、事件或ACK不兼容时只做必要外部适配；只有实际必须改Snow内部才能继续，才携具体阻断与已尝试的外部解决结果交用户决定。
