@@ -1,6 +1,6 @@
-2026-10-25 11:18（Asia/Shanghai）：**LAP-40日常启动入口已详细规划，待medium实际补脚本。** 现有启动cmd只起三组件、Snow状态误提示NapCat/私有前置，用户仍不会用Snow。新合同：同一双击入口自动准备目标OneBot、启动缺少的专用QQ/官方Snow并打开管理页；首次选QQ/登录扫码由用户操作，状态/关闭覆盖本次创建身份，外部手动实例不接管。[计划](tasks/LAP-40/DESKTOP_PLAN.md) / [medium指令](tasks/LAP-40/DESKTOP_MEDIUM_START.md) / [交接](tasks/LAP-40/HANDOFF.md)。
+2026-10-25（Asia/Shanghai）：**LAP-40日常启动入口已实现/离线通过，真实双击登录收发未验。** 用户可双击同一启动/状态/关闭入口；Snow自动准备目标OneBot连接、补启缺少的官方桌面端并打开管理页；新增管理页/日志按钮与[使用说明](../../SnowLuma使用说明.md)。外部实例保留，关闭按PID/创建时间分阶段停止；原start-text/start-channel高级入口和NapCat行为保留。[任务交接](tasks/LAP-40/HANDOFF.md) / [试用](tasks/LAP-40/TRYOUT.md)。
 
-工作根`E:/CodexWS/QQbot_Snowluma`、分支`codex/lap-40-snowluma`，session `LAP-40-desktop-launcher-plan`，起点本地/远端47342ac、工作区干净。QQ/local现已存在，上轮config check已通过；11:18只读status为text running、gateway/router就绪、gate未连接、CLI 0次。旧MATERIALS缺项是历史，下一步不再重复准备/覆盖环境。当前桌面脚本未实现；本轮只改9份文档，0安装/启停/登录/模型/群/SSH，不改local/persona、代码、其他根或A4，不派代理/切模型，B/C停止。文档Git交付后停止并释放归属。
+session `LAP-40-desktop-entry-implementation`，11:27领取，起点本地/远端50a2240、工作区干净。只做本根代码/临时根离线验证；当前真实实例、实际Snow/local/persona和环境未操作，0登录/真实模型/群/SSH。A4未复核、B/C停止。下一步用户亲自双击启动，在官方页面确认条款、选择专用QQ并扫码；不重复安装或自动代为试用。验证与归属见任务交接；Git交付后释放归属。
 
 2026-10-24：LAP-39只读复发诊断/调研完成，故障未恢复。最后准入23日22:29:36；00:30仍在线缓存正常但bot自身状态失败/资料刷新10031ms超时，模型空闲/无清理阻断。全局o3=1、账号0，早期Hook读全局；单变量改0只是候选，旧故障可能默认0，不能当根治。当前包已有SelfOffline恢复、最新版未列匹配修复；接入替换仅后备。5份文档，0代码/配置/启停/QQ登录/模型/群/SSH；[调研](tasks/LAP-39/RESEARCH.md) / [39交接](tasks/LAP-39/HANDOFF.md)，旧差额保留。
 

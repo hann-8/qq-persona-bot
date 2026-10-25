@@ -1,6 +1,7 @@
 param([switch]$ChannelOnly)
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
-$startMode = if ($ChannelOnly) { 'start-channel' } else { 'start-text' }
-& (Join-Path $projectRoot '.venv\Scripts\python.exe') (Join-Path $PSScriptRoot 'manage.py') $startMode
+$startArgs = @('start-desktop')
+if ($ChannelOnly) { $startArgs += '--channel-only' }
+& (Join-Path $projectRoot '.venv\Scripts\python.exe') (Join-Path $PSScriptRoot 'manage.py') @startArgs
 if ($LASTEXITCODE -ne 0) { throw 'Channel startup failed; inspect local logs.' }

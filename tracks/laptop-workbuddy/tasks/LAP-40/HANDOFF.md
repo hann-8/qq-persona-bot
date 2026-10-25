@@ -4,15 +4,40 @@
 
 ## 当前状态
 
-**官方接入和材料已交付，日常启动入口仍缺；详细补充计划已落盘，待medium实际实施。** 用户明确不知道怎么用Snow、期望类似NapCat的启动脚本。现有启动cmd只调用start-text、未拉起QQ/Snow，show_status误提示NapCat登录和私有运行前置；下步必须补双击启动/目标连接自动准备/打开官方管理页/准确查看和关闭，不能再只给手工命令。合同、文件/验证和回滚见[DESKTOP_PLAN](DESKTOP_PLAN.md)，复制[DESKTOP_MEDIUM_START](DESKTOP_MEDIUM_START.md)给medium实施。
+**日常启动入口已实现/离线通过；真实双击、官方页面引导、QQ选择/扫码、OneBot/模型群收发未验。** 返回[日常使用说明](../../../../SnowLuma使用说明.md)。用户最新授权仅代码与必要离线验证，本轮没有运行新入口、启停当前实例、打开真实登录页、写实际Snow配置、改local/persona或既有环境，0登录/真实模型/群/SSH；A4代码/证据未改、未复核，B/C停止。
 
-本轮session `LAP-40-desktop-launcher-plan`，2026-10-25 11:18登记重读，起点本地HEAD/远端`47342ac3691ce49c0b190949c0f7bb726d199e0f`、工作区干净。重新实查专用QQ/local/token均存在，旧MATERIALS的QQ/local缺项为10:49历史；上轮只读config check已通过。11:18本轮只读status：snowluma/text、项目running、gateway/router就绪、gate waiting_login/connected=false/channel_ready=false、CLI 0次、pending_restart=false；不是QQ未登录或真实文字成功的证明。不启停现有实例。
+session `LAP-40-desktop-entry-implementation`于2026-10-25 11:27（Asia/Shanghai）领取并写后重读；工作根`E:/CodexWS/QQbot_Snowluma`，分支`codex/lap-40-snowluma`。起点本地HEAD/远端均`50a22401990f365aec591a00aab5acac5c75c67c`，开始时工作区干净。Git交付后释放归属；下一步由用户亲自双击启动，不自动部署或推进其他功能。
 
-本次仅9份文档（PROGRESS、工作线HANDOFF/TASKS、本任务HANDOFF/PLAN/TRYOUT/NEXT_SESSION和新增DESKTOP_PLAN/DESKTOP_MEDIUM_START），未修改代码、测试、Snow包、运行配置/local/persona或其他根；未安装、启停、登录/扫码、模型/群/SSH，不派代理或切换模型。旧B/C停止，A4原样保留且未复核。下一轮用户选medium后按新指令实施代码与离线验证；真实首次启动/登录/模型群答仍由用户后续明确授权或亲自点击。Git交付后停止并释放归属。
+### 已完成
 
-本轮文档检查：`git diff --check`通过；9文档408个本地链接、22个围栏标记、8段PowerShell语法解析通过（仅解析，未执行块中命令）。与47342ac相比scripts/src/plugins/tests/adapters/config/AGENTS及根cmd无差异；没有运行代码测试或A4。只提交本任务9份文档，提交号/远端SHA核对见最终交付和Git日志。
+- `manage.py start-desktop`：配置锁内按实际provider处理；NapCat委托原项目入口；Snow在项目已running时继续补桌面端，不先停机。已有实例使用加载快照中的账号/路径。原start-text/start-channel高级语义保留；PS的ChannelOnly传新入口的--channel-only。
+- 新`official_snowluma.py`：固定包内node/原版index与包根cwd，短Node检查、隐藏Snow/交互QQ、忽略日志；子环境去掉继承的Snow同意/密码/dev等覆盖，明确回环5099和HOOK_AUTOLOAD=0。未改官方包/全局PATH。
+- 只同步目标账号`qqbot-gate`；一致零写，更新前原字节备份/原子发布，保留其他条目/字段/mode/账号，不生成token，不回显秘密。运行中的Snow需要同步时先提示正常退出Snow再双击，不在线猜接口或改外部实例。
+- 新管理页/本机日志cmd和简短说明；所有5个cmd为UTF-8/CRLF、根相对路径、保留退出码/--no-pause，`.gitattributes`固定这5个入口换行。
+- 状态区分项目组件、Snow/专用QQ脚本创建或外部实例、管理端口与OneBot就绪，模型活动/空闲不生成；Snow不再显示NapCat登录或私有资格。
+- 沿用项目PID/创建时间登记和子进程识别；重复点击不重复创建。关闭先撤销入口/停止模型框架，再Snow再QQ；只终止身份匹配的登记实例，外部手动或身份不清者保留并提示正常退出。失败仅清理本次新增项，原先running组件不受清理影响；清理失败保留存活登记。
 
-以下保留上次材料/复核/实现历史，不能当当前缺项或当前进程状态；最新结论以上述实查与桌面入口计划为准。
+### 文件归属与验证
+
+归属：`.gitattributes`、`scripts/manage.py`、`scripts/Start-Bot.ps1`、`src/qqbot_gateway/official_snowluma.py`、根启动/查看状态/关闭cmd及两个新增Snow辅助cmd、`SnowLuma使用说明.md`、`tests/test_desktop_snowluma.py`、PROGRESS、本工作线HANDOFF/TASKS、本任务HANDOFF/TRYOUT。未夹带其他任务文件或本机材料。
+
+必要验证（`PYTHONPATH=src;tests`，本根`.venv/Scripts/python.exe`）：
+
+```powershell
+.venv/Scripts/python.exe -m unittest test_desktop_snowluma test_lifecycle test_official_snowluma.OfficialManagementTests -v
+```
+
+定向39项通过：23项新桌面测试、14项生命周期、2项原官方管理兼容。新测试使用带中文/空格临时根、伪造账号/token、模拟Popen/浏览器/文件打开；覆盖正确路径/隐藏环境、已有项目真实入口分支只补桌面端、重复点击、无关配置/原字节备份/零写/原子失败、外部实例/端口冲突、PID变化、部分失败与停止顺序/身份保留、中文状态及cmd换行。原生命周期包含临时根的无业务Python父子进程退出验证和合成本机HTTP；均不操作当前真实bot、不调用CLI模型。未跑A4或全量回归。
+
+`git diff --check`、改动PS语法、Markdown链接/围栏和归属差异检查通过。首次检查发现原cmd的LF，与计划CRLF要求不符，已补属性并修正；新增专项最终通过。提交/远端SHA以最终交付与Git日志为准，不将Git交付视为真实验收。
+
+### 剩余、试用与回滚
+
+用户亲自双击启动→官方页面确认条款/登录管理页→选择本根专用QQ/扫码→查看状态；密码只在本机日志查看。管理页可达不等于QQ通道就绪。后续实际群试用由用户开始；脚本不发送测试消息。实际QQ启动器交接、官方父子进程变化、登录持久性和真实ACK均未验，不承诺免扫码。
+
+若已运行的Snow配置不同，先在启动Snow的终端正常退出/用官方退出操作，再双击同步；原项目组件保留。回滚只撤销本次入口提交；恢复目标OneBot备份前先确认对应Snow已退出，其他账号/local/persona/登录数据保留，不启动原根NapCat。
+
+以下保留原接入/材料/规划历史，旧“只由操作者管理QQ/Snow”已由DESKTOP_PLAN的脚本创建归属合同补充，不能据此认为桌面入口尚未实现。
 
 ## 上轮只读复核
 

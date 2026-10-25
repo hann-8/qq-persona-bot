@@ -31,13 +31,14 @@ from qqbot_gateway.qq_transport import resolve_transport
 from qqbot_gateway.transport_owner import prepare_stop_control, startup_unknown
 from qqbot_gateway.config import require_configuration_lease
 from qqbot_gateway.transport_launch import OwnerWriter, snow_specs
+from qqbot_gateway import official_snowluma as desktop
 
 
 def alive(entry):
     try:
         process = psutil.Process(entry['pid'])
         same=(round(process.create_time()*1000)==round(entry['created']*1000) if entry.get('component') in
-              ('snowluma','qq_client','transport_watch') else abs(process.create_time()-entry['created'])<.01)
+              ('snowluma','qq_client','transport_watch',*desktop.COMPONENTS) else abs(process.create_time()-entry['created'])<.01)
         return process if same and process.is_running() else None
     except psutil.NoSuchProcess:
         return None
@@ -156,7 +157,7 @@ def status_report(*,disk_config=None):
             configuration={'loaded':None,'disk':'unknown'},model={},configured_profile={'state':'unavailable'},
             task_counts=task_counts(),napcat_login={'state':'unavailable'},qq_login_state='transport_unavailable',
             qq_login_observation={'state':'not_applicable'},autostart=None,transport_code='LOADED_SNAPSHOT_INVALID')
-    # Official SnowLuma/QQ are operator-owned, outside our process registry.
+    # Desktop identities do not count toward framework readiness.
     components=() if provider=='snowluma' else ('napcat',)
     counts={name:sum(1 for e in entries if e['component']==name and alive(e) is not None)
             for name in ('astrbot','model','gate')+components}
@@ -184,7 +185,8 @@ def status_report(*,disk_config=None):
     from qqbot_gateway.napcat_login_observer import gate_state, listener_identity, historical_status
     current_gate=(listener_identity(entries,'gate',6200) if provider=='napcat' else gate.get('channel_ready') is True) if counts['gate'] else None
     qq_state=gate_state(gate,paused=mode_state.get('login_check_only') is True) if current_gate else 'transport_unavailable'
-    return {'provider':provider,'transport_task':gate.get('transport_monitor',{'running':False}) if provider=='snowluma' else None,
+    return {'provider':provider,'desktop':desktop_status(settings, entries) if provider=='snowluma' and disk_config is not False else None,
+            'transport_task':gate.get('transport_monitor',{'running':False}) if provider=='snowluma' else None,
             'autostart':autostart_status(),'qq_login_observation':historical_status(ROOT,mode_state.get('instance_id')) if provider=='napcat' else {'state':'not_applicable'},'qq_login_state':qq_state,'process_state':phase,'mode':mode,'processes':counts,'channel':gate,'channel_state':channel,
             'can_receive_group_messages':bool(complete and gate.get('connected') is True and
                  gate.get('self_id_verified') is True and gate.get('online') is True and not gate.get('stopping') and
@@ -230,8 +232,14 @@ def show_status(report=None):
     phases={'stopped':'已停止','running':'组件在运行','partial':'组件不完整，请先关闭再启动'}
     channels={'waiting_login':'等待NapCat登录/QQ通道连接','connected':'QQ已连接',
               'disconnected':'QQ已断开或尚未连接','unknown':'登录状态未确认'}
+    if report.get('provider')=='snowluma':channels['waiting_login']='OneBot未接通；QQ登录状态未确认'
     print('项目：'+phases.get(report['process_state'],'启动中'))
     print('QQ通道：'+channels.get(report['channel_state'],'登录状态未确认'))
+    if report.get('provider')=='snowluma':
+        state=report.get('desktop') or {}
+        print('Snow管理页：'+('本机端口可达（不代表QQ已连接）' if state.get('webui_listening') else '尚未监听')+'；'+desktop.URL)
+        print('官方Snow/专用QQ：'+str(state.get('snow','未确认'))+' / '+str(state.get('qq','未确认')))
+        print('OneBot：'+('已连接且就绪' if report.get('channel',{}).get('channel_ready') is True else '未就绪'))
     print('登录层：'+report.get('qq_login_state','unknown'))
     startup=report.get('autostart')
     if startup:print('开机启动最近结果（历史）：'+startup['phase']+'/'+startup['reason'])
@@ -248,6 +256,7 @@ def show_status(report=None):
     if model.get('backend'):print('当前后端：'+model['backend']+'；模型：'+str(model.get('model'))+'；元数据：'+str(model.get('metadata',{}).get('state'))+'；本次状态查询0生成')
     if not model.get('alive'):print('模型：网关未运行/不可达，本次未推理探测')
     else:
+        print('模型活动：'+('处理中' if model.get('active') else '空闲' if model.get('active') is False else '未确认'))
         error=model.get('current_error')
         if error:print('模型：当前错误 '+error.get('code','UNKNOWN'))
         elif model.get('last_success'):print('模型：最近成功 '+time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(model['last_success'])))
@@ -262,7 +271,7 @@ def show_status(report=None):
     if report['process_state']!='stopped' and report['channel_state']!='connected':
         if report.get('provider','napcat')=='napcat':
             print(f'请在本机 {NAPCAT_URL} 完成登录，再查看状态；不会自动重启或调用模型。')
-        else:print('QQ传输尚未就绪：TRANSPORT_NOT_READY；请核对受管身份与私有运行前置。')
+        else:print('OneBot尚未就绪；请打开SnowLuma管理页，确认条款、选择专用QQ并登录/扫码，再查看状态。')
     return report
 
 
@@ -280,7 +289,7 @@ def stop_project(grace=5,*,expected_instance=None):
         entries=read_state()
         if not any(alive(e) is not None for e in entries):
             if startup_unknown(ROOT):raise RuntimeError('TRANSPORT_CREATION_UNKNOWN')
-            save([]);print('已停止。');return
+            save([]);print('已停止。');external_desktop_notice(mode);return
         if mode.get('provider')=='snowluma' and mode.get('transport_mode')!='official_onebot':
             try:control=prepare_stop_control(ROOT,mode,lease,process=psutil.Process)
             except (ValueError,OSError,KeyError,TypeError,psutil.Error):control_code='CONTROL_UNAVAILABLE'
@@ -299,7 +308,7 @@ def stop_project(grace=5,*,expected_instance=None):
             tasks=task_counts()
             if model.get('active') is False and not model.get('queue') and not any(tasks.get(k,0) for k in ('accepted','running')):break
             time.sleep(.1)
-        stop(entries)
+        stop_in_order(entries)
         if startup_unknown(ROOT):raise RuntimeError('TRANSPORT_CREATION_UNKNOWN')
         # Terminated tasks must never be replayed; preserve completed/send_unknown.
         path=ROOT/'state/tasks.sqlite'
@@ -310,6 +319,102 @@ def stop_project(grace=5,*,expected_instance=None):
             except sqlite3.Error:
                 raise RuntimeError('Project processes stopped, but interrupted task state update failed; inspect local task database before restarting') from None
         print('项目后台bot已关闭。')
+        external_desktop_notice(mode)
+
+
+def stop_in_order(entries):
+    official=[e for e in entries if e['component'] in desktop.COMPONENTS]
+    if not official:return stop(entries)
+    framework=[e for e in entries if e['component'] not in desktop.COMPONENTS]
+    try:stop(framework)
+    finally:save(read_state()+official)
+    # Snow exits before the interactive QQ instance. Preserve remaining QQ IDs
+    # even if Snow cleanup fails.
+    snow=[e for e in official if e['component']=='official_snow']
+    qq=[e for e in official if e['component']=='official_qq']
+    try:stop(snow)
+    finally:save(read_state()+qq)
+    stop(qq)
+
+
+def external_desktop_notice(mode):
+    if mode.get('provider')!='snowluma':return
+    try:
+        package,qq=desktop.paths(ROOT,loaded_settings(ROOT,mode))
+        if any(desktop.discover(package,qq).values()):
+            print('外部手动运行或身份未确认的Snow/QQ已保留；需要时请在其窗口正常退出。')
+    except (ValueError,OSError,psutil.Error):
+        print('未登记的Snow/QQ不会关闭；需要时请在其窗口正常退出。')
+
+
+def desktop_status(settings, entries):
+    package,qq=desktop.paths(ROOT,settings)
+    found=desktop.discover(package,qq)
+    def label(component):
+        if any(e['component']==component and alive(e) is not None for e in entries):return '脚本创建，运行中'
+        return '外部实例，保留' if found[component] else '未发现'
+    return dict(webui_listening=port_open(5099),snow=label('official_snow'),qq=label('official_qq'))
+
+
+def start_desktop(channel_only=False):
+    with configuration_lock(ROOT) as lease:
+        project=read_project(ROOT)
+        existing=read_state()
+        live=any(alive(e) is not None for e in existing)
+        # An existing framework keeps its actual loaded account/token/paths.
+        settings=loaded_settings(ROOT,service_mode()) if live else project.settings
+        if resolve_transport(settings)['provider']!=resolve_transport(project.settings)['provider']:
+            raise RuntimeError('运行实例与磁盘provider不同；请先关闭本根实例再启动。')
+        if resolve_transport(settings)['provider']=='napcat':
+            try:return _start_channel(full=not channel_only,lease=lease)
+            finally:print(f'\nNapCat 登录/管理：{NAPCAT_URL}')
+        package,qq=desktop.paths(ROOT,settings)
+        desktop.validate_package(package,qq)
+        gate=load_gate_config(root=ROOT,settings=settings)
+        plan=desktop.connection_plan(ROOT,settings,gate)
+        found=desktop.discover(package,qq)
+        # A registry identity remains decisive when command-line inspection is denied.
+        for component in desktop.COMPONENTS:
+            for entry in existing:
+                if entry['component']==component:
+                    process=alive(entry)
+                    if process is not None and all(p.pid!=process.pid for p in found[component]):found[component].append(process)
+        if found['official_snow'] and plan[3]:
+            raise RuntimeError('Snow已运行，目标OneBot连接需同步。请先在Snow窗口/管理页正常退出Snow（QQ可保留），再双击启动机器人.cmd；脚本会自动备份并同步，无需手填JSON/token。现有项目组件保持运行。')
+        if port_open(5099):
+            permitted=set()
+            for process in found['official_snow']:
+                permitted.add(process.pid)
+                permitted.update(p.pid for p in process.children(recursive=True))
+            listeners=[c for c in psutil.net_connections('tcp') if c.laddr and c.laddr.port==5099 and c.status=='LISTEN']
+            if not listeners or any(c.pid not in permitted or c.laddr.ip not in ('127.0.0.1','::1') for c in listeners):
+                raise RuntimeError('5099端口被未确认或非回环实例占用；请正常退出冲突程序后重试，脚本不会终止它。')
+        try:
+            desktop.publish_connection(plan)
+            _start_channel(full=not channel_only,lease=lease)
+            entries=read_state()
+            for component in ('official_qq','official_snow'):
+                if found[component]:
+                    print(('Snow' if component=='official_snow' else '专用QQ')+'已存在，复用且不接管外部身份。')
+                    continue
+                process=desktop.launch(component,package,qq,ROOT)
+                remember(entries,process,component)
+                capture(entries,process,component,time.time())
+                if component=='official_snow':
+                    desktop.wait_ready(process,lambda:port_open(5099),
+                        lambda:capture(entries,process,component,time.time()))
+            show_status()
+        except BaseException:
+            new=[e for e in read_state() if e not in existing]
+            try:stop_in_order(new)
+            finally:
+                survivors=[e for e in read_state() if e not in existing]
+                save(existing+survivors)
+            raise
+    desktop.open_page()
+    print('首次请在官方页面阅读/确认条款、登录管理页、选择本根专用QQ进程并扫码。')
+    print('管理账号/初始密码请双击“查看Snow本机日志.cmd”在本机查看；统一状态不显示密码。')
+    print('关闭此窗口不会停止机器人；请使用“关闭机器人.cmd”。')
 
 
 def check_port(port):
@@ -700,20 +805,25 @@ def intake_only(*, authorize, group, sender, max_events=1, timeout_seconds=120):
 
 def main():
     parser=argparse.ArgumentParser()
-    parser.add_argument('command',choices=['start-channel','start-text','stop','status','test','cleanup'])
+    parser.add_argument('command',choices=['start-desktop','open-snow','snow-log','start-channel','start-text','stop','status','test','cleanup'])
     parser.add_argument('cleanup_action',nargs='?',choices=['status','check','recover'])
     parser.add_argument('--no-pause',action='store_true',help=argparse.SUPPRESS)
     parser.add_argument('--json',action='store_true',help='metadata status as JSON')
+    parser.add_argument('--channel-only',action='store_true')
     parser.add_argument('--login-check-only',action='store_true')
     parser.add_argument('--login-diagnostics',action='store_true')
     parser.add_argument('--wait-login-seconds',type=int,default=0)
     args=parser.parse_args()
+    if args.channel_only and args.command!='start-desktop':parser.error('--channel-only requires start-desktop')
     if args.login_check_only and args.command!='start-channel':parser.error('--login-check-only requires start-channel')
     if not 0<=args.wait_login_seconds<=300:parser.error('--wait-login-seconds must be 0..300')
     if (args.login_diagnostics or args.wait_login_seconds) and args.command not in ('start-channel','start-text'):
         parser.error('login observation requires a start command')
     try:
-        if args.command in ('start-channel','start-text'):
+        if args.command=='start-desktop':start_desktop(channel_only=args.channel_only)
+        elif args.command=='open-snow':return 0 if desktop.open_page() else 1
+        elif args.command=='snow-log':return 0 if desktop.open_log(ROOT) else 1
+        elif args.command in ('start-channel','start-text'):
             start_channel(full=args.command=='start-text',paused=args.login_check_only,
                           login_diagnostics=args.login_diagnostics,wait_login_seconds=args.wait_login_seconds)
         elif args.command=='stop':stop_project()
