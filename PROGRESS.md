@@ -1,6 +1,6 @@
-2026-10-25（Asia/Shanghai）：**LAP-40日常启动入口已实现/离线通过，真实双击登录收发未验。** 双击启动自动按provider复用项目组件、准备目标OneBot、补启专用QQ/官方Snow并打开管理页；两个辅助按钮、中文分层状态和按创建身份安全关闭已交付。[使用说明](SnowLuma使用说明.md) / [交接与验证](tracks/laptop-workbuddy/tasks/LAP-40/HANDOFF.md)。
+2026-10-25 11:47（Asia/Shanghai，记录时间）：**LAP-40最小文字首试获用户现场确认通过。** 用户本会话确认“snowluma可以跑起来了，bot在qq群中已经可以回复了”。官方原版接入与日常入口已实现/离线通过；当前按用户确认记录实际启动与群内文字回复成功，不再把最小文字链列为未跑通。来源为用户反馈，本轮未另查模型/发送ACK原始追踪；未据此宣称停止、免扫码、其他功能或长稳完整验收。[使用说明](SnowLuma使用说明.md) / [交接与证据边界](tracks/laptop-workbuddy/tasks/LAP-40/HANDOFF.md)。
 
-工作根`E:/CodexWS/QQbot_Snowluma`、分支`codex/lap-40-snowluma`，session `LAP-40-desktop-entry-implementation`，起点本地/远端50a2240、工作区干净。只做本根代码/文档与临时根离线验证；未运行新入口、未启停当前实例、未打开真实登录页或修改实际Snow/local/persona/既有环境，0登录/真实模型/群/SSH。首次选择专用QQ、官方条款/管理页登录与扫码由用户亲自操作；不重装环境，不恢复B/C，不复核A4。
+工作根`E:/CodexWS/QQbot_Snowluma`、分支`codex/lap-40-snowluma`，本轮session `LAP-40-user-text-confirmation`，起点本地/远端1aabe532、工作区干净。仅同步5份文档，无代码/配置/local/persona或运行状态操作，无额外登录/模型/群/SSH/测试，不派代理或切模型。下一步日常使用，按实际出现的问题处理，不追加首试证明/长稳前置或自动推进其他功能；B/C停止，A4原样保留不复核。文档Git交付后停止。
 
 2026-10-24：LAP-39复发只读诊断/上游调研完成，当前故障未恢复。00:30仍进程/WS/缓存在线，最后准入23日22:29:36；bot自身状态失败、原生资料刷新10031ms超时，模型空闲/cleanup未阻断。全局o3=1与账号0不同，早期Hook实际读全局；改0仅候选，旧故障亦可能默认0，不能归因或保证。优先受控单变量试验，再补诊断/评估接入替换，均未执行；0代码/运行配置/启停/QQ登录/模型/群/SSH，仅5份文档。[调研与验证路线](tracks/laptop-workbuddy/tasks/LAP-39/RESEARCH.md) / [39交接](tracks/laptop-workbuddy/tasks/LAP-39/HANDOFF.md)。
 

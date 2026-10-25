@@ -1,3 +1,5 @@
+2026-10-25 11:47（Asia/Shanghai）：`LAP-40-user-text-confirmation`登记用户现场成功反馈的文档同步。用户确认SnowLuma可运行、bot已能在QQ群回复；证据来源为用户本会话说明，不新增真实查询、登录/模型/群试验。起点本地/远端均`1aabe5322b1238f2e30c842381359f990e070598`、工作区干净。仅归属PROGRESS.md、工作线HANDOFF.md/TASKS.md、LAP-40/HANDOFF.md/TRYOUT.md五份文档；登记后重读，不改代码/local/persona/其他根或A4，不启停/模型/群操作。同步后按长期授权交付文档并释放归属，不自动推进其他功能。
+
 2026-10-25 11:27（Asia/Shanghai）：session `LAP-40-desktop-entry-implementation`领取本项实施，起点本地/远端50a22401990f365aec591a00aab5acac5c75c67c，工作区干净。归属scripts/manage.py、src/qqbot_gateway/official_snowluma.py、启动机器人.cmd、scripts/Start-Bot.ps1、两个Snow辅助cmd、SnowLuma使用说明.md、tests/test_desktop_snowluma.py、PROGRESS及工作线HANDOFF/TASKS、LAP-40/HANDOFF/TRYOUT。补充归属.gitattributes及查看状态/关闭cmd的CRLF约束。实现与离线验证已完成，Git交付后释放归属；只做代码/临时根离线验证；不启停当前实例、不运行新入口、不写实际Snow/local配置、不登录/模型/群/SSH，不动A4及其他根。
 
 2026-10-25 11:18（Asia/Shanghai）：`LAP-40-desktop-launcher-plan`领取并完成日常启动入口补全规划。用户指出不会用Snow、缺少类似NapCat的启动脚本；本轮落详细计划和medium实施指令，不实施或真实启停。起点本地/远端均为`47342ac3691ce49c0b190949c0f7bb726d199e0f`，工作区干净。独占文档归属：PROGRESS.md、工作线HANDOFF.md/TASKS.md、LAP-40的HANDOFF.md/PLAN.md/TRYOUT.md/NEXT_SESSION.md，以及新增DESKTOP_PLAN.md/DESKTOP_MEDIUM_START.md。只读核对当前脚本/官方包接口与状态；不改代码、运行配置/local/persona或其他根，不安装/登录/模型/群操作，不派代理或切换模型。登记后重读；9文档408本地链接/22围栏/8段PowerShell语法及差异核对通过，无代码测试，文档Git交付后释放归属。
@@ -100,7 +102,7 @@ LAP-15内容提交`632fdc5`已推送origin/main，2026-10-17 11:09用ls-remote�
 
 | ID | 单一任务 | 状态与已有证据 | 依赖/推荐顺序 | 执行session | 下一步/完成出口 |
 | --- | --- | --- | --- | --- | --- |
-| LAP-40 | 官方原版SnowLuma最小文字接入/日常入口 | 接入和桌面入口已实现/离线通过，材料存在；[HANDOFF](tasks/LAP-40/HANDOFF.md) | 真实双击/登录/收发未验；B/C停止、A4未动 | LAP-40-desktop-entry-implementation，2026-10-25 11:27登记重读；Git交付后释放归属 | 用户双击启动，在官方页面确认条款、选择专用QQ/扫码；按[使用说明](../../SnowLuma使用说明.md)操作，不自动代为真实启停或群验收 |
+| LAP-40 | 官方原版SnowLuma最小文字接入/日常入口 | 接入/桌面入口已实现及离线通过；用户现场确认Snow可运行、QQ群可回复，最小文字首试通过；[HANDOFF](tasks/LAP-40/HANDOFF.md) | 用户确认与独立模型/ACK追踪分开；其他功能/长稳不晋升；B/C停止、A4未动 | LAP-40-user-text-confirmation，2026-10-25 11:47登记重读；本次仅文档，交付后释放归属 | 按[使用说明](../../SnowLuma使用说明.md)日常使用，按实际异常处理；不重复首试、不增证明/长稳前置、不自动推进其他功能 |
 | LAP-39 | 夜间不回复、配置保留与SnowLuma长期运行评估 | 既有修复/离线通过；复发诊断/SnowLuma调研完成；[HANDOFF](tasks/LAP-39/HANDOFF.md) / [评估](tasks/LAP-39/SNOWLUMA_ASSESSMENT.md) | 调研时旧迁移前置已被LAP-40官方OneBot决定取代；o3候选/QQ诱因与历史差额保留 | 历史LAP-39-SnowLuma-longrun-assessment，2026-10-24 00:53登记，调研已交付；不新增本轮39任务 | 迁移仅按LAP-40当前计划，不再补内部存储/过滤证明或以72h/7天阻挡首试；39历史证据不晋升为真实通过 |
 | LAP-38 | 识图/网页补证与个人微信接入详细规划 | completed，仅规划；[HANDOFF](tasks/LAP-38/HANDOFF.md)/[PLAN](tasks/LAP-38/PLAN.md)/[指令](tasks/LAP-38/IMPLEMENTATION_GUIDE.md) | 补18C/28R；微信独立先WX-01，旧36/验收差额保留 | LAP-38-vision-web-wechat-plan，2026-10-22 23:19领取、23:50规划收口；18份文档独占 | 公共网络/正文质量新证据、路径/激活合同与微信七份引导/hash交付；0代码/配置/模型/QQ/微信/SSH/启停，Git见交接 |
 | LAP-37 | 清理容量阻断修复/人工恢复与弃用自启 | 已实现/105项离线通过/停机现场恢复通过；[HANDOFF](tasks/LAP-37/HANDOFF.md) | 既有31/33合同修复，不自动解锁unknown | LAP-37-cleanup-capacity-recovery，2026-10-22 21:20；归属见交接 | blocked=false，bot停机；清理cmd可复用；自启弃用，真实运行/31B差额保留 |
