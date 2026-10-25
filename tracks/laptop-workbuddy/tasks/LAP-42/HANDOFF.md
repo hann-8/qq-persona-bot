@@ -1,8 +1,20 @@
 # LAP-42：Snow既有功能整合与B站退役
 
-返回[PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [AGENTS](../../../../AGENTS.md)。[详细PLAN](PLAN.md) / [完整medium指令](MEDIUM_START.md)。
+返回[PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [AGENTS](../../../../AGENTS.md)。当前[识图收尾详规](VISION_FINISH_PLAN.md) / [来源与推导](HOSTED_CLI_BUDGET_EVIDENCE.md) / [新medium指令](VISION_MEDIUM_START.md)；原[整合PLAN](PLAN.md) / [旧medium指令](MEDIUM_START.md)仅作上一轮历史合同。
 
-## 当前状态
+## 当前接续：只续42的DeepSeek识图
+
+session `LAP-42-hosted-vision-finish-plan`，2026-10-25 22:19（Asia/Shanghai）在TASKS登记7份文档并重读；开始本地/实时远端48f66bc192548184e4f88e23de6a357962bff85e，codex/lap-40-snowluma，Git无非忽略差异。不新建ID，不并领21或其他真实验收。
+
+本轮取得DeepSeek官方单图1024 token及固定tokenizer/encoder来源，锁定CLI有效容量/输出语义已只读核对；普通文本保守上界与模板额外项分开。发现hosted代码中的null窗口互斥、4096 token从30000字节中混扣（当前空prompt 25997>25904）、3字段CLI实际身份被8字段GGUF合同拒绝和旧offline报告路径。下一轮按新详规修项目外部接点、生成当前定向报告，做固定六例及最多两次人工群图闭环；没有换模型/抬预算或改Snow内部的授权。来源支持不等于实际IQ通过。
+
+独占文件：PROGRESS.md、工作线HANDOFF.md/TASKS.md、本HANDOFF及新VISION_FINISH_PLAN.md/HOSTED_CLI_BUDGET_EVIDENCE.md/VISION_MEDIUM_START.md，共7份Markdown。20项配置/persona/图库/pending与key/目录存在状态纳入保护。本轮只读代码/公开来源/纯预算函数和文档，不改运行代码/local/persona/图库/秘密，不安装/启停/登录/真实模型/QQ/群/SSH，不访问其他根或A4，不派代理/切模型。
+
+后续顺序为42识图收尾→独立21表情激活→已开记忆/关注/成员的人工效果验证；仅第一项展开合同，其他未领取、不作识图前置。用户下一轮发送[新medium段](VISION_MEDIUM_START.md)才授予其中列明的代码/0生成能力握手/固定6原生/最多2群图/条件单次补采样及受管加载；原MEDIUM_START不再整轮复用。
+
+22:43文档交付检查点：7份Markdown、218个本地引用、4行围栏、UTF-8/占位符/归属和git diff --check通过。20项保护状态前后相同（配置/persona/图库/pending摘要及key/目录存在状态；不声称运行中的记忆库内容不变）。代码测试未运行；真实CLI/模型/QQ/群、启停、安装、登录及SSH均未执行。已重读所有修改，源码与运行数据0修改；本地/实时远端基线仍48f66bc192548184e4f88e23de6a357962bff85e。仅提交这7份归属文档，最终本地/远端完整SHA见回执；核对后释放本规划归属并停止，不自动进入medium实施。
+
+## 上轮实际状态（本轮未重做）
 
 **可用部分已实施/离线通过/配置保存/运行加载；视觉按具体缺口交付，未称完整验收。** 记忆读取/学习、关注、成员与受控@已启用，字幕退役，最终OneBot就绪；vision仍false。[实际报告](../../../../reports/lap-42-2026-10-25.md)为完整结果。只领取42，未改Snow/QQ/CLI内部、模型/后端/账号/额度。Git交付核对后释放唯一执行归属并停止。
 

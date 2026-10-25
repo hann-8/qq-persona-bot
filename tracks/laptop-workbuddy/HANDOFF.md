@@ -4,6 +4,8 @@
 
 ## 当前状态
 
+**下一项已收敛为42当前DeepSeek识图收尾，详规已交付、未实施**：[详规](tasks/LAP-42/VISION_FINISH_PLAN.md) / [来源](tasks/LAP-42/HOSTED_CLI_BUDGET_EVIDENCE.md) / [新medium指令](tasks/LAP-42/VISION_MEDIUM_START.md)。已核对官方单图1024 token及固定tokenizer/模板来源，发现null窗口互斥、字节/token混扣和CLI/GGUF身份、旧报告接点问题。只修项目外层的hosted规则并做有界闭环，不改Snow/模型/预算数字，不重做已加载功能；本轮只读与7文档，没有真实操作。
+
 **LAP-42已实际交付可用部分**：[交接](tasks/LAP-42/HANDOFF.md) / [实际报告](../../reports/lap-42-2026-10-25.md)。记忆读取/学习、关注、成员与受控@已字段级保存并加载；字幕运行服务和入口已撤下。164单元、19项AstrBot原事件/实际runner底层替身场景通过，官方Snow强刷观察、独立token和失败退化接通。真实单图下载/解码成功，原生视觉预算/质量与图片群闭环仍未证，vision=false。模型/额度/free/web/memes及冷却0/0保留，未修改Snow/QQ/CLI内部，旧27/28/29/30差额保留。只领取42，交付后释放归属并停止。
 
 当前**LAP-21 Snow受控表情迁移准备已完成**，见[实际结果](tasks/LAP-21/SNOW_MIGRATION_RESULT.md)。7图已复制、7条原登记已锁内暂存；5 GIF+2 JPEG共4,100,086字节，候选7项/1134字节。目标既有停机检查为运行中，未激活/加载，活动catalog仍不存在；真实图片ACK/客户端显示/GIF均未验。生产代码修改0，local/persona及当前开关/冷却保持。20项合成回归及源稳定性/目标hash/幂等合并保护复核通过，Git交付后释放归属并停止。
@@ -14,7 +16,7 @@ LAP-41已完成新根整理：uv报告清除38,269缓存文件约626.1MiB、5份
 
 ## 当前需要读的文件
 
-- 当前：[42 HANDOFF](tasks/LAP-42/HANDOFF.md) → [整合计划](tasks/LAP-42/PLAN.md) / [medium指令](tasks/LAP-42/MEDIUM_START.md)，再读使用对照；原功能合同按需补读，不重跑接入或文字首试。
+- 当前：[42 HANDOFF](tasks/LAP-42/HANDOFF.md) → [识图收尾详规](tasks/LAP-42/VISION_FINISH_PLAN.md) / [预算来源](tasks/LAP-42/HOSTED_CLI_BUDGET_EVIDENCE.md) / [新medium指令](tasks/LAP-42/VISION_MEDIUM_START.md)，再读使用对照；原42整合合同只供历史参考，不重跑接入、文字首试或已加载功能。
 - 上轮：[21实际数据准备](tasks/LAP-21/SNOW_MIGRATION_RESULT.md)保留；active未激活/真实未验不阻塞42，42不动其pending。
 - 日常使用：[SnowLuma使用说明](../../SnowLuma使用说明.md)。
 - 旧NapCat用户：[实际bot使用对照](../../docs/BOT_USAGE_COMPARISON.md)。
@@ -32,11 +34,13 @@ NapCat旧根和旧C根不修改/启停；保留本根仍被导入的NapCat兼容
 
 ## 后续排序与含义
 
-用户最新范围覆盖旧排序：42先记忆/关注与B站退役，再成员外部适配和当前DeepSeek图片链，最后统一加载；一个能力缺口不拖住可独立部分。记忆无需先开成员/视觉；识图支持由用户确认，重点验证CLI像素输入/预算/质量与原群返回，不自动换后端。网页读取和搜索质量差额保持。
+上轮42记忆/关注/成员及字幕退役已实际交付，本轮后续排序：先42当前DeepSeek视觉外层预算/原生质量/群闭环；再独立续21激活既有7图/7条pending；最后少量人工验证已开记忆/关注/成员的真实效果。只展开第一项，其余未领取，不作视觉前置。识图支持由用户确认且本轮有官方来源，保持当前CLI/模型/low/账号/额度，网页读取和搜索质量差额保留。
 
 成员是小群名册候选/受控@，42已补官方只读强刷来源并保留1..49/双TTL/8项768字节/单cap/最多1受控@；缺来源、人数无效/大群只暂停增强。关注是free叫名/引用/短续聊，已加载，无新消息不主动发言。字幕专用网络/认证服务及vendor已删除，纯材料schema/选择函数和旧报告保留；旧专用报告脚本不适用于当前退役版本，不重跑。真实效果按42报告逐项保留，不能用开关/代码替代群验收。
 
 ## 本次归属与检查点
+
+2026-10-25 22:19（Asia/Shanghai），session `LAP-42-hosted-vision-finish-plan`登记并重读，起点HEAD/实时远端48f66bc192548184e4f88e23de6a357962bff85e，Git无非忽略差异。独占PROGRESS、本工作线HANDOFF/TASKS、42 HANDOFF及新VISION_FINISH_PLAN/HOSTED_CLI_BUDGET_EVIDENCE/VISION_MEDIUM_START共7文档。20项配置/persona/图库/pending及key/目录存在状态保护；不改运行数据/代码，不启停/模型/群，不读验A4或其他根。检查/Git见42交接，交付后释放归属停止。
 
 2026-10-25 16:32（Asia/Shanghai），LAP-42-snow-feature-rollout-plan登记并重读。起点HEAD/实时远端9bb1b58270dbcaa3c5e40c53f804d5e50c54449b，Git干净；7文档归属见42交接。20项本机保护状态纳入核对，当前只读/详规；交付后释放归属并停止。
 
