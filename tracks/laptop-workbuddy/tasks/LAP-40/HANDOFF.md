@@ -4,9 +4,13 @@
 
 ## 当前状态
 
-**项目侧已实现/上次离线合成通过；本轮交付只读复核与材料准备规划完成，真实未验，新根仍不能直接启动。** 官方原版SnowLuma现成OneBot经gate→AstrBot/router→既有gateway/CodeBuddy CLI；本轮必要调用未发现新增的基本文字收发代码阻断，不新增修复或测试任务。默认provider保持napcat，显式snowluma才走本路径。下一轮优先实际补环境和链路，功能恢复排在文字跑通之后，使用[NEXT_SESSION](NEXT_SESSION.md)；准确准备/启停/一次试用见[TRYOUT](TRYOUT.md)。
+**本轮实际材料准备已完成可独立部分；业务local缺失、腾讯QQ下载403/专用安装未完成，最小文字链仍未真实运行。** Python3.12.14及项目锁定依赖、本根AstrBot4.29.0工具环境/官方基础实例（dashboard回环6185）、官方Snow完整包和三个token已准备并本地核对。现有人设/版本锁原样保留，未用模板替代业务值；实际check/容量核对待用户配置。详细位置、验证、失败尝试、精确手工安装位置与最小待提供项见[MATERIALS](MATERIALS.md)。
 
-## 本轮只读复核
+session `LAP-40-material-preparation`，2026-10-25 10:45登记并重读；起点HEAD/远端4de910007b4fd221af7738a365992694c012e9c1，工作区干净。只改6份归属文档及本根忽略材料，不改接入代码/测试/local/persona/其他根。没有启停、登录、模型生成、群发或SSH；A4未复核/重跑/修改，B/C停止。完成准备后停止并释放归属；下一轮先补用户业务值和独立QQ，再按明确授权进入[TRYOUT](TRYOUT.md)，不得自动启动。
+
+以下保留上次复核/实现的历史证据，历史“缺环境”已由本轮[MATERIALS](MATERIALS.md)结果更新，不作为当前缺项。
+
+## 上轮只读复核
 
 session `LAP-40-official-review-preparation-plan`，2026-10-25 10:31登记后重读；工作根`E:/CodexWS/QQbot_Snowluma`、分支`codex/lap-40-snowluma`。本地HEAD和`git ls-remote --heads origin refs/heads/codex/lap-40-snowluma`均为`89b7dfae0efcd1949fe8289aa76ed1492bdfd8ab`，开始时`git status --short --branch`干净。本轮审阅该提交三个生产文件的差异及必要消费者/材料接口，不重读全部历史、不查询现有bot在线状态。
 
@@ -57,13 +61,11 @@ $env:ASTRBOT_DISABLE_METRICS='1'
 
 未运行A4矩阵、全量旧功能/极端竞态/性能/72h/7天；未安装、真实启停、登录/扫码、调用真实模型、发群或SSH。实际模型生成和目标群可见文字闭环未验，合成ACK不晋升为真实成功。
 
-## 实际准备差额及下一步
+## 当前准备差额及下一步
 
-本轮重新查实：`config/persona.md`存在；新根`.venv`、AstrBot可执行/框架Python/实例标记和基础配置、官方Snow launcher、专用QQ可执行、local/兼容单文件配置及token缺失。uv和锁定CodeBuddy程序材料可用，认证与真实模型未验。准确路径、安装/init、业务值/token交接和零模型预算核对见[TRYOUT](TRYOUT.md)，不从旧资格/长稳差额派生前置。
+本轮环境、基础实例、官方Snow与token准备结果见[MATERIALS](MATERIALS.md)。当前只剩用户业务配置、专用QQ下载/安装，以及业务值齐备后的本地check和容量核对；实际握手/生成/群ACK均未验。后续真实启停/登录/模型群答另由用户明确授权或亲自操作；不自动推进B/C或其他功能。
 
-交付后停止并释放本session归属；用户下一轮可按[NEXT_SESSION](NEXT_SESSION.md)授权medium实际准备环境、官方包、基础实例和已提供的业务值，不重复开发已完成接入。真实启动/登录/模型群答另由用户明确授权或亲自操作；只有实际握手、事件或ACK不兼容才做必要外部适配，必须修改Snow内部时才交具体阻断与外部尝试结果给用户决定。不自动推进B/C或其他功能。
-
-## 本轮文件与Git交付
+## 上轮文件与Git交付
 
 只改6份Markdown：PROGRESS.md、工作线HANDOFF.md/TASKS.md、本任务HANDOFF.md/TRYOUT.md及新增NEXT_SESSION.md。TASKS事先登记时间/归属并写后重读；未改生产代码、测试、模板、PLAN、AGENTS、local/persona、A4、Snow内部或其他工作根。未安装或执行任何测试/回归、启停、登录/扫码、模型/群/SSH操作；只读查官方文档/源码和文件元数据/非秘密程序摘要。文档检查及Git交付结果在最终交付消息与当前Git日志中核对，runtime/local/secrets不提交。
 

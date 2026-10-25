@@ -4,9 +4,9 @@
 
 ## 当前结论与授权边界
 
-10:31起只读复核：本地HEAD与远端分支均为`89b7dfae0efcd1949fe8289aa76ed1492bdfd8ab`，开始时工作区干净。必要接入调用未发现新增的基本文字收发代码阻断，详见[交接中的调用证据](HANDOFF.md#本轮只读复核)。7新专项、18gate、14生命周期共39项是上次离线/合成证据，本轮没有重跑或晋升为真实通过。
+本轮`LAP-40-material-preparation`已实际准备环境/官方基础实例、Snow完整包及token；腾讯QQ下载返回403、未安装，业务local缺失。结果、路径、完整性验证、手工操作和最小待提供项见[MATERIALS](MATERIALS.md)。接入代码仍为89b7dfae；本轮起点HEAD/远端为4de910007b4fd221af7738a365992694c012e9c1，工作区原先干净。39项仅上次离线合成证据，没有真实收发结果。
 
-**下一步优先实际补环境和链路。** 本轮仅复核和文档规划，以下命令全部未执行。下一轮粘贴[NEXT_SESSION](NEXT_SESSION.md)才授权材料准备；该准备授权与真实启动/登录、真实模型/群操作分开。
+**材料准备完成可做部分即停止。** 下面真实start-text/QQ/Snow及文字步骤均未执行，需要后续用户授权。当前环境已经存在，不能重复覆盖init/配置/local；以下准备命令仅作新建空环境复现参考。
 
 | 动作 | 下一轮材料准备指令的范围 | 仍需用户亲自操作或明确授权 |
 | --- | --- | --- |
@@ -17,21 +17,9 @@
 
 ## 当前材料实查
 
-只查有关文件存在性、非秘密程序摘要和本根人设字节量；不读原运行根配置或日常QQ/WorkBuddy登录资料，不查询在线服务。
+2026-10-25 10:49的实际结果以[MATERIALS](MATERIALS.md#已实际准备与核对)为准：本根Python/.venv、AstrBot工具与基础实例、官方Snow完整展开及三个token均已存在并本地核对；Node/CodeBuddy程序文件/摘要匹配。QQ下载失败/未安装；业务local和兼容单文件均缺失。人设19,256字节原样保留，模板16,384预算下正文差2,872、加2,048开销后至少差4,920，尚不含政策/请求封装；优先保留用户现用预算，待业务值后精确计算，不改人设或静默调参。
 
-| 材料 | 2026-10-25本轮结果与处理 |
-| --- | --- |
-| 项目Python | `.venv/Scripts/python.exe`缺失，根`uv.lock`存在；项目要求Python 3.12，不能使用PATH上的3.13代替 |
-| uv | PATH未找到uv，但`C:/Users/yutha/.local/bin/uv.exe`存在，可用绝对路径，无需先改全局PATH；本轮未运行它 |
-| AstrBot | `runtime/astrbot-bin/astrbot.exe`、`runtime/astrbot-tool/astrbot/Scripts/python.exe`、`runtime/astrbot/.astrbot`、`runtime/astrbot/data/cmd_config.json`及`data/plugins`均缺失；准备4.29.0隔离实例 |
-| 官方Snow/QQ | `runtime/snowluma/v2.1.1/launcher.bat`、`runtime/qq-snowluma/QQ.exe`缺失；旧材料报告不证明本根已具备，勿取私有A4产物 |
-| Node/CodeBuddy | `config/versions.lock.json`引用的Node、CLI入口和headless文件存在，headless SHA256与锁一致；不需要另装一套CLI。未验证登录、站点、额度或真实生成 |
-| 业务配置/token | `config/local/`、兼容`config/settings.local.yaml`、`secrets/local-tokens.json`均缺失；不能宣称继承了原根当前选择 |
-| 人设 | `config/persona.md`存在，UTF-8正文19,256字节，本轮未改；须保留，不能用短模板替换 |
-
-**模板预算不能直接沿用。** [新装models模板](../../../../config/examples/models.yaml)的CLI输入上限16,384，另计2,048开销；本根人设正文已超过该上限，拼接固定政策只会更大。[router的select_history调用](../../../../plugins/qq_router/main.py)（455行）进入[InputBudget.check](../../../../src/qqbot_gateway/token_budget.py)（53行）时会触发`INPUT_TOO_LONG`。这是“当前人设+新装默认配置”的确定不兼容，尚无本机配置，不能说已有运行配置存在此故障。准备时先保留用户现用预算；未提供或仍不够则只报告所需字节量与可选参数变更，由用户决定，不改人设、不静默调预算。无需新代码或测试任务。
-
-## 下一轮材料准备顺序
+## 材料准备复现参考（已存在的本轮材料不覆盖）
 
 1. 复核根、分支、HEAD/状态并登记session/文件归属。先补齐能独立准备的环境、官方包和框架基础实例，不因缺业务值退回纯规划。
 2. 用以下命令创建本根两个Python环境；uv工具、Python下载目录和缓存仅定向本根，不修改全局PATH或原运行根。每条外部命令非零即停止该步骤、保留错误；网络/包准备失败只处理实际错误，不改锁或自动升级后端。
@@ -45,13 +33,19 @@ $env:UV_PYTHON_INSTALL_DIR = "$taskRoot/runtime/python"
 $env:UV_PYTHON_BIN_DIR = "$taskRoot/runtime/python-bin"
 $env:UV_TOOL_DIR = "$taskRoot/runtime/astrbot-tool"
 $env:UV_TOOL_BIN_DIR = "$taskRoot/runtime/astrbot-bin"
-& $taskUv sync --frozen --python 3.12
+& $taskUv python install 3.12 --no-bin
+if ($LASTEXITCODE -ne 0) { throw 'Local Python preparation failed' }
+$taskPython = "$taskRoot/runtime/python/cpython-3.12.14-windows-x86_64-none/python.exe" # 本轮实得版本，先核对存在
+& $taskUv sync --frozen --python $taskPython
 if ($LASTEXITCODE -ne 0) { throw 'Project environment preparation failed' }
-& $taskUv tool install --python 3.12 --with 'PyYAML==6.0.3' --with 'markdown-it-py==4.2.0' 'astrbot==4.29.0'
+$taskLock = Get-Content "$taskRoot/config/versions.lock.json" -Raw | ConvertFrom-Json
+New-Item -ItemType Directory -Force "$taskRoot/runtime/downloads" | Out-Null
+$taskLock.astrbot.dependencies.psobject.Properties | ForEach-Object { '{0}=={1}' -f $_.Name,$_.Value } | Set-Content "$taskRoot/runtime/downloads/astrbot-constraints.local.txt"
+& $taskUv tool install --python $taskPython --constraints "$taskRoot/runtime/downloads/astrbot-constraints.local.txt" --with 'PyYAML==6.0.3' --with 'markdown-it-py==4.2.0' 'astrbot==4.29.0'
 if ($LASTEXITCODE -ne 0) { throw 'AstrBot environment preparation failed' }
 ```
 
-AstrBot独立工具环境也要能导入项目使用的yaml/markdown_it；安装到`.venv`不会使工具环境自动可见。依据[uv工具安装](https://docs.astral.sh/uv/guides/tools/)、[uv目录环境变量](https://docs.astral.sh/uv/reference/environment/)及[AstrBot 4.29.0包入口](https://github.com/AstrBotDevs/AstrBot/blob/v4.29.0/pyproject.toml)。这两条安装命令是已核对语法的待执行步骤，不是本根安装成功记录。
+AstrBot独立工具环境也要能导入项目使用的yaml/markdown_it；安装到`.venv`不会使工具环境自动可见。依据[uv工具安装](https://docs.astral.sh/uv/guides/tools/)、[uv目录环境变量](https://docs.astral.sh/uv/reference/environment/)及[AstrBot 4.29.0包入口](https://github.com/AstrBotDevs/AstrBot/blob/v4.29.0/pyproject.toml)。本轮已实际执行环境准备，显式绑定本根Python并用现有版本记录约束工具传递依赖，最终版本对照0差异；见MATERIALS。
 
 3. 仅对新建空AstrBot实例做官方初始化。`init --yes`建立`.astrbot`和data目录；它不保证单独生成`cmd_config.json`，所以再通过官方配置类生成基础配置并把dashboard约束到回环6185。现有实例若已出现，先检查归属并保留，不覆盖。
 
