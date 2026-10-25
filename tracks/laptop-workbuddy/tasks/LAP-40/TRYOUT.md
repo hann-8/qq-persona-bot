@@ -1,12 +1,12 @@
 # LAP-40 官方OneBot准备与一次文字试用
 
-返回[交接](HANDOFF.md) / [下一轮可复制指令](NEXT_SESSION.md) / [项目入口](../../../../PROGRESS.md)。2026-10-25，Asia/Shanghai。
+返回[交接](HANDOFF.md) / [当前medium实施指令](DESKTOP_MEDIUM_START.md) / [桌面入口计划](DESKTOP_PLAN.md) / [项目入口](../../../../PROGRESS.md)。2026-10-25，Asia/Shanghai。
 
 ## 当前结论与授权边界
 
-本轮`LAP-40-material-preparation`已实际准备环境/官方基础实例、Snow完整包及token；腾讯QQ下载返回403、未安装，业务local缺失。结果、路径、完整性验证、手工操作和最小待提供项见[MATERIALS](MATERIALS.md)。接入代码仍为89b7dfae；本轮起点HEAD/远端为4de910007b4fd221af7738a365992694c012e9c1，工作区原先干净。39项仅上次离线合成证据，没有真实收发结果。
+11:18最新只读实查：环境/官方Snow/token、专用QQ和local均存在，项目组件text running、gateway/router就绪，但gate尚未收到OneBot连接，CLI 0次。旧[MATERIALS](MATERIALS.md)的QQ/local缺项为10:49历史，不能据此重装/覆盖。现有`启动机器人.cmd`只起项目三组件，未启动QQ/Snow；中文状态还存在错误提示。用户不熟悉Snow，下一轮应按[DESKTOP_PLAN](DESKTOP_PLAN.md)/[medium指令](DESKTOP_MEDIUM_START.md)实际补日常入口，不能把下面的高级手工命令当成日常入口已经交付。
 
-**材料准备完成可做部分即停止。** 下面真实start-text/QQ/Snow及文字步骤均未执行，需要后续用户授权。当前环境已经存在，不能重复覆盖init/配置/local；以下准备命令仅作新建空环境复现参考。
+**桌面入口目前只完成规划，尚未实现。** 未来用户将双击同一启动/查看/关闭入口，脚本准备OneBot并打开管理页；首次用户只在官方网页确认条款、选择专用QQ并登录/扫码，不手填JSON/token。本轮没有启停、登录或模型/群操作；下面材料命令仅作空环境复现，高级手工方式保留给熟悉者。真实启停/接通后的模型群答仍需用户后续明确授权或亲自操作。
 
 | 动作 | 下一轮材料准备指令的范围 | 仍需用户亲自操作或明确授权 |
 | --- | --- | --- |

@@ -1,4 +1,6 @@
-# LAP-40 下一轮：先补环境和链路材料
+# LAP-40 旧材料准备指令（已完成）
+
+2026-10-25 11:18：以下材料准备任务已交付，QQ/local现也已存在，不再重复执行。本轮用户要求补日常启动入口，**当前下一轮请复制[DESKTOP_MEDIUM_START](DESKTOP_MEDIUM_START.md)**，按[DESKTOP_PLAN](DESKTOP_PLAN.md)实际落地脚本；下文仅为历史指令，不覆盖新合同。
 
 返回[项目入口](../../../../PROGRESS.md) / [当前交接](HANDOFF.md) / [操作步骤](TRYOUT.md)。2026-10-25，Asia/Shanghai。
 

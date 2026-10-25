@@ -1,14 +1,18 @@
 # LAP-40：官方原版SnowLuma最小文字接入
 
-返回[项目入口](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [任务台账](../../TASKS.md) / [计划](PLAN.md) / [准备与试用](TRYOUT.md) / [下一轮最小执行指令](NEXT_SESSION.md)。继承本根AGENTS，用户最新决定优先。2026-10-25，Asia/Shanghai。
+返回[项目入口](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [任务台账](../../TASKS.md) / [原OneBot计划](PLAN.md) / [准备与试用](TRYOUT.md) / [桌面入口计划](DESKTOP_PLAN.md) / [medium实施指令](DESKTOP_MEDIUM_START.md)。继承本根AGENTS，用户最新决定优先。2026-10-25，Asia/Shanghai。
 
 ## 当前状态
 
-**本轮实际材料准备已完成可独立部分；业务local缺失、腾讯QQ下载403/专用安装未完成，最小文字链仍未真实运行。** Python3.12.14及项目锁定依赖、本根AstrBot4.29.0工具环境/官方基础实例（dashboard回环6185）、官方Snow完整包和三个token已准备并本地核对。现有人设/版本锁原样保留，未用模板替代业务值；实际check/容量核对待用户配置。详细位置、验证、失败尝试、精确手工安装位置与最小待提供项见[MATERIALS](MATERIALS.md)。
+**官方接入和材料已交付，日常启动入口仍缺；详细补充计划已落盘，待medium实际实施。** 用户明确不知道怎么用Snow、期望类似NapCat的启动脚本。现有启动cmd只调用start-text、未拉起QQ/Snow，show_status误提示NapCat登录和私有运行前置；下步必须补双击启动/目标连接自动准备/打开官方管理页/准确查看和关闭，不能再只给手工命令。合同、文件/验证和回滚见[DESKTOP_PLAN](DESKTOP_PLAN.md)，复制[DESKTOP_MEDIUM_START](DESKTOP_MEDIUM_START.md)给medium实施。
 
-session `LAP-40-material-preparation`，2026-10-25 10:45登记并重读；起点HEAD/远端4de910007b4fd221af7738a365992694c012e9c1，工作区干净。只改6份归属文档及本根忽略材料，不改接入代码/测试/local/persona/其他根。没有启停、登录、模型生成、群发或SSH；A4未复核/重跑/修改，B/C停止。完成准备后停止并释放归属；下一轮先补用户业务值和独立QQ，再按明确授权进入[TRYOUT](TRYOUT.md)，不得自动启动。
+本轮session `LAP-40-desktop-launcher-plan`，2026-10-25 11:18登记重读，起点本地HEAD/远端`47342ac3691ce49c0b190949c0f7bb726d199e0f`、工作区干净。重新实查专用QQ/local/token均存在，旧MATERIALS的QQ/local缺项为10:49历史；上轮只读config check已通过。11:18本轮只读status：snowluma/text、项目running、gateway/router就绪、gate waiting_login/connected=false/channel_ready=false、CLI 0次、pending_restart=false；不是QQ未登录或真实文字成功的证明。不启停现有实例。
 
-以下保留上次复核/实现的历史证据，历史“缺环境”已由本轮[MATERIALS](MATERIALS.md)结果更新，不作为当前缺项。
+本次仅9份文档（PROGRESS、工作线HANDOFF/TASKS、本任务HANDOFF/PLAN/TRYOUT/NEXT_SESSION和新增DESKTOP_PLAN/DESKTOP_MEDIUM_START），未修改代码、测试、Snow包、运行配置/local/persona或其他根；未安装、启停、登录/扫码、模型/群/SSH，不派代理或切换模型。旧B/C停止，A4原样保留且未复核。下一轮用户选medium后按新指令实施代码与离线验证；真实首次启动/登录/模型群答仍由用户后续明确授权或亲自点击。Git交付后停止并释放归属。
+
+本轮文档检查：`git diff --check`通过；9文档408个本地链接、22个围栏标记、8段PowerShell语法解析通过（仅解析，未执行块中命令）。与47342ac相比scripts/src/plugins/tests/adapters/config/AGENTS及根cmd无差异；没有运行代码测试或A4。只提交本任务9份文档，提交号/远端SHA核对见最终交付和Git日志。
+
+以下保留上次材料/复核/实现历史，不能当当前缺项或当前进程状态；最新结论以上述实查与桌面入口计划为准。
 
 ## 上轮只读复核
 
@@ -63,7 +67,7 @@ $env:ASTRBOT_DISABLE_METRICS='1'
 
 ## 当前准备差额及下一步
 
-本轮环境、基础实例、官方Snow与token准备结果见[MATERIALS](MATERIALS.md)。当前只剩用户业务配置、专用QQ下载/安装，以及业务值齐备后的本地check和容量核对；实际握手/生成/群ACK均未验。后续真实启停/登录/模型群答另由用户明确授权或亲自操作；不自动推进B/C或其他功能。
+旧环境准备结果见[MATERIALS](MATERIALS.md)，QQ/local现已存在，不再按历史缺项重复安装。当前缺口是普通用户的桌面启动/配置/状态/关闭入口，按[DESKTOP_MEDIUM_START](DESKTOP_MEDIUM_START.md)实际补齐；上次39项仍仅离线合成证据，本轮未重跑。真实握手/生成/群ACK和QQ会话保留尚未验证，不自动推进B/C或其他功能。
 
 ## 上轮文件与Git交付
 
