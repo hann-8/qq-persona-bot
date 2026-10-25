@@ -1,0 +1,87 @@
+# 旧NapCat bot与当前SnowLuma bot：实际使用对照
+
+返回[项目入口](../PROGRESS.md) / [日常操作](../SnowLuma使用说明.md) / [本次整理交接](../tracks/laptop-workbuddy/tasks/LAP-41/HANDOFF.md)。核对日期：2026-10-25，Asia/Shanghai。
+
+这里比较的是你已经使用过的 `E:/CodexWS/QQbot` 和当前 `E:/CodexWS/QQbot_Snowluma` 里的bot，依据两边实际配置、最近启动快照、共用源码和本机资产，不比较框架宣传功能。
+
+## 先看结论
+
+聊天习惯大体可以照旧：两边保存的模型/参数、free参与、分条/历史等设置一致，persona文件内容也完全相同。9个共用业务源文件逐文件相同；router额外差异用于Snow连接/状态适配。换接入没有把bot换成另一套聊天大脑。
+
+你现在最需要适应四件事：
+
+1. 登录和管理入口换到Snow网页；首次要选择专用QQ进程，日常已有双击脚本负责拉起组件和准备连接。
+2. 两个工作根各自保存会话/状态，不会自动延续旧聊天。
+3. 旧根有7条表情登记，新根是0条；因此现在发不出原来的那批受控表情。这是资产未迁移，不是Snow不能发图。
+4. Snow另外带有#sl状态答复；它不是bot的人设/模型答复。
+
+## 日常使用中哪些不同
+
+| 你关心的事情 | 旧NapCat bot | 当前Snow bot | 对你的影响 |
+| --- | --- | --- | --- |
+| 双击启动 | 原根的脚本启动NapCat及共用bot组件 | 新根同名脚本复用/启动bot组件，再补专用QQ和官方Snow、准备账号连接、打开管理页 | 以后从新根启动；不要同时开两套来碰同一QQ和端口 |
+| 首次登录 | 主要使用原NapCat管理页完成QQ登录 | 在Snow官方页面选择本根专用QQ进程并登录/扫码 | 首次多一个选进程动作，连接JSON/token由脚本准备 |
+| 管理页面 | 原来是6099的NapCat页面 | 本根是5099的Snow页面，并有管理页/本机日志按钮 | 管理网页登录与QQ账号登录仍是两件事 |
+| 群里怎么叫它 | 既有free：普通新消息可以被考虑，真实@进入回应流程 | 相同free规则，attention增强仍关闭 | 仍可直接聊天或真实@；普通消息未回复不一定是掉线 |
+| 答复的模型/人设 | CodeBuddy/deepseek-v4.1-flash，现用人设 | 相同模型、同内容人设和参数配置 | 不应仅因换Snow就期待更聪明或人设改变；旧上下文缺失可能影响续聊 |
+| 分条/语气 | adaptive，最多3条、闲聊总80字，单次模型尝试 | 配置与共用发送逻辑相同 | 继续按原方式闲聊；不是每次都一定分满3条 |
+| 临时停言与真实@恢复 | 既有功能已开 | 同一业务功能已开 | 用法不变；不在本轮重复群验收 |
+| 私聊/群范围与屏蔽 | 项目私聊关闭，入口授权群；当前内部blocked列表为空 | 同样；用户决定以QQ客户端拉黑处理账号屏蔽 | 不新增内部过滤要求；官方额外状态命令另见下节 |
+| 对话历史 | 留在原根AstrBot/state等数据中 | 当前新根自己的数据；没有指向旧根的数据目录链接 | 不自动接续旧对话；“16轮”是读取上限，不代表旧历史已经迁入 |
+| 受控表情 | 本机登记7条 | enabled=true，但登记文件不存在、0条 | 当前没有旧表情可供bot选择，本轮不复制图库或重新生成登记 |
+| 网页材料 | web=true，既有URL/明确请求的材料读取 | 相同开关、同一正文提取/预算逻辑 | 可沿用原使用方式；不是通用联网搜索已经验收通过 |
+| B站/识图/群记忆/成员增强 | 这次核对的配置里都关闭 | 同样关闭 | 不会因为Snow协议支持媒体/名册就自动可用 |
+| 查看是否能回复 | 原项目状态/入口链路 | 新状态额外分开显示Snow进程/管理页和OneBot就绪，检查online+good及45秒状态新鲜度 | “组件运行/网页打开”不等于bot能回；也不能据此保证更长稳 |
+| 关闭 | 旧管理器按登记身份处理原组件 | 先停bot入口/模型/框架，再Snow再专用QQ；仅限脚本创建且身份匹配的实例 | 手工启动或外部实例会保留，需要从对应窗口正常退出 |
+| 是否更稳定/免扫码 | 曾有旧根故障与现场恢复记录 | 用户已确认当前Snow能跑、群内可回复 | 这不是长稳或免扫码对比试验，目前不能下“已彻底解决”的结论 |
+
+旧根只读，没有启动/登录/模型/群查询；“最近启动快照”是磁盘保存值，不当成当前在线证明。本轮也没有为比较另外发消息。
+
+## Snow的#sl要单独理解
+
+本根官方账号配置未覆盖statusCommand，原版v2.1.1默认enabled=true、trigger=#sl、swallow=false。单条纯文字#sl可能由Snow原版直接回复运行状态，这条官方状态答复不经过本项目CodeBuddy人设链。
+
+因此：
+
+- 它出现时不等于AI聊天正常，也不代表bot理解了你的话。
+- 项目的私聊关闭、授权群和临时停言约束AI项目路径，不能自动套用于这条官方内置答复路径；此结论来自本机原版代码，未发群/私聊实测。
+- 当前swallow=false，原消息仍可能继续进入OneBot。free模式下项目也可能考虑同一条新消息，所以不能承诺整个#sl操作一定0模型调用。想做0生成状态查询，用“查看状态.cmd”。
+
+本轮只记录这个已存在的行为，没有禁用、修改或另建原生过滤/证明系统。
+
+## 当前共同设置
+
+以下是非秘密字段的本轮只读结果，两边磁盘设置及最近启动快照一致；没有打印账号/群号/token。
+
+| 项目 | 两边当前保存值 |
+| --- | --- |
+| 后端 / 模型 | codebuddy_cli / deepseek-v4.1-flash |
+| 推理参数配置 | low；沿用现有CLI下发方式，本次没有独立追踪远端实际档位 |
+| 输入/开销/输出预留 | 30000 / 2048 / 2048；为项目可见UTF-8保守预算，非原生token窗口或credits承诺 |
+| 单次运行期限 | 90秒 |
+| 参与模式 / attention | free / false |
+| 临时停言 | true |
+| 回复方式 | adaptive，最多3条；闲聊总80字符，max_reply_chars=1200 |
+| 历史上限 / 同人冷却 | 16轮 / 1秒；实际历史会受预算裁剪 |
+| web / memes | true / true；memes还依赖各根实际图库 |
+| B站字幕 / 视觉 / 成员增强 | false / false / false |
+| 长期群记忆 / 学习 | false / false |
+| 私聊 | false |
+| persona | 两边均19,256字节，SHA256一致；未在文档复制正文 |
+
+授权账号/群/管理员等私人列表只在内存读取，未展示或迁移；本表没有声称两边所有私人列表逐项完全一致。
+
+## 目前哪些是“已用过”，哪些只是开关相同
+
+- 旧NapCat bot：你已使用过一段时间，旧真实记录继续保留在原任务/报告中。
+- Snow bot：你已现场确认可启动且QQ群可回复，LAP-40最小文字首试按用户确认成功。
+- 本轮：只读比较配置/源码/资产并整理工作区；没有重新验证分条、停言、网页或表情的真实闭环，不把“代码相同/开关打开”写成这些功能已在Snow逐项通过。
+- 新旧根的聊天库/群记忆/图片、QQ会话均不自动合并。是否把原7条表情及对应资产带过来，或迁移会话，留给你后续明确选择。
+
+## 查证位置
+
+共用业务：[模型网关](../src/qqbot_gateway/model_gateway.py)、[CLI runner](../src/qqbot_gateway/workbuddy_cli_runner.py)、[参与策略](../src/qqbot_gateway/participation.py)、[人设拼接](../src/qqbot_gateway/persona.py)、[回复发送](../src/qqbot_gateway/reply_delivery.py)、[会话队列](../src/qqbot_gateway/session_queue.py)、[群记忆](../src/qqbot_gateway/group_memory.py)、[网页材料](../src/qqbot_gateway/web_retrieval.py)、[B站策略](../src/qqbot_gateway/bilibili_policy.py)，这9份与旧根文件内容一致。
+
+接入差异：[manage](../scripts/manage.py)、[官方桌面包装](../src/qqbot_gateway/official_snowluma.py)、[OneBot gate](../src/qqbot_gateway/onebot_gate.py)、[router](../plugins/qq_router/main.py)。表情依据[MemeCatalog](../src/qqbot_gateway/meme_catalog.py)及两根登记数量。
+
+官方#sl依据本根原版 `runtime/snowluma/v2.1.1/index.mjs` 的DEFAULT_STATUS_COMMAND、handleStatusCommand/replyStatus；这是忽略的本机安装文件，不提交或复制其源码。历史观察与当前使用边界见[LAP-40交接](../tracks/laptop-workbuddy/tasks/LAP-40/HANDOFF.md)和[旧NapCat观察](../tracks/laptop-workbuddy/tasks/LAP-39/HANDOFF.md)。

@@ -1,0 +1,206 @@
+> 历史快照：2026-10-25 LAP-41整理前，来源 项目目录与日志说明.md，基线3d3361e。仅供追溯；当前入口见[PROGRESS](../../../PROGRESS.md)。相对链接已按新位置调整。
+
+# 项目目录与日志说明
+
+项目位置：`E:\CodexWS\QQbot`。按2026-10-18本机目录和源码核对。
+
+这份文档用于查找文件和排查故障；项目进度仍以[PROGRESS.md](../../../PROGRESS.md)为唯一入口，使用方式见[README.md](../../../README.md)。新增或移动一级目录、调整日志路径时，应同步更新本文件。运行数据会随使用变化，下面按用途归类，不枚举每份临时文件或第三方软件的内部目录。
+
+## 先回答：机器人有日志吗？
+
+有。最常用的是根目录下的 **`logs/`**。排查“模型进程清理未确认完成”，优先看 **`logs/model.log`**，再看 **`state/cli-cleanup/`** 的状态。
+
+| 文件 | 记录哪一层 | 适合查什么 |
+| --- | --- | --- |
+| `logs/model.log` | 模型网关、CLI请求及清理诊断 | 模型请求有没有开始、错误码、清理失败、台账文件操作失败 |
+| `logs/gate.log` | QQ与AstrBot之间的入口网关 | QQ连接/断开、入口状态写入失败 |
+| `logs/astrbot.log` | AstrBot进程与框架 | 启动退出、框架错误；详细上游文本可能被抑制 |
+| `logs/napcat.log` | 项目管理器接收的NapCat进程输出 | NapCat启动退出、进程级异常；不保证包含WebUI里看到的所有记录 |
+
+这些文件由`scripts/manage.py`以追加方式接收进程输出，重启通常不会清空，所以要按故障时间查找。本项目的`scripts/process_host.py`会过滤上游输出，只放行固定格式的诊断元数据；**这里不是完整的群聊天记录，也不是模型原始输入/输出记录**。启动源码当前将NapCat独立文件日志关闭、控制台级别设为warn；AstrBot独立文件/追踪日志关闭、级别设为ERROR。用户从NapCat界面导出的日志，内容范围可能与`logs/napcat.log`不同。
+
+## 目录层级与用途
+
+```text
+QQbot/
+├─ 项目目录与日志说明.md      本文：找目录、找日志
+├─ PROGRESS.md               唯一项目进度入口
+├─ README.md                 操作、配置、能力与限制
+├─ AGENTS.md                 agent协作、权限、Git和验证规则
+├─ 启动机器人.cmd            日常启动入口
+├─ 关闭机器人.cmd            日常关闭入口
+├─ 查看状态.cmd              日常状态入口
+├─ 清理模型阻断.cmd          停机后的显式核验/备份归档恢复
+├─ 开机启动机器人.cmd        已弃用，仅提示手动启动
+├─ pyproject.toml            项目Python版本、依赖声明
+├─ uv.lock                   锁定依赖版本
+├─ .gitignore                本机数据/隐私文件的Git排除规则
+├─ info.txt                  本机旧资料，已忽略；不是配置入口
+│
+├─ assets/                   项目资源
+│  └─ memes/                 受控表情图库
+│     ├─ inbox/              操作者放入待登记图片
+│     └─ library/            登记后的内容哈希图片库
+├─ config/                   配置、默认模板、角色正文和能力约束
+│  ├─ README.md              配置文件总索引；关闭→编辑→正常启动
+│  ├─ examples/              bot/models/chat/features/runtime五份中文注释模板
+│  ├─ local/                 同名五份本机配置，整个目录Git忽略
+│  ├─ settings.example.yaml  旧单文件兼容模板
+│  ├─ settings.local.yaml    未迁移旧入口；迁移后只作回退备份
+│  ├─ persona.md             角色正文；访问控制另由代码强制
+│  ├─ memes.example.yaml     表情目录模板
+│  ├─ memes.local.yaml       本机图片标签/启用目录，Git忽略
+│  ├─ versions.lock.json     第三方组件版本记录
+│  └─ cli-*.json / mcp-empty.json
+│                            CLI能力、工具拒绝与隔离材料
+├─ docs/                     全局需求与调研
+│  ├─ REQUIREMENTS.md        需求与边界
+│  └─ RESEARCH.md            技术路线调研
+├─ logs/                     四个主要组件的运行日志（见上表）
+├─ plugins/                  本项目维护的AstrBot插件源码
+│  └─ qq_router/             消息路由、provider适配和插件元数据
+├─ reports/                  各任务的检查报告、离线测试结果JSON
+├─ runtime/                  本机运行依赖、第三方程序和运行实例
+│  ├─ astrbot/               独立AstrBot实例工作目录
+│  │  └─ data/               该实例配置、数据库、插件副本等
+│  │     ├─ plugins/         启动配置时由plugins/复制的插件
+│  │     ├─ config/          框架/插件配置
+│  │     ├─ attachments/     框架附件目录
+│  │     ├─ temp/            框架临时数据
+│  │     └─ 其他框架目录      如webchat、skills、knowledge_base等
+│  ├─ astrbot-bin/           AstrBot启动程序
+│  ├─ astrbot-tool/          AstrBot工具/框架Python环境
+│  ├─ napcat/installer/      本项目使用的NapCat安装包/程序
+│  ├─ python/               项目使用的本机Python运行时
+│  ├─ tools/                辅助工具
+│  ├─ downloads/            下载工件
+│  ├─ requests/             请求暂存；可能含请求材料
+│  ├─ uv-cache/             依赖下载/安装缓存
+│  └─ g0/                   早期可行性验证的隔离运行工件
+├─ scripts/                  启停、配置、诊断、验证脚本
+│  ├─ Start-Bot.ps1 / Stop-Bot.ps1 / Show-BotStatus.ps1
+│  │                         cmd入口调用的PowerShell包装
+│  ├─ manage.py             受管进程生命周期、状态、cleanup诊断
+│  ├─ process_host.py       托管子进程并过滤日志
+│  ├─ configure_bot.py      无参索引；图库/记忆/凭据/连接显式管理动作
+│  ├─ config_files.py        check/init/migrate/export-legacy/rollback-layout
+│  ├─ configure_astrbot.py  准备隔离AstrBot实例、复制插件
+│  ├─ observe_lap28.py      受门槛约束的视觉能力验证入口
+│  └─ verify_*.py / probe_*.py / g0_*.py / Test-Bot.ps1
+│                            验证或探测；用途不同，不能一概当健康检查
+├─ secrets/                  本机令牌、家庭访问资料与受保护凭据
+├─ src/                      本项目主要Python源码
+│  └─ qqbot_gateway/         入口过滤、模型、群调度、发送及状态逻辑
+├─ state/                    持久状态、任务数据库、身份台账和验证工件
+│  ├─ cli-cleanup/          CLI请求清理台账
+│  │  ├─ unresolved.json    尚未可靠结清的请求；存在时须检查阻断状态
+│  │  └─ resolved-*.json    已解决请求摘要，最多保留32份
+│  ├─ meme-delivery/        表情发送回执/未决状态
+│  ├─ meme-preview/         本机图库预览网页/工件
+│  ├─ config-runtime/       实例配置快照/摘要，程序维护，禁止手改
+│  ├─ config-backups/       配置迁移/导出/回滚备份及阶段记录
+│  ├─ persona-backups/      角色正文备份
+│  ├─ gate.sqlite           QQ入口事件/回执等去重状态
+│  ├─ tasks.sqlite          业务任务、历史与投递状态
+│  ├─ managed-processes.json
+│  │                         项目受管进程PID及创建身份
+│  ├─ service-mode.json / stop-request.json
+│  │                         当前实例模式/停止准入标记
+│  ├─ gate-connection.json / router-ready.json
+│  │                         通道连接和插件就绪元数据
+│  └─ lap* / *scratch* / *framework* 等
+│                            历次本机验证日志、临时目录或结果
+├─ tests/                    自动化测试源码；离线替身不代表真实QQ验收
+├─ tracks/                   按工作线组织的规划、台账和交接
+│  ├─ laptop-workbuddy/      笔记本与共用网关工作线
+│  │  ├─ HANDOFF.md         工作线交接
+│  │  ├─ TASKS.md           任务领取/归属与验收差额
+│  │  ├─ ACCEPTANCE.md      验收合同
+│  │  ├─ IMPLEMENTATION_PLAN.md / UX_PLAN.md
+│  │  │                     工作线早期实施/体验规划
+│  │  └─ tasks/LAP-xx/      各任务HANDOFF及按需存在的PLAN/SPEC/指引
+│  └─ local-5070/           家庭5070工作线交接、选型与部署规划
+├─ .venv/                    项目网关Python虚拟环境
+└─ .git/                     Git版本库内部数据
+```
+
+某些目录按功能使用后才创建：例如根`cache/`、`state/config-exports/`以及临时导入状态；本次根目录未见`cache/`。`__pycache__/`是Python自动生成的字节码缓存，可出现在源码、脚本、测试等目录内，不是业务源码。
+
+`runtime/astrbot/data/`里的目录名表示框架预留位置；目录存在不能证明知识库、附件理解、技能或长期记忆已经启用。`runtime/requests/`也不能据目录名推断当前视觉实现会落图；现有视觉材料按合同在RAM处理。
+
+## 源码按什么分工？
+
+| 位置或模块 | 作用 |
+| --- | --- |
+| `onebot_gate.py`、`event_guard.py` | QQ事件入口、授权群/黑名单、连接与回执保护 |
+| `plugins/qq_router/` | AstrBot消息路由与本地provider对接 |
+| `model_gateway.py`、`session_queue.py` | 请求接收、排队、后端调用、会话隔离 |
+| `workbuddy_cli_runner.py`、`cli_control.py` | CodeBuddy CLI启动及协议控制 |
+| `cleanup_identity.py` | 按PID和创建时间清理、未决台账、清理诊断 |
+| `ollama_ssh_runner.py`、`ssh_transport.py` | 固定连接/指纹的家庭模型通道及未知结果保护 |
+| `participation.py`、`attention.py`、`turn_v2.py` | 群参与、关注/续聊、一次请求材料协议 |
+| `reply_plan.py`、`reply_delivery.py`、`task_store.py` | 回复规划、逐条发送/ACK、持久化任务状态 |
+| `persona.py`、`token_budget.py`、`turn_budget.py` | 角色规则组合、输入和回合预算 |
+| `web_*.py`、`vision.py`、`members.py` | 联网、图片材料、小群成员能力；实际可用须看任务验收状态 |
+| `meme_*.py`、`media_protocol.py` | 受控表情图库、导入、媒体/成员等typed输出协议 |
+| `config.py`、`lifecycle.py`、`napcat_login*.py` | 配置校验/锁、实例标记和独立登录回退边界 |
+
+## 遇到故障时怎么查？
+
+在项目目录打开PowerShell。先记录故障发生时间，再执行只读状态命令：
+
+```powershell
+Set-Location -LiteralPath 'E:\CodexWS\QQbot'
+.\.venv\Scripts\python.exe -X utf8 scripts/manage.py status --json
+.\.venv\Scripts\python.exe -X utf8 scripts/manage.py cleanup status
+Get-Content -LiteralPath .\logs\model.log -Tail 100
+Get-Content -LiteralPath .\logs\gate.log -Tail 60
+```
+
+只筛选清理相关诊断：
+
+```powershell
+Select-String -LiteralPath .\logs\model.log -Pattern 'CLI_CLEANUP|CLEANUP_FAILED'
+```
+
+`cleanup status`只读台账，不调用模型、不kill。另一个已有命令`cleanup check`会被动检查已登记进程身份，并可能写回检查时间/状态；它不kill、不生成或补发，**也不是解锁命令**。健康与状态检查不消耗模型生成额度。
+
+| 现象 | 优先看哪里 |
+| --- | --- |
+| 启动失败或某进程退出 | 对应组件log；配置准备失败另查`runtime/astrbot/configure-error.log` |
+| QQ没连接、断线、消息进不来 | `gate.log`、`napcat.log`、查看状态；必要时补NapCat界面导出 |
+| 模型没有开始、超时或拒绝请求 | `model.log`中的REQUEST/CLI事件与错误码 |
+| “模型进程清理未确认完成” | `model.log`的CLI_CLEANUP/CLI_CLEANUP_IO、`cleanup status` |
+| 发送结果未知或部分发送 | 任务/发送回执诊断；不要重放或直接改数据库 |
+
+主要组件日志经脱敏过滤，定位时提供故障前后片段、时间、错误码、随机trace和`cleanup status`即可。NapCat导出及数据库可能包含私密群消息、标识或带签名URL，分享前须脱敏；不要整包发送`state/`、`runtime/`、`secrets/`或本机配置。
+
+## 2026-10-22再次阻断：原因与恢复
+
+10月21日19:08:04的请求生成成功，但累计128条子进程身份触发capacity_exceeded，未决记录跨重启继续阻断；这次与旧I/O故障原因不同。已修复为容量满时回收系统确认退出的条目，存活/未知身份不丢弃，真实超限继续阻断。`uv.lock`是依赖版本锁，不负责运行状态。
+
+先关闭bot，再双击根`清理模型阻断.cmd`（或`manage.py cleanup recover`）。仅在所有登记身份退出、6185/6199/6200/6099/8765关闭时执行；持配置锁、严格账本校验、原始字节备份/SHA256核验、归档到忽略的`state/cli-cleanup-manual-archive/`。不kill、不重发、不改历史/ACK/unknown；失败不移除活动记录。此为用户选择的observed_only人工恢复，不能当作31B完整后代证明。
+
+本次已实际执行，blocked=false、bot保持停止，任务计数不变。详见[LAP-37交接](../../../tracks/laptop-workbuddy/tasks/LAP-37/HANDOFF.md)。
+
+## 2026-10-18历史“重启也不恢复”的核对结果
+
+2026-10-18只读检查得到：
+
+- `logs/model.log`在23:00:52记录一次**原生成成功**，但清理诊断出现`ledger_error`，随后持续`CLEANUP_FAILED`。这不是模型生成文本中的一句话，而是项目固定错误提示。
+- `state/cli-cleanup/unresolved.json`仍在；`cleanup status`返回`blocked=true`。重启会读取未决台账继续阻断，所以重启并不等于清除故障。
+- 当时日志的`observed_empty/observed_only`只表示已观察集合的结果，不能证明所有后代完整退出；后续台账检查类别也不能替代初次文件错误的证据。
+- 用户提供的NapCat日志包含该提示的收发及连接信息，有辅助价值，但没有模型清理阶段的操作/OS错误。初次失败的具体文件操作和系统错误类别在旧日志中缺失。
+
+本轮[LAP-32调试](../../../tracks/laptop-workbuddy/tasks/LAP-32/HANDOFF.md)在临时目录复现了Windows读句柄导致原子替换/删除失败的路径，为清理台账加入受总期限约束的最多3次文件操作尝试，并增加`CLI_CLEANUP_IO`固定诊断，区分写未决台账、轮换摘要、写摘要和删除未决文件。**这能处理已复现的临时文件冲突，但不能据此断言现场原始原因已唯一确定，或真实bot已经恢复。** 新诊断随正常重启加载代码后生效。
+
+已有未决记录继续保留；本轮不删除台账、不切后端绕过，也不把LAP-31B尚未完成的完整退出/恢复能力标成已交付。当时要求的完整自动恢复仍需补足完整退出证据（19日已单次人工恢复，22日新故障处理见上节），详见[LAP-31交接](../../../tracks/laptop-workbuddy/tasks/LAP-31/HANDOFF.md)。
+
+## 哪些属于本机数据？
+
+`logs/`、`state/`、`runtime/`、`secrets/`、`.venv/`以及按需创建的根`cache/`均由Git忽略；`config/local/`、`config/settings.local.yaml`、`config/memes.local.yaml`、真实表情图片也忽略。源码、配置模板、文档、测试及经过检查的报告才是通常的Git交付内容。
+
+“Git忽略”不代表可以随意删除：`state/`含unknown和回执保护，`runtime/astrbot/data/`含实例数据库/配置，`secrets/`含本机访问材料。清理磁盘或恢复运行前，应先识别内容与任务归属；不要按目录名把运行数据整包清空。
+
+
+LAP-35临时停言：授权群普通成员明确要求bot停言后，本群无确认输出，下一条非黑名单原始真实@恢复；同条@停言优先。gate/完整bot重启复位，网络/插件/model重连保持；已提交消息不能撤回，旧结果失效。唯一设置 `participation.silence.enabled` 默认true，位于chat.yaml，下一次正常启动生效；当前只离线交付，未改本机配置或加载。详见[配置索引](../../../config/README.md)。忽略的 `state/gate-connection.json` 包含boot与散列群代际诊断镜像，主状态只在RAM，启动不读镜像恢复，不含原话/门票；不能拿停言/重启清除原unknown/cleanup台账。

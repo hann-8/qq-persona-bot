@@ -1,6 +1,5 @@
 # Windows cmd must parse UTF-8 messages with CRLF line endings.
 /清理模型阻断.cmd text eol=crlf
-/开机启动机器人.cmd text eol=crlf
 /启动机器人.cmd text eol=crlf
 /查看状态.cmd text eol=crlf
 /关闭机器人.cmd text eol=crlf
