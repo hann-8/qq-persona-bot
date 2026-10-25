@@ -89,13 +89,13 @@ LAP-18B补充：`features.yaml`新增`public_network`（resolver=system、ca_bun
 这些字段随五文件源摘要、规范化语义摘要、实例快照、兼容单文件导出及会话版本一起生效；不会自动修改已有web.enabled。此轮没有迁移或保存真实local/CA。网络状态仍network_unverified、搜索质量门槛false，需后续本机安全TLS/公网/公开正文质量证据；详见[报告](../reports/lap-18-B-2026-10-21.md)。
 
 
-## B站轻量字幕（LAP-06）
+## B站字幕已退役（LAP-42）
 
-`features.yaml` 新增 `bilibili` 节，示例完整字段见[features](examples/features.yaml)。缺字段默认 `enabled=false`、`trigger=explicit`、`auth_mode=none`、中文优先、`long_subtitle_policy=excerpt`、1200秒/1MiB响应/6000 UTF-8字节材料/600秒RAM缓存。true要求web.enabled=true；只在操作者审阅后下次正常启动生效，本轮未写本机local或启用。
+不再提供字幕运行服务或配置入口。旧 `bilibili.enabled=false` 节兼容保留，true明确拒绝启用；新模板不再提供此节。普通网页正文读取保留，视频链接不能代替视频内容。
 
-开启后仅当前文字的一个BV/av/视频长短链/P：真实@单定位，或当前目标明确要求总结。free裸链接不抓字幕；不补拉引用、转发、QQ卡片或历史。中文人工优先，再中文自动，再英文；en仅英文人工/自动。完整要求超预算拒绝，节选按六个时间区保留完整字幕窗口并标实际范围/空隙/比例；字幕全文也不代表已看画面。无字幕、认证/网络限制、多视频、超时长明确失败，不走ASR、音视频、评论/弹幕/封面或平台AI摘要。
+旧报告和材料 schema 保留用于历史解释，不是恢复字幕的入口。旧专用报告脚本已不适用于当前运行版本，不重跑或覆盖其报告。
 
-认证none完全不读凭据。操作者另行明确选择sessdata时，仅固定忽略`secrets/bilibili-session.local.json`，结构只有字符串字段SESSDATA；拒链接/重解析点/超过8KiB/额外字段。Cookie只发固定api.bilibili.com的view/player API，不随重定向，不发短链/CDN/DoH/模型。不在聊天粘贴Cookie，不读浏览器、不登录/刷新、不重试或切身份。本轮不创建凭据文件。
+不读 SESSDATA、不抓字幕、不做 ASR；已有本机凭据文件不读取、不删除。
 
 缓存仅RAM的有界编码材料，键含群隔离epoch、bvid/cid/P、语言、认证模式/凭据RAM摘要、配置/网络/提取版本；600秒内最多32条/4MiB，每条含预留开销不超过128KiB，0禁缓存，重启清空。只共享材料，不共享最终问题或答案；配置/认证变化不复用。配置进入快照/版本及五文件映射；旧代码回滚用原有双摘要审阅导出的兼容副本，先正常停止并保留unknown/pending/清理账，不直接删除字段或历史。首次启用使用已有v2材料/ACK管道，不依赖开启图片/群记忆/成员能力。
 

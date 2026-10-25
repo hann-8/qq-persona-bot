@@ -127,7 +127,6 @@ class OneBotGate:
     def __init__(self, config: GateConfig, root=None):
         self.config = config
         self.config_message_limit=getattr(config,'message_max_chars',2000)
-        self.store = DedupStore(config.database)
         self.active = None
         self.failures = 0
         self.root = root
@@ -164,6 +163,7 @@ class OneBotGate:
         self.context_token=context_token(root) if root and (config.vision_enabled or config.members_enabled) else None
         if self.context_token and self.context_token in (config.inbound_token,config.upstream_token,self.admin_token):
             raise ValueError('Independent context token required')
+        self.store = DedupStore(config.database)
 
     def snow(self):return self.config.transport_provider == 'snowluma'
 
@@ -586,6 +586,10 @@ class OneBotGate:
         # This private method is never exposed as an action-param HTTP proxy.
         if action not in ('get_group_info','get_group_member_list') or self.active is None or not self.channel_ready():raise ValueError('Fixed member RPC')
         connection=self.connection_id
+        if (set(params)!={'group_id','no_cache'} or params['no_cache'] is not True or
+            type(params['group_id']) is not int or str(params['group_id']) not in self.config.allowed_groups):
+            raise ValueError('Fixed member RPC scope')
+        started=time.monotonic()
         echo='gate-members-'+secrets.token_hex(32);key=echo_key(echo)
         future=asyncio.get_running_loop().create_future();self.admin_pending[key]=future
         try:
@@ -593,7 +597,16 @@ class OneBotGate:
             result=await asyncio.wait_for(future,3)
             if not self.channel_ready() or self.snow() and connection!=self.connection_id:raise ValueError('Member RPC unavailable')
             if result.get('status')!='ok' or result.get('retcode')!=0:raise ValueError('Member RPC failed')
-            return result.get('data')
+            data=result.get('data')
+            if action=='get_group_info':
+                from .members import CountObservation
+                completed=time.monotonic()
+                if (not self.snow() or not isinstance(data,dict) or
+                    qq_id(data.get('group_id'))!=str(params['group_id']) or
+                    type(data.get('member_count')) is not int or not 1<=data['member_count']<=49 or
+                    completed-started>=3):raise ValueError('Member observation unavailable')
+                return CountObservation(str(params['group_id']),data['member_count'],started,completed,connection)
+            return data
         finally:self.admin_pending.pop(key,None)
 
     async def resolve_members(self,request):

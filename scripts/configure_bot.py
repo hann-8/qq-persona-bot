@@ -49,7 +49,9 @@ def show(settings):
         print('当前模型可显式选强度：'+('/'.join(supported) or '未知，仅auto'))
     print(f"回复方式：{settings['output']['delivery_mode']}；闲聊最多{settings['output']['max_bubbles']}条/{settings['output']['casual_max_chars']}字符，认真问题单条；切换后新上下文，旧历史保留。")
     print(f"共用网页：{settings.get('web',{}).get('enabled',False)}；搜索候选未通过质量门槛，仅受控公共URL读取；不上传历史。")
-    print(f"小群成员：desired={settings['members']['enabled']}；capability_unverified，人数观测新鲜度未知，生产暂停；受控@默认关闭。")
+    from qqbot_gateway.members import suspend_unverified
+    effective=suspend_unverified(settings)
+    print(f"小群成员：desired={settings['members']['enabled']}；effective={effective['enabled']}；受控@={effective['mentions_enabled']}；仅官方Snow v2.1.1强刷人数1..49，失败暂停增强。")
     print(f"原生识图：desired={settings['vision']['enabled']}；生产不可启用（模板/视觉token上界与原生容量未验证）；reserve={settings['vision']['input_reserve_tokens']}仅假设。")
     print(f"本群长期记忆：{settings['memory']['enabled']}；学习：{settings['memory']['learning_enabled']}；默认关闭，本机管理见7→22。")
 
@@ -455,8 +457,10 @@ class ConfigMenu:
     def members_group(self):
         from qqbot_gateway.members import DEFAULTS,validate_config,require_production
         settings,digest=read_settings(self.path)
-        self.ui.page('小群成员与受控@（生产不可启用）')
-        self.ui.write('capability_unverified：NapCat缓存人数没有观测时间/最大陈旧度证明。received_at不是观测时间。手改desired时启动仅暂停成员功能，文字继续。')
+        self.ui.page('小群成员与受控@')
+        self.ui.write('仅已审阅的官方Snow v2.1.1可用强刷观察；NapCat/未知版本继续暂停增强，文字继续。普通received_at不能证明新鲜度。')
+        from qqbot_gateway.members import snow_source
+        if not snow_source(settings):self.ui.write('capability_unverified：当前来源暂停成员增强。')
         self.ui.write('仅1..49可取名单；50/未知/过期不取。人数60秒/名单300秒同时有效；最多8人/768字节候选，禁止任意QQ/@all/CQ。正常重启加载，不自动启停或查询QQ。')
         keys=list(DEFAULTS)
         for i,key in enumerate(keys,1):self.ui.write(f'{i} {key}: {settings["members"][key]}')

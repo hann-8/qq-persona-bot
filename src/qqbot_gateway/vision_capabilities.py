@@ -13,6 +13,29 @@ ROOT = Path(__file__).resolve().parents[2]
 CASES = tuple(f'IQ-{i:02}' for i in range(1, 7))
 
 
+def managed_cli_input_review(root, settings):
+    """Report reviewed local transport facts, without inventing remote bounds.
+
+    Hosted CodeBuddy has no local processor/projector to attest. Its advertised
+    maxInputTokens is a capacity claim, not a proved text+image/template bound.
+    This diagnostic deliberately cannot create a registry record or eligibility.
+    """
+    from .backends import resolve_backend
+    from .token_budget import known_models
+    cfg=resolve_backend(settings)
+    if cfg['backend']!='codebuddy_cli':raise ValueError('MANAGED_CLI_REQUIRED')
+    identity=runtime_identity(Path(root),settings)
+    model=known_models().get(cfg['model'],{})
+    reviewed_bundle=identity['artifact_sha256']=='13e6dd30a22d2f11857675193f909a2ccb935da67a067f580fcfe764e474ff60'
+    return dict(runtime=identity,model=cfg['model'],reasoning_effort=cfg['reasoning_effort'],
+        native_input_contract='stream-json:user.content[text,image.base64]' if reviewed_bundle else 'unreviewed',
+        advertised_max_input=model.get('maxInputTokens'),advertised_max_output=model.get('maxOutputTokens'),
+        remote_processor='not_applicable_hosted_service',remote_projector='not_applicable_hosted_service',
+        missing=['VISUAL_TOKEN_UPPER_BOUND_UNAVAILABLE','TEMPLATE_TOKEN_UPPER_BOUND_UNAVAILABLE',
+                 'COMBINED_NATIVE_CAPACITY_UNPROVEN'],
+        permits_native_iq=False)
+
+
 def runtime_identity(root,settings):
     """Local facts only. No copying expected processor facts into observations."""
     from .backends import resolve_backend

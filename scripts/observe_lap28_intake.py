@@ -14,10 +14,12 @@ def inspect(root):
     """Only structure metadata, no locks/writes/ports/network/token read."""
     from qqbot_gateway.config_files import read_project
     cfg=read_project(root).settings
+    from qqbot_gateway.qq_transport import resolve_transport
+    provider=resolve_transport(cfg)['provider']
     bundle=root/'runtime/napcat/installer/NapCat.52230.Shell/versions/9.9.33-52230/resources/app/napcat/napcat.mjs'
     # No scan of logs, private credentials or message bodies.
     return dict(schema_version=1,mode='inspect',configuration_loaded=True,
-        napcat_bundle_present=bundle.is_file(),vision_enabled=cfg['vision']['enabled'],
+        provider=provider,napcat_bundle_present=bundle.is_file() if provider=='napcat' else False,vision_enabled=cfg['vision']['enabled'],
         ingress_diagnostics=cfg['vision']['ingress_diagnostics'],get_image_implemented=False,
         ingress_state='ingress_unverified',production_eligible=False,backend_calls=0,qq_outputs=0)
 

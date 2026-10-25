@@ -1,16 +1,19 @@
 """Gate-owned members, single-use turn receipts and typed mention permissions.
 
-Production count freshness is deliberately unverified. Only offline callers can
-inject an observation adapter; no response receipt time becomes an observation.
+Official Snow force-network observations are bound by the gate. Other providers
+remain paused; no response receipt time or JSON field becomes an observation.
 """
 import asyncio
 from collections import OrderedDict
-from dataclasses import replace
+from dataclasses import replace, dataclass
 import json
 import logging
 import re
 import secrets
 import time
+import hashlib
+import os
+from pathlib import Path
 from contextvars import ContextVar
 
 PREPARE_DEADLINE=ContextVar("qqbot_prepare_deadline",default=None)
@@ -36,17 +39,49 @@ def validate_config(raw):
     return cfg
 
 
+def snow_source(settings):
+    """Only the reviewed official release; no model-supplied freshness flags."""
+    from .qq_transport import resolve_transport
+    transport=resolve_transport(settings)
+    if not (transport['provider']=='snowluma' and
+            transport['snowluma']['runtime_root']=='runtime/snowluma/v2.1.1'):return False
+    root=Path(os.environ.get('QQBOT_ROOT',Path(__file__).resolve().parents[2]))
+    from .qq_transport import checked_path
+    try:
+        path=checked_path(root,transport['snowluma']['runtime_root']+'/index.mjs','runtime')
+        return hashlib.sha256(path.read_bytes()).hexdigest()=='e23ed3d4aa7e01e7f45400a7ffe6b0c4b67bb6d011f776f2fd04b959510435e6'
+    except (ValueError,OSError):return False
+
+
 def require_production(settings):
-    if settings.get('members',DEFAULTS)['enabled']:
+    if settings.get('members',DEFAULTS)['enabled'] and not snow_source(settings):
         raise ValueError('members capability_unverified: NapCat cached count observation age unknown')
-    return False
+    return bool(settings.get('members',DEFAULTS)['enabled'])
 
 
 def suspend_unverified(settings):
     """Runtime copy only. Hand-edited desired config never breaks text startup."""
     cfg=validate_config(settings.get('members',{}))
+    if snow_source(settings):return cfg
     if cfg['enabled']:logging.getLogger(__name__).warning('MEMBERS_CAPABILITY_UNVERIFIED feature_paused')
     return cfg|dict(enabled=False,mentions_enabled=False)
+
+
+@dataclass(frozen=True)
+class CountObservation:
+    """Internal result of one force-fetch on one group/connection, not JSON."""
+    group: str
+    count: int
+    started: float
+    completed: float
+    connection: str
+
+
+def count_proof(value, group, clock):
+    if not isinstance(value,CountObservation) or value.group!=group:return None
+    now=clock()
+    if not (value.started<=value.completed<=now and now-value.started<60):return None
+    return dict(count=value.count,age=now-value.started,source='snowluma-v2.1.1-force-network')
 
 
 def valid_candidates(rows):
@@ -92,13 +127,19 @@ class Members:
     def __init__(self,cfg=None,clock=time.monotonic,observe=None):
         self.cfg=validate_config(cfg or {});self.clock=clock;self.observe=observe
         self.counts={};self.rosters={};self.caps=OrderedDict();self.receipts=OrderedDict();self.permits=OrderedDict()
+        self.pauses={}
         self.generation=0;self.busy=False;self.events=OrderedDict()
 
     def clear(self):
-        self.generation+=1;self.counts.clear();self.rosters.clear();self.caps.clear();self.receipts.clear();self.permits.clear();self.events.clear()
+        self.generation+=1;self.counts.clear();self.rosters.clear();self.pauses.clear();self.caps.clear();self.receipts.clear();self.permits.clear();self.events.clear()
 
     def invalidate(self,group):
         self.counts.pop(group,None);self.rosters.pop(group,None)
+        self.pauses.pop(group,None)
+
+    def pause(self,group):
+        self.invalidate(group)
+        if len(self.pauses)<128:self.pauses[group]=self.clock()+self.cfg['count_ttl_seconds']
 
     def prune(self):
         now=self.clock()
@@ -109,6 +150,8 @@ class Members:
             if row['expires']<=now:self.counts.pop(group,None)
         for group,row in list(self.rosters.items()):
             if row['expires']<=now:self.rosters.pop(group,None)
+        for group,expires in list(self.pauses.items()):
+            if expires<=now:self.pauses.pop(group,None)
 
     def issue(self,event,connection):
         self.prune()
@@ -159,26 +202,29 @@ class Members:
 
     async def roster(self,group,rpc):
         self.prune();now=self.clock()
+        if group in self.pauses:return None
         count=self.counts.get(group)
         if count is None:
-            data=await rpc('get_group_info',{'group_id':int(group)})
-            # The production adapter has NO freshness proof. Never trust a
-            # guessed observed_at field or the local response receipt time.
-            proof=self.observe(data) if self.observe else None
+            try:data=await rpc('get_group_info',{'group_id':int(group),'no_cache':True})
+            except (ValueError,TimeoutError,OSError):self.pause(group);raise
+            # Only the gate-owned typed network result or an explicit offline
+            # adapter can attest age. Raw OneBot/model JSON cannot.
+            proof=self.observe(data) if self.observe else count_proof(data,group,self.clock)
             count=None
             if isinstance(proof,dict):
                 n=proof.get('count');age=proof.get('age');source=proof.get('source')
                 if (type(n) is int and 1<=n<=49 and type(age) in (int,float) and 0<=age<self.cfg['count_ttl_seconds'] and
                     isinstance(source,str) and source):
                     count=dict(value=n,expires=self.clock()+self.cfg['count_ttl_seconds']-age,source=source)
-            if count is None:self.invalidate(group);return None
+            if count is None:self.pause(group);return None
             self.counts[group]=count
         if count['expires']<=self.clock():self.invalidate(group);return None
         cached=self.rosters.get(group)
         if cached and len(cached['entries'])==count['value']:return cached
         if cached:self.rosters.pop(group,None)
         if len(self.rosters)>=128:self.invalidate(group);return None
-        data=await rpc('get_group_member_list',{'group_id':int(group),'no_cache':True})
+        try:data=await rpc('get_group_member_list',{'group_id':int(group),'no_cache':True})
+        except (ValueError,TimeoutError,OSError):self.pause(group);raise
         if not isinstance(data,list) or len(data)!=count['value'] or not 1<=len(data)<=49:
             self.invalidate(group);return None
         result={}

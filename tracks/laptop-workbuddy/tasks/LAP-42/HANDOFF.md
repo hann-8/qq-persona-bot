@@ -4,9 +4,26 @@
 
 ## 当前状态
 
-**整合详规完成，待用户下一轮选择medium实际执行；本轮未实施或启用。** 用户最新范围覆盖此前只展开一项的安排：长期群记忆、关注、成员增强均可交medium落地，图片识别也尝试，B站字幕撤下。用户明确当前deepseek-v4.1-flash支持视觉，按当前CodeBuddy路线实施，不换模型/后端/账号/额度。实际CLI图片传输与QQ闭环仍需验证。
+**可用部分已实施/离线通过/配置保存/运行加载；视觉按具体缺口交付，未称完整验收。** 记忆读取/学习、关注、成员与受控@已启用，字幕退役，最终OneBot就绪；vision仍false。[实际报告](../../../../reports/lap-42-2026-10-25.md)为完整结果。只领取42，未改Snow/QQ/CLI内部、模型/后端/账号/额度。Git交付核对后释放唯一执行归属并停止。
 
-## 领取和归属
+S5交付检查：224个本地文档链接、围栏/UTF-8替换字符/私人目标ID与git diff --check均通过；原字节/候选与16项保护摘要已复核。仅交付本任务跟踪文件，真实对象/观察工件与local/persona/图库/key/记忆/pending全部忽略保留。最终提交/实时完整远端SHA一致性见本轮回执；不自引用提交号。旧规划MEDIUM_START仅作历史授权文本，不能不经新指令再次运行整轮。
+
+| 能力 | 本轮状态 | 未验差额 |
+| --- | --- | --- |
+| 记忆/关注 | 读取/学习/attention已保存加载；独立HMAC key已建；164定向单元及组合回环通过 | 真实新事实持久化与清RAM回忆、叫名/引用/续聊效果未独立验收 |
+| 成员/受控@ | Snow固定强刷typed观察、effective一致及独立context token已接通并加载；1..49/双TTL/单cap/最多1@保留 | 实际群名册/受控@生成/ACK/客户端未独立验收；大群/来源无效退化为普通文字 |
+| 视觉 | 追加授权的新图真实JPEG下载/解码成功：1260×709→1024×576，421ms；0模型/0输出 | 视觉token/模板上界、组合原生容量未证，真实IQ与图片群生成未执行，vision=false |
+| 字幕 | 运行服务、认证抓取、专用vendor/能力提示/新模板入口退役；旧false兼容、true拒启 | 旧报告保留，纯材料schema/选择函数不删；普通web不变 |
+
+末次164单元0失败、两组AstrBot原事件/实际runner底层替身共19场景通过；末次成员8场景再通过。首120秒采样在线超时，用户后来发图未回拉；用户明确追加一次120秒/1条新图及恢复后，发图提示就绪、操作者重发确认、采样decoded成功。共两次诊断启动/两次正常加载，第二组有追加授权。原生IQ=0/6、群图片生成=0/2，未写eligible；不把入站/模拟ACK当成远端理解成功。
+
+现场保护：仅features.yaml与chat.yaml的5个布尔值改变，16项保护摘要中persona/图库/21 pending及其他local相同。原字节/候选/双摘要、临时框架工件归档和受测对象在忽略state/lap42-rollout；真实对象ID/名册/图像/事实/秘密不提交。当前persona组合28581/30000，无提预算。末次快照free/原CodeBuddy/DeepSeek/low、web/memes及冷却0/0不变，memory/learning/attention/members/mentions=true，vision=false，无pending_restart。
+
+自然业务单列：开始到首次停机旧实例脱敏日志可见4次真实CLI_START；停机前累计72。两次新实例检查CLI/user_messages均0；任务累计completed102、failed1，未查原消息或推定原因，保留。样本0调用不表示全轮0真实调用。真实记忆/成员/图片群ACK等旧差额保留，后续需用户指定继续，不能自动洗批/重试。
+
+回滚按报告的停机锁/摘要/拥有字段与配对代码执行；key/库、purge、ACK/pending/unknown/清理台账、锁及21 pending保留。未回滚、未重建key、无reset/clean、未访问其他根/A4或推进其他任务。
+
+## 规划轮领取和归属（以下为16:52之前历史）
 
 session `LAP-42-snow-feature-rollout-plan`，2026-10-25 16:24开始只读复核，16:32（Asia/Shanghai）登记TASKS并重读。开始HEAD/实时远端均为`9bb1b58270dbcaa3c5e40c53f804d5e50c54449b`，分支`codex/lap-40-snowluma`，无非忽略差异。
 
@@ -32,3 +49,17 @@ session `LAP-42-snow-feature-rollout-plan`，2026-10-25 16:24开始只读复核�
 文档完成检查与Git交付后释放归属并停止。逐项保留代码/离线/配置/加载/真实差别，最终SHA和保留差异见交付回执，不自引用提交号。
 
 16:52检查点：7份Markdown、231个本地链接、4个围栏行检查通过，git diff --check通过；20项本机配置/persona/图库/pending/记忆与context存在状态前后相同。未运行代码测试，真实模型/QQ/启停操作0。仅7份已登记文档交付；当前DeepSeek视觉支持的用户补充已同步到入口/计划/medium指令。
+
+## 实施归属
+
+2026-10-25T16:57:28+08:00 (Asia/Shanghai): LAP-42-snow-integration-implementation owns LAP-42 only, including the sole managed runtime executor. Baseline HEAD/live remote 0752c7b9bc2c38033d86e957fdfd9d179460aea1; initial tree clean. Exact owned paths: PROGRESS.md; tracks/laptop-workbuddy/{HANDOFF.md,TASKS.md,tasks/LAP-42/HANDOFF.md}; docs/BOT_USAGE_COMPARISON.md; src/qqbot_gateway/{members,onebot_gate,config,web_retrieval,persona,bilibili_policy,bilibili_subtitles,model_gateway,vision_intake_gate,vision_capabilities,vision,workbuddy_cli_runner,config_comments}.py; src/qqbot_gateway/vendor/bilibili_fields.py; scripts/{configure_bot,configure_astrbot,manage,observe_lap28_intake,lap42_rollout}.py; plugins/qq_router/main.py; tests/{test_lap42,test_bilibili}.py; reports/lap-42-2026-10-25.md. Ignored ownership: state/lap42-rollout backups/candidate/digests; specified local flags; independent memory key/context token only when absent. Preserve all other local/persona/library/LAP-21 pending and old evidence. No agents, model switch, A4 access, old-root work.
+
+## S0—S3检查点（加载前）
+
+- 根/分支/本地及实时远端核验通过，规划起点是祖先，初始Git干净。16项本机配置/persona/图库/pending摘要及五份配置原字节保存于忽略的state/lap42-rollout；受测群/操作者仅保存在忽略文件。
+- 字幕服务、认证/HTTP实现和专用vendor已撤下；旧材料选择/schema及历史报告脚本保留。旧false兼容、true明确拒启；普通web保留。
+- 成员补固定no_cache强刷、gate内部typed请求时间窗/群/连接绑定、已审阅官方v2.1.1包摘要限定；旧NapCat/未知版本仍暂停。effective与独立context token校验已接通。
+- 定向163项首次有1项菜单提示断言失败，已修正并32项成员复跑通过；没有产品逻辑失败遗留。当前CodeBuddy/free/adaptive/web/memes的实际AstrBot原事件、实际runner底层替身两组19场景通过。运行目录UTF-8需显式PYTHONUTF8=1，未改旧writer。
+- 四种真实像素编码经实际CLI runner替身，同次base64/MIME/hash和返回验证通过；GIF仅首帧。当前人设19256字节，组合system24114字节，最终可见预算28581/30000；原fitter裁剪可选候选/记忆，没有修改正文或抬预算。
+- 当前托管CLI 2.168.0/固定bundle支持原生图片封套；已核对DeepSeek元数据1000000输入、128000输出及low，但视觉token/模板上界及组合原生容量尚未获证，不套本地processor/projector门槛。IQ前置不满足，真实六例未调用，vision保留false；单图Snow采样仍独立推进。
+- 启停前现场：官方OneBot connected，text/free运行，队列0/active=false，已完成任务102，无unknown；自然历史CLI计数72，只作停机前基线，不能归成本轮受控试验。外部手工Snow/QQ保留。

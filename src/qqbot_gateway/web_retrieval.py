@@ -126,8 +126,6 @@ class Retriever:
     def __init__(self,cfg,private_ids=(),http_factory=PublicHTTP,*,network=None,root=None,bilibili=None):
         self.cfg=DEFAULTS|cfg;self.cfg.update(public_network=network or {},_root=root)
         self.private_ids=private_ids;self.http_factory=http_factory;self.last_audit={};self.extractor=None
-        from .bilibili_subtitles import Subtitles
-        self.bilibili=Subtitles(bilibili or {},self.cfg,network,root,http_factory)
     async def extract(self,text,url,mime):
         if mime=='text/plain':
             result=extract(text,url,mime,self.cfg)
@@ -149,41 +147,12 @@ class Retriever:
         finally:MATERIAL_TRACE.reset(token)
     async def _retrieve(self,question):
         self.last_audit=vars(Audit())
-        from .bilibili_policy import current_locators, FORBID, LINK, BARE, REQUEST
-        mentioned,scope=CURRENT_TEXT.get()
-        try:
-            locators=current_locators(question,mentioned)
-            if locators:
-                if not self.cfg['enabled'] or not self.bilibili.cfg['enabled']:
-                    return Retrieval('video',notice='B站字幕读取尚未开启，请由本机操作者审阅配置后正常重启。')
-                source=await self.bilibili.get(locators,scope)
-                return Retrieval('subtitle',sources=[source])
-            # Free bare Bilibili text stays ordinary chat and never fetches.
-            if (LINK.search(question) or BARE.search(question)) and not FORBID.search(question) and not REQUEST.search(question) and not mentioned:
-                return Retrieval()
-        except (WebFailure,aiohttp.ClientError,OSError,TimeoutError,ValueError,TypeError,KeyError) as error:
-            code=str(error) if isinstance(error,WebFailure) else 'subtitle_timeout' if isinstance(error,TimeoutError) else 'network_unverified' if isinstance(error,(aiohttp.ClientError,OSError)) else 'subtitle_invalid'
-            notices={'bilibili_multiple':'请只选择一个视频的一个P，并去掉其他网页链接。',
-                     'video_too_long':'当前P超过20分钟或配置时长上限，请缩小范围。',
-                     'bilibili_page':'这个P不存在或参数无效，请选择一个有效分P。',
-                     'no_subtitle':'当前没有可用字幕，无法据正文总结；本次不进行音视频或ASR读取。',
-                     'need_login_subtitle':'字幕要求登录，当前未取得正文；请由操作者本机处理，本次不重试。',
-                     'auth_missing':'本机未提供有效字幕凭据，本次未读取字幕。',
-                     'auth_expired':'字幕认证已失效，本次不重试。',
-                     'http_403':'字幕服务拒绝访问（403），本次不重试。',
-                     'http_412':'字幕服务风控限制（412），本次不重试。',
-                     'http_429':'字幕服务限流（429），本次不重试。',
-                     'http_404':'视频或字幕不存在（404），本次未取得正文。',
-                     'subtitle_timeout':'本次字幕准备超时，未调用模型；不会自动重试。',
-                     'video_missing':'视频已删除或不可见，未取得字幕。',
-                     'video_restricted':'视频受限，未取得字幕。'}
-            self.last_audit={'failures':[code]}
-            return Retrieval('subtitle',notice=notices.get(code,'当前无法安全取得可用字幕，本次未调用模型；不会用标题或简介代替正文。'))
-        finally:
-            if self.bilibili.last_audit:
-                failures=self.last_audit.get('failures',[])
-                self.last_audit=dict(self.bilibili.last_audit)
-                if failures:self.last_audit['failures']=failures
+        from .bilibili_policy import LINK, BARE, FORBID, REQUEST
+        mentioned,_=CURRENT_TEXT.get()
+        if LINK.search(question) or BARE.search(question):
+            if not FORBID.search(question) and (mentioned or REQUEST.search(question)):
+                return Retrieval('video',notice='Video content and subtitle reading are retired; provide the text to discuss.')
+            return Retrieval()
         decision=intent(question,self.cfg,self.private_ids)
         material_log('intent',decision.kind,failure='search_unverified' if decision.kind=='search' and not SEARCH_QUALITY_PASSED else 'blocked' if decision.kind=='blocked' else 'none')
         if decision.kind=='none':return Retrieval()

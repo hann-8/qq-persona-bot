@@ -17,6 +17,7 @@ FORBID = re.compile(r'不要联网|别联网|不联网|禁止联网|只根据这
 def validate(raw, web):
     if not isinstance(raw, dict) or set(raw)-set(DEFAULTS):raise ValueError('Invalid bilibili fields')
     cfg=DEFAULTS|raw
+    if cfg['enabled'] is True:raise ValueError('BILIBILI_RETIRED: subtitle service cannot be enabled')
     if (type(cfg['enabled']) is not bool or cfg['trigger']!='explicit' or cfg['auth_mode'] not in ('none','sessdata')
         or cfg['preferred_language'] not in ('zh','en') or cfg['long_subtitle_policy'] not in ('excerpt','reject')
         or cfg['enabled'] and not web['enabled']):raise ValueError('Invalid bilibili mode')

@@ -726,8 +726,9 @@ def intake_only(*, authorize, group, sender, max_events=1, timeout_seconds=120):
         if CleanupOwner(ROOT).status()['blocked']:raise ValueError('INTAKE_CLEANUP_UNRESOLVED')
         if any(v for k,v in task_counts().items() if k in ('accepted','running','unknown','send_unknown')):
             raise ValueError('INTAKE_TASK_UNRESOLVED')
-        for port in (6185,6199,6200,6099,8765):check_port(port)
         project=read_project(ROOT)
+        intake_provider=resolve_transport(project.settings)['provider']
+        for port in (6185,6199,6200,8765)+((6099,) if intake_provider=='napcat' else ()):check_port(port)
         from qqbot_gateway.vision import require_production
         require_production(project.settings,root=ROOT)
         gate=load_gate_config(root=ROOT,settings=project.settings)
@@ -735,7 +736,18 @@ def intake_only(*, authorize, group, sender, max_events=1, timeout_seconds=120):
             raise ValueError('INTAKE_TARGET_DENIED')
         from qqbot_gateway.config import qq_id
         if qq_id(sender)!=sender:raise ValueError('INTAKE_TARGET_DENIED')
-        require_intake_logging(gate.bot_qq)
+        settings=project.settings
+        snow_intake=resolve_transport(settings)['provider']=='snowluma'
+        if snow_intake:
+            # Reuse external identities without adoption. If the normal managed
+            # stop also stopped its Snow, use the existing desktop launcher to
+            # create a diagnostic Snow only; never launch/login QQ here.
+            package,qq=desktop.paths(ROOT,settings)
+            found=desktop.discover(package,qq)
+            if not found['official_snow'] and not found['official_qq']:raise ValueError('INTAKE_SNOW_OPERATOR_REQUIRED')
+            desktop.validate_package(package,qq)
+            if desktop.connection_plan(ROOT,settings,gate)[3]:raise ValueError('INTAKE_SNOW_CONNECTION_MISMATCH')
+        else:require_intake_logging(gate.bot_qq)
         instance=uuid.uuid4().hex
         snapshot,metadata=create_snapshot(project,instance)
         env=child_environment(os.environ);env.update(snapshot_environment(ROOT,snapshot,metadata))
@@ -751,13 +763,18 @@ def intake_only(*, authorize, group, sender, max_events=1, timeout_seconds=120):
         specs=(('gate',[str(ROOT/'.venv/Scripts/python.exe'),'-m','qqbot_gateway.vision_intake_gate',
                        '--root',str(ROOT),'--config',str(snapshot),'--instance',instance,'--timeout',str(timeout_seconds)],ROOT),
                ('napcat',[str(NAPCAT/'NapCatWinBootMain.exe')],NAPCAT))
+        if snow_intake:
+            specs=specs[:1]
+            if not found['official_snow']:specs+=(('official_snow',[],package),)
         owners=[];deadline=time.monotonic()+timeout_seconds
         try:
             for component,args,cwd in specs:
                 started=time.time()
-                with (logs/('intake-'+component+'.log')).open('ab') as output:
-                    process=psutil.Popen([str(ROOT/'.venv/Scripts/python.exe'),str(ROOT/'scripts/process_host.py'),component,'--',*args],
-                        cwd=cwd,env=env,stdout=output,stderr=subprocess.STDOUT,creationflags=subprocess.CREATE_NO_WINDOW)
+                if component=='official_snow':process=desktop.launch(component,package,qq,ROOT)
+                else:
+                    with (logs/('intake-'+component+'.log')).open('ab') as output:
+                        process=psutil.Popen([str(ROOT/'.venv/Scripts/python.exe'),str(ROOT/'scripts/process_host.py'),component,'--',*args],
+                            cwd=cwd,env=env,stdout=output,stderr=subprocess.STDOUT,creationflags=subprocess.CREATE_NO_WINDOW)
                 owners.append((process,component,started))
                 capture(entries,process,component,started)
                 if not entries:raise RuntimeError('INTAKE_IDENTITY_UNVERIFIED')
@@ -796,7 +813,7 @@ def intake_only(*, authorize, group, sender, max_events=1, timeout_seconds=120):
             try:
                 try:
                     for process,component,started in owners:capture(entries,process,component,started)
-                finally:stop(entries)
+                finally:stop_in_order(entries)
                 mode['phase']='finished'
             finally:
                 atomic_json(ROOT/'state/service-mode.json',mode)

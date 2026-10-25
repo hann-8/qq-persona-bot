@@ -321,7 +321,9 @@ def load_gate_config(path=None, *, root=None, settings=None):
     from .meme_import import admin_token
     admin=admin_token(root)
     from .vision import context_token
-    context=context_token(root) if data['vision']['enabled'] else None
+    from .members import suspend_unverified
+    effective_members=suspend_unverified(data)
+    context=context_token(root) if data['vision']['enabled'] or effective_members['enabled'] else None
     if context and context in list(tokens.values())+[admin]:raise ValueError('Independent context token required')
     if admin and admin in tokens.values():raise ValueError('Independent memes admin token required')
     if data['access'].get('private_enabled') is not False:
@@ -347,8 +349,8 @@ def load_gate_config(path=None, *, root=None, settings=None):
         message_max_chars=data['participation']['message_max_chars'],
         vision_enabled=data['vision']['enabled'],
         ingress_diagnostics=data['vision']['ingress_diagnostics'],
-        members_enabled=False,
-        members_config=suspend_unverified(data),
+        members_enabled=effective_members['enabled'],
+        members_config=effective_members,
         public_network=data['public_network'],
         attention_enabled=data['participation']['mode']=='free' and data['participation']['attention']['enabled'],
         media_catalog=MemeCatalog(root,data['memes']) if data['memes']['enabled'] else None,
