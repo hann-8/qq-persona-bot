@@ -2,6 +2,22 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [TASKS](../../TASKS.md) / [工作线](../../HANDOFF.md) / [合同](../LAP-19/GROUP_CHAT_PLAN.md)。继承AGENTS及实施指引共同边界。
 
+## 当前接续：Snow主线7条受控表情迁移，仅规划完成
+
+2026-10-25，session `LAP-21-snow-controlled-memes-plan`，15:46开始只读复核、15:49登记7份文档并重读。工作根`E:/CodexWS/QQbot_Snowluma`，分支`codex/lap-40-snowluma`；起点HEAD和实时远端同为`e2d9a0c082f3400904d8a4032eb01b4290ef08a8`，开始无非忽略Git差异。沿用LAP-21，未新开任务/同时领取其他实施。
+
+已完成[详细计划](SNOW_MIGRATION_PLAN.md)及[下一轮完整medium复制指令](SNOW_MEDIUM_START.md)。旧NapCat根7条已启用登记及对应7张文件均通过现有路径/真实类型/尺寸帧数/hash校验：5 GIF+2 JPEG、4,100,086字节，7候选紧凑JSON 1134字节。新根catalog不存在/0条，两个根pending均不存在；两根memes=true、冷却0/0、free与persona保留。7份相关共用业务源码与旧根相同；缺口首先是数据未迁移，预计0生产代码修改，不能把它写成Snow真实图片成功。
+
+本轮只改PROGRESS、工作线HANDOFF/TASKS、本交接、新PLAN/medium指令、BOT_USAGE_COMPARISON共7份Markdown；未迁移、暂存或激活数据，不改代码/local/persona，不安装、启停、登录/扫码、调用真实模型或QQ接口/群发送。源根仅本机只读，旧C根不访问；B/C停止，A4代码/产物/证据不读不验。34份本机配置/persona/目录表/pending及图库文件状态纳入前后保护摘要，最终结果在下文交付检查点记录。
+
+下一轮由用户选择gpt-6.1-sol/medium并发送新指令，**实际复制、备份、暂存7图与原标签**，只在目标本来已停止且既有锁/摘要通过时激活目录；运行中交付已准备/未激活，不擅自停机。保留现有local/persona/模型/额度/free选择，不增配置/依赖/架构。真实启停、模型和群验收另行授权，保存/激活不等于已加载或真实通过。之后推荐记忆30→识图28，但完成本项即停止；B站字幕退出近期路线，本项不删代码。
+
+本轮验证限只读资产解析/源文件比较、Markdown链接/围栏、保护摘要和git diff检查；不运行代码测试或旧完整矩阵。长期Git授权仅交付本任务文档并push核对远端；最终SHA与保留差异见当轮回执。交付后释放文档归属，不自动实施。
+
+16:01交付检查点：7份Markdown、223个本地文件链接及2个围栏行检查通过；`git diff --check`通过。两根共34个保护路径的字节摘要/不存在状态前后相同，目标catalog/pending仍不存在，未迁移图片或历史。`git check-ignore`确认local、catalog、pending、迁移工件与用户图库保留忽略；仅7份任务文档进入Git，不运行代码测试/A4或真实操作。Git交付后的完整SHA、远端一致性和最终工作区状态见当轮回执，不在文档自引用提交号。
+
+## 以下为原LAP-21历史实现/验收记录
+
 2026-10-17 16:49（Asia/Shanghai）领取，session `LAP-21-controlled-memes` / “LAP-21受控表情实施”。main起点d70000674861b718d020d14b57f676f547b6b7dd，工作区干净。仅领取21；目标为本地inbox/library、目录表、固定收藏只读导入、单次生成候选ID、typed parts及逐条ACK/恢复，完成离线与实际框架合成回归及Git交付。
 
 文件归属：新增meme_catalog/meme_import/media_protocol；config、onebot_gate、model_gateway、contracts、group_protocol、reply_plan/reply_delivery/task_store、persona、router/provider、配置脚本与示例、依赖锁、.gitignore、assets模板、相关测试/框架验证、README/报告及本交接/TASKS/PROGRESS/工作线交接。独占本任务文件写入，不操作运行bot。

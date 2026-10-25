@@ -8,10 +8,12 @@ QQ以后以 `E:/CodexWS/QQbot_Snowluma` 的官方原版SnowLuma路线为主线�
 
 LAP-41工作区整理与使用对照已完成：uv报告清除38,269个缓存文件约626.1MiB，5份临时网页快照和退役自启提示入口已删除，四份旧入口说明归档。约1.25MiB字节码缓存因自动审批拒绝删除而保留。25份运行保护文件摘要相同，未改生产代码、模型/人设/触发或其他业务配置，未启停bot。
 
+下一项续原**LAP-21受控表情迁移**，详细[计划](tracks/laptop-workbuddy/tasks/LAP-21/SNOW_MIGRATION_PLAN.md)及[可复制medium实施指令](tracks/laptop-workbuddy/tasks/LAP-21/SNOW_MEDIUM_START.md)已交付；仅规划，尚未迁移或启用。当前7条源登记及5 GIF/2 JPEG共4,100,086字节校验通过，Snow目录仍0条；现有共用发送逻辑可复用，预期只做数据准备。之后推荐长期群记忆→识图；成员/关注暂后置，B站字幕按用户决定退出近期路线。本轮不删代码、不启停/模型/群操作，不并领其他任务。
+
 ## 从哪里继续
 
 1. 使用bot：[日常操作](SnowLuma使用说明.md) / [与旧NapCat bot的使用对照](docs/BOT_USAGE_COMPARISON.md)。
-2. 项目接续：本文件 → [AGENTS](AGENTS.md) → [QQ主线HANDOFF](tracks/laptop-workbuddy/HANDOFF.md)和[TASKS](tracks/laptop-workbuddy/TASKS.md) → 当前[LAP-41交接](tracks/laptop-workbuddy/tasks/LAP-41/HANDOFF.md)。
+2. 项目接续：本文件 → [AGENTS](AGENTS.md) → [QQ主线HANDOFF](tracks/laptop-workbuddy/HANDOFF.md)和[TASKS](tracks/laptop-workbuddy/TASKS.md) → 当前[LAP-21交接](tracks/laptop-workbuddy/tasks/LAP-21/HANDOFF.md)、[Snow迁移计划](tracks/laptop-workbuddy/tasks/LAP-21/SNOW_MIGRATION_PLAN.md)及[medium指令](tracks/laptop-workbuddy/tasks/LAP-21/SNOW_MEDIUM_START.md)。上一轮整理依据仍见[LAP-41](tracks/laptop-workbuddy/tasks/LAP-41/HANDOFF.md)，使用差异见[对照](docs/BOT_USAGE_COMPARISON.md)。
 3. 故障找文件：[目录与日志](项目目录与日志说明.md)。只按实际问题检索，不从历史清单自动展开新任务。
 
 ## 路线和边界
@@ -29,19 +31,20 @@ LAP-41工作区整理与使用对照已完成：uv报告清除38,269个缓存文
 
 | 工作线 | 状态/最新依据 | 接续入口 |
 | --- | --- | --- |
-| QQ主线：SnowLuma及共用bot业务 | active，日常使用；LAP-40用户文字首试成功，LAP-41整理/对照完成 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [LAP-41](tracks/laptop-workbuddy/tasks/LAP-41/HANDOFF.md) / [LAP-40](tracks/laptop-workbuddy/tasks/LAP-40/HANDOFF.md) |
+| QQ主线：SnowLuma及共用bot业务 | active，日常使用；LAP-21旧7条表情迁移详规完成，待用户选择medium实际准备数据 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [LAP-21](tracks/laptop-workbuddy/tasks/LAP-21/HANDOFF.md) / [medium指令](tracks/laptop-workbuddy/tasks/LAP-21/SNOW_MEDIUM_START.md) |
 | 家庭5070备用模型路线 | 历史记录为接入已实现/离线及元数据通过、真实生成未验；本轮未重查，不自动切换后端 | [HANDOFF](tracks/local-5070/HANDOFF.md) / [既有选型](tracks/local-5070/MODEL_SELECTION.md) |
 
 `tracks/laptop-workbuddy` 是保留的历史目录名，当前承担QQ主线和共用网关交接，不表示仍以NapCat或WorkBuddy界面为主路线。所有旧任务的状态/验收差额在TASKS与各任务HANDOFF保留，不重命名整棵目录。
 
 ## 当前使用快照与未验证范围
 
-本轮只读比较两边磁盘设置与最近启动快照：共同使用deepseek-v4.1-flash/low、free、adaptive最多3条、16轮历史，persona内容相同。Snow新根的表情登记为0条，旧NapCat为7条；没有在本轮迁移。详细值与来源见[使用对照](docs/BOT_USAGE_COMPARISON.md)。
+LAP-41只读比较两边磁盘设置与最近启动快照：共同使用deepseek-v4.1-flash/low、free、adaptive最多3条、16轮历史，persona内容相同。LAP-21本次重新核对磁盘memes=true、图片冷却0/0、source 7条/target 0条及7张图片均有效；没有迁移，未查询当前运行态。默认值与实际保存值不可混用，详见[使用对照](docs/BOT_USAGE_COMPARISON.md)和[迁移计划](tracks/laptop-workbuddy/tasks/LAP-21/SNOW_MIGRATION_PLAN.md)。
 
-网页材料读取开着，搜索质量门槛仍未通过；看图、B站字幕、成员增强、长期群记忆、关注增强目前关着。旧18/28/29/31B等验收差额继续按各自任务保存，既不晋升为通过，也不自动转成当前待办。微信是独立 `E:/CodexWS/WeChatbot` 项目，本次不推进。
+网页材料读取开着，搜索质量门槛仍未通过；看图、B站字幕、成员增强、长期群记忆/学习、关注增强目前关着。关着不代表缺代码：记忆/关注已有离线实现；识图有实际能力与容量/质量差额，成员有生产人数新鲜度差额。用户要求记忆、识图尽快落地，但本轮仅展开表情；B站字幕先撤下、以后再说，其代码清理不混入表情任务。旧18/28/29/31B差额继续按各自任务保存，不自动转成新前置。微信独立项目本次不推进。
 
 ## 历史与检查点
 
+- 本次规划起点本地HEAD/实时远端：e2d9a0c082f3400904d8a4032eb01b4290ef08a8；无非忽略Git差异。session `LAP-21-snow-controlled-memes-plan`，15:49登记7份文档并重读；只有规划交付，不迁数据/历史、不动运行设置或其他根。最终Git号及SHA一致性见当轮交付回执。
 - 接入实现：89b7dfae；桌面入口实现：1aabe532。
 - 用户确认文字成功：3d3361e，仅指用户现场说明，未独立读取原始模型/发送ACK追踪。
 - LAP-41整理前基线：3d3361eaecae1e342bb05412c6af3ccdf6b4417b。
