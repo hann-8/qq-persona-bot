@@ -2,7 +2,21 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [TASKS](../../TASKS.md) / [工作线](../../HANDOFF.md) / [合同](../LAP-19/GROUP_CHAT_PLAN.md)。继承AGENTS及实施指引共同边界。
 
-## 当前接续：Snow主线7条受控表情迁移，仅规划完成
+## 当前接续：Snow七条表情已复制/暂存，运行中未激活
+
+2026-10-25 16:07:00（Asia/Shanghai）：session LAP-21-snow-memes-data-migration / Snow七条受控表情实际迁移，续领LAP-21。基线HEAD/实时远端dc79796642371ee72945457b0a4c1bcd94164801，工作区无非忽略差异。精确文档归属：PROGRESS.md、tracks/laptop-workbuddy/HANDOFF.md、tracks/laptop-workbuddy/TASKS.md、tracks/laptop-workbuddy/tasks/LAP-21/HANDOFF.md、tracks/laptop-workbuddy/tasks/LAP-21/SNOW_MIGRATION_RESULT.md、docs/BOT_USAGE_COMPARISON.md。忽略数据归属：源catalog验证引用的目标assets/memes/library七文件、state/memes-pending.local.yaml、仅已停可激活的config/memes.local.yaml，以及state/meme-migration/LAP-21-snow-memes-data-migration/。预计生产代码0修改；源码小修复须先另登记。源E:/CodexWS/QQbot仅只读；不启停/真实模型/QQ/RPC，不读验A4、不访问旧C根，不并领其他任务。完成验证与Git交付后释放归属。
+
+2026-10-25，session `LAP-21-snow-memes-data-migration`，16:07（Asia/Shanghai）登记并重读文件归属。实际起点HEAD/实时远端同为`dc79796642371ee72945457b0a4c1bcd94164801`，Git开始干净。仅续LAP-21；[实际迁移结果](SNOW_MIGRATION_RESULT.md)记录本轮M1—M5交付。
+
+7图实际复制入目标library，7条保留原字段并在配置锁内暂存到pending；5 GIF+2 JPEG共4,100,086字节，全部路径/reparse/真实格式/尺寸/帧数/hash校验通过，候选7项/1134字节。目标catalog原先不存在且仍保持不存在。`require_stopped`确认目标项目正在运行，本轮未调用激活、不启停，loaded/real_ack/client_display/GIF动画均未验。
+
+备份原catalog/pending不存在标记、配置摘要及私密manifest均在目标忽略的`state/meme-migration/LAP-21-snow-memes-data-migration/`。源catalog/7图复制前后及独立验证摘要一致；两根local/persona保护摘要不变，memes=true、冷却0/0、free/web及其他开关保留。生产代码和新增配置均0。当前20项test_memes合成回归通过，独立7图/字段/hash/预算/幂等合并及本机保护复核通过；不跑全矩阵/verify_lap21/A4，不覆盖旧reports。
+
+跟踪交付仅PROGRESS、工作线HANDOFF/TASKS、本交接、新SNOW_MIGRATION_RESULT、BOT_USAGE_COMPARISON共6份文档；图库/标签/local/persona/state不提交。源根全程只读，旧C根不访问，真实模型/群/RPC/下载均0。后续停机激活及正常启动步骤见实际结果；真实验收另定session/时段/群/上限。完成Git交付后释放归属并停止，等待用户下一条指令。
+
+交付检查点：6份文档/208本地链接/2行围栏/10个精确忽略路径检查通过，`git diff --check`通过。最后独立复核仍为staged、stop_check=running，7图/字段/源稳定性与本机保护保持；不再修改数据，提交推送核对后释放本批归属。
+
+## 规划检查点（历史，已由本次实际准备接续）
 
 2026-10-25，session `LAP-21-snow-controlled-memes-plan`，15:46开始只读复核、15:49登记7份文档并重读。工作根`E:/CodexWS/QQbot_Snowluma`，分支`codex/lap-40-snowluma`；起点HEAD和实时远端同为`e2d9a0c082f3400904d8a4032eb01b4290ef08a8`，开始无非忽略Git差异。沿用LAP-21，未新开任务/同时领取其他实施。
 
