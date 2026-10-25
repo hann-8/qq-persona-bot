@@ -10,11 +10,11 @@ LAP-41工作区整理与使用对照已完成：uv报告清除38,269个缓存文
 
 **LAP-42已实际实施并加载可用部分**：[实际报告](reports/lap-42-2026-10-25.md) / [交接](tracks/laptop-workbuddy/tasks/LAP-42/HANDOFF.md)。长期群记忆读取/学习、关注、成员与受控@已保存并加载；B站字幕运行服务/入口已退役，普通web保留。164项定向单元、19项AstrBot原事件组合回环通过。新根独立记忆key/context token已初始化，人设/图库/21 pending未变，CodeBuddy/DeepSeek/low/free及原预算保留。
 
-用户配合的追加单图采样已真实下载并解码JPEG（1260×709→1024×576），该样本0模型/0bot输出；首窗口超时保留，不抹失败。当前CLI原生图片封套与四种格式像素hash已用实际runner底层替身验证；模型支持由用户确认，但视觉token/模板上界与组合原生容量未获证，六例IQ/群图片生成未执行，vision仍false。记忆持久学习、成员/受控@群内真实效果与客户端显示均未据加载晋升通过。最终OneBot就绪；本轮实施期间旧实例有4次可见自然CLI尝试，不能称全程0调用。只完成42，不续其他任务。
+上轮用户配合的追加单图采样已真实下载并解码JPEG（1260×709→1024×576），该样本0模型/0bot输出；首窗口超时保留，不抹失败。当前CLI原生图片封套与四种格式像素hash已用实际runner底层替身验证；模型支持由用户确认，但视觉token/模板上界与组合原生容量未获证，六例IQ/群图片生成未执行，vision仍false。记忆持久学习、成员/受控@群内真实效果与客户端显示均未据加载晋升通过。最终OneBot就绪；本轮实施期间旧实例有4次可见自然CLI尝试，不能称全程0调用。只完成42，不续其他任务。
 
 上轮LAP-21[实际数据准备](tracks/laptop-workbuddy/tasks/LAP-21/SNOW_MIGRATION_RESULT.md)已交付：7图复制、7条暂存，运行中未激活/加载/真实验收。用户说图片完成，不据此扩写为图片ACK/客户端显示已通过；42不复做图库、不动21 pending，也不拿该尾项作前置。
 
-**下一项只续LAP-42当前DeepSeek识图收尾，已详细规划、未实施**：[详规](tracks/laptop-workbuddy/tasks/LAP-42/VISION_FINISH_PLAN.md) / [来源与推导](tracks/laptop-workbuddy/tasks/LAP-42/HOSTED_CLI_BUDGET_EVIDENCE.md) / [可复制medium指令](tracks/laptop-workbuddy/tasks/LAP-42/VISION_MEDIUM_START.md)。本轮只读核对取得官方单图1024 token规则和固定编码器来源；发现项目hosted校验的null窗口互斥、字节/token混扣、GGUF身份要求及旧报告接点阻断。按当前CLI真实契约修项目外层，不改模型/人设/预算数字或Snow内部，不等于已通过原生质量/启用。然后才分别收尾21表情激活与已开增强的人工验收；本轮不同时领取。
+**LAP-42视觉续作已交付代码与定向验证，识图仍待具体来源缺口**：[实际结果](reports/lap-42-vision-result.md) / [定向报告](reports/lap-42-vision-offline.json) / [来源审阅](reports/lap-42-vision-sources.json)。null窗口、字节/token分账、hosted三字段身份及新offline接点已修；88单元/39框架场景通过。现有0生成握手确认当前DeepSeek支持图片与low（1M输入/128000输出），但CLI自定义system后仍渲染/追加产品agent文字，完整F上界未获证，静态拒绝IQ；IQ=0/6、群图=0/2、vision=false。既有decoded记录有效可复用，未新采样/启停/改local；现场当前stopped/disconnected，不能沿用上轮ready。只交付42并释放归属，未自动推进21或其他验收。
 
 ## 从哪里继续
 
@@ -37,7 +37,7 @@ LAP-41工作区整理与使用对照已完成：uv报告清除38,269个缓存文
 
 | 工作线 | 状态/最新依据 | 接续入口 |
 | --- | --- | --- |
-| QQ主线：SnowLuma及共用bot业务 | active；42可用功能已加载；视觉真实入站通过、原生预算/质量未验且仍关闭；hosted预算修复/识图收尾详规已交付未实施 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [LAP-42](tracks/laptop-workbuddy/tasks/LAP-42/HANDOFF.md) / [识图medium](tracks/laptop-workbuddy/tasks/LAP-42/VISION_MEDIUM_START.md) |
+| QQ主线：SnowLuma及共用bot业务 | active；42可用功能历史已加载；本轮hosted外层修复/88单元39场景通过，完整CLI模板来源未界定、IQ/群图未验且仍关闭；现场stopped | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [LAP-42](tracks/laptop-workbuddy/tasks/LAP-42/HANDOFF.md) / [识图medium](tracks/laptop-workbuddy/tasks/LAP-42/VISION_MEDIUM_START.md) |
 | 家庭5070备用模型路线 | 历史记录为接入已实现/离线及元数据通过、真实生成未验；本轮未重查，不自动切换后端 | [HANDOFF](tracks/local-5070/HANDOFF.md) / [既有选型](tracks/local-5070/MODEL_SELECTION.md) |
 
 `tracks/laptop-workbuddy` 是保留的历史目录名，当前承担QQ主线和共用网关交接，不表示仍以NapCat或WorkBuddy界面为主路线。所有旧任务的状态/验收差额在TASKS与各任务HANDOFF保留，不重命名整棵目录。

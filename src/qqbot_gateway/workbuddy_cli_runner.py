@@ -20,6 +20,10 @@ from .token_budget import InputBudget, known_models, user_message
 LOG = logging.getLogger(__name__)
 
 
+class _MetadataReady(Exception):
+    pass
+
+
 class ResultParser:
     def __init__(self, expected_model=None):
         self.expected_model = expected_model
@@ -140,9 +144,17 @@ class CLIRunner:
         if owner.task is not None:
             await owner.join()
 
+    async def inspect_models(self, request_id):
+        """Same isolated controls and cleanup, with no user or model generation."""
+        return await self._execute('', '', request_id, control_only=True)
+
     async def run(self, system, prompt, request_id):
+        return await self._execute(system, prompt, request_id)
+
+    async def _execute(self, system, prompt, request_id, *, control_only=False):
         from .vision import CURRENT,text_budget,cli_message,wire_check,production_budget
-        production_budget(self.root,getattr(self,'vision_settings',{}),self.budget,system,prompt)
+        if control_only and CURRENT.get():raise GatewayError('PROTOCOL_ERROR')
+        if not control_only:production_budget(self.root,getattr(self,'vision_settings',{}),self.budget,system,prompt)
         text_budget(self.budget).check(system, prompt)
         image_message=cli_message(prompt)
         wire_check(dict(system=system,input=image_message))
@@ -204,7 +216,7 @@ class CLIRunner:
                                     'effort_effective':None,'auto_compact_setting':False,
                                     'forced_compact_exclusion_verified':False,'native_window':'unverified'}
             self.last_parameters['effort_evidence']='auto_default' if self.reasoning_effort=='auto' else 'awaiting_current_capabilities'
-            exchange = ControlExchange('get_available_models') if self.reasoning_effort != 'auto' else None
+            exchange = ControlExchange('get_available_models') if control_only or self.reasoning_effort != 'auto' else None
             acknowledged = asyncio.Event()
             owned_root = None
             try:
@@ -231,9 +243,13 @@ class CLIRunner:
                         if not isinstance(event,dict):raise GatewayError('PROTOCOL_ERROR')
                         if event.get('type') == 'control_response':
                             response = exchange.accept(event)
-                            models = {m['id']:m for m in model_metadata(response)}
+                            safe_models=model_metadata(response)
+                            ids=[m['id'] for m in safe_models]
+                            if len(set(ids))!=len(ids):raise GatewayError('PROTOCOL_ERROR')
+                            models = {m['id']:m for m in safe_models}
+                            self.last_models=safe_models
                             model = models.get(self.model, {})
-                            if self.reasoning_effort not in model.get('reasoning',{}).get('supportedEfforts',[]):
+                            if self.reasoning_effort != 'auto' and self.reasoning_effort not in model.get('reasoning',{}).get('supportedEfforts',[]):
                                 raise GatewayError('MODEL_CONFIG_UNSUPPORTED')
                             maximum = model.get('maxInputTokens')
                             if isinstance(maximum,int) and self.budget.limit > maximum:
@@ -241,6 +257,7 @@ class CLIRunner:
                             self.last_parameters['effort_effective'] = self.reasoning_effort
                             self.last_parameters['effort_evidence']='current_supportedEfforts_and_cli_flag'
                             acknowledged.set()
+                            if control_only:raise _MetadataReady()
                             break
                         # No model response may precede the only user message.
                         if event.get('type') in ('result','assistant','user'):
@@ -267,7 +284,10 @@ class CLIRunner:
                         await asyncio.wait_for(acknowledged.wait(), min(self.control_timeout,self.timeout))
                     except TimeoutError:
                         raise GatewayError('PROTOCOL_ERROR') from None
-                    if CURRENT.get():text_budget(self.budget).check(system,prompt)
+                    if control_only:return
+                    if CURRENT.get():
+                        text_budget(self.budget).check(system,prompt)
+                        self._native_metadata_check(system,prompt)
                     payload = (json.dumps(image_message,ensure_ascii=False,separators=(',',':'))+'\n').encode('utf-8')
                 elif CURRENT.get():
                     text_budget(self.budget).check(system,prompt)
@@ -291,6 +311,10 @@ class CLIRunner:
                 result = BackendResult(parser.finish(process.returncode),parser.usage,self.last_parameters,'stop')
                 generation = 'success'
                 return result
+            except _MetadataReady:
+                # Intentional end after control; no generation was started.
+                generation='cancelled'
+                return self.last_models
             except TimeoutError:
                 generation = 'MODEL_TIMEOUT'
                 raise GatewayError('MODEL_TIMEOUT') from None
@@ -315,3 +339,27 @@ class CLIRunner:
                     raise GatewayError('CLEANUP_FAILED')
                 if asyncio.current_task().cancelling():
                     raise asyncio.CancelledError
+
+    def _native_metadata_check(self, system, prompt):
+        from .vision import CURRENT
+        from .hosted_cli_budget import KIND, RUNTIME, final_budget
+        if self.budget.vision_kind != KIND:
+            # Legacy local/transport-only fixtures keep their existing contract.
+            # A real hosted observation is always constructed with from_settings.
+            return
+        from .vision_capabilities import selected_record, runtime_identity
+        settings=getattr(self,'vision_settings',{})
+        try:
+            record=selected_record(settings)
+            if runtime_identity(self.root,settings)!=RUNTIME:raise ValueError('HOSTED_RUNTIME_MISMATCH')
+            model=next((m for m in self.last_models if m['id']==self.model),{})
+            expected=known_models().get(self.model,{})
+            keys=('id','supportsImages','maxInputTokens','maxOutputTokens','contextWindow','reasoning')
+            if {k:model.get(k) for k in keys}!={k:expected.get(k) for k in keys}:
+                raise ValueError('HOSTED_CURRENT_CAPABILITIES_CHANGED')
+            image=CURRENT.get().blob.checked()
+            terms=final_budget(record,self.budget,system,prompt,image.width,image.height,model)
+            self.last_parameters['native_budget']=terms
+        except (ValueError,KeyError,TypeError,StopIteration) as error:
+            self.last_parameters['vision_rejection']=str(error)
+            raise GatewayError('MODEL_CONFIG_UNSUPPORTED') from None

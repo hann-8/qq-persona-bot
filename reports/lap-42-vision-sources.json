@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "retrieved_date": "2026-10-25",
+  "public_resources": {
+    "tokenizer.json": {
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/raw/314113f8a7dadb388215396ba5fbee2c610a04d6/tokenizer.json",
+      "bytes": 6367257,
+      "sha256": "c90dfa01249db1be4245780a052ede752e1361c612ac6d08e2bdada7d599476b"
+    },
+    "encoding/encoding.py": {
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/raw/314113f8a7dadb388215396ba5fbee2c610a04d6/encoding/encoding.py",
+      "bytes": 37962,
+      "sha256": "13231c592e958fb39e2af6001dae69d90e7a36b265702b9b390236fb387599e2"
+    },
+    "encoding/README.md": {
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/raw/314113f8a7dadb388215396ba5fbee2c610a04d6/encoding/README.md",
+      "bytes": 12164,
+      "sha256": "a34a5ca98c65e5b5b2bedd693cc2e18e732fe50192723fb6937ae07219c23739"
+    },
+    "vision": {
+      "url": "https://api-docs.deepseek.com/zh-cn/guides/vision/",
+      "bytes": 81484,
+      "sha256": "e2893cc471715215872d02384a52e6ac10a0cebc7379f383ab834a6f3ac00f8b"
+    },
+    "release": {
+      "url": "https://deepseek.com/en/news/deepseek-v4-1-flash/",
+      "bytes": 114584,
+      "sha256": "2f6db410eac964987a53c21455b4f4168bbd66489efc2819d1a2348bcd6a8c20"
+    },
+    "pricing": {
+      "url": "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
+      "bytes": 26182,
+      "sha256": "556097caba8adfeeed6455714bffd731c7f60db520fcee06a922eba5840663a3"
+    },
+    "tokenizers/byte_level.rs": {
+      "url": "https://raw.githubusercontent.com/huggingface/tokenizers/v0.22.2/tokenizers/src/pre_tokenizers/byte_level.rs",
+      "bytes": 20007,
+      "sha256": "f9b5a747a0ad936f0c49cff8f32bc8f166126704ab02d5af0505ad032fe6d99a"
+    }
+  },
+  "cli_bundle_sha256": "13e6dd30a22d2f11857675193f909a2ccb935da67a067f580fcfe764e474ff60",
+  "symbols": {
+    "capacity": {
+      "symbol": "function resolveEffectiveContextBudget(eA)",
+      "character_offset": 14059297,
+      "review_excerpt_bytes": 800,
+      "review_excerpt_sha256": "b212b0466f298a1003280fde604d03aeb409c0c43b96598363bdd8c72bc79c34"
+    },
+    "output": {
+      "symbol": "static getMaxOutputTokens(eA,el,ec={})",
+      "character_offset": 14128070,
+      "review_excerpt_bytes": 800,
+      "review_excerpt_sha256": "566b653f5f5b0b24777a2ae0d77878b973058d949125cc1a4cefcb3939e5bd57"
+    },
+    "override_then_render": {
+      "symbol": "let eu=this.getCliSystemPromptOverride();if(void 0!==eu)",
+      "character_offset": 4893638,
+      "review_excerpt_bytes": 800,
+      "review_excerpt_sha256": "220a9110ef7f110596aa82535fc5347456f208b774716be0112b642c6d2eeda2"
+    },
+    "append_after_override": {
+      "symbol": "ey=(0,r7.v3)(em,eA.appendInstructions)",
+      "character_offset": 4866998,
+      "review_excerpt_bytes": 800,
+      "review_excerpt_sha256": "56547b506594273f7f7e52ce445c3801d3ccd5d46383c8841a6f7eb81f7cedbd"
+    },
+    "remote_agent_source": {
+      "symbol": "let{agents:ep=[],models:eg=[],skills:eh=[],commands:ef=[],tools:em=[]}=eu",
+      "character_offset": 4860826,
+      "review_excerpt_bytes": 800,
+      "review_excerpt_sha256": "3b60bca3242e97a2eb58f54469156f986d16804df7663b7d77e5ed304609a37c"
+    },
+    "metadata_only_models": {
+      "symbol": "let{models:ec}=await this.agentManager.getInitializeMetadata()",
+      "character_offset": 6646417,
+      "review_excerpt_bytes": 800,
+      "review_excerpt_sha256": "517462a09bea35ed11cd169b21b5ee032c0d01d7ed5687483d59fce245a6ac82"
+    },
+    "single_image_passthrough": {
+      "symbol": "convertInputImageToImageBlock(eA)",
+      "character_offset": 5483701,
+      "review_excerpt_bytes": 800,
+      "review_excerpt_sha256": "919dfb80624492ed26cd7d81e108aabff1a5ea1e5501568a71b8013b72bb4332"
+    },
+    "user_wrapper": {
+      "symbol": "static wrapUserQuery(eA)",
+      "character_offset": 14096651,
+      "review_excerpt_bytes": 800,
+      "review_excerpt_sha256": "476c6c4c8897c7446f9505a09743c9eb8fa0e307e0404feb8da7e81a6bdab813"
+    }
+  },
+  "conclusion": {
+    "ordinary_text_tokens_per_utf8_byte": 1,
+    "visual_tokens_per_first_image": 1024,
+    "official_encoder_finite": true,
+    "complete_cli_template_bound": false,
+    "reason": "Custom system still passes through promptRenderer.render and agent.appendInstructions after override. Agent configurations come from product configuration. get_available_models returns models only; neither effective appended text nor a source-backed length bound is observable in this control. A finite complete F is therefore not established.",
+    "native_iq_permitted": false,
+    "real_generations": 0
+  }
+}

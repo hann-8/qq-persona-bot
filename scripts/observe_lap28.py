@@ -44,7 +44,7 @@ async def observe(root,settings,sample,case,truth,bound,human_score,fixture_hash
     from qqbot_gateway.token_budget import InputBudget,validate_model_settings
     from qqbot_gateway.vision import normalize,NativeImage,CURRENT,AUDIT,binding,text_budget
     from qqbot_gateway.vision_quality import score
-    from qqbot_gateway.vision_capabilities import selected_record
+    from qqbot_gateway.vision_capabilities import selected_record,static_diagnostics
     identity=runtime_identity(root,settings)
     if binding(settings,identity)!=bound:raise ValueError('EVIDENCE_BINDING_MISMATCH')
     if sample.stat().st_size>8*1024*1024:raise ValueError('SAMPLE_TOO_LARGE')
@@ -55,6 +55,8 @@ async def observe(root,settings,sample,case,truth,bound,human_score,fixture_hash
     budget=InputBudget.from_settings(settings,validate_model_settings(settings))
     runner=create_runner(root,settings,budget);runtime={};metrics={}
     cfg=resolve_backend(settings);record=selected_record(settings)
+    missing=static_diagnostics(settings,identity) if record and record.get('kind') else []
+    if missing:raise ValueError('NATIVE_IQ_STATIC_REJECTED: '+','.join(missing))
     token=None;audit=None
     try:
         if hasattr(runner,'preflight'):
@@ -73,7 +75,7 @@ async def observe(root,settings,sample,case,truth,bound,human_score,fixture_hash
         # Never manufacture an observed platform/processor by copying the review
         # record. Current API metadata cannot attest a Windows GGUF runtime path.
         # This independent gap must return to planning before any registry grant.
-        observed_identity=identity|{k:runtime[k] for k in ('version','runtime_path') if k in runtime}
+        observed_identity=identity if record and record.get('kind') else identity|{k:runtime[k] for k in ('version','runtime_path') if k in runtime}
         runtime_ok=bool(record and observed_identity==record['runtime'] and
             (cfg['backend']=='codebuddy_cli' or (runtime.get('version')==identity['version'] and runtime.get('digest')==identity['model_digest'])))
         return dict(state='scored',**graded,**metrics,
@@ -105,7 +107,7 @@ def main():
     parser.add_argument('--authorize-native',choices=('SIX_NATIVE_IMAGE_CALLS',))
     args=parser.parse_args()
     from qqbot_gateway.vision_quality import fixtures,BatchLedger
-    from qqbot_gateway.vision_capabilities import CASES,production_diagnostics,digest,selected_record,read_json
+    from qqbot_gateway.vision_capabilities import CASES,production_diagnostics,digest,selected_record,read_json,offline_valid,static_diagnostics
     from qqbot_gateway.config import read_settings,configuration_lock,require_stopped
     from qqbot_gateway.config_files import read_project
     from qqbot_gateway.backends import resolve_backend
@@ -126,8 +128,10 @@ def main():
     spec=read_json(args.spec)
     with configuration_lock(root):
         require_stopped(root)
-        offline=read_json(ROOT/'reports/lap-28-C-offline.json')
-        if offline.get('passed') is not True or offline.get('adapter_signature')!=adapter_signature():
+        record=selected_record(settings)
+        if record and record.get('kind') and static_diagnostics(settings,identity):
+            parser.error('Native IQ static review failed: '+','.join(static_diagnostics(settings,identity)))
+        if not offline_valid(settings):
             parser.error('Current adapter offline proof required')
         ledger=BatchLedger(root/'state/vision-evidence/iq-batches.sqlite3')
         if args.create_batch:
@@ -136,33 +140,40 @@ def main():
             print('Fixed six-case batch authorized; zero generations');return 0
         plan=ledger.plan(args.batch_id)
         if plan['fixture_hash']!=digest(spec):parser.error('Fixture spec changed')
-        def human(text):
-            print(text)  # synthetic only, transient local answer, never report/file
-            return {k:input(k+' [yes/no]: ').strip()=='yes' for k in ('no_hallucination','visible_facts_correct','injection_safe')}
-        for case in CASES:
-            sample=args.spec.parent/(case+'.png')
-            data=sample.read_bytes()
-            image_hash=hashlib.sha256(data).hexdigest()
-            if image_hash!=spec['cases'][case]['sha256']:parser.error('Fixture pixels changed')
-            ledger.reserve(args.batch_id,case,bound,image_hash)
-            try:
-                result=asyncio.run(observe(root,settings,sample,case,spec['cases'][case]['truth'],bound,human,image_hash))
-            except (Exception,KeyboardInterrupt):
-                ledger.finish(args.batch_id,case,dict(state='failed_or_unknown',failure='NATIVE_OBSERVATION_FAILED'))
-                print('Batch stopped; consumed case retained; no retry');return 1
-            ledger.finish(args.batch_id,case,result)
-            if not result['quality_passed'] or not result['no_truncation']:
-                print('Quality/capacity failed; batch stopped; no retry');return 1
-        # Observation export only. active.json requires separate stopped operator
-        # review, ingress evidence and reviewed bounds; this command never writes it.
-        snapshot=ledger.snapshot(args.batch_id)
-        path=root/'state/vision-evidence'/(args.batch_id+'-observation.json')
-        record=selected_record(settings)
-        value=dict(binding=bound,runtime=identity,record_hash=digest(record),fixture_hash=plan['fixture_hash'],
-            batch=snapshot,offline_passed=True,ingress_decoded=False,unresolved_attempts=ledger.unresolved(bound))
-        with path.open('x',encoding='utf-8') as stream:json.dump(value,stream,indent=2)
-        print(json.dumps(dict(state='observed',production_eligible=False,missing=production_diagnostics(settings,value,identity))))
-        return 0
+    # The runner reserves its cleanup ledger under the same OS configuration
+    # lock. Never hold the outer snapshot lock across native process I/O.
+    def human(text):
+        print(text)  # synthetic only, transient local answer, never report/file
+        return {k:input(k+' [yes/no]: ').strip()=='yes' for k in ('no_hallucination','visible_facts_correct','injection_safe')}
+    for case in CASES:
+        sample=args.spec.parent/(case+'.png')
+        data=sample.read_bytes()
+        image_hash=hashlib.sha256(data).hexdigest()
+        if image_hash!=spec['cases'][case]['sha256']:parser.error('Fixture pixels changed')
+        with configuration_lock(root):
+            require_stopped(root)
+            current=read_settings(args.config,root=root)[0] if args.config else read_project(root).settings
+            if binding(current,runtime_identity(root,current))!=bound:
+                parser.error('Current selected binding changed; no case started')
+        ledger.reserve(args.batch_id,case,bound,image_hash)
+        try:
+            result=asyncio.run(observe(root,settings,sample,case,spec['cases'][case]['truth'],bound,human,image_hash))
+        except (Exception,KeyboardInterrupt):
+            ledger.finish(args.batch_id,case,dict(state='failed_or_unknown',failure='NATIVE_OBSERVATION_FAILED'))
+            print('Batch stopped; consumed case retained; no retry');return 1
+        ledger.finish(args.batch_id,case,result)
+        if not result['quality_passed'] or not result['no_truncation']:
+            print('Quality/capacity failed; batch stopped; no retry');return 1
+    # Observation export only. active.json requires separate stopped operator
+    # review, ingress evidence and reviewed bounds; this command never writes it.
+    snapshot=ledger.snapshot(args.batch_id)
+    path=root/'state/vision-evidence'/(args.batch_id+'-observation.json')
+    record=selected_record(settings)
+    value=dict(binding=bound,runtime=identity,record_hash=digest(record),fixture_hash=plan['fixture_hash'],
+        batch=snapshot,offline_passed=True,ingress_decoded=False,unresolved_attempts=ledger.unresolved(bound))
+    with path.open('x',encoding='utf-8') as stream:json.dump(value,stream,indent=2)
+    print(json.dumps(dict(state='observed',production_eligible=False,missing=production_diagnostics(settings,value,identity))))
+    return 0
 
 
 if __name__=='__main__':raise SystemExit(main())

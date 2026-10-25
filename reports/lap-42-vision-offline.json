@@ -1,0 +1,289 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "adapter_signature": "7d168ec87aef89a06474980ec1e0eadd244c525939a86b4861b0ee1ffd0fefd4",
+  "rule_hash": "6768dfc6f70717e3519ecfcacbdd03b02c2ccbc95742cc17fa48f25163059fa2",
+  "verifier_sha256": "985c6538a8bbb36874dbfe93be8c06047fc6105e6efb42abcf95840fd2a71610",
+  "tests_sha256": "964c6b6d10b0e3acc82cbe16b0145906b07aea2598712153da39cb75ac1bd83d",
+  "source_audit_sha256": "97257ab40964755b99413646554a7774692ce2ddeb4b5256d41ddf64c5c595ff",
+  "unit_tests": 88,
+  "failures": 0,
+  "errors": 0,
+  "modules": [
+    "test_lap42_vision",
+    "test_lap28",
+    "test_lap28_ingress",
+    "test_lap28_capability",
+    "test_cli_runner",
+    "test_cli_control",
+    "test_token_budget",
+    "test_lap42"
+  ],
+  "frameworks": [
+    {
+      "backend": "codebuddy_cli",
+      "mode": "adaptive",
+      "participation": "free",
+      "attention": true,
+      "web": true,
+      "memory_enabled": true,
+      "body_reader": false,
+      "cases": [
+        {
+          "case": "current_first_image_native_once",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "vision_effective_text_only_v2_no_image",
+          "generations": 1,
+          "sends": 1
+        },
+        {
+          "case": "replay_local_notice_no_generation",
+          "generations": 0,
+          "sends": 1
+        },
+        {
+          "case": "text_visual_reserve_rejected_before_native",
+          "generations": 0,
+          "sends": 1
+        },
+        {
+          "case": "ambient_unavailable_silent_no_generation",
+          "generations": 0,
+          "sends": 0
+        },
+        {
+          "case": "ambient_merge_target_and_cap_together",
+          "generations": 2,
+          "sends": 2
+        }
+      ],
+      "real_model_calls": 0,
+      "real_qq_calls": 0,
+      "real_run_agent": true,
+      "actual_runner": true,
+      "private_gate_http": true,
+      "actual_provider": true,
+      "original_event_ACK": true,
+      "production_eligible": false
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "adaptive",
+      "participation": "free",
+      "attention": true,
+      "web": true,
+      "memes": true,
+      "memory_enabled": true,
+      "cases": [
+        {
+          "case": "same_text_chain_gate_ACK",
+          "generations": 1,
+          "sends": 1,
+          "mention_applied": true,
+          "part_states": [
+            "sent"
+          ]
+        },
+        {
+          "case": "count_expires_during_generation_same_attempt_strip",
+          "generations": 1,
+          "sends": 1,
+          "mention_applied": false,
+          "part_states": [
+            "sent"
+          ]
+        },
+        {
+          "case": "invalid_all_aux_preserves_text",
+          "generations": 1,
+          "sends": 1,
+          "mention_applied": false,
+          "part_states": [
+            "sent"
+          ]
+        },
+        {
+          "case": "count_50_zero_list",
+          "generations": 1,
+          "sends": 1,
+          "mention_applied": false,
+          "part_states": [
+            "sent"
+          ]
+        },
+        {
+          "case": "count_51_zero_list",
+          "generations": 1,
+          "sends": 1,
+          "mention_applied": false,
+          "part_states": [
+            "sent"
+          ]
+        },
+        {
+          "case": "count_None_zero_list",
+          "generations": 1,
+          "sends": 1,
+          "mention_applied": false,
+          "part_states": [
+            "sent"
+          ]
+        },
+        {
+          "case": "unknown_observation_age_zero_list",
+          "generations": 1,
+          "sends": 1,
+          "mention_applied": false,
+          "part_states": [
+            "sent"
+          ]
+        },
+        {
+          "case": "ordinary_direct_text_no_automatic_mention",
+          "generations": 1,
+          "sends": 1,
+          "mention_applied": false,
+          "part_states": [
+            "sent"
+          ]
+        }
+      ],
+      "real_model_calls": 0,
+      "real_qq_calls": 0,
+      "real_run_agent": true,
+      "actual_runner": true,
+      "private_gate_http": true,
+      "actual_provider": true,
+      "original_event_ACK": true,
+      "production_eligible": false
+    },
+    {
+      "backend": "codebuddy_cli",
+      "mode": "adaptive",
+      "participation": "free",
+      "attention": true,
+      "memory": true,
+      "memes": true,
+      "members": true,
+      "cases": [
+        {
+          "case": "normal_original_event_ACK",
+          "sends": 1
+        },
+        {
+          "case": "same_at_stop_blacklist_other_member_wake",
+          "sends": 1
+        },
+        {
+          "case": "old_result_after_wake_no_assistant_history",
+          "sends": 0
+        },
+        {
+          "case": "local_notice_ticket_old_rejected",
+          "sends": 1
+        },
+        {
+          "case": "all_local_notice_families_immutable_ticket",
+          "sends": 11
+        },
+        {
+          "case": "gate_refusal_known_not_sent_no_unknown_lock",
+          "sends": 0
+        },
+        {
+          "case": "submitted_delayed_ACK_retained",
+          "sends": 1
+        },
+        {
+          "case": "bubble_interval_stop_wake_partial",
+          "sends": 1
+        },
+        {
+          "case": "image_only_original_ACK_ticket",
+          "sends": 1
+        },
+        {
+          "case": "old_image_after_wake_rejected",
+          "sends": 0
+        },
+        {
+          "case": "failed_image_local_notice_ticket",
+          "sends": 1
+        },
+        {
+          "case": "typed_at_same_chain_ticket_and_permission",
+          "sends": 1
+        },
+        {
+          "case": "typed_at_permission_race_no_send",
+          "sends": 0
+        },
+        {
+          "case": "router_local_wait_no_provider_no_global_cancel",
+          "sends": 0
+        },
+        {
+          "case": "ambient_batch_discard_no_backlog",
+          "sends": 0
+        },
+        {
+          "case": "pre_HTTP_invalidated_no_generation",
+          "sends": 0
+        },
+        {
+          "case": "local_input_notice_0",
+          "sends": 1
+        },
+        {
+          "case": "local_input_notice_4200",
+          "sends": 1
+        },
+        {
+          "case": "local_input_notice_7",
+          "sends": 1
+        },
+        {
+          "case": "submitted_HTTP_internal_queue_natural_completion",
+          "sends": 0
+        },
+        {
+          "case": "wake_never_clears_real_blocking_state",
+          "sends": 0
+        },
+        {
+          "case": "true_ACK_unknown_preserved",
+          "sends": 1
+        },
+        {
+          "case": "other_group_isolated",
+          "sends": 1
+        },
+        {
+          "case": "missing_mirror_closed",
+          "sends": 0
+        },
+        {
+          "case": "malformed_mirror_closed_then_recovers",
+          "sends": 0
+        }
+      ],
+      "real_model_calls": 0,
+      "real_qq_calls": 0,
+      "real_run_agent": true,
+      "actual_runner": true,
+      "original_event_ACK": true
+    }
+  ],
+  "framework_combinations": 3,
+  "framework_cases": 39,
+  "real_model_calls": 0,
+  "real_qq_outputs": 0,
+  "bot_start_stop_operations": 0,
+  "native_iq_eligible": false,
+  "production_eligible": false,
+  "remaining_source_gap": "CLI_POST_OVERRIDE_TEMPLATE_UNBOUNDED",
+  "scope": "Current hosted regression and existing original AstrBot event/actual runner bottom substitutes; legacy harnesses do not prove hosted native eligibility."
+}

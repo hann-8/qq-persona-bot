@@ -46,13 +46,14 @@ def model_metadata(response):
         for key in ('maxInputTokens', 'maxOutputTokens'):
             if type(value.get(key)) is int and value[key] > 0:
                 result[key] = value[key]
-        for key in ('supportsReasoning','onlyReasoning'):
+        for key in ('supportsReasoning','onlyReasoning','supportsImages'):
             if type(value.get(key)) is bool:result[key]=value[key]
         window = value.get('contextWindow')
         if isinstance(window, dict):
             result['contextWindow'] = {}
-            if type(window.get('default')) is int and window['default']>0:
-                result['contextWindow']['default']=window['default']
+            for field in ('default','defaultLength'):
+                if type(window.get(field)) is int and window[field]>0:
+                    result['contextWindow'][field]=window[field]
             if isinstance(window.get('supportedLengths'),list):
                 result['contextWindow']['supportedLengths']=[v for v in window['supportedLengths'] if type(v) is int and v>0]
         reasoning = value.get('reasoning')

@@ -2,17 +2,21 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [AGENTS](../../../../AGENTS.md)。当前[识图收尾详规](VISION_FINISH_PLAN.md) / [来源与推导](HOSTED_CLI_BUDGET_EVIDENCE.md) / [新medium指令](VISION_MEDIUM_START.md)；原[整合PLAN](PLAN.md) / [旧medium指令](MEDIUM_START.md)仅作上一轮历史合同。
 
-## 当前接续：只续42的DeepSeek识图
+## 当前视觉续作实际检查点
 
-session `LAP-42-hosted-vision-finish-plan`，2026-10-25 22:19（Asia/Shanghai）在TASKS登记7份文档并重读；开始本地/实时远端48f66bc192548184e4f88e23de6a357962bff85e，codex/lap-40-snowluma，Git无非忽略差异。不新建ID，不并领21或其他真实验收。
+session `LAP-42-hosted-vision-implementation`，2026-10-25 22:47:38（Asia/Shanghai）在TASKS登记精确文件与唯一受管/真实验证归属并重读。起点本地/实时远端1660f3e6c026390909caa37480ca08493305c242，分支codex/lap-40-snowluma，Git干净。不新领28/21/已开增强。
 
-本轮取得DeepSeek官方单图1024 token及固定tokenizer/encoder来源，锁定CLI有效容量/输出语义已只读核对；普通文本保守上界与模板额外项分开。发现hosted代码中的null窗口互斥、4096 token从30000字节中混扣（当前空prompt 25997>25904）、3字段CLI实际身份被8字段GGUF合同拒绝和旧offline报告路径。下一轮按新详规修项目外部接点、生成当前定向报告，做固定六例及最多两次人工群图闭环；没有换模型/抬预算或改Snow内部的授权。来源支持不等于实际IQ通过。
+[实际结果](../../../../reports/lap-42-vision-result.md) / [当前offline](../../../../reports/lap-42-vision-offline.json) / [实际公开资源与CLI符号来源](../../../../reports/lap-42-vision-sources.json)。已实现字节/token分账、hosted null窗口/锁定容量函数、三字段身份严格kind、新固定offline和最终安全能力握手；88单元/3组39场景通过。真实0生成get_available_models确认当前supportsImages=true、low/1M输入/128000输出；已保存安全能力快照，不含rawModels/URL/Key。
 
-独占文件：PROGRESS.md、工作线HANDOFF.md/TASKS.md、本HANDOFF及新VISION_FINISH_PLAN.md/HOSTED_CLI_BUDGET_EVIDENCE.md/VISION_MEDIUM_START.md，共7份Markdown。20项配置/persona/图库/pending与key/目录存在状态纳入保护。本轮只读代码/公开来源/纯预算函数和文档，不改运行代码/local/persona/图库/秘密，不安装/启停/登录/真实模型/QQ/群/SSH，不访问其他根或A4，不派代理/切模型。
+**尚未完成视觉目标**：renderDefaultAgentInstructions在system覆盖后仍渲染，ownInstructions随后追加产品agent.appendInstructions；模型握手不含该文本，完整F来源界未获证。新hosted规则是partial review，准确返回CLI_POST_OVERRIDE_TEMPLATE_UNBOUNDED；不伪造模板=2048/0或写eligible。IQ静态前置未过，未建批次、0/6真实IQ、0/2群图、无人工代审；vision保持false。既有observed/decoded成功结构/下载1次/bytes已复核，normalizer相关AST未变，复用有效；不补采样或重拉旧URL。
 
-后续顺序为42识图收尾→独立21表情激活→已开记忆/关注/成员的人工效果验证；仅第一项展开合同，其他未领取、不作识图前置。用户下一轮发送[新medium段](VISION_MEDIUM_START.md)才授予其中列明的代码/0生成能力握手/固定6原生/最多2群图/条件单次补采样及受管加载；原MEDIUM_START不再整轮复用。
+15份保护文件（local/persona/图库/21 pending）原字节与SHA不变，私有备份/采样复核/控制结果/失败及定向日志在state/lap42-vision-finish。现场约23:00为stopped/disconnected；未启停、未改vision或其他local、未正常加载新代码。其他开关磁盘保留true，不能声称当前运行ready。自然free未追溯统计；受控0生成单列。旧E/C、家庭SSH、Snow/QQ/CLI内部、A4未触及。
 
-22:43文档交付检查点：7份Markdown、218个本地引用、4行围栏、UTF-8/占位符/归属和git diff --check通过。20项保护状态前后相同（配置/persona/图库/pending摘要及key/目录存在状态；不声称运行中的记忆库内容不变）。代码测试未运行；真实CLI/模型/QQ/群、启停、安装、登录及SSH均未执行。已重读所有修改，源码与运行数据0修改；本地/实时远端基线仍48f66bc192548184e4f88e23de6a357962bff85e。仅提交这7份归属文档，最终本地/远端完整SHA见回执；核对后释放本规划归属并停止，不自动进入medium实施。
+验证命令：`$env:PYTHONUTF8='1'; .\.venv\Scripts\python.exe scripts/verify_lap42_vision.py`，其框架子过程使用既有AstrBot环境；offline_valid已独立复查true。新fixed offline不覆盖旧writer/报告。首次0生成辅助调用因外锁嵌套在spawn前失败（0进程/控制/user），日志保留；释放辅助外锁后唯一实际握手成功并清理无阻断。其他测试失败已修或调整为本任务必要传输组合，末次88/39全过，详见实际结果。
+
+归属：PROGRESS、工作线HANDOFF/TASKS、本HANDOFF、使用对照；vision_capabilities/vision/token_budget/cli_control/workbuddy_cli_runner/新hosted_cli_budget；observe_lap28、新verify_lap42_vision/test_lap42_vision；code-owned两份能力JSON与reports/lap-42-vision-*。local/观察工件不提交。按长期Git授权检查/commit/push、核对本地/远端完整SHA后释放归属并停止。下一步仅处理实际CLI追加/渲染内容的有限来源合同或经确认的外层隔离方案；不自动重试IQ/启用或推进21。
+
+历史规划合同继续保留：[详规](VISION_FINISH_PLAN.md) / [当时来源](HOSTED_CLI_BUDGET_EVIDENCE.md) / [本轮用户已发送的实施指令](VISION_MEDIUM_START.md)。本轮不是再交新计划；已完成独立代码/报告，具体未解缺口按合同交付。
 
 ## 上轮实际状态（本轮未重做）
 
@@ -75,3 +79,11 @@ session `LAP-42-snow-feature-rollout-plan`，2026-10-25 16:24开始只读复核�
 - 四种真实像素编码经实际CLI runner替身，同次base64/MIME/hash和返回验证通过；GIF仅首帧。当前人设19256字节，组合system24114字节，最终可见预算28581/30000；原fitter裁剪可选候选/记忆，没有修改正文或抬预算。
 - 当前托管CLI 2.168.0/固定bundle支持原生图片封套；已核对DeepSeek元数据1000000输入、128000输出及low，但视觉token/模板上界及组合原生容量尚未获证，不套本地processor/projector门槛。IQ前置不满足，真实六例未调用，vision保留false；单图Snow采样仍独立推进。
 - 启停前现场：官方OneBot connected，text/free运行，队列0/active=false，已完成任务102，无unknown；自然历史CLI计数72，只作停机前基线，不能归成本轮受控试验。外部手工Snow/QQ保留。
+
+## 当前视觉实施归属
+
+2026-10-25T22:47:38+08:00 (Asia/Shanghai): LAP-42-hosted-vision-implementation owns only LAP-42 visual continuation, sole managed instance/native IQ/real verification executor. Baseline HEAD/live remote 1660f3e6c026390909caa37480ca08493305c242, clean initial tree. Exact tracked ownership: PROGRESS.md, tracks/laptop-workbuddy/HANDOFF.md, tracks/laptop-workbuddy/TASKS.md, tracks/laptop-workbuddy/tasks/LAP-42/HANDOFF.md, docs/BOT_USAGE_COMPARISON.md, src/qqbot_gateway/vision_capabilities.py, src/qqbot_gateway/vision.py, src/qqbot_gateway/token_budget.py, src/qqbot_gateway/cli_control.py, src/qqbot_gateway/workbuddy_cli_runner.py, src/qqbot_gateway/hosted_cli_budget.py, scripts/observe_lap28.py, scripts/verify_lap42_vision.py, tests/test_lap42_vision.py, config/vision-capabilities.json, config/cli-capabilities.json, reports/lap-42-vision-offline.json, reports/lap-42-vision-result.md, reports/lap-42-vision-sources.json. Ignored ownership: state/lap42-vision-finish backups/source cache/protection, state/vision-evidence new fixed IQ ledger/candidate; conditionally only vision.enabled false->true under stopped lock. Preserve other local/persona/library/LAP-21 pending, memory and all old evidence. No subagents, A4, old roots, model or budget parameter changes.
+
+P0: root/branch/live remote verified; ownership reread; original bytes and protection manifest saved privately before code edits. Implementation and all real stages pending.
+
+2026-10-25T23:11:40+08:00（Asia/Shanghai）：最终交付检查：88单元/39框架场景、当前offline binding、19份归属文件编译/UTF-8/隐私ID检查、230个Markdown本地链接与围栏、git diff --check通过；15份保护原字节/SHA不变。唯一实际模型控制1次、0 user/0生成，清理无阻断。Git核对后释放本session归属，停止于已记录的完整CLI模板来源缺口。

@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-**下一项已收敛为42当前DeepSeek识图收尾，详规已交付、未实施**：[详规](tasks/LAP-42/VISION_FINISH_PLAN.md) / [来源](tasks/LAP-42/HOSTED_CLI_BUDGET_EVIDENCE.md) / [新medium指令](tasks/LAP-42/VISION_MEDIUM_START.md)。已核对官方单图1024 token及固定tokenizer/模板来源，发现null窗口互斥、字节/token混扣和CLI/GGUF身份、旧报告接点问题。只修项目外层的hosted规则并做有界闭环，不改Snow/模型/预算数字，不重做已加载功能；本轮只读与7文档，没有真实操作。
+**LAP-42视觉续作代码/定向验证已交付，真实识图未完成**：[本轮实际结果](../../reports/lap-42-vision-result.md)。已修hosted字节/原生分账、null窗口/容量语义、三字段身份与固定新报告；88单元/39原事件框架场景通过，0生成握手确认当前模型supportsImages/low/1M输入/128000输出。完整CLI模板F仍因自定义system后渲染与产品agent追加文字未能界定，未开IQ/启用/群图；vision=false。旧decoded结构有效且normalizer未变，无需新采样。现场stopped/disconnected，未启停/加载，local/persona/图库/21 pending不变。session LAP-42-hosted-vision-implementation交付后释放唯一归属，停止于42具体缺口。
 
 **LAP-42已实际交付可用部分**：[交接](tasks/LAP-42/HANDOFF.md) / [实际报告](../../reports/lap-42-2026-10-25.md)。记忆读取/学习、关注、成员与受控@已字段级保存并加载；字幕运行服务和入口已撤下。164单元、19项AstrBot原事件/实际runner底层替身场景通过，官方Snow强刷观察、独立token和失败退化接通。真实单图下载/解码成功，原生视觉预算/质量与图片群闭环仍未证，vision=false。模型/额度/free/web/memes及冷却0/0保留，未修改Snow/QQ/CLI内部，旧27/28/29/30差额保留。只领取42，交付后释放归属并停止。
 
@@ -56,3 +56,7 @@ NapCat旧根和旧C根不修改/启停；保留本根仍被导入的NapCat兼容
 - [LAP-38后续功能/独立微信规划](tasks/LAP-38/HANDOFF.md)：仅用户指定后推进，不自动启用。
 - [LAP-37人工清理恢复](tasks/LAP-37/HANDOFF.md)：保留维护边界，不删除任务台账或依赖锁。
 - [家庭5070备用路线](../local-5070/HANDOFF.md)：原有后端保留，未在本轮认证或调用。
+
+## 本轮视觉续作检查点
+
+2026-10-25T23:08:17+08:00（Asia/Shanghai）：起点HEAD/实时远端1660f3e6c026390909caa37480ca08493305c242，TASKS登记重读、15份保护原字节/SHA保存；本轮代码/来源/0生成/定向验证与限制见实际结果。不将此前历史ready当当前状态，其他任务未领取；Git核对后释放归属。

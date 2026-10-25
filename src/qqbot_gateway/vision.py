@@ -1,7 +1,7 @@
 """LAP-28 private, bounded image materials. No media tools or disk blobs.
 
-Production is deliberately ineligible: no reviewed token/patch upper bound is
-available for either locked backend. A sample observation cannot supply one.
+Production requires a complete selected-path source review and durable real
+observations. Partial hosted source facts and samples cannot grant eligibility.
 """
 import asyncio
 import base64
@@ -322,7 +322,10 @@ def text_budget(budget):
     if not current:return budget
     current.blob.checked()
     if time.monotonic()>=current.expires:raise GatewayError('INPUT_TOO_LONG')
-    if current.reserve<=0 or budget.limit<=current.reserve:raise GatewayError('INPUT_TOO_LONG')
+    if current.reserve<=0:raise GatewayError('INPUT_TOO_LONG')
+    from .hosted_cli_budget import KIND
+    if budget.vision_kind==KIND:return budget
+    if budget.limit<=current.reserve:raise GatewayError('INPUT_TOO_LONG')
     reduced=replace(budget,limit=budget.limit-current.reserve)
     if budget.window is not None and reduced.limit+current.reserve+budget.output>budget.window:raise GatewayError('INPUT_TOO_LONG')
     return reduced

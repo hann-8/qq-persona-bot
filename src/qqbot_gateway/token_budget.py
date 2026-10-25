@@ -23,6 +23,7 @@ class InputBudget:
     max_input: int | None = None
     window: int | None = None
     native_profile: dict | None = None
+    vision_kind: str | None = None
 
     @classmethod
     def from_settings(cls, settings, metadata=None):
@@ -32,7 +33,8 @@ class InputBudget:
         cfg = resolve_backend(settings)
         return cls(chat['context_input_limit_tokens'], chat['context_overhead_reserve_tokens'],
                    chat['output_reserve_tokens'], settings['chat']['history_turns'], metadata.get('maxInputTokens'),
-                   cfg.get('num_ctx'),cfg if cfg['backend']=='ollama_ssh' else None)
+                   cfg.get('num_ctx'),cfg if cfg['backend']=='ollama_ssh' else None,
+                   _vision_kind(cfg))
 
     @property
     def payload_limit(self):
@@ -91,3 +93,9 @@ def validate_model_settings(settings, models=None, backend=None):
     cfg = dict(settings, llm=dict(settings['llm'],backend='codebuddy_cli'))
     InputBudget.from_settings(cfg, model).validate_capacity()
     return model
+
+
+def _vision_kind(cfg):
+    # Unit selection only; this does not grant source/identity/quality eligibility.
+    from .hosted_cli_budget import KIND, matches_profile
+    return KIND if matches_profile(cfg) else None

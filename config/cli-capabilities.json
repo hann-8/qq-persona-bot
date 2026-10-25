@@ -80,7 +80,8 @@
           "max"
         ],
         "defaultEffort": "high"
-      }
+      },
+      "supportsImages": true
     },
     {
       "id": "glm-5.3",
@@ -219,5 +220,6 @@
     }
   ],
   "recorded_at": "2026-10-16T23:10:06+08:00",
-  "native_window_effective_verified": false
+  "native_window_effective_verified": false,
+  "selected_vision_metadata_recorded_at": "2026-10-25T23:02:48+08:00"
 }

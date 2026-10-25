@@ -8,7 +8,7 @@
 
 已按[42计划](../tracks/laptop-workbuddy/tasks/LAP-42/PLAN.md)实际实施，见[结果](../reports/lap-42-2026-10-25.md)。长期群记忆读取/学习、成员/受控@、关注已经保存并加载；B站字幕运行服务与入口撤下。仍用当前CodeBuddy/deepseek-v4.1-flash/low/free和原额度，不改Snow/QQ/CLI内部。164单元与19项AstrBot原事件组合回环通过。
 
-真实新图已由Snow一次下载/解码成功（JPEG1260×709→1024×576），样本0模型/0bot输出；首窗口超时、追加授权后重发成功分别保留。CLI原生像素封套仅底层替身验证，视觉token/模板上界与组合原生容量缺证，IQ/群图片生成未执行，vision=false。模型视觉支持由用户确认，不把预算缺证说成模型不支持，也不把解码算成“看懂”。GIF仍仅首帧，face ID不能代替像素。
+上轮真实新图已由Snow一次下载/解码成功（JPEG1260×709→1024×576），样本0模型/0输出，首窗口超时记录保留。本轮[视觉实际续作](../reports/lap-42-vision-result.md)已修hosted文字/原生预算、null窗口、身份与新报告接点，88单元/39框架场景通过；0生成握手也确认当前DeepSeek支持图片/low（1M输入/128000输出）。但CLI在system覆盖后仍渲染和追加agent文字，完整模板F未能界定，IQ/群图未执行，vision=false。既有decoded有效可复用，未要求重发、未启停或改local；现场当前stopped/disconnected。GIF仍仅首帧，不把解码/支持声明当模型理解。
 
 ## 表情准备及功能含义
 
