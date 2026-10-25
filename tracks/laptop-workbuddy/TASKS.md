@@ -1,3 +1,5 @@
+2026-10-25 16:32（Asia/Shanghai）：session LAP-42-snow-feature-rollout-plan / Snow既有功能整合落地详规，登记新LAP-42。16:24开始只读复核，用户追加明确要求记忆/关注/成员/识图交medium落地并撤下B站；本轮仍仅规划，不实施或启用。起点本地/实时远端9bb1b58270dbcaa3c5e40c53f804d5e50c54449b，codex/lap-40-snowluma，Git无非忽略差异。已核对TASKS及任务目录无42占用；新ID仅用于跨既有27/28/29/30与06退役的Snow组合适配和一致配置激活，不重领或抹掉各原任务证据/缺口。独占7份文档：PROGRESS.md、工作线HANDOFF.md/TASKS.md、新tasks/LAP-42/HANDOFF.md/PLAN.md/MEDIUM_START.md、docs/BOT_USAGE_COMPARISON.md。写后重读再改文档；不改代码/local/persona/图库/历史/秘密，不安装、启停、登录/扫码、真实模型/QQ/群/SSH；不改Snow或CLI内部，不访问旧C/原NapCat运行数据，不读验A4，不派代理或切模型。只交付文档commit/push并核对远端后停止。
+
 2026-10-25 16:07:00（Asia/Shanghai）：session LAP-21-snow-memes-data-migration / Snow七条受控表情实际迁移，续领LAP-21。基线HEAD/实时远端dc79796642371ee72945457b0a4c1bcd94164801，工作区无非忽略差异。精确文档归属：PROGRESS.md、tracks/laptop-workbuddy/HANDOFF.md、tracks/laptop-workbuddy/TASKS.md、tracks/laptop-workbuddy/tasks/LAP-21/HANDOFF.md、tracks/laptop-workbuddy/tasks/LAP-21/SNOW_MIGRATION_RESULT.md、docs/BOT_USAGE_COMPARISON.md。忽略数据归属：源catalog验证引用的目标assets/memes/library七文件、state/memes-pending.local.yaml、仅已停可激活的config/memes.local.yaml，以及state/meme-migration/LAP-21-snow-memes-data-migration/。预计生产代码0修改；源码小修复须先另登记。源E:/CodexWS/QQbot仅只读；不启停/真实模型/QQ/RPC，不读验A4、不访问旧C根，不并领其他任务。完成验证与Git交付后释放归属。
 
 2026-10-25 15:49（Asia/Shanghai）：session `LAP-21-snow-controlled-memes-plan` / “Snow主线受控表情迁移详规”续领原LAP-21，仅只读复核、详细规划和下一轮medium实施指令。只读复核始于15:46；起点本地HEAD及实时远端均`e2d9a0c082f3400904d8a4032eb01b4290ef08a8`，分支`codex/lap-40-snowluma`，Git工作区无非忽略差异。文档独占归属：PROGRESS.md、工作线HANDOFF.md/TASKS.md、tasks/LAP-21/HANDOFF.md、新SNOW_MIGRATION_PLAN.md/SNOW_MEDIUM_START.md、docs/BOT_USAGE_COMPARISON.md共7份。写后重读登记，再改其余文档；不新建任务ID，不领取记忆/识图/成员/关注或B站实施。旧NapCat根只读校验登记/7张资产，旧C根不访问；本轮不迁移图库/历史，不改代码/local/persona/运行配置，不安装、启停、登录/扫码、真实模型/群/SSH，不派代理或切模型；B/C停止，A4不读不验。完成文档检查与commit/push、远端SHA核对后释放归属并停止。
@@ -72,7 +74,7 @@ LAP-13实现提交`ee7f2d4`已成功推送origin/main；随后仅同步交付检
 
 ## 当前任务
 
-2026-10-25：当前唯一下一项为原LAP-21的Snow受控表情迁移，[详细计划](tasks/LAP-21/SNOW_MIGRATION_PLAN.md)及[完整medium指令](tasks/LAP-21/SNOW_MEDIUM_START.md)已完成，仅规划、未迁数据/激活。之后推荐LAP-30长期群记忆→LAP-28识图；27关注/29成员后置，B站06/07按用户决定退出近期路线。本轮不领取这些实施，不删字幕代码、不改变原任务证据；成员/关注含义及关闭/未迁移/能力缺口分级见计划第1—3节。
+2026-10-25最新：当前下一项为LAP-42 Snow既有功能整合，[HANDOFF](tasks/LAP-42/HANDOFF.md) / [PLAN](tasks/LAP-42/PLAN.md) / [medium指令](tasks/LAP-42/MEDIUM_START.md)。用户追加记忆/成员/关注全部交medium落地、识图尝试、B站撤下，并确认当前DeepSeek支持视觉。42只领一个整合任务，复用旧功能，保留旧证据/缺口；21迁移准备已交付，未激活/真实差额保留但不作前置。本轮仅7文档规划，未实施/启用或真实操作。
 
 2026-10-21 19:48（Asia/Shanghai）：LAP-36图片与轻量网页/B站详细规划完成，未实施；session `LAP-36-image-web-video-plan`，19:20领取。起点main/b23d961，24并行实现现已738ca0a独立交付并明确留下36归属段落；保留用户persona。归属六份36规划文档、PROGRESS/工作线HANDOFF/本台账与18/28旧HANDOFF指针，共11份；0代码/运行配置/启停/登录/真实模型/QQ/SSH。分级证据/配置/限额/失败/验收/回滚及四阶段[medium指引](tasks/LAP-36/IMPLEMENTATION_GUIDE.md)完成，检查/Git见[36交接](tasks/LAP-36/HANDOFF.md)。28A→18B→28C→06D分别等待后续实施指令，不合并旧差额。
 
@@ -110,6 +112,7 @@ LAP-15内容提交`632fdc5`已推送origin/main，2026-10-17 11:09用ls-remote�
 
 | ID | 单一任务 | 状态与已有证据 | 依赖/推荐顺序 | 执行session | 下一步/完成出口 |
 | --- | --- | --- | --- | --- | --- |
+| LAP-42 | Snow既有记忆/关注/成员/识图整合与B站退役 | 详规完成，仅文档；[HANDOFF](tasks/LAP-42/HANDOFF.md) / [PLAN](tasks/LAP-42/PLAN.md) / [medium](tasks/LAP-42/MEDIUM_START.md) | 复用27/28/29/30，原模型视觉支持用户确认；成员补Snow强刷外部适配，其他项不被单项缺口阻塞 | LAP-42-snow-feature-rollout-plan，2026-10-25 16:32登记重读；7份文档，Git后释放 | 用户下轮medium实际代码/定向验证/指定开关/受管加载和条件明确的受控尝试；不改Snow/QQ/CLI内部，不换模型/后端，真实状态逐项保留 |
 | LAP-41 | Snow主线工作区整理与两套bot使用对照 | 完成；主线入口已整理，缓存/网页快照/退役提示已清，4文档归档；[HANDOFF](tasks/LAP-41/HANDOFF.md) / [清单](tasks/LAP-41/CLEANUP.md) / [使用对照](../../docs/BOT_USAGE_COMPARISON.md) | 承接40用户文字首试成功；字节码缓存因自动审批拒绝保留，不扩功能 | LAP-41-snow-mainline-cleanup-comparison，2026-10-25 12:03登记重读；Git交付后释放归属 | 正常使用Snow；新根缺旧7条表情登记，未自动迁移；配置/历史/其他根/A4保留，不自动推进新功能 |
 | LAP-40 | 官方原版SnowLuma最小文字接入/日常入口 | 接入/桌面入口已实现及离线通过；用户现场确认Snow可运行、QQ群可回复，最小文字首试通过；[HANDOFF](tasks/LAP-40/HANDOFF.md) | 用户确认与独立模型/ACK追踪分开；其他功能/长稳不晋升；B/C停止、A4未动 | LAP-40-user-text-confirmation，2026-10-25 11:47登记重读；本次仅文档，交付后释放归属 | 按[使用说明](../../SnowLuma使用说明.md)日常使用，按实际异常处理；不重复首试、不增证明/长稳前置、不自动推进其他功能 |
 | LAP-39 | 夜间不回复、配置保留与SnowLuma长期运行评估 | 既有修复/离线通过；复发诊断/SnowLuma调研完成；[HANDOFF](tasks/LAP-39/HANDOFF.md) / [评估](tasks/LAP-39/SNOWLUMA_ASSESSMENT.md) | 调研时旧迁移前置已被LAP-40官方OneBot决定取代；o3候选/QQ诱因与历史差额保留 | 历史LAP-39-SnowLuma-longrun-assessment，2026-10-24 00:53登记，调研已交付；不新增本轮39任务 | 迁移仅按LAP-40当前计划，不再补内部存储/过滤证明或以72h/7天阻挡首试；39历史证据不晋升为真实通过 |
@@ -129,7 +132,7 @@ LAP-15内容提交`632fdc5`已推送origin/main，2026-10-17 11:09用ls-remote�
 | LAP-03 | 人设风格确认 | 部分完成；LAP-11人设v2已实现/暂停准入加载，当前停机；最终接受待验 | LAP-11实现后 | 未登记 | 按用户v2风格和P01做最终人工接受，不与LAP-11实现重复领任务 |
 | LAP-04 | 运行恢复与文本稳定性 | 部分完成；旧脚本存在，完整恢复/长稳待验 | LAP-09—12收敛，最终使用LAP-02/03接受的版本 | 未登记 | 完成适用O项与文本观察，记录锁屏/睡眠及QQ共存边界 |
 | LAP-05 | 文本交付收口 | 待领取 | LAP-09—12新U项及原LAP-02/03/04必要项完成 | 未登记 | 汇总报告、README、限制及版本；延期/不支持项不能写完成 |
-| LAP-06 | B站字幕总结 | 已实现/离线通过，真实未验；[HANDOFF](tasks/LAP-06/HANDOFF.md) / [报告](../../reports/lap-06-2026-10-22.md) | 36D，18安全传输；07 ASR及完整V11保留 | LAP-06-light-subtitles，2026-10-22 20:37:21领取；归属见交接，本session独占 | 273受影响+末次25材料专项（含20字幕）、8组合88字幕/8组合118关闭兼容；anonymous/auth/真实材料/生成/ACK未验，默认false，未改local/启用 |
+| LAP-06 | B站字幕总结（用户决定退役） | 历史已实现/离线通过、真实未验保留；当前关闭；[HANDOFF](tasks/LAP-06/HANDOFF.md) / [报告](../../reports/lap-06-2026-10-22.md) | 2026-10-25用户决定撤下，由42处理运行入口/服务退役及旧配置兼容，不再补字幕/ASR验收 | 历史LAP-06-light-subtitles归属结束；本轮仅42规划，不领取06实施 | 旧273单元/字幕与关闭组合证据保留，不改旧报告；退役实际状态由42报告，当前尚未删代码或改变运行 |
 | LAP-07 | 无字幕本地ASR | 延期，尚未接入 | LAP-06 | 未登记 | G6及V类音频关键项；基于实际转写，不用标题代替正文 |
 | LAP-08 | 试用体验改进详细规划 | completed，仅规划；[任务HANDOFF](tasks/LAP-08/HANDOFF.md) | 本轮用户只授权计划 | 当前试用体验规划会话，22:10完成 | AGENTS、UX_PLAN及索引/验收已同步；9份文档77个本地链接、U01—20一致性核对通过 |
 | LAP-09 | 配置基础、授权群和黑名单 | 已实现/离线通过，真实待验；[任务HANDOFF](tasks/LAP-09/HANDOFF.md) | 第一实施任务 | LAP-09配置准入实施，2026-10-16 22:54开始，23:00交接 | 53项测试及实际框架离线通过；U04/05真实群、U07暂停准入重启加载已验证，真实群快照待用户参与；[报告](../../reports/lap-09-2026-10-16.md) |
