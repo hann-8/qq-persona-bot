@@ -1,8 +1,20 @@
 # LAP-42：Snow既有功能整合与B站退役
 
-返回[PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [AGENTS](../../../../AGENTS.md)。当前[识图收尾详规](VISION_FINISH_PLAN.md) / [来源与推导](HOSTED_CLI_BUDGET_EVIDENCE.md) / [新medium指令](VISION_MEDIUM_START.md)；原[整合PLAN](PLAN.md) / [旧medium指令](MEDIUM_START.md)仅作上一轮历史合同。
+返回[PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [AGENTS](../../../../AGENTS.md)。当前[真实闭环详规](VISION_CLOSURE_PLAN.md) / [官方输入合同](CLI_PROMPT_CONTRACT.md) / [本次medium指令](VISION_CLOSURE_MEDIUM_START.md)。旧[收尾详规](VISION_FINISH_PLAN.md)/[旧视觉指令](VISION_MEDIUM_START.md)和[整合PLAN](PLAN.md)/[旧整合指令](MEDIUM_START.md)均为历史，不整轮再跑。
 
-## 当前视觉续作实际检查点
+## 当前规划：官方投影与真实启用闭环
+
+session LAP-42-vision-prompt-closure-plan，2026-10-26 00:00登记7文档并重读，18:34按用户“继续”恢复。开始/恢复本地与实时远端均355f7eec2971946595efd057ea3f2a5790afa6f3，codex/lap-40-snowluma；初始干净，恢复时仅本session TASKS领取段有差异。只续42，不新ID、不领21/其他功能，不派代理或切模型。
+
+已只读核实：当前CLI完整agent文字组装之后调用官方prompt.compose，可用项目所有的当次Mod原样提供完整CLIRunner system，并通过双字段prompt.context限制CLI附加材料；正常启动在dispatch前装载，能建立首条user前检查。关键hook异常默认可能透传，需catch/step短路和父进程回执，不是仅throw。详见新输入合同，尚未实际装载插件/检查CLI。
+
+本次计划明确补齐此前未有的active候选/停机激活入口；与实际CLI零生成检查、固定六例人工质量、vision保存/正常加载和最多两条原群图像理解/ACK/显示一起执行。源码/资产/激活代码在IQ前冻结，不再六例后改源码使binding失效；不能仅代码/离线或0/6就称完成。当前模型/low/账号/额度、预算、人设/free及其他增强保留，Snow/QQ/CLI内部不动。
+
+独占7文档：PROGRESS、工作线HANDOFF/TASKS、本HANDOFF、新CLI_PROMPT_CONTRACT/VISION_CLOSURE_PLAN/VISION_CLOSURE_MEDIUM_START。恢复后22项保护状态新基线涵盖local/persona/图库/pending、key/目录存在及vision active/ledger摘要；不声称跨暂停状态不变，不读取真实记忆事实。本轮不改运行代码/配置，不启停/安装/登录/真实模型/QQ/群/SSH，不读验A4或其他根。完成文档检查及本任务commit/push/远端核对后释放归属停止。
+
+2026-10-26 18:46（Asia/Shanghai）交付检查点：7份Markdown、226个本地链接、2行围栏、UTF-8/占位符/归属与git diff --check通过；锁定CLI及类型来源摘要已复核。恢复后重新取得的22项保护状态前后相同，涵盖配置/persona/图库/pending及vision active/ledger摘要和key/目录存在状态；不声称运行中记忆事实或跨暂停时段不变。已重读本任务修改，未运行代码测试/CLI/真实模型/QQ/群/启停/安装/登录/SSH，生产代码和运行配置0修改。仅提交本任务7文档；完整本地/远端SHA以最终回执为准，核对后释放规划归属并停止，不自动实施。
+
+## 上轮视觉续作实际检查点（不是本轮真实验证）
 
 session `LAP-42-hosted-vision-implementation`，2026-10-25 22:47:38（Asia/Shanghai）在TASKS登记精确文件与唯一受管/真实验证归属并重读。起点本地/实时远端1660f3e6c026390909caa37480ca08493305c242，分支codex/lap-40-snowluma，Git干净。不新领28/21/已开增强。
 

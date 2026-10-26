@@ -1,6 +1,6 @@
 # QQ bot项目入口：SnowLuma主线
 
-本文件是唯一项目进度入口，不另建根HANDOFF。更新：2026-10-25（Asia/Shanghai）。
+本文件是唯一项目进度入口，不另建根HANDOFF。更新：2026-10-26（Asia/Shanghai）。
 
 ## 当前结论
 
@@ -16,10 +16,12 @@ LAP-41工作区整理与使用对照已完成：uv报告清除38,269个缓存文
 
 **LAP-42视觉续作已交付代码与定向验证，识图仍待具体来源缺口**：[实际结果](reports/lap-42-vision-result.md) / [定向报告](reports/lap-42-vision-offline.json) / [来源审阅](reports/lap-42-vision-sources.json)。null窗口、字节/token分账、hosted三字段身份及新offline接点已修；88单元/39框架场景通过。现有0生成握手确认当前DeepSeek支持图片与low（1M输入/128000输出），但CLI自定义system后仍渲染/追加产品agent文字，完整F上界未获证，静态拒绝IQ；IQ=0/6、群图=0/2、vision=false。既有decoded记录有效可复用，未新采样/启停/改local；现场当前stopped/disconnected，不能沿用上轮ready。只交付42并释放归属，未自动推进21或其他验收。
 
+**当前只续42识图闭环：新方案已详细规划，未实施。** [新详规](tracks/laptop-workbuddy/tasks/LAP-42/VISION_CLOSURE_PLAN.md) / [官方接口与输入合同](tracks/laptop-workbuddy/tasks/LAP-42/CLI_PROMPT_CONTRACT.md) / [新medium指令](tracks/laptop-workbuddy/tasks/LAP-42/VISION_CLOSURE_MEDIUM_START.md)。已在锁定CLI查到产品文字追加之后的官方prompt.compose接点，可由项目插件原样提供完整system；不改Snow/CLI内部或模型/账号。还须实际验证扩展、固定六例、补齐停机active/vision事务并正常加载、两条原群图像理解/ACK/显示。旧observer不写active、旧整合apply不负责视觉，这次纳入同一收尾；不能仍以0/6宣称完成。本轮仅文档，旧stopped是历史记录，不据此认定当前运行状态。
+
 ## 从哪里继续
 
 1. 使用bot：[日常操作](SnowLuma使用说明.md) / [与旧NapCat bot的使用对照](docs/BOT_USAGE_COMPARISON.md)。
-2. 项目接续：本文件 → [AGENTS](AGENTS.md) → [QQ主线HANDOFF](tracks/laptop-workbuddy/HANDOFF.md)和[TASKS](tracks/laptop-workbuddy/TASKS.md) → 当前[LAP-42交接](tracks/laptop-workbuddy/tasks/LAP-42/HANDOFF.md)、[识图详规](tracks/laptop-workbuddy/tasks/LAP-42/VISION_FINISH_PLAN.md)、[预算来源](tracks/laptop-workbuddy/tasks/LAP-42/HOSTED_CLI_BUDGET_EVIDENCE.md)、[新medium指令](tracks/laptop-workbuddy/tasks/LAP-42/VISION_MEDIUM_START.md) → [使用对照](docs/BOT_USAGE_COMPARISON.md)。原42 PLAN/MEDIUM_START为上一轮合同，不整轮再跑；旧功能合同只按具体接点补读，表情上轮结果见[LAP-21](tracks/laptop-workbuddy/tasks/LAP-21/SNOW_MIGRATION_RESULT.md)。
+2. 项目接续：本文件 → [AGENTS](AGENTS.md) → [QQ主线HANDOFF](tracks/laptop-workbuddy/HANDOFF.md)和[TASKS](tracks/laptop-workbuddy/TASKS.md) → [LAP-42交接](tracks/laptop-workbuddy/tasks/LAP-42/HANDOFF.md)、[闭环详规](tracks/laptop-workbuddy/tasks/LAP-42/VISION_CLOSURE_PLAN.md)、[输入合同](tracks/laptop-workbuddy/tasks/LAP-42/CLI_PROMPT_CONTRACT.md)、[本次medium指令](tracks/laptop-workbuddy/tasks/LAP-42/VISION_CLOSURE_MEDIUM_START.md) → [使用对照](docs/BOT_USAGE_COMPARISON.md)。旧42整合及VISION_MEDIUM_START均为历史，不整轮再跑；原功能合同只按具体接点补读，表情上轮结果见[LAP-21](tracks/laptop-workbuddy/tasks/LAP-21/SNOW_MIGRATION_RESULT.md)。
 3. 故障找文件：[目录与日志](项目目录与日志说明.md)。只按实际问题检索，不从历史清单自动展开新任务。
 
 ## 路线和边界
@@ -37,7 +39,7 @@ LAP-41工作区整理与使用对照已完成：uv报告清除38,269个缓存文
 
 | 工作线 | 状态/最新依据 | 接续入口 |
 | --- | --- | --- |
-| QQ主线：SnowLuma及共用bot业务 | active；42可用功能历史已加载；本轮hosted外层修复/88单元39场景通过，完整CLI模板来源未界定、IQ/群图未验且仍关闭；现场stopped | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [LAP-42](tracks/laptop-workbuddy/tasks/LAP-42/HANDOFF.md) / [识图medium](tracks/laptop-workbuddy/tasks/LAP-42/VISION_MEDIUM_START.md) |
+| QQ主线：SnowLuma及共用bot业务 | active；42外层修复/88单元39场景保留；识图仍未启用，官方Mod投影/实际CLI检查/安全激活与群闭环已详规待medium | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [LAP-42](tracks/laptop-workbuddy/tasks/LAP-42/HANDOFF.md) / [闭环medium](tracks/laptop-workbuddy/tasks/LAP-42/VISION_CLOSURE_MEDIUM_START.md) |
 | 家庭5070备用模型路线 | 历史记录为接入已实现/离线及元数据通过、真实生成未验；本轮未重查，不自动切换后端 | [HANDOFF](tracks/local-5070/HANDOFF.md) / [既有选型](tracks/local-5070/MODEL_SELECTION.md) |
 
 `tracks/laptop-workbuddy` 是保留的历史目录名，当前承担QQ主线和共用网关交接，不表示仍以NapCat或WorkBuddy界面为主路线。所有旧任务的状态/验收差额在TASKS与各任务HANDOFF保留，不重命名整棵目录。
@@ -49,6 +51,8 @@ LAP-41历史比较共同使用deepseek-v4.1-flash/low、free、adaptive最多3�
 网页材料读取保持开启，搜索质量门槛仍未通过。42后记忆/学习/关注开启，成员/受控@仅已审阅官方Snow强刷来源、1..49人及双TTL有效时增强；NapCat/未知版本继续暂停，大群/失败保留普通文字。B站字幕已退役，旧false节兼容且未改本机原字节，true拒绝恢复服务。视觉仍关闭；真实入站成功不等于模型理解/群ACK成功。旧差额保留，不把资格/proof/probe/长稳变成前置；微信不推进。
 
 ## 历史与检查点
+
+- 2026-10-26识图闭环规划session LAP-42-vision-prompt-closure-plan：00:00领取7文档并重读，18:34用户“继续”后重核本地/实时远端仍355f7eec2971946595efd057ea3f2a5790afa6f3，仅已有本session TASKS段落有差异。查明官方后组装投影接口及实际启用事务尾项；只读/文档，不执行插件/模型/启停/QQ。恢复后重取22项保护基线，检查/Git见42交接，交付后停止。
 
 - 识图收尾规划session `LAP-42-hosted-vision-finish-plan`，22:19登记7份文档并重读，起点本地/实时远端48f66bc192548184e4f88e23de6a357962bff85e，Git无非忽略差异。只续42，不新建ID；本轮只读代码/公开来源和纯预算计算，不改代码/local/persona/图库/运行状态，不启停/真实模型/QQ/群/SSH。实际检查和Git回执见42交接；规划完成后停止。
 

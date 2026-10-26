@@ -1,8 +1,10 @@
 # QQ主线交接：SnowLuma与共用bot业务
 
-返回[项目入口](../../PROGRESS.md) / [AGENTS](../../AGENTS.md) / [任务台账](TASKS.md)。2026-10-25，Asia/Shanghai。保留原目录名以兼容已有链接；此处今后以SnowLuma为主线。
+返回[项目入口](../../PROGRESS.md) / [AGENTS](../../AGENTS.md) / [任务台账](TASKS.md)。2026-10-26，Asia/Shanghai。保留原目录名以兼容已有链接；此处今后以SnowLuma为主线。
 
 ## 当前状态
+
+**当前是42识图实际闭环详规，未实施**：[新计划](tasks/LAP-42/VISION_CLOSURE_PLAN.md) / [CLI输入合同](tasks/LAP-42/CLI_PROMPT_CONTRACT.md) / [新medium指令](tasks/LAP-42/VISION_CLOSURE_MEDIUM_START.md)。锁定CLI在产品追加之后调用官方prompt.compose，可经项目所有的当次Mod原样提供完整system；无须修改第三方内部。计划明确真实CLI零生成检查、固定6原生/人工质量、安全active/vision事务、实际加载及最多2群图ACK/显示，不再仅交固定缺项。其余功能/21未领取，最新运行态本轮未探测。
 
 **LAP-42视觉续作代码/定向验证已交付，真实识图未完成**：[本轮实际结果](../../reports/lap-42-vision-result.md)。已修hosted字节/原生分账、null窗口/容量语义、三字段身份与固定新报告；88单元/39原事件框架场景通过，0生成握手确认当前模型supportsImages/low/1M输入/128000输出。完整CLI模板F仍因自定义system后渲染与产品agent追加文字未能界定，未开IQ/启用/群图；vision=false。旧decoded结构有效且normalizer未变，无需新采样。现场stopped/disconnected，未启停/加载，local/persona/图库/21 pending不变。session LAP-42-hosted-vision-implementation交付后释放唯一归属，停止于42具体缺口。
 
@@ -16,7 +18,7 @@ LAP-41已完成新根整理：uv报告清除38,269缓存文件约626.1MiB、5份
 
 ## 当前需要读的文件
 
-- 当前：[42 HANDOFF](tasks/LAP-42/HANDOFF.md) → [识图收尾详规](tasks/LAP-42/VISION_FINISH_PLAN.md) / [预算来源](tasks/LAP-42/HOSTED_CLI_BUDGET_EVIDENCE.md) / [新medium指令](tasks/LAP-42/VISION_MEDIUM_START.md)，再读使用对照；原42整合合同只供历史参考，不重跑接入、文字首试或已加载功能。
+- 当前：[42 HANDOFF](tasks/LAP-42/HANDOFF.md) → [闭环详规](tasks/LAP-42/VISION_CLOSURE_PLAN.md) / [输入合同](tasks/LAP-42/CLI_PROMPT_CONTRACT.md) / [本次medium指令](tasks/LAP-42/VISION_CLOSURE_MEDIUM_START.md)，再读使用对照；旧42整合及VISION_MEDIUM_START仅历史，不重跑接入、首试或已加载功能。
 - 上轮：[21实际数据准备](tasks/LAP-21/SNOW_MIGRATION_RESULT.md)保留；active未激活/真实未验不阻塞42，42不动其pending。
 - 日常使用：[SnowLuma使用说明](../../SnowLuma使用说明.md)。
 - 旧NapCat用户：[实际bot使用对照](../../docs/BOT_USAGE_COMPARISON.md)。
@@ -39,6 +41,8 @@ NapCat旧根和旧C根不修改/启停；保留本根仍被导入的NapCat兼容
 成员是小群名册候选/受控@，42已补官方只读强刷来源并保留1..49/双TTL/8项768字节/单cap/最多1受控@；缺来源、人数无效/大群只暂停增强。关注是free叫名/引用/短续聊，已加载，无新消息不主动发言。字幕专用网络/认证服务及vendor已删除，纯材料schema/选择函数和旧报告保留；旧专用报告脚本不适用于当前退役版本，不重跑。真实效果按42报告逐项保留，不能用开关/代码替代群验收。
 
 ## 本次归属与检查点
+
+2026-10-26 00:00登记、18:34恢复重核，session LAP-42-vision-prompt-closure-plan续42，仅PROGRESS/本工作线HANDOFF/TASKS/42 HANDOFF及新CLI_PROMPT_CONTRACT/VISION_CLOSURE_PLAN/VISION_CLOSURE_MEDIUM_START共7文档。基线/实时远端355f7eec2971946595efd057ea3f2a5790afa6f3；恢复时仅原TASKS领取段有差异。本轮无生产/运行操作，恢复后22项保护状态重新取基线；核对/Git见42交接，交付后释放归属停止。
 
 2026-10-25 22:19（Asia/Shanghai），session `LAP-42-hosted-vision-finish-plan`登记并重读，起点HEAD/实时远端48f66bc192548184e4f88e23de6a357962bff85e，Git无非忽略差异。独占PROGRESS、本工作线HANDOFF/TASKS、42 HANDOFF及新VISION_FINISH_PLAN/HOSTED_CLI_BUDGET_EVIDENCE/VISION_MEDIUM_START共7文档。20项配置/persona/图库/pending及key/目录存在状态保护；不改运行数据/代码，不启停/模型/群，不读验A4或其他根。检查/Git见42交接，交付后释放归属停止。
 
