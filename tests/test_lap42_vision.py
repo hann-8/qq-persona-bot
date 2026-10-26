@@ -239,3 +239,42 @@ class HostedRunnerTests(unittest.IsolatedAsyncioTestCase):
                     self.assertFalse((f.root/'user.json').exists(),change)
                 finally:CURRENT.reset(token)
             finally:f.tearDown()
+
+
+class OperatorAcceptanceTests(unittest.TestCase):
+    def review(self):
+        from qqbot_gateway.vision_operator_review import MODE,WAIVED,FIRST_BINDING,FIRST_ANSWER
+        checks=('exact_facts','human_passed','quality_passed','native_image_verified','budget_passed','runtime_verified','no_truncation','no_tools')
+        return dict(mode=MODE,binding='b'*64,
+            authorization=dict(source='conversation_explicit_feedback',waived_cases=WAIVED,prior_recorder_failure_acknowledged=True),
+            first=dict(binding=FIRST_BINDING,case='IQ-01',answer_sha256=FIRST_ANSWER,accepted=True,source='conversation_explicit_feedback'),
+            large=dict(state='scored',attempts=1,case_id='IQ-05',normalized=dict(width=1000,height=1000),
+                human_review=dict(source='conversation_explicit_feedback',case='IQ-05',timestamp=1,answer_sha256='a'*64),
+                **{k:True for k in checks}))
+
+    def test_explicit_shortened_acceptance(self):
+        from qqbot_gateway.vision_operator_review import diagnostics
+        self.assertEqual(diagnostics(self.review(),'b'*64),[])
+
+    def test_no_reply_is_never_approval(self):
+        from qqbot_gateway.vision_operator_review import diagnostics
+        row=self.review();row['large']['human_passed']=False
+        self.assertTrue(diagnostics(row,'b'*64))
+
+    def test_stale_binding_and_unacknowledged_failure_rejected(self):
+        from qqbot_gateway.vision_operator_review import diagnostics
+        self.assertTrue(diagnostics(self.review(),'c'*64))
+        row=self.review();row['authorization']['prior_recorder_failure_acknowledged']=False
+        self.assertTrue(diagnostics(row,'b'*64))
+
+    def test_not_a_six_case_claim_or_small_image(self):
+        from qqbot_gateway.vision_operator_review import diagnostics
+        row=self.review();row['authorization']['waived_cases']=[]
+        self.assertTrue(diagnostics(row,'b'*64))
+        row=self.review();row['large']['normalized']['width']=640
+        self.assertTrue(diagnostics(row,'b'*64))
+
+    def test_missing_durable_review_rejected(self):
+        from qqbot_gateway.vision_operator_review import durable_diagnostics
+        with tempfile.TemporaryDirectory() as directory:
+            self.assertTrue(durable_diagnostics(Path(directory),self.review(),'b'*64))

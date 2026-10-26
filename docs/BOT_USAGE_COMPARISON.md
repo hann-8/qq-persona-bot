@@ -1,5 +1,10 @@
 # 旧NapCat bot与当前SnowLuma bot：实际使用对照
 
+## 2026-10-26 当前缩减验收
+
+用户已将六例验收缩减为“已通过的IQ-01 + 一张大图IQ-05”，IQ-02/03/04/06明确未测豁免，不是全通过。首张真实回答与用户通过反馈已保留；TTY评分记录异常留下failed_or_unknown原行，不重跑或洗批。新operator acceptance与生产共享校验只适用于该明确授权，复查当前绑定、离线/probe、有效decoded、原行及大图独次持久测量/人工反馈；没有force配置。原c135f83冻结保留为历史；用户变更验收后仅调整验收/脚本/签名，插件和runner未改。真实请求目前2次（早前意外1+IQ-01 1），大图还未调用；vision=false、群图0/2、服务停止。102单元/39框架已通过；真实CLI新probe正向1本地user/0 next，反向0/0。最终offline摘要正在刷新，完成后冻结并仅调用大图一次。
+
+
 返回[项目入口](../PROGRESS.md) / [日常操作](../SnowLuma使用说明.md) / [本次整理交接](../tracks/laptop-workbuddy/tasks/LAP-41/HANDOFF.md)。核对日期：2026-10-25，Asia/Shanghai。
 
 这里比较的是你已经使用过的 `E:/CodexWS/QQbot` 和当前 `E:/CodexWS/QQbot_Snowluma` 里的bot，依据两边实际配置、最近启动快照、共用源码和本机资产，不比较框架宣传功能。

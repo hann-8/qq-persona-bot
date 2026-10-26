@@ -88,7 +88,7 @@ def adapter_signature():
     # transport and extraction policy. Public review records are code-owned.
     names=sorted(set(names) | {str(p.relative_to(root)).replace('\\','/') for p in (root/'src/qqbot_gateway').glob('*.py')} |
         {'config/vision-capabilities.json','config/cli-capabilities.json','config/cli-tools-denied.json','config/versions.lock.json','uv.lock',
-         'scripts/observe_lap28.py','config/persona.md',
+         'scripts/observe_lap28.py','scripts/observe_lap42_operator.py','config/persona.md',
          'scripts/probe_lap42_vision_contract.py','scripts/activate_lap42_vision.py',
          'scripts/verify_lap42_vision.py','tests/test_vision_mod_guard.py','tests/test_lap42_vision.py',
          'reports/lap-42-vision-closure-sources.json'} |

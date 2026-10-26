@@ -39,7 +39,7 @@ def current(root):
     return project,runtime,binding(project.settings,runtime)
 
 
-def prepare(root,batch_id,ingress,expected_binding):
+def prepare(root,batch_id,ingress,expected_binding,operator_review=False):
     from qqbot_gateway.vision_quality import BatchLedger
     from qqbot_gateway.vision_capabilities import digest,selected_record,validate_production_evidence,offline_valid,read_json
     from qqbot_gateway.vision_ingress import validate_record
@@ -58,6 +58,9 @@ def prepare(root,batch_id,ingress,expected_binding):
     evidence=dict(binding=bound,runtime=runtime,record_hash=digest(selected_record(project.settings)),
         fixture_hash=batch['fixture_hash'],batch=batch,offline_passed=offline_valid(project.settings),ingress_decoded=decoded,
         ingress_instance=ingress,unresolved_attempts=ledger.unresolved(bound))
+    if operator_review:
+        from qqbot_gateway.vision_operator_review import MODE,PATH
+        evidence.update(acceptance_mode=MODE,operator_review=read_json(root/PATH))
     _,missing=validate_production_evidence(project.settings,evidence,root)
     if missing:raise ValueError('CANDIDATE_REJECTED: '+','.join(missing))
     active=root/'state/vision-evidence/active.json'
@@ -141,6 +144,7 @@ def main():
     parser.add_argument('--candidate-sha256')
     parser.add_argument('--batch-id')
     parser.add_argument('--ingress-instance')
+    parser.add_argument('--operator-review',action='store_true',help='Explicit shortened LAP-42 human acceptance; never six-case proof')
     args=parser.parse_args()
     from qqbot_gateway.config import configuration_lock,require_stopped
     from qqbot_gateway.vision_capabilities import read_json
@@ -149,7 +153,7 @@ def main():
         if current(ROOT)[2]!=args.expected_binding:raise ValueError('CURRENT_BINDING_CHANGED')
         if args.action=='prepare':
             if not args.batch_id or not args.ingress_instance:parser.error('batch and ingress required')
-            result=prepare(ROOT,args.batch_id,args.ingress_instance,args.expected_binding)
+            result=prepare(ROOT,args.batch_id,args.ingress_instance,args.expected_binding,args.operator_review)
         elif args.action=='activate':
             if not args.candidate_sha256:parser.error('candidate digest required')
             result=activate(ROOT,args.candidate_sha256,args.expected_binding)

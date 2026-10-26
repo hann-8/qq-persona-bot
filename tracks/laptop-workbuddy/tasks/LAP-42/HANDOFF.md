@@ -1,8 +1,15 @@
 # LAP-42：Snow既有功能整合与B站退役
 
+## 2026-10-26 当前缩减验收
+
+用户已将六例验收缩减为“已通过的IQ-01 + 一张大图IQ-05”，IQ-02/03/04/06明确未测豁免，不是全通过。首张真实回答与用户通过反馈已保留；TTY评分记录异常留下failed_or_unknown原行，不重跑或洗批。新operator acceptance与生产共享校验只适用于该明确授权，复查当前绑定、离线/probe、有效decoded、原行及大图独次持久测量/人工反馈；没有force配置。原c135f83冻结保留为历史；用户变更验收后仅调整验收/脚本/签名，插件和runner未改。真实请求目前2次（早前意外1+IQ-01 1），大图还未调用；vision=false、群图0/2、服务停止。102单元/39框架已通过；真实CLI新probe正向1本地user/0 next，反向0/0。最终offline摘要正在刷新，完成后冻结并仅调用大图一次。
+
+
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [AGENTS](../../../../AGENTS.md)。当前[真实闭环详规](VISION_CLOSURE_PLAN.md) / [官方输入合同](CLI_PROMPT_CONTRACT.md) / [本次medium指令](VISION_CLOSURE_MEDIUM_START.md)。旧[收尾详规](VISION_FINISH_PLAN.md)/[旧视觉指令](VISION_MEDIUM_START.md)和[整合PLAN](PLAN.md)/[旧整合指令](MEDIUM_START.md)均为历史，不整轮再跑。
 
 ## 当前检查点：真实契约通过、源码冻结、固定六例待人工审阅
+
+2026-10-26T20:44:50.439947+08:00：IQ-01已得到一次真实模型回答，正在TTY session 23522的no_hallucination输入处等待用户；回答hash及绑定在私有pending-human-review.json，不持久化正文。不能重启observer/重新生成；仅收到明确逐例反馈后忠实输入三项yes/no。当前IQ已预占1/6，原意外耗次另1，共2次本机真实尝试。唯一运行/验证归属继续保持，不释放，不改绑定源码。
 
 2026-10-26T20:42:55.248901+08:00（Asia/Shanghai）：用户明确授权总上限7次（原意外请求1已耗+六例6），群图最多2；未授权换模型/后端/额度。原失败/隔离/known-zero协议失败和授权账目全保留，不改写成质量通过。当前停止/保护已核对，无运行配置变更。
 

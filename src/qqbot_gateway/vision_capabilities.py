@@ -179,6 +179,10 @@ def production_diagnostics(settings, evidence, runtime, *, table=None):
         return missing + ['OBSERVATION_BINDING_MISMATCH']
     if evidence.get('offline_passed') is not True or evidence.get('ingress_decoded') is not True:
         missing.append('OFFLINE_OR_INGRESS_UNVERIFIED')
+    if evidence.get('acceptance_mode')=='lap42_first_plus_large_operator_acceptance':
+        if not record.get('kind'):return missing+['OPERATOR_ACCEPTANCE_BACKEND_INVALID']
+        from .vision_operator_review import diagnostics
+        return missing+diagnostics(evidence.get('operator_review'),expected)
     batch = evidence.get('batch', {})
     if not isinstance(batch,dict):return missing+['FIXED_IQ_BATCH_INVALID']
     rows = batch.get('cases', {})
@@ -239,7 +243,10 @@ def validate_production_evidence(settings, evidence, root=None):
     from .vision_quality import BatchLedger
     from .vision import adapter_signature
     ledger_path=root/'state/vision-evidence/iq-batches.sqlite3'
-    if not ledger_path.is_file():
+    if evidence.get('acceptance_mode')=='lap42_first_plus_large_operator_acceptance':
+        from .vision_operator_review import durable_diagnostics
+        missing.extend(durable_diagnostics(root,evidence.get('operator_review'),evidence.get('binding')))
+    elif not ledger_path.is_file():
         missing.append('DURABLE_IQ_LEDGER_MISSING')
     else:
         ledger=BatchLedger(ledger_path)
