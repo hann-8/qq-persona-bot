@@ -8,7 +8,22 @@ RUNTIME = dict(version='2.168.0',
 MODEL = 'deepseek-v4.1-flash'
 REVISION = '314113f8a7dadb388215396ba5fbee2c610a04d6'
 TYPES_HASH = '450476f6346507eb032a00a90c3a90c036e37ef57fbc442b52d5ec725a365a92'
-FRAMEWORK_SPANS = {'composer': (4986189, 4987069, 'a46ede57030afae34423d73373ff98860df53a3edeee722d5970241a3eb88eda'), 'context_bridge': (5965415, 5969944, '1827d5126dd2be97a39ffbdf1d2408397b78ca1f136bd355c30911f6600a9f9b'), 'user_wrapper': (14096651, 14096715, '1d68621e1e8e4ba1de6f851849345a4c2207efe314066981739f97934b4957ef'), 'tool_enable_checker': (4873338, 4874369, 'f6394cad47e5c07534ab0fe975b9ae449f16acf642c4b7b80a6e8d4c802835b5'), 'sdk_enabled_tools': (19196392, 19196637, '35eac3fdb00d6c284f49817354d8ca5adba55354c469f0bf3960af69a36818a8'), 'catalog_context': (9736113, 9737113, '8057848afb9b46b0c67b6a1dafb280e7ab8b8e59c07cf7e0a0fe7f3437c7339a')}
+FRAMEWORK_SPANS = {'composer': (4986189, 4987069, 'a46ede57030afae34423d73373ff98860df53a3edeee722d5970241a3eb88eda'),
+ 'context_bridge': (5965415, 5969944, '1827d5126dd2be97a39ffbdf1d2408397b78ca1f136bd355c30911f6600a9f9b'),
+ 'user_wrapper': (14096651, 14096715, '1d68621e1e8e4ba1de6f851849345a4c2207efe314066981739f97934b4957ef'),
+ 'tool_enable_checker': (4873338,
+                         4874369,
+                         'f6394cad47e5c07534ab0fe975b9ae449f16acf642c4b7b80a6e8d4c802835b5'),
+ 'sdk_enabled_tools': (19196392,
+                       19196637,
+                       '35eac3fdb00d6c284f49817354d8ca5adba55354c469f0bf3960af69a36818a8'),
+ 'catalog_context': (9736113, 9737113, '8057848afb9b46b0c67b6a1dafb280e7ab8b8e59c07cf7e0a0fe7f3437c7339a'),
+ 'system_reminder_switch': (4778768,
+                            4779179,
+                            'f099b6eed4ee1d8068eea00b2fd2381befe02691a05b835f42a567292d43572e'),
+ 'public_transcript_projection': (15569013,
+                                  15569619,
+                                  'e4bd16e17942bf3629a264a26438c92a8f2fcb424412e0836ed22bc868df7eb7')}
 
 SOURCE_HASHES = {
     'tokenizer.json': 'c90dfa01249db1be4245780a052ede752e1361c612ac6d08e2bdada7d599476b',

@@ -31,7 +31,7 @@ def blob():
 # This proves handler/catch behavior only; it is explicitly NOT a real CLI probe.
 HARNESS=r'''
 import {pathToFileURL} from 'node:url';
-import {readFileSync,writeFileSync,statSync,realpathSync} from 'node:fs';
+import {readFileSync,writeFileSync,statSync,realpathSync,readdirSync} from 'node:fs';
 const root=process.argv[2], variant=process.argv[3];
 const manifest=JSON.parse(readFileSync(root+'/.codebuddy-plugin/plugin.json','utf8'));
 const request=manifest.userConfig.request.default;
@@ -43,7 +43,8 @@ let failWrite=false;
 const host={plugin:{root},fs:{
  read:async(path,options)=>options?.as==='bytes'?{base64:readFileSync(path).toString('base64')}:readFileSync(path,'utf8'),
  write:async(path,text)=>{if(failWrite)throw Error('synthetic IO failure');writeFileSync(path,text)},
- stat:async(path)=>({realPath:realpathSync(path),isLink:false})
+ stat:async(path)=>({realPath:realpathSync(path),isLink:false}),
+ list:async(path)=>readdirSync(path).map(name=>({name}))
 },tool:{list:async()=>[]}};
 await handlers['engine.create']({}, {}, async()=>host);
 const composed=await handlers['prompt.compose'](host, {model:q.model,promptModel:q.model,tools:[]});
@@ -59,7 +60,7 @@ if(variant==='step_one') e.index=1;
 if(variant==='subagent') e.agentId='other';
 if(variant==='wrong_count') e.messageCount=2;
 host.session={messages:async()=>[{role:'user',content:[{type:'text',text:
-    variant==='injected_context'?'extra':q.prompt},image]}]};
+    variant==='injected_context'?'extra':q.prompt}]}]};
 if(variant==='blocks_missing')host.session.messages=async()=>[{role:'user',content:[]}];
 if(variant==='messages_io_failure')host.session.messages=async()=>{throw Error('synthetic read failure')};
 const result={...e,answer:'original result',toolUses:[],stopReason:'end_turn',usage:null};
@@ -70,7 +71,7 @@ let answer;
 if(variant==='catch_before') {next.called=false;answer=await catches['turn.step'](host,e,next)}
 else if(variant==='host_called_without_admission') {next.called=true;answer=await catches['turn.step'](host,e,next)}
 else if(variant==='catch_after') {
- const prior=JSON.parse(readFileSync(q.receipt,'utf8'));prior.next_calls=1;prior.stages.push('admitted','next');writeFileSync(q.receipt,JSON.stringify(prior));
+ writeFileSync(q.receipt_root+'/phase-next-test.json',JSON.stringify({nonce:q.nonce,stage:'next'}));
  next.called=true;nextCalls=1;answer=await catches['turn.step'](host,e,next)
 }
 else if(variant==='context_catch') {await catches['prompt.context'](host,e,{error:{message:'test'}});answer=await handlers['turn.step'](host,e,next)}
@@ -80,11 +81,30 @@ else {
  catch(err) {next.called=nextCalls>0;answer=await catches['turn.step'](host,e,next)}
 }
 if(variant==='twice') await handlers['turn.step'](host,e,next);
+if(variant==='ready_refresh_after_probe'){
+ const original=JSON.parse(readFileSync(q.receipt,'utf8'));original.stages=['ready'];original.next_calls=0;writeFileSync(q.receipt,JSON.stringify(original));
+ await Promise.all([handlers['prompt.context'](host),handlers['prompt.compose'](host,{model:q.model,promptModel:q.model,tools:[]})]);
+}
 console.log(JSON.stringify({nextCalls,answer,system:composed.sections[0].text,context}));
 '''
 
 
 class ModTests(unittest.TestCase):
+    def test_reauthorization_accounts_only_the_exact_prior_marker(self):
+        from qqbot_gateway.vision_mod_guard import probe_unknown_unresolved,sha
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);base=root/'state/vision-evidence';base.mkdir(parents=True)
+            marker=base/'lap42-cli-probe-unknown.json';marker.write_bytes(b'prior consumed attempt')
+            grant=dict(schema_version=1,authorization='USER_CONFIRMED_7_TOTAL_WITH_SIX_FIXED_CASES',
+                previous_real_requests=1,max_local_real_requests=7,fixed_batch='lap42-vision-closure-v2',
+                max_group_generations=2,backend='codebuddy_cli',model='deepseek-v4.1-flash',effort='low',
+                prior_marker_sha256=sha(marker.read_bytes()),source='explicit_current_conversation')
+            path=base/'lap42-native-authorization.json';path.write_text(json.dumps(grant))
+            self.assertFalse(probe_unknown_unresolved(root))
+            marker.write_bytes(b'new unexpected generation')
+            self.assertTrue(probe_unknown_unresolved(root))
+            self.assertEqual(marker.read_bytes(),b'new unexpected generation')
+
     def test_generation_quarantine_stops_probe_before_async_runner_or_new_journal(self):
         from scripts import probe_lap42_vision_contract as probe
         from types import SimpleNamespace
@@ -142,7 +162,7 @@ class ModTests(unittest.TestCase):
     def test_plugin_projection_refusal_catch_and_single_next(self):
         lock=json.loads((ROOT/'config/versions.lock.json').read_text(encoding='utf-8'))
         import base64
-        for mode,variants in [('probe',['normal']),('live',['normal','wrong_model','wrong_effort','step_one',
+        for mode,variants in [('probe',['normal','ready_refresh_after_probe']),('live',['normal','wrong_model','wrong_effort','step_one',
             'subagent','wrong_count','injected_context','blocks_missing','messages_io_failure','catch_before','catch_after',
             'host_called_without_admission','after_next_receipt_failure','context_catch','compose_catch','receipt_failure','twice'])]:
             for variant in variants:
@@ -155,11 +175,11 @@ class ModTests(unittest.TestCase):
                         cwd=work,capture_output=True,text=True,encoding='utf-8',timeout=15)
                     self.assertEqual(result.returncode,0,result.stderr)
                     value=json.loads(result.stdout)
-                    expected=1 if mode=='live' and variant in ('normal','twice','catch_after','after_next_receipt_failure') else 0
+                    expected=1 if mode=='live' and variant in ('normal','twice','catch_after','after_next_receipt_failure','context_catch','compose_catch') else 0
                     self.assertEqual(value['nextCalls'],expected)
                     self.assertEqual(value['system'],g.request['system'])
                     self.assertEqual(value['context'],dict(blocks=[],instructionFiles=[]))
-                    if variant=='normal':g.finish()
+                    if variant in ('normal','ready_refresh_after_probe','context_catch','compose_catch'):g.finish()
                     elif variant not in ('catch_after',):
                         with self.assertRaises(ValueError):g.finish()
 

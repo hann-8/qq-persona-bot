@@ -64,24 +64,46 @@ export function register(on, options) {
   need(q.mode === 'probe' || q.mode === 'live');
   need(typeof q.system === 'string' && typeof q.prompt === 'string');
   need(q.T + q.F + q.V + q.O <= q.C && q.V === 1024 && q.O >= 2048);
-  need(path(q.receipt) === path(q.root + '/receipt.json'));
+  need(path(q.receipt_root) === path(q.root).replace(/\/vision-plugin$/,'/vision-receipts'));
+  need(path(q.receipt) === path(q.receipt_root + '/receipt.json'));
   const state = {schema: 2, nonce: q.nonce, system_sha256: q.system_sha256,
     system_bytes: q.system_bytes, assets_sha256: q.assets_sha256,
     model: q.model, effort: q.effort, mode: q.mode, stages: [], next_calls: 0};
-  async function receipt($, stage, extra = {}) {
-    // Request-private receipts coordinate events without relying on mutable
-    // captured JavaScript state surviving host boundaries.
-    const current = stage === 'ready' ? {...state, stages: []} : JSON.parse(await $.fs.read(q.receipt));
-    need(current.nonce === q.nonce && current.assets_sha256 === q.assets_sha256, 'receipt_identity');
-    Object.assign(current, extra); current.stages.push(stage);
-    await $.fs.write(q.receipt, JSON.stringify(current));
+  const phaseNames=['context_cleared','composed','refused','admitted','probe_short_circuit','next','completed'];
+  async function readState($) {
+    const current=JSON.parse(await $.fs.read(q.receipt));
+    need(current.nonce===q.nonce,'receipt_identity');
+    const stages=['ready'];let calls=0;
+    const entries=(await $.fs.list(q.receipt_root)).filter(x=>x.name.startsWith('phase-') && x.name.endsWith('.json'));
+    need(entries.length<=128,'receipt_count');
+    for(const entry of entries){
+      let row;
+      try {row=JSON.parse(await $.fs.read(q.receipt_root+'/'+entry.name));} catch {continue;}
+      need(row.nonce===q.nonce && phaseNames.includes(row.stage),'phase_identity');
+      stages.push(row.stage);
+      for(const key of ['reason','hook_error','diagnostic','registered_tools','catalog_tools','transcript_verified'])
+        if(row[key]!==undefined)current[key]=row[key];
+      if(row.stage==='next')calls=1;
+    }
+    current.stages=stages;current.next_calls=calls;
     return current;
+  }
+  async function receipt($, stage, extra = {}) {
+    if(stage==='ready'){
+      await $.fs.write(q.receipt,JSON.stringify({...state,...extra,stages:['ready']}));
+      return;
+    }
+    need(phaseNames.includes(stage),'phase_name');
+    // Independent immutable phase files prevent concurrent context/composition
+    // dispatches from erasing admission/refusal/short-circuit evidence.
+    const name='phase-'+stage+'-'+Date.now()+'-'+Math.floor(Math.random()*4294967296).toString(16)+'.json';
+    await $.fs.write(q.receipt_root+'/'+name,JSON.stringify({nonce:q.nonce,stage,...extra}));
   }
   function empty(e) {
     return {turnId: e.turnId, index: e.index, answer: '', toolUses: [], stopReason: null, usage: null};
   }
-  async function reject($, e, reason) {
-    try { await receipt($, 'refused', {reason}); } catch {}
+  async function reject($, e, reason, details = {}) {
+    try { await receipt($, 'refused', {reason,...details}); } catch {}
     return empty(e);
   }
   on('engine.create', async ($, e, next) => {
@@ -95,7 +117,15 @@ export function register(on, options) {
       const data = await engine.fs.read(q.root + '/' + file, {as:'bytes'});
       need(await hash(decode(data.base64)) === sha, 'asset');
     }
-    await receipt(engine, 'ready', {request_sha256: await hash(canonical(q))});
+    const wireText=await engine.fs.read(q.wire_path);
+    need(hash(wireText)===q.wire_sha256,'wire_hash');
+    const wire=JSON.parse(wireText);
+    need(wire.type==='user' && wire.message.role==='user' && wire.message.content.length===2,'wire_shape');
+    need(wire.message.content[0].type==='text' && wire.message.content[0].text===q.prompt,'wire_text');
+    const image=wire.message.content[1];
+    need(image.type==='image' && image.source.type==='base64' && image.source.media_type==='image/png','wire_image');
+    need(hash(decode(image.source.data))===q.image_sha256,'wire_pixels');
+    await receipt(engine, 'ready', {request_sha256: await hash(canonical(q)),wire_verified:true});
     return engine;
   }); // engine.create has no Registration.catch; failure fails the load.
   const project = () => ({sections: [{id: 'qqbot-vision-guard:system', scope: 'session', text: q.system}]});
@@ -108,36 +138,37 @@ export function register(on, options) {
     // the actual model request; the parent also requires init tools/MCP=[] .
     await receipt($, 'composed', {registered_tools:e.tools.length,catalog_tools:catalog.length});
     return project();
-  }).catch(async ($, e, next) => { try {await receipt($, 'refused', {reason:'compose_failure',
-    compose_model:e.model,prompt_model:e.promptModel,compose_tools:e.tools?.length,
-    hook_error:next.error?.message});} catch {} return project(); });
+  }).catch(() => project());
   const clear = () => ({blocks: [], instructionFiles: []});
-  on('prompt.context', async ($) => {
-    await receipt($, 'context_cleared');
-    return clear();
-  }).catch(async ($) => { try {await receipt($, 'refused', {reason:'context_failure'});} catch {} return clear(); });
+  // Context preparation also runs around host API calls. This handler must be
+  // pure: doing fs I/O here recursively prepares context again in this build.
+  on('prompt.context', () => clear()).catch(() => clear());
   on('turn.step', async ($, e, next) => {
     let nextEntered=false;
+    let diagnostic={};
     try {
-    const prior = JSON.parse(await $.fs.read(q.receipt));
+    const prior = await readState($);
     const stages = prior.stages ?? [];
-    if (prior.nonce !== q.nonce || !stages.includes('composed') || !stages.includes('context_cleared') ||
+    if (prior.nonce !== q.nonce || !stages.includes('composed') ||
         stages.some(x => ['refused','admitted','probe_short_circuit','next','completed'].includes(x)) ||
         e.agentId || e.index !== 0 ||
         e.model !== q.model || e.effort !== q.effort || e.messageCount !== 1 || Date.now() > q.deadline) {
       return reject($, e, 'identity_projection_or_step');
     }
     const rows = await $.session.messages({as: 'api'});
+    diagnostic={rows:Array.isArray(rows)?rows.length:-1,roles:Array.isArray(rows)?rows.map(r=>r.role):[],
+      blocks:Array.isArray(rows)?rows.map(r=>Array.isArray(r.content)?r.content.map(b=>({type:b.type,keys:Object.keys(b),
+        text_bytes:typeof b.text==='string'?bytes(b.text).length:null,source_keys:b.source?Object.keys(b.source):[]})):[]):[]};
     need((await $.tool.list()).every(t => t.mcp===false), 'step_tools');
     need(Array.isArray(rows) && rows.length === 1 && rows[0].role === 'user', 'messages');
     const blocks = rows[0].content;
-    need(Array.isArray(blocks) && blocks.length === 2, 'blocks');
+    // Locked toApiMessages() intentionally emits text/tool blocks only. Pixel
+    // identity is bound to the exact parent stdin frame verified at engine.create.
+    need(Array.isArray(blocks) && blocks.length === 1, 'blocks');
     const texts = blocks.filter(b => b.type === 'text');
-    const images = blocks.filter(b => b.type === 'image');
-    need(texts.length === 1 && images.length === 1, 'content');
+    need(texts.length === 1, 'content');
     need(texts[0].text === q.prompt || texts[0].text === '<user_query>' + q.prompt + '</user_query>', 'text');
-    need(images[0].source?.type === 'base64' && images[0].source.media_type === 'image/png', 'image_type');
-    need(await hash(decode(images[0].source.data)) === q.image_sha256, 'image_hash');
+    await receipt($, 'context_cleared', {transcript_verified: true});
     await receipt($, q.mode === 'probe' ? 'probe_short_circuit' : 'admitted', {transcript_verified: true});
     if (q.mode === 'probe') return empty(e);
     await receipt($, 'next', {next_calls: 1});
@@ -149,13 +180,13 @@ export function register(on, options) {
       if(nextEntered)return next(e); // host replay of that same admission
       // Keep ordinary validation/host-I/O failures inside the handler. A thrown
       // guard is skipped by the host, so it is never our refusal mechanism.
-      return reject($, e, 'step_validation_or_io');
+      return reject($, e, 'step_validation_or_io', {hook_error:String(error).slice(0,160),diagnostic});
     }
   }).catch(async ($, e, next) => {
     // next.called alone is insufficient: replay only after our own persisted
     // admission. Any inability to prove that state returns an empty refusal.
     try {
-      const prior=JSON.parse(await $.fs.read(q.receipt));
+      const prior=await readState($);
       if(prior.nonce===q.nonce && prior.next_calls===1 && prior.stages.includes('next') && next.called)
         return await next(e);
     } catch {}

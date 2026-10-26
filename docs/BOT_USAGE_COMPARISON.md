@@ -6,7 +6,7 @@
 
 ## 2026-10-26视觉续作当前状态
 
-[真实CLI probe结果](../reports/lap-42-vision-closure-result.md)：官方Mod已实际装载并投影system，但新guard在图片块校验异常后未成功拒绝，出现1次真实DeepSeek请求/SSE，已立即停止后续调用。修复后96单元/39框架通过，尚未重新真实验证；IQ=0/6、群图=0/2、vision=false，没有启用加载或群发，当前无需操作者发群图。隔离记录保留，不能把这次称作零生成probe再额外跑满六例。其他模型/low/free/记忆/成员/web/memes与冷却0/0、图库/pending保持。
+[当前进度](../reports/lap-42-vision-closure-result.md)：真实CLI接线和零生成契约已通过（正向0 next，反向0 user），97单元/39框架通过，已冻结源码进入固定六例人工质量审阅。用户授权总上限7（原意外1+六例6），旧失败保留；vision仍false，尚未激活/加载/群图。目前无需操作者发群图，后续就绪时再提示。开关是config/local/features.yaml的vision.enabled，正常切换需先关闭再改标量并启动，true仍须有效生产证据。
 
 ## 2026-10-25 LAP-42实际整合结果
 

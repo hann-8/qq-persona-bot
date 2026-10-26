@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-**LAP-42真实CLI probe失败，按意外生成停止条款停止真实调用，vision=false。** [实际结果](../../reports/lap-42-vision-closure-result.md) / [来源](../../reports/lap-42-vision-closure-sources.json)。用户就绪后已实际验证官方插件装载/system投影与双上下文清空，但turn.step图片块校验异常向宿主透传，真实DeepSeek请求/SSE发生1次，完成状态未验证；不是成功的零生成probe，不纳入六例。21条本地probe尝试记录共7条本地user，只有1次观察到远端请求，其余装载/准入/显式拒绝失败均保留。没有继续额外跑六例，IQ=0/6、群图=0/2、未激活/加载或发群。拒绝分支已修为内部try/catch及本请求准入证明后才可重放，96单元/39框架通过；该修复未再次实际CLI验证。隔离标记阻止后续probe/IQ/生产，须先处理本次实际耗次/完成未知与后续预算，不能假作零生成再跑满六次。15份本机保护文件不变，项目保持stopped/disconnected，外部QQ保留。
+**LAP-42真实CLI接线与当前零生成契约检查已通过，代码冻结，开始固定六例人工审阅。** 用户明确追加授权本机总上限7次（既有意外1+固定六例6），群图仍最多2。新规则/视图/回执问题已修，97单元/39框架通过；当前实际正向1本地user/0 next、缺插件与错回执均0 user，无新增远端生成。双上下文纯函数、仅视觉子进程关闭CLI rules注入，原system/项目材料保留；API文字视图不冒充图片视图，原生帧由子进程与父进程分别校验。回执置于插件目录之外并按阶段独立留证。现有真实耗次1、IQ待逐例、vision=false，尚未激活/群图。实际结果与当前私有frozen-before-iq绑定见[报告](../../reports/lap-42-vision-closure-result.md)。
 
 **LAP-42视觉续作代码/定向验证已交付，真实识图未完成**：[本轮实际结果](../../reports/lap-42-vision-result.md)。已修hosted字节/原生分账、null窗口/容量语义、三字段身份与固定新报告；88单元/39原事件框架场景通过，0生成握手确认当前模型supportsImages/low/1M输入/128000输出。完整CLI模板F仍因自定义system后渲染与产品agent追加文字未能界定，未开IQ/启用/群图；vision=false。旧decoded结构有效且normalizer未变，无需新采样。现场stopped/disconnected，未启停/加载，local/persona/图库/21 pending不变。session LAP-42-hosted-vision-implementation交付后释放唯一归属，停止于42具体缺口。
 

@@ -191,7 +191,7 @@ class CLIRunner:
                 try:
                     terms=final_budget(selected_record(self.vision_settings),self.budget,system,prompt,
                         CURRENT.get().blob.width,CURRENT.get().blob.height,known_models().get(self.model,{}))
-                    guard=Guard(work,system,prompt,CURRENT.get().blob,terms,mode='probe' if probe else 'live',denied_tools=self.denied)
+                    guard=Guard(work,system,prompt,CURRENT.get().blob,terms,mode='probe' if probe else 'live',denied_tools=self.denied,wire_message=image_message)
                 except (OSError,ValueError,KeyError,TypeError):
                     raise GatewayError('MODEL_CONFIG_UNSUPPORTED') from None
                 if probe_fault!='missing_plugin':args += ['--plugin-dir',str(guard.root)]
@@ -203,6 +203,7 @@ class CLIRunner:
             env = os.environ.copy()
             if guard:
                 env.update(CBC_ENABLE_FUNCTION_HOOKS='1',CLAUDE_CODE_ENABLE_FUNCTION_HOOKS='1')
+                env['CODEBUDDY_DISABLE_SYSTEM_REMINDER_MD']='1'
                 env.pop('CODEBUDDY_LIBRARY_RUNTIME',None)
             env.pop('MAX_THINKING_TOKENS',None)
             for key in list(env):
@@ -342,7 +343,8 @@ class CLIRunner:
                         self._native_metadata_check(system,prompt)
                         if guard:
                             try:
-                                await guard.ready(min(self.control_timeout,self.timeout))
+                                ready_proof=await guard.ready(min(self.control_timeout,self.timeout))
+                                if probe:self.last_parameters['vision_guard_ready']=ready_proof
                                 if probe_fault=='wrong_receipt':
                                     # Deliberately invalidate the expected identity after
                                     # real engine readiness; the parent must withhold user.
@@ -362,6 +364,9 @@ class CLIRunner:
                 # Identity/ledger overflow must fail before the only user input.
                 if owner.record['reasons'] or owner.io_failed:
                     raise GatewayError('CLEANUP_FAILED')
+                if guard:
+                    if hashlib.sha256(payload).hexdigest()!=guard.request['wire_sha256']:
+                        raise GatewayError('MODEL_CONFIG_UNSUPPORTED')
                 self.user_messages_sent += 1
                 process.stdin.write(payload)
                 await process.stdin.drain()
@@ -405,7 +410,11 @@ class CLIRunner:
             finally:
                 if probe and guard:
                     try:self.last_parameters['vision_guard_observed']=guard.read()
-                    except (OSError,ValueError):pass
+                    except (OSError,ValueError) as error:self.last_parameters['vision_guard_read_error']=str(error)
+                    try:
+                        self.last_parameters['probe_evidence']=guard.preserve_probe(
+                            self.root/'state/lap42-vision-closure/probe-request-evidence'/work.name)
+                    except (OSError,ValueError):self.last_parameters['probe_evidence_error']=True
                 self.last_protocol = parser.events
                 owner.begin(process, io, watcher, owned_root, generation, self.cleanup_seconds)
                 clean = await owner.join()

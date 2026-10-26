@@ -1,6 +1,16 @@
-# LAP-42真实CLI probe失败与停止记录
+# LAP-42视觉闭环实际进度
 
 返回[PROGRESS](../PROGRESS.md) / [42交接](../tracks/laptop-workbuddy/tasks/LAP-42/HANDOFF.md) / [闭环计划](../tracks/laptop-workbuddy/tasks/LAP-42/VISION_CLOSURE_PLAN.md)。2026-10-26，Asia/Shanghai；session `LAP-42-vision-closure-implementation`。
+
+## 当前续作：真实CLI契约通过，进入固定六例
+
+2026-10-26T20:42:55.248901+08:00：用户明确授权7次本机真实请求总上限（已耗1+固定六例6），群图仍最多2。当前97单元/39框架通过，实际正向1本地user/0 next/0远端、反向缺插件/错回执均0 user。当前源码/资产/helper/来源/测试与offline、probe绑定已冻结，不能在IQ后变动。尚未启用vision或开始群图，当前代码检查点不等于识图完整验收。
+
+新修复仅作用于NativeImage子进程：关闭CLI自身rules注入，保留完整项目system/prompt；公开API toApiMessages实际仅投影文字，不能用它断言图片丢失。原生图片stdin帧由父进程逐字节hash与子进程原文/像素hash分别校验。prompt.context改为无I/O纯双空返回；回执置于插件兄弟目录，独立phase文件避免并发覆盖/递归。F当前8985，原30000/2048/2048、4096、null及模型/low/free不变。
+
+私有frozen-before-iq保存当前binding/adapter/offline/probe摘要；旧失败/unknown及known-zero本机协议失败均保留，不伪改通过。六例只使用一个持久batch，每例一次、真实回答只临时显示并由用户逐例审阅；任何失败/unknown停止，不换batch洗过。
+
+## 先前失败与停止记录（历史，不是当前契约结果）
 
 **没有完成识图闭环。** 用户确认可配合后实际进入CLI契约probe，最终出现1次意外DeepSeek真实请求/SSE；已按原指令“若出现真实生成迹象立即停止并实记次数，不装作probe后再额外跑满六次”停止后续调用。vision=false，六例和群图均未开始。新guard异常拒绝分支已离线修复，尚未重新真实验证。
 

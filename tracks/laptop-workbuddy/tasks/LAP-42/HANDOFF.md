@@ -2,7 +2,17 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [AGENTS](../../../../AGENTS.md)。当前[真实闭环详规](VISION_CLOSURE_PLAN.md) / [官方输入合同](CLI_PROMPT_CONTRACT.md) / [本次medium指令](VISION_CLOSURE_MEDIUM_START.md)。旧[收尾详规](VISION_FINISH_PLAN.md)/[旧视觉指令](VISION_MEDIUM_START.md)和[整合PLAN](PLAN.md)/[旧整合指令](MEDIUM_START.md)均为历史，不整轮再跑。
 
-## 当前实际检查点：probe意外发生1次真实请求，已停止
+## 当前检查点：真实契约通过、源码冻结、固定六例待人工审阅
+
+2026-10-26T20:42:55.248901+08:00（Asia/Shanghai）：用户明确授权总上限7次（原意外请求1已耗+六例6），群图最多2；未授权换模型/后端/额度。原失败/隔离/known-zero协议失败和授权账目全保留，不改写成质量通过。当前停止/保护已核对，无运行配置变更。
+
+97单元/39框架通过，当前实际CLI正向1本地user/0 next/0远端；两项反向0 user。修复native-only系统规则注入、公共toApiMessages丢图片造成的误判；原生stdin帧父子双重核验。prompt.context纯函数无I/O，避免host操作再次准备context导致递归；回执移到请求内的插件兄弟目录且分阶段独立保存，防止并发覆盖。CLI及SDK内部/全局配置未改。
+
+**代码、插件、规则、来源、helper及测试已冻结，不能在IQ后改动。** 私有`state/lap42-vision-closure/frozen-before-iq.json`保存binding/adapter/offline/probe摘要；固定batch仍`lap42-vision-closure-v2`、spec在私有iq-fixtures-lap42-v2。六例真实答案只在TTY临时显示，逐例等待本会话人工反馈并忠实转录，source=conversation_explicit_feedback，未回复不得通过，不重新生成已有答案。模型/low/free/预算保持，vision=false。
+
+当前报告[closure-result](../../../../reports/lap-42-vision-closure-result.md)优先于以下历史停止记录；IQ/启用/群图未完成。源码检查点提交后继续同一任务，保持唯一运行与验证归属，不领取21。待审TTY会话及台账应在每次等待点登记。
+
+## 历史：probe意外发生1次真实请求并停止
 
 2026-10-26T20:00:31.695386+08:00（Asia/Shanghai），同session `LAP-42-vision-closure-implementation`按用户“我可以配合了”恢复。开始本地/实时远端`84da0e9d6ff0029c317dba5829634a78d69b53b9`、工作区干净；TASKS已登记重读同23路径和唯一真实执行归属，停止/配置/冻结证据重核通过。
 

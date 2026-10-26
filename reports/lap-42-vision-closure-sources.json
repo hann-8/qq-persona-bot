@@ -44,18 +44,34 @@
       "sha256": "8057848afb9b46b0c67b6a1dafb280e7ab8b8e59c07cf7e0a0fe7f3437c7339a",
       "source_bytes": 1000,
       "multiplicity": 1
+    },
+    "system_reminder_switch": {
+      "start": 4778768,
+      "end": 4779179,
+      "sha256": "f099b6eed4ee1d8068eea00b2fd2381befe02691a05b835f42a567292d43572e",
+      "source_bytes": 411,
+      "multiplicity": 1
+    },
+    "public_transcript_projection": {
+      "start": 15569013,
+      "end": 15569619,
+      "sha256": "e4bd16e17942bf3629a264a26438c92a8f2fcb424412e0836ed22bc868df7eb7",
+      "source_bytes": 606,
+      "multiplicity": 1
     }
   },
-  "framework_upper_bytes": 7968,
+  "framework_upper_bytes": 8985,
   "known_encoder_bytes": 219,
   "applicability": [
     "Single projected session system, no SDK preset; no tools/response schema/history/compaction/automatic memory.",
     "Both prompt.context fields empty; project policy and user material remain in original system/prompt.",
-    "Public normalized API transcript must be exactly one user text (unchanged or user_query wrapper) plus one PNG with the current pixel hash.",
     "Whole source bytes overcount each reviewed fixed composer/context/wrapper contribution, once each; model framing and low reasoning prefix included separately.",
-    "SDK/provider wire JSON field names/base64 are not tokenized prose; image pixels use V=1024. No claim that TurnStepInput contains SDK system."
+    "SDK/provider wire JSON field names/base64 are not tokenized prose; image pixels use V=1024. No claim that TurnStepInput contains SDK system.",
+    "Locked toApiMessages() drops images and joins text; the API view cannot attest pixel absence or identity. It must contain exactly original single user text/wrapper.",
+    "The parent hashes the exact single-native-image stdin frame. engine.create independently reads that private frame, checks text/PNG/pixel hash and frame hash before ready. Parent rechecks the outgoing bytes before user.",
+    "For native-image subprocesses only, CODEBUDDY_DISABLE_SYSTEM_REMINDER_MD=1 suppresses CLI rules injection at the source-reviewed shouldInjectSystemReminder branch; original project system/prompt materials remain."
   ],
-  "real_cli_probe": "FAILED_UNEXPECTED_REAL_GENERATION_1_STOPPED",
+  "real_cli_probe": "current_bound_private_proof_required",
   "public_source_audit": "reports/lap-42-vision-sources.json",
   "actual_findings": [
     "Direct Mod loader reads manifest.options; userConfig.default alone is insufficient.",
@@ -64,5 +80,12 @@
     "Locked createIsEnabledChecker returns false for empty session tools string; SDK getAllTools filters disabled functions; strict empty MCP and parent init checks remain.",
     "One real probe turn failed a block-shape assertion, host skipped that thrown handler, and a real model request/SSE followed. Not a successful zero-generation probe.",
     "Ordinary step validation now uses an internal try/catch; Registration.catch replays only if this nonce has persisted next_calls=1, stage next, and host next.called. Offline repair only; no real rerun after generation."
+  ],
+  "continuation_findings": [
+    "Explicit user reauthorized cap7: prior unexpected request consumed1 plus fixed IQ6; max group images2 unchanged. Original marker remains and exact prior hash is accounted; a changed marker immediately blocks again.",
+    "An actual positive probe reached probe_short_circuit with next_calls0, and actual missing-plugin/wrong-receipt variants sent0 users after the rules/view fixes. Final current binding requires its own private proof; this historical finding does not grant eligibility.",
+    "Receipts are outside the immutable plugin directory. Independent per-phase files preserve short-circuit/admission evidence across concurrent context/composition events.",
+    "prompt.context is a pure synchronous dual-empty result with no host I/O: host API calls themselves prepare context, so I/O in that hook recursively dispatches it. turn.step records context_cleared only after the normalized text exactly matches original text/wrapper.",
+    "A known-zero local protocol failure is resolved only against the exact current marker, private journal and completed own CLI log with no ModelProvider entry, no escaped step exception and empty terminal/exit0. Records remain failures, never passed; the prior observed real request remains consumed1."
   ]
 }
