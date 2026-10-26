@@ -54,6 +54,7 @@ def main():
     from qqbot_gateway.vision_capabilities import digest
     from qqbot_gateway.hosted_cli_budget import review_record
     sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+    audit=json.loads((ROOT/'reports/lap-42-vision-closure-sources.json').read_text(encoding='utf-8'))
     value=dict(schema_version=1,passed=result.wasSuccessful() and len(rows)==3,
         adapter_signature=adapter_signature(),rule_hash=digest(review_record()),
         verifier_sha256=sha(Path(__file__)),tests_sha256=sha(ROOT/'tests/test_lap42_vision.py'),
@@ -62,7 +63,8 @@ def main():
         frameworks=rows,framework_combinations=len(rows),framework_cases=sum(len(r['cases']) for r in rows),
         real_model_calls=0,real_qq_outputs=0,bot_start_stop_operations=0,
         native_iq_eligible=False,production_eligible=False,
-        remaining_source_gap=None,real_cli_contract='pending_actual_probe',
+        remaining_source_gap=None,real_cli_contract=audit.get('real_cli_probe','pending_actual_probe'),
+        execution_scope='This offline verifier only; actual CLI/model attempts are separately reported in closure-result.',
         scope='Current hosted regression and existing original AstrBot event/actual runner bottom substitutes; legacy harnesses do not prove hosted native eligibility.')
     (ROOT/'reports/lap-42-vision-offline.json').write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n',encoding='utf-8',newline='\n')
     print(json.dumps({k:value[k] for k in ('passed','unit_tests','framework_cases','remaining_source_gap')}))

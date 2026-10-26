@@ -6,7 +6,7 @@
 
 ## 2026-10-26视觉续作当前状态
 
-[闭环代码/离线结果](../reports/lap-42-vision-closure-result.md)：官方当次Mod、完整system投影/双上下文清空、预算及安全启用工具已实现，95单元/39框架场景通过。用户选择先完成代码和离线验证，实际CLI装载probe、六例模型理解/人工质量、启用加载与两条原群图仍待配合；vision继续false，没有把离线执行TS插件当成模型看懂图片。其他模型/low/free/记忆/成员/web/memes与冷却0/0、图库/pending不变。
+[真实CLI probe结果](../reports/lap-42-vision-closure-result.md)：官方Mod已实际装载并投影system，但新guard在图片块校验异常后未成功拒绝，出现1次真实DeepSeek请求/SSE，已立即停止后续调用。修复后96单元/39框架通过，尚未重新真实验证；IQ=0/6、群图=0/2、vision=false，没有启用加载或群发，当前无需操作者发群图。隔离记录保留，不能把这次称作零生成probe再额外跑满六例。其他模型/low/free/记忆/成员/web/memes与冷却0/0、图库/pending保持。
 
 ## 2026-10-25 LAP-42实际整合结果
 

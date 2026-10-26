@@ -24,7 +24,7 @@ def assets_signature():
 
 
 class Guard:
-    def __init__(self, work, system, prompt, image, terms, *, mode='live'):
+    def __init__(self, work, system, prompt, image, terms, *, mode='live',denied_tools=None):
         self.root = Path(work) / 'vision-plugin'
         self.root.mkdir()
         source = assets()
@@ -41,6 +41,7 @@ class Guard:
             system_sha256=sha(system.encode()), system_bytes=len(system.encode()),
             prompt_sha256=sha(prompt.encode()), image_sha256=image.sha256,
             assets={k:v for k,v in source.items() if k != FILES[0]}, assets_sha256=assets_signature(), model='deepseek-v4.1-flash',
+            denied_tools=denied_tools if denied_tools is not None else json.loads((ROOT/'config/cli-tools-denied.json').read_text(encoding='utf-8')),
             effort='low', mode=mode, deadline=int((time.time()+180)*1000), **terms)
         self.serialized = json.dumps(self.request, ensure_ascii=False, separators=(',', ':'))
         manifest_path = self.root / FILES[0]
@@ -48,6 +49,7 @@ class Guard:
         # A per-request default, never user/global settings; static source hashes
         # exclude this derived manifest, whose independent hash is also checked.
         manifest['userConfig']['request']['default'] = self.serialized
+        manifest['options'] = {'request': self.serialized}
         manifest_path.write_text(json.dumps(manifest, ensure_ascii=False), encoding='utf-8')
         self.manifest_hash = sha(manifest_path.read_bytes())
 
@@ -61,17 +63,22 @@ class Guard:
             raise ValueError('VISION_PLUGIN_RECEIPT_INVALID')
         value = json.loads(self.receipt.read_text(encoding='utf-8'))
         keys = ('nonce', 'system_sha256', 'system_bytes', 'assets_sha256', 'model', 'effort', 'mode')
-        if any(value.get(k) != self.request[k] for k in keys) or value.get('request_sha256') != sha(self.serialized.encode()):
-            raise ValueError('VISION_PLUGIN_RECEIPT_MISMATCH')
+        mismatches=[k for k in keys if value.get(k) != self.request[k]]
+        canonical=json.dumps(self.request,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()
+        if value.get('request_sha256') != sha(canonical):mismatches.append('request_sha256')
+        if mismatches:
+            raise ValueError('VISION_PLUGIN_RECEIPT_MISMATCH:'+','.join(mismatches))
         if not isinstance(value.get('stages'), list) or 'ready' not in value['stages']:
             raise ValueError('VISION_PLUGIN_NOT_READY')
         return value
 
     async def ready(self, timeout):
         async with asyncio.timeout(timeout):
-            while not self.receipt.exists():
+            while True:
+                if self.receipt.exists():
+                    try:return self.read()
+                    except json.JSONDecodeError:pass  # host fs.write may still be completing
                 await asyncio.sleep(.025)
-        return self.read()
 
     def finish(self):
         value = self.read()
@@ -103,10 +110,15 @@ def probe_valid(root, settings):
         if (proof.get('mode')!='probe' or proof.get('next_calls')!=0 or proof.get('transcript_verified') is not True or
             not {'ready','composed','context_cleared','probe_short_circuit'}.issubset(proof.get('stages',[])) or
             'refused' in proof.get('stages',[]) or proof.get('assets_sha256')!=assets_signature()):return False
-        return (not (Path(root)/'state/vision-evidence/lap42-cli-probe-unknown.json').exists() and
+        return (not probe_unknown_unresolved(root) and
                 item.get('binding') == binding(settings, runtime_identity(Path(root), settings)) and
                 item.get('assets_signature') == assets_signature() and item.get('passed') is True and
                 item.get('positive_local_users') == 1 and item.get('positive_next_calls') == 0 and
                 item.get('negative_users') == [0, 0] and item.get('real_generations') == 0)
     except (OSError, ValueError, KeyError, TypeError):
         return False
+
+
+def probe_unknown_unresolved(root):
+    """Unexpected generation is quarantined; never auto-clear it from other logs."""
+    return (Path(root)/'state/vision-evidence/lap42-cli-probe-unknown.json').exists()

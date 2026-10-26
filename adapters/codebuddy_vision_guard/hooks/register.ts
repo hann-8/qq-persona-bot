@@ -1,84 +1,164 @@
-import { readFileSync, writeFileSync, renameSync } from 'node:fs';
-import { createHash } from 'node:crypto';
-import { resolve, dirname } from 'node:path';
-
-// No tools, processes, HTTP or model nouns. Only the host's typed prompt events.
+// Uses the documented Mod host API and pure JavaScript; no Node imports.
 export function register(on, options) {
-  const hash = x => createHash('sha256').update(x).digest('hex');
+  const bytes = text => {
+    const out=[];
+    for (const ch of text) {
+      const n=ch.codePointAt(0);
+      if(n<128)out.push(n);
+      else if(n<2048)out.push(192|(n>>>6),128|(n&63));
+      else if(n<65536)out.push(224|(n>>>12),128|((n>>>6)&63),128|(n&63));
+      else out.push(240|(n>>>18),128|((n>>>12)&63),128|((n>>>6)&63),128|(n&63));
+    }
+    return out;
+  };
+  // SHA-256 over bytes, no unavailable sandbox imports/Web Crypto dependency.
+  const hash = value => {
+    const data=typeof value==='string'?bytes(value):Array.from(value);
+    const bitLength=data.length*8; data.push(128);
+    while(data.length%64!==56)data.push(0);
+    const high=Math.floor(bitLength/4294967296),low=bitLength>>>0;
+    for(let i=3;i>=0;i--)data.push((high>>>(i*8))&255);
+    for(let i=3;i>=0;i--)data.push((low>>>(i*8))&255);
+    const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+      0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+      0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+      0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+      0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+      0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+      0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+      0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+    const H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+    const rotr=(x,n)=>(x>>>n)|(x<<(32-n));
+    for(let pos=0;pos<data.length;pos+=64){
+      const W=[];
+      for(let i=0;i<16;i++)W[i]=(data[pos+i*4]<<24)|(data[pos+i*4+1]<<16)|(data[pos+i*4+2]<<8)|data[pos+i*4+3];
+      for(let i=16;i<64;i++){
+        const x=W[i-15],y=W[i-2];
+        W[i]=(W[i-16]+(rotr(x,7)^rotr(x,18)^(x>>>3))+W[i-7]+(rotr(y,17)^rotr(y,19)^(y>>>10)))|0;
+      }
+      let [a,b,c,d,e,f,g,h]=H;
+      for(let i=0;i<64;i++){
+        const t1=(h+(rotr(e,6)^rotr(e,11)^rotr(e,25))+((e&f)^(~e&g))+K[i]+W[i])|0;
+        const t2=((rotr(a,2)^rotr(a,13)^rotr(a,22))+((a&b)^(a&c)^(b&c)))|0;
+        h=g;g=f;f=e;e=(d+t1)|0;d=c;c=b;b=a;a=(t1+t2)|0;
+      }
+      const working=[a,b,c,d,e,f,g,h];
+      for(let i=0;i<8;i++)H[i]=(H[i]+working[i])|0;
+    }
+    return H.map(x=>(x>>>0).toString(16).padStart(8,'0')).join('');
+  };
+  const decode = text => {
+    const alphabet='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+    const out=[];let buffer=0,bits=0;
+    for(const ch of text){if(ch==='=')break;const n=alphabet.indexOf(ch);if(n<0)throw Error('VISION_GUARD_BASE64');
+      buffer=(buffer<<6)|n;bits+=6;if(bits>=8){bits-=8;out.push((buffer>>>bits)&255);}}
+    return out;
+  };
+  const path = x => x.replace(/\\/g,'/').replace(/\/$/,'').toLowerCase();
   const q = JSON.parse(options.request);
-  const need = (ok) => { if (!ok) throw Error('VISION_GUARD_CONTRACT'); };
+  const canonical = x => Array.isArray(x) ? '[' + x.map(canonical).join(',') + ']' :
+    x && typeof x === 'object' ? '{' + Object.keys(x).sort().map(k => JSON.stringify(k)+':'+canonical(x[k])).join(',') + '}' : JSON.stringify(x);
+  const need = (ok, reason='contract') => { if (!ok) throw Error('VISION_GUARD_' + reason); };
   need(q.schema === 2 && /^[a-f0-9]{64}$/.test(q.nonce));
   need(q.model === 'deepseek-v4.1-flash' && q.effort === 'low');
   need(q.mode === 'probe' || q.mode === 'live');
   need(typeof q.system === 'string' && typeof q.prompt === 'string');
-  need(hash(q.system) === q.system_sha256 && Buffer.byteLength(q.system) === q.system_bytes);
-  need(hash(q.prompt) === q.prompt_sha256 && q.T === q.system_bytes + Buffer.byteLength(q.prompt));
   need(q.T + q.F + q.V + q.O <= q.C && q.V === 1024 && q.O >= 2048);
-  need(resolve(q.receipt) === resolve(q.root, 'receipt.json'));
-  need(dirname(resolve(q.root)) === process.cwd());
-  for (const [file, sha] of Object.entries(q.assets)) {
-    need(!file.includes('..') && hash(readFileSync(resolve(q.root, file))) === sha);
-  }
-  let composed = false, context = false, admitted = false, failed = false;
+  need(path(q.receipt) === path(q.root + '/receipt.json'));
   const state = {schema: 2, nonce: q.nonce, system_sha256: q.system_sha256,
     system_bytes: q.system_bytes, assets_sha256: q.assets_sha256,
-    request_sha256: hash(options.request), model: q.model, effort: q.effort,
-    mode: q.mode, stages: [], next_calls: 0};
-  function receipt(stage, extra = {}) {
-    Object.assign(state, extra); state.stages.push(stage);
-    const tmp = q.receipt + '.tmp';
-    writeFileSync(tmp, JSON.stringify(state), {mode: 0o600});
-    renameSync(tmp, q.receipt);
+    model: q.model, effort: q.effort, mode: q.mode, stages: [], next_calls: 0};
+  async function receipt($, stage, extra = {}) {
+    // Request-private receipts coordinate events without relying on mutable
+    // captured JavaScript state surviving host boundaries.
+    const current = stage === 'ready' ? {...state, stages: []} : JSON.parse(await $.fs.read(q.receipt));
+    need(current.nonce === q.nonce && current.assets_sha256 === q.assets_sha256, 'receipt_identity');
+    Object.assign(current, extra); current.stages.push(stage);
+    await $.fs.write(q.receipt, JSON.stringify(current));
+    return current;
   }
   function empty(e) {
     return {turnId: e.turnId, index: e.index, answer: '', toolUses: [], stopReason: null, usage: null};
   }
-  function reject(e, reason) {
-    failed = true;
-    try { receipt('refused', {reason}); } catch {}
+  async function reject($, e, reason) {
+    try { await receipt($, 'refused', {reason}); } catch {}
     return empty(e);
   }
   on('engine.create', async ($, e, next) => {
     const engine = await next(e);
-    receipt('ready');
+    const rootStat=await engine.fs.stat(q.root,{resolve:true});
+    need(rootStat.realPath && path(rootStat.realPath) === path(q.root) && !rootStat.isLink, 'root');
+    need(await hash(q.system) === q.system_sha256 && bytes(q.system).length === q.system_bytes, 'system');
+    need(await hash(q.prompt) === q.prompt_sha256 && q.T === q.system_bytes + bytes(q.prompt).length, 'prompt');
+    for (const [file, sha] of Object.entries(q.assets)) {
+      need(!file.includes('..') && !file.startsWith('/'), 'asset_path');
+      const data = await engine.fs.read(q.root + '/' + file, {as:'bytes'});
+      need(await hash(decode(data.base64)) === sha, 'asset');
+    }
+    await receipt(engine, 'ready', {request_sha256: await hash(canonical(q))});
     return engine;
   }); // engine.create has no Registration.catch; failure fails the load.
   const project = () => ({sections: [{id: 'qqbot-vision-guard:system', scope: 'session', text: q.system}]});
-  on('prompt.compose', ($, e) => {
-    need(e.model === q.model && e.promptModel === q.model && e.tools.length === 0);
-    receipt('composed'); composed = true;
+  on('prompt.compose', async ($, e) => {
+    need(e.model === q.model && e.promptModel === q.model && e.tools.every(t => q.denied_tools.includes(t)), 'compose_shape');
+    const catalog=await $.tool.list();
+    need(Array.isArray(catalog) && catalog.every(t => t.mcp===false), 'tool_catalog');
+    // This build's public catalog ignores an empty --tools string. Locked
+    // createIsEnabledChecker + SDK getAllTools remove every function before
+    // the actual model request; the parent also requires init tools/MCP=[] .
+    await receipt($, 'composed', {registered_tools:e.tools.length,catalog_tools:catalog.length});
     return project();
-  }).catch(() => { failed = true; return project(); });
+  }).catch(async ($, e, next) => { try {await receipt($, 'refused', {reason:'compose_failure',
+    compose_model:e.model,prompt_model:e.promptModel,compose_tools:e.tools?.length,
+    hook_error:next.error?.message});} catch {} return project(); });
   const clear = () => ({blocks: [], instructionFiles: []});
-  on('prompt.context', () => {
-    receipt('context_cleared'); context = true;
+  on('prompt.context', async ($) => {
+    await receipt($, 'context_cleared');
     return clear();
-  }).catch(() => { failed = true; return clear(); });
+  }).catch(async ($) => { try {await receipt($, 'refused', {reason:'context_failure'});} catch {} return clear(); });
   on('turn.step', async ($, e, next) => {
-    if (failed || !composed || !context || admitted || e.agentId || e.index !== 0 ||
+    let nextEntered=false;
+    try {
+    const prior = JSON.parse(await $.fs.read(q.receipt));
+    const stages = prior.stages ?? [];
+    if (prior.nonce !== q.nonce || !stages.includes('composed') || !stages.includes('context_cleared') ||
+        stages.some(x => ['refused','admitted','probe_short_circuit','next','completed'].includes(x)) ||
+        e.agentId || e.index !== 0 ||
         e.model !== q.model || e.effort !== q.effort || e.messageCount !== 1 || Date.now() > q.deadline) {
-      return reject(e, 'identity_projection_or_step');
+      return reject($, e, 'identity_projection_or_step');
     }
-    // Public normalized transcript, not an assertion that TurnStepInput exposes
-    // the SDK system. Reject unexpected reminder/tool/history/content expansion.
     const rows = await $.session.messages({as: 'api'});
-    need(Array.isArray(rows) && rows.length === 1 && rows[0].role === 'user');
+    need((await $.tool.list()).every(t => t.mcp===false), 'step_tools');
+    need(Array.isArray(rows) && rows.length === 1 && rows[0].role === 'user', 'messages');
     const blocks = rows[0].content;
-    need(Array.isArray(blocks) && blocks.length === 2);
+    need(Array.isArray(blocks) && blocks.length === 2, 'blocks');
     const texts = blocks.filter(b => b.type === 'text');
     const images = blocks.filter(b => b.type === 'image');
-    need(texts.length === 1 && images.length === 1);
-    need(texts[0].text === q.prompt || texts[0].text === '<user_query>' + q.prompt + '</user_query>');
-    need(images[0].source?.type === 'base64' && images[0].source.media_type === 'image/png');
-    need(hash(Buffer.from(images[0].source.data, 'base64')) === q.image_sha256);
-    receipt(q.mode === 'probe' ? 'probe_short_circuit' : 'admitted', {transcript_verified: true});
-    admitted = true;
+    need(texts.length === 1 && images.length === 1, 'content');
+    need(texts[0].text === q.prompt || texts[0].text === '<user_query>' + q.prompt + '</user_query>', 'text');
+    need(images[0].source?.type === 'base64' && images[0].source.media_type === 'image/png', 'image_type');
+    need(await hash(decode(images[0].source.data)) === q.image_sha256, 'image_hash');
+    await receipt($, q.mode === 'probe' ? 'probe_short_circuit' : 'admitted', {transcript_verified: true});
     if (q.mode === 'probe') return empty(e);
-    // Set before calling next; catch may replay that same call, never generate twice.
-    state.next_calls = 1;
-    receipt('next');
+    await receipt($, 'next', {next_calls: 1});
+    nextEntered=true;
     const result = await next(e);
-    receipt('completed');
+    await receipt($, 'completed');
     return result;
-  }).catch(($, e, next) => next.called ? next(e) : reject(e, 'hook_failure'));
+    } catch (error) {
+      if(nextEntered)return next(e); // host replay of that same admission
+      // Keep ordinary validation/host-I/O failures inside the handler. A thrown
+      // guard is skipped by the host, so it is never our refusal mechanism.
+      return reject($, e, 'step_validation_or_io');
+    }
+  }).catch(async ($, e, next) => {
+    // next.called alone is insufficient: replay only after our own persisted
+    // admission. Any inability to prove that state returns an empty refusal.
+    try {
+      const prior=JSON.parse(await $.fs.read(q.receipt));
+      if(prior.nonce===q.nonce && prior.next_calls===1 && prior.stages.includes('next') && next.called)
+        return await next(e);
+    } catch {}
+    return empty(e);
+  });
 }

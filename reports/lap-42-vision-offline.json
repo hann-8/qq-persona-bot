@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "passed": true,
-  "adapter_signature": "43ed90e5eefd92e556e43b82826e1d1fd4b27bee01e1c5be08d31444847eecc0",
-  "rule_hash": "635ed9402dd2f748e2b271db49f95664d0fde27947bfa7f218978894a357850c",
-  "verifier_sha256": "76e512807a341c8b346e265df4aeedbc368cf370f4586732de3ffe3acb553354",
+  "adapter_signature": "75a4cee27a3bd46c44b7970ccf1d22cf2046aedcf85d8d38e4ff90839bdc4d85",
+  "rule_hash": "b5a19ab31b4fbbcdd5666e3401a15300392bf665f6acb00047aaf3d5824940ee",
+  "verifier_sha256": "6449174489fe926aed870d8363ed878a82e2e8208d9239ce4644d4a90d278f69",
   "tests_sha256": "fe34ea8c31bdf6834eda3213ebb408a1462a2accb8b76496a426d0730b9ea881",
-  "source_audit_sha256": "2aa072e77a2b9fd5a2a9bce8c60725fa5abaab4e51d10613fd889a5f30012e6d",
-  "unit_tests": 95,
+  "source_audit_sha256": "dd7fc796e1fb6f852087534415098f86badfcb7b09eb7245cdf628f4362edf33",
+  "unit_tests": 96,
   "failures": 0,
   "errors": 0,
   "modules": [
@@ -286,6 +286,7 @@
   "native_iq_eligible": false,
   "production_eligible": false,
   "remaining_source_gap": null,
-  "real_cli_contract": "pending_actual_probe",
+  "real_cli_contract": "FAILED_UNEXPECTED_REAL_GENERATION_1_STOPPED",
+  "execution_scope": "This offline verifier only; actual CLI/model attempts are separately reported in closure-result.",
   "scope": "Current hosted regression and existing original AstrBot event/actual runner bottom substitutes; legacy harnesses do not prove hosted native eligibility."
 }

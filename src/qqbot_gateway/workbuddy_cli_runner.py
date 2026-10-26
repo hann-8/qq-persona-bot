@@ -191,7 +191,7 @@ class CLIRunner:
                 try:
                     terms=final_budget(selected_record(self.vision_settings),self.budget,system,prompt,
                         CURRENT.get().blob.width,CURRENT.get().blob.height,known_models().get(self.model,{}))
-                    guard=Guard(work,system,prompt,CURRENT.get().blob,terms,mode='probe' if probe else 'live')
+                    guard=Guard(work,system,prompt,CURRENT.get().blob,terms,mode='probe' if probe else 'live',denied_tools=self.denied)
                 except (OSError,ValueError,KeyError,TypeError):
                     raise GatewayError('MODEL_CONFIG_UNSUPPORTED') from None
                 if probe_fault!='missing_plugin':args += ['--plugin-dir',str(guard.root)]
@@ -265,7 +265,10 @@ class CLIRunner:
                 if exchange is not None:
                     while line := await process.stdout.readline():
                         try:event = json.loads(line)
-                        except (ValueError,UnicodeError):raise GatewayError('PROTOCOL_ERROR') from None
+                        except (ValueError,UnicodeError):
+                            if probe:
+                                self.last_probe_nonjson=getattr(self,'last_probe_nonjson',b'')+line
+                            raise GatewayError('PROTOCOL_ERROR') from None
                         if not isinstance(event,dict):raise GatewayError('PROTOCOL_ERROR')
                         if event.get('type') == 'control_response':
                             response = exchange.accept(event)
@@ -295,12 +298,19 @@ class CLIRunner:
                     while line := await process.stdout.readline():
                         event=json.loads(line)
                         if event.get('type')=='assistant':
-                            raise GatewayError('VISION_PROBE_GENERATION_UNKNOWN')
+                            self.last_parameters['vision_probe_failure']='generation_unknown'
+                            raise GatewayError('PROTOCOL_ERROR')
                         if event.get('type')=='result':
-                            if (not parser.initialized or event.get('subtype')!='success' or
-                                event.get('is_error') is not False or event.get('result') not in ('',None)):
-                                raise GatewayError('VISION_PROBE_GENERATION_UNKNOWN')
+                            observed=guard.read()
+                            self.last_parameters['vision_guard_observed']=observed
+                            if 'refused' in observed.get('stages',[]) and observed.get('next_calls')==0:
+                                raise GatewayError('MODEL_CONFIG_UNSUPPORTED')
                             proof=guard.finish()
+                            if not parser.initialized:raise GatewayError('PROTOCOL_ERROR')
+                            # An empty Mod short circuit produces the CLI's local
+                            # no-response terminal on this locked build. The
+                            # independently verified probe receipt is the proof.
+                            self.last_parameters['probe_terminal_subtype']=event.get('subtype')
                             self.last_parameters['vision_guard']=proof
                             raise _ProbeReady()
                         parser.line(line.decode('utf-8'))
@@ -310,10 +320,12 @@ class CLIRunner:
 
             async def read_stderr():
                 count = 0
+                if probe:self.last_probe_stderr=bytearray()
                 while chunk := await process.stderr.read(8192):
                     count += len(chunk)
                     if count > 65536:
                         raise GatewayError('PROTOCOL_ERROR')
+                    if probe:self.last_probe_stderr.extend(chunk)
 
             async def write_stdin():
                 if exchange is not None:
@@ -336,8 +348,10 @@ class CLIRunner:
                                     # real engine readiness; the parent must withhold user.
                                     guard.request['nonce']='0'*64
                                     guard.read()
-                            except (OSError,ValueError,TimeoutError):
+                            except (OSError,ValueError,TimeoutError) as error:
                                 self.last_parameters['vision_rejection']='VISION_PLUGIN_NOT_READY_OR_MISMATCH'
+                                if probe:self.last_parameters['vision_guard_error']=type(error).__name__
+                                if probe:self.last_parameters['vision_guard_reason']=str(error)
                                 raise GatewayError('MODEL_CONFIG_UNSUPPORTED') from None
                     payload = (json.dumps(image_message,ensure_ascii=False,separators=(',',':'))+'\n').encode('utf-8')
                 elif CURRENT.get():
@@ -389,6 +403,9 @@ class CLIRunner:
                 generation = 'BACKEND_UNAVAILABLE'
                 raise GatewayError('BACKEND_UNAVAILABLE') from None
             finally:
+                if probe and guard:
+                    try:self.last_parameters['vision_guard_observed']=guard.read()
+                    except (OSError,ValueError):pass
                 self.last_protocol = parser.events
                 owner.begin(process, io, watcher, owned_root, generation, self.cleanup_seconds)
                 clean = await owner.join()

@@ -2,17 +2,21 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [AGENTS](../../../../AGENTS.md)。当前[真实闭环详规](VISION_CLOSURE_PLAN.md) / [官方输入合同](CLI_PROMPT_CONTRACT.md) / [本次medium指令](VISION_CLOSURE_MEDIUM_START.md)。旧[收尾详规](VISION_FINISH_PLAN.md)/[旧视觉指令](VISION_MEDIUM_START.md)和[整合PLAN](PLAN.md)/[旧整合指令](MEDIUM_START.md)均为历史，不整轮再跑。
 
-## 当前实施检查点：代码/离线通过，等待真实阶段配合
+## 当前实际检查点：probe意外发生1次真实请求，已停止
 
-session `LAP-42-vision-closure-implementation`；起点HEAD/实时远端`61124d583c3fba49c17d38a3ed549ccc6c50856b`，初始干净，2026-10-26T18:51:14+08:00登记精确归属并重读。新检查[实际结果](../../../../reports/lap-42-vision-closure-result.md) / [来源](../../../../reports/lap-42-vision-closure-sources.json) / [offline](../../../../reports/lap-42-vision-offline.json)。
+2026-10-26T20:00:31.695386+08:00（Asia/Shanghai），同session `LAP-42-vision-closure-implementation`按用户“我可以配合了”恢复。开始本地/实时远端`84da0e9d6ff0029c317dba5829634a78d69b53b9`、工作区干净；TASKS已登记重读同23路径和唯一真实执行归属，停止/配置/冻结证据重核通过。
 
-当次Mod、父进程准入、有限F/预算、新kind、真实CLI probe及安全激活/回滚工具已实现；95单元/39框架场景通过，静态diagnostics空、offline_valid=true。实际TS插件代码由Node执行、宿主事件为替身；不能记成实际CLI probe或模型理解。15份local/persona/图库/pending保护原字节不变。规范化函数AST相同，旧decoded成功结构仍有效，未回拉URL或新采样。
+[本轮实际结果](../../../../reports/lap-42-vision-closure-result.md) / [来源](../../../../reports/lap-42-vision-closure-sources.json)。实际21条probe尝试记录、7条本地user；1次真实DeepSeek请求/SSE（19:51:03异常后、19:51:05收到首块）后停止，无后续模型调用。该次不是成功零生成probe，也不是IQ；完成/质量未验证。IQ=0/6、群图=0/2、vision=false，无active/正常加载/群发。用户尚不需发图。
 
-用户本会话明确选择“稍后配合，先完成代码和离线验证”。因此本轮真实CLI进程/probe=0、IQ=0/6、人工质量=0/6、群图=0/2、active/vision保存和生产加载未执行，vision=false。新核对项目stopped/disconnected，外部QQ保留，无启停；不重复42其他增强/21或旧任务。当前是可恢复的阶段A交付，不是视觉闭环完成或外部技术阻断。
+真实装载发现Node imports禁止、crypto全局不可用、直接loader用manifest.options；已改纯JS UTF-8/SHA-256和公开fs API、请求私有回执协调。prompt.compose为注册工具65，公共catalog为83；SDK工具过滤来源与空--tools、strict空MCP、deny及父进程init空工具检查保留。不能把catalog当实际SDK工具。上述实际发现均写来源审阅。
 
-后续先确认操作者在线、重核停止/绑定与无并行修改，运行`probe_lap42_vision_contract.py --run`；probe无IQ/生产资格前置。若真实装载需修复，只能在六例前修复/重验并再次冻结；当前尚未消耗任何IQ，不能直接跳过probe。固定batch `lap42-vision-closure-v2`仅一个；逐例真实人工评分后，执行新activate工具prepare/activate、正常受管加载一次，再最多两条操作者手工真实@图。具体命令/边界/回滚见本轮结果，禁止旧整轮apply。
+此次直接失败是turn.step块形状断言抛出后宿主继续模型路径；外层catch未成功封闭异常。已修普通校验/I/O内部try/catch、仅nonce匹配且next_calls=1/stage next与host next.called共同成立才重放。96定向单元/39框架通过，包含缺块、host读取失败、宿主called但本请求未准入、next后回执失败，以及隔离在CLI启动前拒绝。**此修复没有再次真实CLI验证**，未将离线通过晋升实际安全通过。
 
-Git检查/推送后释放本session运行及真实验证归属；等待用户后续配合，不自动启用或推进下一项。
+第一次本地user的skipRun/无响应错误伴随清理阻断，已核对登记owner/11身份退出，经原工具归档恢复（observed_only，不声称完整后代覆盖）；原归档和当时零生成事实保留。随后实际远端请求的隔离标记完整保留，历史skipRun日志不能再自动清除此标记。后续probe/IQ工具在该标记存在时0进程拒绝；不删台账/换batch/忽略标记来继续。
+
+15份保护文件原字节/SHA保持，独立记忆/key/库、图库/21 pending、local/persona及模型/low/free未改；服务一直stopped/disconnected，外部QQ保留。未发生项目启停或群发送；只有一次既有cleanup recover归档，不读验A4/旧根/家庭SSH。
+
+下一步先向用户交代已耗1次真实请求、原六例未开始及停止条款；继续实际probe/六例必须明确后续次数预算与新检查点。不能在原范围内装作probe零生成后另跑满六次。当前23份归属文件按长期授权检查commit/push并核对远端后释放运行/验证归属，不自行恢复free/推进21。
 
 ## 历史规划：官方投影与真实启用闭环
 

@@ -38,8 +38,20 @@ async def probe(root,settings,journal):
                     'Synthetic local image probe.', 'lap42-probe-'+str(fault),fault=fault)
             except GatewayError as error:
                 row.update(state='failed',users=runner.user_messages_sent,error=error.code)
+                row['rejection']=runner.last_parameters.get('vision_rejection')
+                row['guard_error']=runner.last_parameters.get('vision_guard_error')
+                row['guard_reason']=runner.last_parameters.get('vision_guard_reason')
+                row['guard_observed']=runner.last_parameters.get('vision_guard_observed')
+                stderr=getattr(runner,'last_probe_stderr',b'')
+                if stderr:atomic(journal.with_suffix('.stderr.log'),stderr)
+                nonjson=getattr(runner,'last_probe_nonjson',b'')
+                if nonjson:atomic(journal.with_suffix('.nonjson.log'),nonjson)
                 atomic(journal,json.dumps(rows).encode())
-                if runner.user_messages_sent:
+                observed=runner.last_parameters.get('vision_guard_observed',{})
+                local_refusal=(observed.get('next_calls')==0 and 'refused' in observed.get('stages',[]))
+                row['local_refusal_zero_next']=local_refusal
+                atomic(journal,json.dumps(rows).encode())
+                if runner.user_messages_sent and not local_refusal:
                     atomic(root/'state/vision-evidence/lap42-cli-probe-unknown.json',json.dumps(dict(
                         state='unknown',users=runner.user_messages_sent,timestamp=time.time(),journal=journal.name)).encode())
                 if not fault or runner.user_messages_sent or runner.last_parameters.get('vision_rejection')!='VISION_PLUGIN_NOT_READY_OR_MISMATCH':
@@ -72,7 +84,8 @@ def main():
     with configuration_lock(root):
         require_stopped(root);settings=read_project(root).settings
         before=binding(settings,runtime_identity(root,settings))
-        if (root/'state/vision-evidence/lap42-cli-probe-unknown.json').exists():
+        from qqbot_gateway.vision_mod_guard import probe_unknown_unresolved
+        if probe_unknown_unresolved(root):
             raise ValueError('UNRESOLVED_PROBE_GENERATION')
     # Never hold config lock across runner I/O.
     import uuid

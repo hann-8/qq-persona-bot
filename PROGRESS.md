@@ -16,7 +16,7 @@ LAP-41工作区整理与使用对照已完成：uv报告清除38,269个缓存文
 
 **LAP-42视觉续作已交付代码与定向验证，识图仍待具体来源缺口**：[实际结果](reports/lap-42-vision-result.md) / [定向报告](reports/lap-42-vision-offline.json) / [来源审阅](reports/lap-42-vision-sources.json)。null窗口、字节/token分账、hosted三字段身份及新offline接点已修；88单元/39框架场景通过。现有0生成握手确认当前DeepSeek支持图片与low（1M输入/128000输出），但CLI自定义system后仍渲染/追加产品agent文字，完整F上界未获证，静态拒绝IQ；IQ=0/6、群图=0/2、vision=false。既有decoded记录有效可复用，未新采样/启停/改local；现场当前stopped/disconnected，不能沿用上轮ready。只交付42并释放归属，未自动推进21或其他验收。
 
-**LAP-42视觉闭环代码与离线检查点已交付，真实阶段等待操作者。** [本轮结果](reports/lap-42-vision-closure-result.md) / [定向报告](reports/lap-42-vision-offline.json) / [新来源](reports/lap-42-vision-closure-sources.json)。已实现当次官方Mod完整system投影、双上下文清空、首条user前回执与能力准入、单次step/异常短路、T/F/V/O/C、新probe及停机prepare/activate/rollback工具。95单元/39框架场景通过；这包含项目TS插件在模拟宿主事件中的离线执行，不代表实际CLI装载。用户本会话选择“稍后配合，先完成代码和离线验证”，故未运行实际CLI probe、IQ=0/6、群图=0/2、人工审阅/保存启用/运行加载均未执行，vision=false。15份保护文件不变，既有decoded有效、normalizer AST未变，无需补采样。只续42，未启停/调用真实模型/QQ/改local；后续先真实CLI probe，再固定单批六例及人工逐例评分，满足条件才激活/加载/两条群图。
+**LAP-42真实CLI probe失败，按意外生成停止条款停止真实调用，vision=false。** [实际结果](reports/lap-42-vision-closure-result.md) / [来源](reports/lap-42-vision-closure-sources.json)。用户就绪后已实际验证官方插件装载/system投影与双上下文清空，但turn.step图片块校验异常向宿主透传，真实DeepSeek请求/SSE发生1次，完成状态未验证；不是成功的零生成probe，不纳入六例。21条本地probe尝试记录共7条本地user，只有1次观察到远端请求，其余装载/准入/显式拒绝失败均保留。没有继续额外跑六例，IQ=0/6、群图=0/2、未激活/加载或发群。拒绝分支已修为内部try/catch及本请求准入证明后才可重放，96单元/39框架通过；该修复未再次实际CLI验证。隔离标记阻止后续probe/IQ/生产，须先处理本次实际耗次/完成未知与后续预算，不能假作零生成再跑满六次。15份本机保护文件不变，项目保持stopped/disconnected，外部QQ保留。
 
 ## 从哪里继续
 
@@ -39,7 +39,7 @@ LAP-41工作区整理与使用对照已完成：uv报告清除38,269个缓存文
 
 | 工作线 | 状态/最新依据 | 接续入口 |
 | --- | --- | --- |
-| QQ主线：SnowLuma及共用bot业务 | active；42 Mod/激活工具已实现，95单元39场景通过；用户选择先离线，真实CLI/六例/启用/群图待配合 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [LAP-42](tracks/laptop-workbuddy/tasks/LAP-42/HANDOFF.md) / [闭环medium](tracks/laptop-workbuddy/tasks/LAP-42/VISION_CLOSURE_MEDIUM_START.md) |
+| QQ主线：SnowLuma及共用bot业务 | active；真实CLI probe意外请求1次后停止；guard修复96单元39场景通过，未重跑真实；IQ/启用/群图仍未过 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [LAP-42](tracks/laptop-workbuddy/tasks/LAP-42/HANDOFF.md) / [闭环medium](tracks/laptop-workbuddy/tasks/LAP-42/VISION_CLOSURE_MEDIUM_START.md) |
 | 家庭5070备用模型路线 | 历史记录为接入已实现/离线及元数据通过、真实生成未验；本轮未重查，不自动切换后端 | [HANDOFF](tracks/local-5070/HANDOFF.md) / [既有选型](tracks/local-5070/MODEL_SELECTION.md) |
 
 `tracks/laptop-workbuddy` 是保留的历史目录名，当前承担QQ主线和共用网关交接，不表示仍以NapCat或WorkBuddy界面为主路线。所有旧任务的状态/验收差额在TASKS与各任务HANDOFF保留，不重命名整棵目录。

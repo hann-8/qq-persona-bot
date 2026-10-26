@@ -23,9 +23,30 @@
       "sha256": "1d68621e1e8e4ba1de6f851849345a4c2207efe314066981739f97934b4957ef",
       "source_bytes": 64,
       "multiplicity": 1
+    },
+    "tool_enable_checker": {
+      "start": 4873338,
+      "end": 4874369,
+      "sha256": "f6394cad47e5c07534ab0fe975b9ae449f16acf642c4b7b80a6e8d4c802835b5",
+      "source_bytes": 1031,
+      "multiplicity": 1
+    },
+    "sdk_enabled_tools": {
+      "start": 19196392,
+      "end": 19196637,
+      "sha256": "35eac3fdb00d6c284f49817354d8ca5adba55354c469f0bf3960af69a36818a8",
+      "source_bytes": 245,
+      "multiplicity": 1
+    },
+    "catalog_context": {
+      "start": 9736113,
+      "end": 9737113,
+      "sha256": "8057848afb9b46b0c67b6a1dafb280e7ab8b8e59c07cf7e0a0fe7f3437c7339a",
+      "source_bytes": 1000,
+      "multiplicity": 1
     }
   },
-  "framework_upper_bytes": 5692,
+  "framework_upper_bytes": 7968,
   "known_encoder_bytes": 219,
   "applicability": [
     "Single projected session system, no SDK preset; no tools/response schema/history/compaction/automatic memory.",
@@ -34,6 +55,14 @@
     "Whole source bytes overcount each reviewed fixed composer/context/wrapper contribution, once each; model framing and low reasoning prefix included separately.",
     "SDK/provider wire JSON field names/base64 are not tokenized prose; image pixels use V=1024. No claim that TurnStepInput contains SDK system."
   ],
-  "real_cli_probe": "pending_operator_stage",
-  "public_source_audit": "reports/lap-42-vision-sources.json"
+  "real_cli_probe": "FAILED_UNEXPECTED_REAL_GENERATION_1_STOPPED",
+  "public_source_audit": "reports/lap-42-vision-sources.json",
+  "actual_findings": [
+    "Direct Mod loader reads manifest.options; userConfig.default alone is insufficient.",
+    "Node imports refused; crypto global unavailable in actual event sandbox; pure JS UTF-8/SHA-256 and public fs API used.",
+    "prompt.compose reports registered agent tools (65). Public tool.list reports global catalog (83), including inactive entries; neither is the SDK enabled list.",
+    "Locked createIsEnabledChecker returns false for empty session tools string; SDK getAllTools filters disabled functions; strict empty MCP and parent init checks remain.",
+    "One real probe turn failed a block-shape assertion, host skipped that thrown handler, and a real model request/SSE followed. Not a successful zero-generation probe.",
+    "Ordinary step validation now uses an internal try/catch; Registration.catch replays only if this nonce has persisted next_calls=1, stage next, and host next.called. Offline repair only; no real rerun after generation."
+  ]
 }

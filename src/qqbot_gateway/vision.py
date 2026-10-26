@@ -87,7 +87,7 @@ def adapter_signature():
     # Bind every prompt/network/normalizer dependency, including LAP-18's final
     # transport and extraction policy. Public review records are code-owned.
     names=sorted(set(names) | {str(p.relative_to(root)).replace('\\','/') for p in (root/'src/qqbot_gateway').glob('*.py')} |
-        {'config/vision-capabilities.json','config/cli-capabilities.json','config/versions.lock.json','uv.lock',
+        {'config/vision-capabilities.json','config/cli-capabilities.json','config/cli-tools-denied.json','config/versions.lock.json','uv.lock',
          'scripts/observe_lap28.py','config/persona.md',
          'scripts/probe_lap42_vision_contract.py','scripts/activate_lap42_vision.py',
          'scripts/verify_lap42_vision.py','tests/test_vision_mod_guard.py','tests/test_lap42_vision.py',

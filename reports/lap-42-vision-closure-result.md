@@ -1,64 +1,54 @@
-# LAP-42视觉闭环：代码与离线交付检查点
+# LAP-42真实CLI probe失败与停止记录
 
 返回[PROGRESS](../PROGRESS.md) / [42交接](../tracks/laptop-workbuddy/tasks/LAP-42/HANDOFF.md) / [闭环计划](../tracks/laptop-workbuddy/tasks/LAP-42/VISION_CLOSURE_PLAN.md)。2026-10-26，Asia/Shanghai；session `LAP-42-vision-closure-implementation`。
 
-本轮实际实现阶段A并完成定向离线验证。用户在本会话选择“稍后配合，先完成代码和离线验证”，所以真实CLI/六例/启用/群图阶段等待操作者，不称识图闭环完成，不记录虚构通过。
+**没有完成识图闭环。** 用户确认可配合后实际进入CLI契约probe，最终出现1次意外DeepSeek真实请求/SSE；已按原指令“若出现真实生成迹象立即停止并实记次数，不装作probe后再额外跑满六次”停止后续调用。vision=false，六例和群图均未开始。新guard异常拒绝分支已离线修复，尚未重新真实验证。
 
-| 证据层 | 当前结果 |
+| 证据层 | 当前实际结果 |
 | --- | --- |
-| 代码/资产/激活工具 | 已实现，当前检查点冻结；实际CLI装载前仍待验证 |
-| 定向离线 | 95单元、3组合39框架场景通过；[固定报告](lap-42-vision-offline.json)，当前offline_valid=true |
-| 插件执行 | 锁定Node实际运行项目TS，宿主事件模拟；完整system中英/emoji/双大括号保持，双上下文清空、拒绝/catch/回执失败/一次next通过 |
-| 实际CLI契约probe | 本轮0进程、未执行；不把上述插件单测当成CLI装载证明 |
-| 固定真实模型IQ | 0/6；未创建真实批次、无人工代评 |
-| 人工质量 | 0/6，等待逐例明确反馈 |
-| active/vision保存 | 未执行prepare/activate；vision=false，其他本机配置原字节不变 |
-| 正常生产加载 | 未执行；新核对项目stopped/disconnected、model/gate/AstrBot=0，外部QQ保留 |
-| 原群图像理解/ACK/显示 | 0/2、均未执行，agent未代发消息 |
-| 入站复用 | 1条既有成功decoded结构仍有效、下载一次，normalize函数AST未变；未拉旧URL或新采样 |
+| 代码/插件/安全激活工具 | 已实现并交付；不是生产通过 |
+| 最新离线 | 96单元、3组合39框架场景通过；[固定报告](lap-42-vision-offline.json)，offline_valid=true |
+| 实际CLI装载与投影 | 已装载4个官方事件，完整system身份/摘要和双上下文清空有实际阶段回执；尚未取得合格的整轮probe |
+| 实际本机probe | 21条尝试记录、7条本地user，失败均保留；只有1次观察到远端请求，非成功零生成probe |
+| 意外真实模型请求 | 1次当前DeepSeek/low，请求开始及SSE首块有日志；完成、有效回答和质量未验证，按耗次保留 |
+| 固定IQ/人工评分 | 0/6，未创建真实六例批次，未预填人工评分 |
+| 配置保存/运行加载 | 未执行prepare/activate或正常加载；vision=false |
+| 原群图像理解/ACK/显示 | 0/2，agent未发群，操作者尚无需发图 |
+| 运行状态 | 最后核对stopped/disconnected，model/gate/AstrBot=0；外部QQ保留 |
+| 本机保护 | 15份local/persona/图库/pending原字节不变；既有decoded有效、normalize AST未变，未重采样/拉旧URL |
 
-## 实现与来源
+## 具体失败与真实证据
 
-项目所有的`adapters/codebuddy_vision_guard`三份资产仅对当前NativeImage经当次`--plugin-dir`装载。普通文字不装载。每请求在runtime/requests复制核验资产，完整system/prompt、模型/low、预算、nonce与私有回执放manifest的本次选项默认值；静态包、请求选项、派生manifest分别摘要，不自引用。
+2026-10-26T19:25:40+08:00恢复，起点本地/实时远端`84da0e9d6ff0029c317dba5829634a78d69b53b9`、工作区干净。TASKS登记重读同23路径和唯一真实执行归属，停止/冻结/保护检查通过；没有启动bot服务。
 
-engine.create回执与既有get_available_models握手都必须先于唯一user。父进程验证资产、manifest、nonce/system摘要及当前模型容量。prompt.compose返回完整原system的一个session section；prompt.context同时清blocks和instructionFiles。项目原prompt中的记忆/成员/web/群材料保留。
+真实装载暴露了离线直接Node测试未覆盖的宿主差异：Node内置模块导入被Mod loader拒绝；声明类型中的crypto在实际事件环境不可用；直接loader从manifest.options读取选项，userConfig.default不足；跨事件状态须用每请求私有回执协调。已改为纯JavaScript UTF-8/SHA-256、公开fs API和manifest.options，不改CLI/SDK/Snow内部、全局配置或鉴权来源。
 
-turn.step检查投影、上下文、本次身份/TTL、主turn第0步、model/low、单消息及无工具形状；公开API transcript只允许原text或其user_query封套，加当前PNG的像素hash。它不声称TurnStepInput包含SDK system。probe始终不next，live最多一次；关键事件catch在未next时返回锁定空TurnStepResult，已next时沿用宿主重放语义，不再次生成。回执I/O失败不放行，父进程拒绝短路结果为AI正文。保持deny/dontAsk/strict空MCP、无续接/持久化、禁自动记忆/compact；仅视觉子进程设hook开关并移除库模式禁止值，未改全局或第三方内部。
+prompt.compose事件给出65个注册工具名；公共tool.list给出83个全局catalog项，包含未挂载到本agent的工具，不能将其视为SDK实际工具集。锁定createIsEnabledChecker对空session --tools返回false，SDK getAllTools过滤disabled函数；原deny/dontAsk/strict空MCP、空--tools及父进程init tools/MCP为空的检查保留。只使用原模型/low/账号/额度，没有其他后端或额外模型。
 
-当前组合唯一记录更新为`hosted_codebuddy_deepseek_v41_mod_v2`，绑定模型/low、CLI/node、插件包及[新来源审阅](lap-42-vision-closure-sources.json)。旧[实际结果](lap-42-vision-result.md)、[来源](lap-42-vision-sources.json)和旧28报告保留。
+19:51:03，实际turn.step在API transcript块数量检查处抛出`VISION_GUARD_blocks`；宿主报告skipped并继续。随后ModelProvider发出同次当前DeepSeek请求，19:51:05记录SSE建立及首块接收。父进程检测assistant事件后拒绝结果、关闭受管进程，没有把正文发送到QQ。该失败来自新guard异常路径未成功封闭；不能把它解释成模型不支持图片，也不能称作0远端生成或IQ通过。
 
-预算仍为原30000/2048/2048字节政策、4096视觉预留、null窗口。最终检查T+F+V+O≤C：T=原system+prompt UTF-8字节上界；V=1024；O=max(2048,当前CLI maxOutputTokens)，当前记录128000；C=min(CLI有效输入容量,1000000)。F=5692，是219已知编码文字，加锁定composer/context桥/单次wrapper审阅源码段的保守整段字节收费880+4529+64，逐项摘要及固定偏移由代码复核。原样投影移除了动态产品system，双清空移除了动态CLI材料，transcript准入拒绝额外历史/工具/文字扩张；该有限收费仅适用于此封闭请求形状，实际CLI仍须probe证明接线。它不是把219或政策2048直接当完整框架。
+完整失败、私有回执和各次journal在忽略的state/lap42-vision-closure；已生成实际尝试清单及日志SHA。公开报告不包含原始请求options/nonce/消息/图片/名册/秘密。当前state/vision-evidence/lap42-cli-probe-unknown.json保留1次实际请求及完成未验事实，工具在该标记存在时启动CLI之前拒绝。此前skipRun本地失败的历史来源/解析结论保留，但不再允许用另一条日志自动清除隔离。
 
-fitter/IQ/runner共用新kind。插件、probe/activate helper、测试、规则和来源均进入adapter_signature/offline绑定；真实IQ开始后禁止改变这些材料。若实际CLI接线暴露问题，在IQ前修复、重验并重新冻结；不沿用失效批次。
+## 已做的离线修复与验证界限
 
-新激活工具共用完整生产校验，prepare重新读取当前offline/probe/真实decoded及持久六例，不接受手编eligible。activate在停止/配置锁、源/语义双摘要和binding稳定时备份，先原子保存已验证active，再仅替换features中的vision.enabled标量并重读load_production。失败/rollback核对两个目标拥有摘要，先恢复features再恢复active，保留并行修改；不删IQ失败/unknown、记忆、锁、ACK、图库或pending。旧lap42_rollout apply未运行。
+普通turn.step身份、消息形状和host I/O验证现在全部在handler内部try/catch中返回本机空拒绝，不让普通异常透传。外层Registration.catch仅在同nonce回执已持久保存next_calls=1、stage next且host next.called成立时重放该次原结果；宿主called但本请求没有准入时返回空拒绝。next之后回执失败只沿用宿主重放，不再次生成。拒绝/探针结果仍不能作为AI正文发群。
 
-## 已执行验证
+新增/扩展的实际项目TS离线执行覆盖缺块、host读取失败、回执I/O失败、host called但无本请求准入、已next后回执失败；另有集成测试证明隔离在async runner和新journal之前生效。96单元0失败0错误、39框架场景通过。**这些修复只获离线证据，出现真实请求后没有再次运行CLI或模型。**
 
-在`E:/CodexWS/QQbot_Snowluma`：
+[来源审阅](lap-42-vision-closure-sources.json)补充锁定工具过滤/SDK启用筛选/catalog上下文的源码段和摘要。T/F/V/O/C仍分账：T为原system+prompt UTF-8保守界，F=7968为219已知文字与逐项审阅框架源码段的保守收费，V=1024，O=max(项目2048,当前CLI输出上界128000)，C=min(CLI有效容量,1000000)。原30000/2048/2048、4096及null窗口未改；有限框架仅适用于所审闭合形状，真实probe失败不能用静态/离线通过替代。
 
-```powershell
-$env:PYTHONUTF8='1'
-.\.venv\Scripts\python.exe scripts/verify_lap42_vision.py
-.\.venv\Scripts\python.exe scripts/activate_lap42_vision.py --help
-.\.venv\Scripts\python.exe scripts/probe_lap42_vision_contract.py --help
-.\.venv\Scripts\python.exe scripts/observe_lap28.py --inspect
-git diff --check
-```
+当次资产、完整system/prompt、nonce、预算和私有回执仍在runtime/requests，静态包、canonical请求及派生manifest独立摘要。普通文字不装载插件。新kind仍仅替换当前组合唯一记录；guard/helper/source/test及deny规则进入adapter/offline绑定，IQ尚未开始，无旧批次被洗掉。
 
-末次95单元0失败0错误、39框架场景通过；helper help及inspect、23份归属文件语法/JSON/UTF-8、248个Markdown本地链接、受测对象隐私扫描及diff检查通过。新增激活测试覆盖active先于开关、保存后校验失败恢复、候选摘要过期、并行features变动与回滚冲突保护；新质量校验拒绝仅有quality_passed而无人工来源/时间/case/回答hash的行。单元日志的模拟“Batch stopped”来自故意验证一次预占后失败不重试的临时测试根，不是真实IQ耗次。
+## 清理和保护
 
-本轮所有真实模型/群输出/启停/配置写入为0，未启动CLI模型控制进程。15份local/persona/图库/pending原字节/SHA核对无变化。私有备份、保护摘要、decoded复用检查及测试日志在忽略的state/lap42-vision-closure，未提交原始图/消息/名册/秘密/options/nonce。
+第一次本地user因宿主skipRun/无响应结束时，新增错误标签不属于既有清理结果枚举，导致pending清理记录未能完成保存。已改回项目现有错误枚举、细节放私有元数据；核对其登记owner及11个观察身份全部退出，使用原`manage.py cleanup recover`归档恢复，保留原记录。该覆盖只是observed_only，不声称完整所有后代证明。后续清理状态独立核对，不以旧退出推定未来状态。
 
-## 操作者就绪后接续
+未启停bot服务、登录/扫码、安装、调用家庭SSH、访问旧根或A4；未修改本机模型/persona/free/预算/记忆key或库/其他开关、图库/21 pending。未执行激活、回滚或群发。运行配置原字节/SHA保持。
 
-先重核Git/归属、当前受管停止与运行状态、配置/绑定及真实IQ台账，不把本轮停止记录当未来现场。接续只领42；用户授权范围仍为固定6原生+最多2群图，失败/取消/unknown耗次停止，不能换batch洗过。
+## 验证命令与下一步
 
-1. 执行`python scripts/probe_lap42_vision_contract.py --run`。正向应1本地user、0 next/远端生成；两项反向均0 user。实际回执/结果/源绑定写私有journal；出现远端生成迹象保留unknown并停止，不能再额外跑满六次。probe不要求已IQ或生产eligible。
-2. probe与冻结offline有效后，用现有observer创建唯一`lap42-vision-closure-v2`批次。六例spec自造图/真值保留私有；每例一次。直接TTY评分，或明确逐例本会话反馈后忠实转录，并使用`--review-source conversation_explicit_feedback`。等待人工时不重新生成。
-3. 六例全过后执行新工具`prepare --batch-id lap42-vision-closure-v2 --ingress-instance <有效私有decoded实例> --expected-binding <当前binding>`；用其返回的候选摘要执行`activate --candidate-sha256 <prepare摘要> --expected-binding <同一binding>`。目前这两项未执行，不伪造实际命令成功回执。
-4. 正常受管加载一次，读实际vision=true和原模型/low/free/其他开关，受测对象从已有私有记录核对。通知就绪后操作者手工最多两条真实@自造图（清晰PNG/JPEG；优先GIF首帧）。逐条核对理解、同trace/request_key/原事件ACK和客户端显示，不旁路代发，free自然流量单列。
+已实际执行现有环境的`python scripts/verify_lap42_vision.py`、probe helper的真实`--run`及管理器状态/必要清理恢复；实际probe为上述失败结果，不提供假成功回执。最新定向验证仍为96单元/39框架，不跑全库、旧矩阵或A4。先前阶段A的95/39和当时0真实调用是Git检查点历史，不能套用到本次真实阶段。
 
-rollback入口为`python scripts/activate_lap42_vision.py rollback --expected-binding <配对binding>`，须停止和拥有摘要不漂移；代码回退只处理本任务配对文件，禁止reset/clean/覆盖并行修改。普通文字不依赖新插件。
+后续不得直接重跑probe或另建六例批次：先明确已耗1次实际请求、完成未知及后续预算。重新进行合格零生成probe和完整6例将使本机实际请求上限成为至少7次（已发生1+六例6），超出原“probe应为零生成+固定6例”的计数，须由用户明确后续范围。群图仍至多2条且必须等实际启用/加载就绪后操作者手工发送。未处理隔离及预算前，vision保持false。
 
-本轮起点本地/实时远端`61124d583c3fba49c17d38a3ed549ccc6c50856b`；只提交已检查归属文件，交付后释放运行/原生验证归属。最终提交号及实时远端完整SHA核对见本次交付回执；Git交付不代表部署或识图完整验收。
+只提交本任务检查过的代码、测试、公开脱敏报告与进度文档；所有实际journal/图/原始日志/options/nonce/未知和清理归档继续私有保留。完成commit/push与远端完整SHA核对后释放唯一运行/真实验证归属，不恢复free或推进其他任务。
