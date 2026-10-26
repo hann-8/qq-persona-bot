@@ -88,7 +88,11 @@ def adapter_signature():
     # transport and extraction policy. Public review records are code-owned.
     names=sorted(set(names) | {str(p.relative_to(root)).replace('\\','/') for p in (root/'src/qqbot_gateway').glob('*.py')} |
         {'config/vision-capabilities.json','config/cli-capabilities.json','config/versions.lock.json','uv.lock',
-         'scripts/observe_lap28.py','config/persona.md'})
+         'scripts/observe_lap28.py','config/persona.md',
+         'scripts/probe_lap42_vision_contract.py','scripts/activate_lap42_vision.py',
+         'scripts/verify_lap42_vision.py','tests/test_vision_mod_guard.py','tests/test_lap42_vision.py',
+         'reports/lap-42-vision-closure-sources.json'} |
+        {str(p.relative_to(root)).replace('\\','/') for p in (root/'adapters/codebuddy_vision_guard').rglob('*') if p.is_file()})
     from importlib.metadata import version
     for package in ('readability-lxml','lxml','lxml_html_clean','chardet','cssselect'):
         h.update(package.encode());h.update(version(package).encode())

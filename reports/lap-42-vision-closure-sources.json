@@ -1,0 +1,39 @@
+{
+  "schema_version": 2,
+  "bundle_sha256": "13e6dd30a22d2f11857675193f909a2ccb935da67a067f580fcfe764e474ff60",
+  "types_sha256": "450476f6346507eb032a00a90c3a90c036e37ef57fbc442b52d5ec725a365a92",
+  "framework_parts": {
+    "composer": {
+      "start": 4986189,
+      "end": 4987069,
+      "sha256": "a46ede57030afae34423d73373ff98860df53a3edeee722d5970241a3eb88eda",
+      "source_bytes": 880,
+      "multiplicity": 1
+    },
+    "context_bridge": {
+      "start": 5965415,
+      "end": 5969944,
+      "sha256": "1827d5126dd2be97a39ffbdf1d2408397b78ca1f136bd355c30911f6600a9f9b",
+      "source_bytes": 4529,
+      "multiplicity": 1
+    },
+    "user_wrapper": {
+      "start": 14096651,
+      "end": 14096715,
+      "sha256": "1d68621e1e8e4ba1de6f851849345a4c2207efe314066981739f97934b4957ef",
+      "source_bytes": 64,
+      "multiplicity": 1
+    }
+  },
+  "framework_upper_bytes": 5692,
+  "known_encoder_bytes": 219,
+  "applicability": [
+    "Single projected session system, no SDK preset; no tools/response schema/history/compaction/automatic memory.",
+    "Both prompt.context fields empty; project policy and user material remain in original system/prompt.",
+    "Public normalized API transcript must be exactly one user text (unchanged or user_query wrapper) plus one PNG with the current pixel hash.",
+    "Whole source bytes overcount each reviewed fixed composer/context/wrapper contribution, once each; model framing and low reasoning prefix included separately.",
+    "SDK/provider wire JSON field names/base64 are not tokenized prose; image pixels use V=1024. No claim that TurnStepInput contains SDK system."
+  ],
+  "real_cli_probe": "pending_operator_stage",
+  "public_source_audit": "reports/lap-42-vision-sources.json"
+}

@@ -2,7 +2,19 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [AGENTS](../../../../AGENTS.md)。当前[真实闭环详规](VISION_CLOSURE_PLAN.md) / [官方输入合同](CLI_PROMPT_CONTRACT.md) / [本次medium指令](VISION_CLOSURE_MEDIUM_START.md)。旧[收尾详规](VISION_FINISH_PLAN.md)/[旧视觉指令](VISION_MEDIUM_START.md)和[整合PLAN](PLAN.md)/[旧整合指令](MEDIUM_START.md)均为历史，不整轮再跑。
 
-## 当前规划：官方投影与真实启用闭环
+## 当前实施检查点：代码/离线通过，等待真实阶段配合
+
+session `LAP-42-vision-closure-implementation`；起点HEAD/实时远端`61124d583c3fba49c17d38a3ed549ccc6c50856b`，初始干净，2026-10-26T18:51:14+08:00登记精确归属并重读。新检查[实际结果](../../../../reports/lap-42-vision-closure-result.md) / [来源](../../../../reports/lap-42-vision-closure-sources.json) / [offline](../../../../reports/lap-42-vision-offline.json)。
+
+当次Mod、父进程准入、有限F/预算、新kind、真实CLI probe及安全激活/回滚工具已实现；95单元/39框架场景通过，静态diagnostics空、offline_valid=true。实际TS插件代码由Node执行、宿主事件为替身；不能记成实际CLI probe或模型理解。15份local/persona/图库/pending保护原字节不变。规范化函数AST相同，旧decoded成功结构仍有效，未回拉URL或新采样。
+
+用户本会话明确选择“稍后配合，先完成代码和离线验证”。因此本轮真实CLI进程/probe=0、IQ=0/6、人工质量=0/6、群图=0/2、active/vision保存和生产加载未执行，vision=false。新核对项目stopped/disconnected，外部QQ保留，无启停；不重复42其他增强/21或旧任务。当前是可恢复的阶段A交付，不是视觉闭环完成或外部技术阻断。
+
+后续先确认操作者在线、重核停止/绑定与无并行修改，运行`probe_lap42_vision_contract.py --run`；probe无IQ/生产资格前置。若真实装载需修复，只能在六例前修复/重验并再次冻结；当前尚未消耗任何IQ，不能直接跳过probe。固定batch `lap42-vision-closure-v2`仅一个；逐例真实人工评分后，执行新activate工具prepare/activate、正常受管加载一次，再最多两条操作者手工真实@图。具体命令/边界/回滚见本轮结果，禁止旧整轮apply。
+
+Git检查/推送后释放本session运行及真实验证归属；等待用户后续配合，不自动启用或推进下一项。
+
+## 历史规划：官方投影与真实启用闭环
 
 session LAP-42-vision-prompt-closure-plan，2026-10-26 00:00登记7文档并重读，18:34按用户“继续”恢复。开始/恢复本地与实时远端均355f7eec2971946595efd057ea3f2a5790afa6f3，codex/lap-40-snowluma；初始干净，恢复时仅本session TASKS领取段有差异。只续42，不新ID、不领21/其他功能，不派代理或切模型。
 
@@ -99,3 +111,7 @@ session `LAP-42-snow-feature-rollout-plan`，2026-10-25 16:24开始只读复核�
 P0: root/branch/live remote verified; ownership reread; original bytes and protection manifest saved privately before code edits. Implementation and all real stages pending.
 
 2026-10-25T23:11:40+08:00（Asia/Shanghai）：最终交付检查：88单元/39框架场景、当前offline binding、19份归属文件编译/UTF-8/隐私ID检查、230个Markdown本地链接与围栏、git diff --check通过；15份保护原字节/SHA不变。唯一实际模型控制1次、0 user/0生成，清理无阻断。Git核对后释放本session归属，停止于已记录的完整CLI模板来源缺口。
+
+
+
+2026-10-26T18:51:14.069564+08:00 (Asia/Shanghai): session LAP-42-vision-closure-implementation owns LAP-42 only; sole managed stop/start, CLI probe/native IQ and real group verification executor. Baseline HEAD/live remote 61124d583c3fba49c17d38a3ed549ccc6c50856b; initial tracked tree clean. Exact tracked ownership: PROGRESS.md, tracks/laptop-workbuddy/HANDOFF.md, tracks/laptop-workbuddy/TASKS.md, tracks/laptop-workbuddy/tasks/LAP-42/HANDOFF.md, docs/BOT_USAGE_COMPARISON.md, src/qqbot_gateway/workbuddy_cli_runner.py, src/qqbot_gateway/hosted_cli_budget.py, src/qqbot_gateway/vision_capabilities.py, src/qqbot_gateway/vision.py, src/qqbot_gateway/vision_mod_guard.py, scripts/observe_lap28.py, scripts/verify_lap42_vision.py, scripts/probe_lap42_vision_contract.py, scripts/activate_lap42_vision.py, tests/test_lap42_vision.py, tests/test_vision_mod_guard.py, config/vision-capabilities.json, reports/lap-42-vision-offline.json, reports/lap-42-vision-closure-sources.json, reports/lap-42-vision-closure-result.md, adapters/codebuddy_vision_guard/.codebuddy-plugin/plugin.json, adapters/codebuddy_vision_guard/hooks/hooks.json, adapters/codebuddy_vision_guard/hooks/register.ts. Ignored ownership: state/lap42-vision-closure and runtime/requests per-request plugin/options/receipts; state/vision-evidence probe, fixed IQ batch/candidate/paired active backups; conditionally only features vision.enabled. Protection original bytes/SHA saved. No subagents/model switch/other tasks/A4/old roots; source and activation helpers frozen before IQ. Fresh manage status: stopped/disconnected, model/gate/AstrBot=0; external QQ preserved.

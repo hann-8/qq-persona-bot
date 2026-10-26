@@ -24,6 +24,10 @@ class _MetadataReady(Exception):
     pass
 
 
+class _ProbeReady(Exception):
+    pass
+
+
 class ResultParser:
     def __init__(self, expected_model=None):
         self.expected_model = expected_model
@@ -151,7 +155,12 @@ class CLIRunner:
     async def run(self, system, prompt, request_id):
         return await self._execute(system, prompt, request_id)
 
-    async def _execute(self, system, prompt, request_id, *, control_only=False):
+    async def probe_image_contract(self, system, prompt, request_id, *, fault=None):
+        """Local single-user turn.step short circuit; never a business answer."""
+        if fault not in (None,'missing_plugin','wrong_receipt'):raise ValueError('INVALID_PROBE_FAULT')
+        return await self._execute(system,prompt,request_id,probe=True,probe_fault=fault)
+
+    async def _execute(self, system, prompt, request_id, *, control_only=False,probe=False,probe_fault=None):
         from .vision import CURRENT,text_budget,cli_message,wire_check,production_budget
         if control_only and CURRENT.get():raise GatewayError('PROTOCOL_ERROR')
         if not control_only:production_budget(self.root,getattr(self,'vision_settings',{}),self.budget,system,prompt)
@@ -174,10 +183,27 @@ class CLIRunner:
             local_settings={'autoCompactEnabled':False}
             if self.reasoning_effort != 'auto':local_settings['alwaysThinkingEnabled']=True
             args += ['--settings',json.dumps(local_settings)]
+            guard=None
+            from .hosted_cli_budget import KIND, final_budget
+            if CURRENT.get() and self.budget.vision_kind==KIND:
+                from .vision_mod_guard import Guard
+                from .vision_capabilities import selected_record
+                try:
+                    terms=final_budget(selected_record(self.vision_settings),self.budget,system,prompt,
+                        CURRENT.get().blob.width,CURRENT.get().blob.height,known_models().get(self.model,{}))
+                    guard=Guard(work,system,prompt,CURRENT.get().blob,terms,mode='probe' if probe else 'live')
+                except (OSError,ValueError,KeyError,TypeError):
+                    raise GatewayError('MODEL_CONFIG_UNSUPPORTED') from None
+                if probe_fault!='missing_plugin':args += ['--plugin-dir',str(guard.root)]
+            elif probe:
+                raise GatewayError('MODEL_CONFIG_UNSUPPORTED')
             if self.reasoning_effort != 'auto':
                 args += ['--effort',self.reasoning_effort,'--input-format','stream-json']
             elif CURRENT.get():args += ['--input-format','stream-json']
             env = os.environ.copy()
+            if guard:
+                env.update(CBC_ENABLE_FUNCTION_HOOKS='1',CLAUDE_CODE_ENABLE_FUNCTION_HOOKS='1')
+                env.pop('CODEBUDDY_LIBRARY_RUNTIME',None)
             env.pop('MAX_THINKING_TOKENS',None)
             for key in list(env):
                 if any(term in key.upper() for term in ('API_KEY','AUTH_TOKEN','ACCESS_TOKEN','BASE_URL')):
@@ -265,8 +291,22 @@ class CLIRunner:
                         parser.line(line.decode('utf-8'))
                     else:
                         raise GatewayError('PROTOCOL_ERROR')
-                while chunk := await process.stdout.read(8192):
-                    parser.feed(chunk)
+                if guard and probe:
+                    while line := await process.stdout.readline():
+                        event=json.loads(line)
+                        if event.get('type')=='assistant':
+                            raise GatewayError('VISION_PROBE_GENERATION_UNKNOWN')
+                        if event.get('type')=='result':
+                            if (not parser.initialized or event.get('subtype')!='success' or
+                                event.get('is_error') is not False or event.get('result') not in ('',None)):
+                                raise GatewayError('VISION_PROBE_GENERATION_UNKNOWN')
+                            proof=guard.finish()
+                            self.last_parameters['vision_guard']=proof
+                            raise _ProbeReady()
+                        parser.line(line.decode('utf-8'))
+                else:
+                    while chunk := await process.stdout.read(8192):
+                        parser.feed(chunk)
 
             async def read_stderr():
                 count = 0
@@ -288,6 +328,17 @@ class CLIRunner:
                     if CURRENT.get():
                         text_budget(self.budget).check(system,prompt)
                         self._native_metadata_check(system,prompt)
+                        if guard:
+                            try:
+                                await guard.ready(min(self.control_timeout,self.timeout))
+                                if probe_fault=='wrong_receipt':
+                                    # Deliberately invalidate the expected identity after
+                                    # real engine readiness; the parent must withhold user.
+                                    guard.request['nonce']='0'*64
+                                    guard.read()
+                            except (OSError,ValueError,TimeoutError):
+                                self.last_parameters['vision_rejection']='VISION_PLUGIN_NOT_READY_OR_MISMATCH'
+                                raise GatewayError('MODEL_CONFIG_UNSUPPORTED') from None
                     payload = (json.dumps(image_message,ensure_ascii=False,separators=(',',':'))+'\n').encode('utf-8')
                 elif CURRENT.get():
                     text_budget(self.budget).check(system,prompt)
@@ -308,6 +359,9 @@ class CLIRunner:
             try:
                 async with asyncio.timeout(self.timeout):
                     await asyncio.gather(*io,process.wait())
+                if guard:
+                    try:self.last_parameters['vision_guard']=guard.finish()
+                    except (OSError,ValueError):raise GatewayError('MODEL_CONFIG_UNSUPPORTED') from None
                 result = BackendResult(parser.finish(process.returncode),parser.usage,self.last_parameters,'stop')
                 generation = 'success'
                 return result
@@ -315,6 +369,10 @@ class CLIRunner:
                 # Intentional end after control; no generation was started.
                 generation='cancelled'
                 return self.last_models
+            except _ProbeReady:
+                generation='cancelled'
+                return {'local_probe':True,'user_messages':self.user_messages_sent,
+                    'guard':self.last_parameters['vision_guard']}
             except TimeoutError:
                 generation = 'MODEL_TIMEOUT'
                 raise GatewayError('MODEL_TIMEOUT') from None

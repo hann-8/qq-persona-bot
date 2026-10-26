@@ -38,7 +38,7 @@ async def frameworks():
 
 
 def main():
-    modules=('test_lap42_vision','test_lap28','test_lap28_ingress','test_lap28_capability',
+    modules=('test_lap42_vision','test_vision_mod_guard','test_lap28','test_lap28_ingress','test_lap28_capability',
              'test_cli_runner','test_cli_control','test_token_budget','test_lap42')
     suite=unittest.defaultTestLoader.loadTestsFromNames(modules)
     result=unittest.TextTestRunner(verbosity=1).run(suite)
@@ -57,12 +57,12 @@ def main():
     value=dict(schema_version=1,passed=result.wasSuccessful() and len(rows)==3,
         adapter_signature=adapter_signature(),rule_hash=digest(review_record()),
         verifier_sha256=sha(Path(__file__)),tests_sha256=sha(ROOT/'tests/test_lap42_vision.py'),
-        source_audit_sha256=sha(ROOT/'reports/lap-42-vision-sources.json'),
+        source_audit_sha256=sha(ROOT/'reports/lap-42-vision-closure-sources.json'),
         unit_tests=result.testsRun,failures=len(result.failures),errors=len(result.errors),modules=modules,
         frameworks=rows,framework_combinations=len(rows),framework_cases=sum(len(r['cases']) for r in rows),
         real_model_calls=0,real_qq_outputs=0,bot_start_stop_operations=0,
         native_iq_eligible=False,production_eligible=False,
-        remaining_source_gap='CLI_POST_OVERRIDE_TEMPLATE_UNBOUNDED',
+        remaining_source_gap=None,real_cli_contract='pending_actual_probe',
         scope='Current hosted regression and existing original AstrBot event/actual runner bottom substitutes; legacy harnesses do not prove hosted native eligibility.')
     (ROOT/'reports/lap-42-vision-offline.json').write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n',encoding='utf-8',newline='\n')
     print(json.dumps({k:value[k] for k in ('passed','unit_tests','framework_cases','remaining_source_gap')}))

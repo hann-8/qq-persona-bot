@@ -1,16 +1,17 @@
 {
   "schema_version": 1,
   "passed": true,
-  "adapter_signature": "7d168ec87aef89a06474980ec1e0eadd244c525939a86b4861b0ee1ffd0fefd4",
-  "rule_hash": "6768dfc6f70717e3519ecfcacbdd03b02c2ccbc95742cc17fa48f25163059fa2",
-  "verifier_sha256": "985c6538a8bbb36874dbfe93be8c06047fc6105e6efb42abcf95840fd2a71610",
-  "tests_sha256": "964c6b6d10b0e3acc82cbe16b0145906b07aea2598712153da39cb75ac1bd83d",
-  "source_audit_sha256": "97257ab40964755b99413646554a7774692ce2ddeb4b5256d41ddf64c5c595ff",
-  "unit_tests": 88,
+  "adapter_signature": "43ed90e5eefd92e556e43b82826e1d1fd4b27bee01e1c5be08d31444847eecc0",
+  "rule_hash": "635ed9402dd2f748e2b271db49f95664d0fde27947bfa7f218978894a357850c",
+  "verifier_sha256": "76e512807a341c8b346e265df4aeedbc368cf370f4586732de3ffe3acb553354",
+  "tests_sha256": "fe34ea8c31bdf6834eda3213ebb408a1462a2accb8b76496a426d0730b9ea881",
+  "source_audit_sha256": "2aa072e77a2b9fd5a2a9bce8c60725fa5abaab4e51d10613fd889a5f30012e6d",
+  "unit_tests": 95,
   "failures": 0,
   "errors": 0,
   "modules": [
     "test_lap42_vision",
+    "test_vision_mod_guard",
     "test_lap28",
     "test_lap28_ingress",
     "test_lap28_capability",
@@ -284,6 +285,7 @@
   "bot_start_stop_operations": 0,
   "native_iq_eligible": false,
   "production_eligible": false,
-  "remaining_source_gap": "CLI_POST_OVERRIDE_TEMPLATE_UNBOUNDED",
+  "remaining_source_gap": null,
+  "real_cli_contract": "pending_actual_probe",
   "scope": "Current hosted regression and existing original AstrBot event/actual runner bottom substitutes; legacy harnesses do not prove hosted native eligibility."
 }

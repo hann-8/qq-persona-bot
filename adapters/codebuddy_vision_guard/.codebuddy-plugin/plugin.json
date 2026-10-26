@@ -1,0 +1,8 @@
+{
+  "name": "qqbot-vision-guard",
+  "version": "2.0.0",
+  "description": "Private per-request native-image system projection and single-step admission",
+  "userConfig": {
+    "request": {"type": "string", "description": "Private request contract", "required": true}
+  }
+}

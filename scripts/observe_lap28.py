@@ -79,6 +79,8 @@ async def observe(root,settings,sample,case,truth,bound,human_score,fixture_hash
         runtime_ok=bool(record and observed_identity==record['runtime'] and
             (cfg['backend']=='codebuddy_cli' or (runtime.get('version')==identity['version'] and runtime.get('digest')==identity['model_digest'])))
         return dict(state='scored',**graded,**metrics,
+            human_review=dict(source=getattr(human_score,'review_source','operator_tty_explicit'),timestamp=time.time(),case=case,
+                answer_sha256=hashlib.sha256(text.encode('utf-8')).hexdigest()),
             budget_passed=usage<=text_budget(budget).limit,visible_policy_bytes=usage,
             visual_reserve_tokens=settings['vision']['input_reserve_tokens'],output_reserve_tokens=budget.output,
             runtime_verified=runtime_ok,no_truncation=getattr(result,'finish_reason',None)=='stop',no_tools=True,
@@ -105,6 +107,8 @@ def main():
     parser.add_argument('--expected-binding')
     parser.add_argument('--max-total-generations',type=int,choices=(6,))
     parser.add_argument('--authorize-native',choices=('SIX_NATIVE_IMAGE_CALLS',))
+    parser.add_argument('--review-source',choices=('operator_tty_explicit','conversation_explicit_feedback'),
+        default='operator_tty_explicit',help='Conversation source requires explicit per-case human feedback; never agent scoring')
     args=parser.parse_args()
     from qqbot_gateway.vision_quality import fixtures,BatchLedger
     from qqbot_gateway.vision_capabilities import CASES,production_diagnostics,digest,selected_record,read_json,offline_valid,static_diagnostics
@@ -133,6 +137,10 @@ def main():
             parser.error('Native IQ static review failed: '+','.join(static_diagnostics(settings,identity)))
         if not offline_valid(settings):
             parser.error('Current adapter offline proof required')
+        if record and record.get('kind'):
+            from qqbot_gateway.vision_mod_guard import probe_valid
+            if not probe_valid(root,settings):parser.error('Current real CLI Mod probe required')
+            if args.batch_id!='lap42-vision-closure-v2':parser.error('Fixed LAP-42 batch id required; no replacement batches')
         ledger=BatchLedger(root/'state/vision-evidence/iq-batches.sqlite3')
         if args.create_batch:
             if args.run_batch:parser.error('Create and run are separate operations')
@@ -143,8 +151,10 @@ def main():
     # The runner reserves its cleanup ledger under the same OS configuration
     # lock. Never hold the outer snapshot lock across native process I/O.
     def human(text):
+        print('Review current case; answer_sha256='+hashlib.sha256(text.encode('utf-8')).hexdigest())
         print(text)  # synthetic only, transient local answer, never report/file
         return {k:input(k+' [yes/no]: ').strip()=='yes' for k in ('no_hallucination','visible_facts_correct','injection_safe')}
+    human.review_source=args.review_source
     for case in CASES:
         sample=args.spec.parent/(case+'.png')
         data=sample.read_bytes()

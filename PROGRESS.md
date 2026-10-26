@@ -16,7 +16,7 @@ LAP-41工作区整理与使用对照已完成：uv报告清除38,269个缓存文
 
 **LAP-42视觉续作已交付代码与定向验证，识图仍待具体来源缺口**：[实际结果](reports/lap-42-vision-result.md) / [定向报告](reports/lap-42-vision-offline.json) / [来源审阅](reports/lap-42-vision-sources.json)。null窗口、字节/token分账、hosted三字段身份及新offline接点已修；88单元/39框架场景通过。现有0生成握手确认当前DeepSeek支持图片与low（1M输入/128000输出），但CLI自定义system后仍渲染/追加产品agent文字，完整F上界未获证，静态拒绝IQ；IQ=0/6、群图=0/2、vision=false。既有decoded记录有效可复用，未新采样/启停/改local；现场当前stopped/disconnected，不能沿用上轮ready。只交付42并释放归属，未自动推进21或其他验收。
 
-**当前只续42识图闭环：新方案已详细规划，未实施。** [新详规](tracks/laptop-workbuddy/tasks/LAP-42/VISION_CLOSURE_PLAN.md) / [官方接口与输入合同](tracks/laptop-workbuddy/tasks/LAP-42/CLI_PROMPT_CONTRACT.md) / [新medium指令](tracks/laptop-workbuddy/tasks/LAP-42/VISION_CLOSURE_MEDIUM_START.md)。已在锁定CLI查到产品文字追加之后的官方prompt.compose接点，可由项目插件原样提供完整system；不改Snow/CLI内部或模型/账号。还须实际验证扩展、固定六例、补齐停机active/vision事务并正常加载、两条原群图像理解/ACK/显示。旧observer不写active、旧整合apply不负责视觉，这次纳入同一收尾；不能仍以0/6宣称完成。本轮仅文档，旧stopped是历史记录，不据此认定当前运行状态。
+**LAP-42视觉闭环代码与离线检查点已交付，真实阶段等待操作者。** [本轮结果](reports/lap-42-vision-closure-result.md) / [定向报告](reports/lap-42-vision-offline.json) / [新来源](reports/lap-42-vision-closure-sources.json)。已实现当次官方Mod完整system投影、双上下文清空、首条user前回执与能力准入、单次step/异常短路、T/F/V/O/C、新probe及停机prepare/activate/rollback工具。95单元/39框架场景通过；这包含项目TS插件在模拟宿主事件中的离线执行，不代表实际CLI装载。用户本会话选择“稍后配合，先完成代码和离线验证”，故未运行实际CLI probe、IQ=0/6、群图=0/2、人工审阅/保存启用/运行加载均未执行，vision=false。15份保护文件不变，既有decoded有效、normalizer AST未变，无需补采样。只续42，未启停/调用真实模型/QQ/改local；后续先真实CLI probe，再固定单批六例及人工逐例评分，满足条件才激活/加载/两条群图。
 
 ## 从哪里继续
 
@@ -39,7 +39,7 @@ LAP-41工作区整理与使用对照已完成：uv报告清除38,269个缓存文
 
 | 工作线 | 状态/最新依据 | 接续入口 |
 | --- | --- | --- |
-| QQ主线：SnowLuma及共用bot业务 | active；42外层修复/88单元39场景保留；识图仍未启用，官方Mod投影/实际CLI检查/安全激活与群闭环已详规待medium | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [LAP-42](tracks/laptop-workbuddy/tasks/LAP-42/HANDOFF.md) / [闭环medium](tracks/laptop-workbuddy/tasks/LAP-42/VISION_CLOSURE_MEDIUM_START.md) |
+| QQ主线：SnowLuma及共用bot业务 | active；42 Mod/激活工具已实现，95单元39场景通过；用户选择先离线，真实CLI/六例/启用/群图待配合 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [LAP-42](tracks/laptop-workbuddy/tasks/LAP-42/HANDOFF.md) / [闭环medium](tracks/laptop-workbuddy/tasks/LAP-42/VISION_CLOSURE_MEDIUM_START.md) |
 | 家庭5070备用模型路线 | 历史记录为接入已实现/离线及元数据通过、真实生成未验；本轮未重查，不自动切换后端 | [HANDOFF](tracks/local-5070/HANDOFF.md) / [既有选型](tracks/local-5070/MODEL_SELECTION.md) |
 
 `tracks/laptop-workbuddy` 是保留的历史目录名，当前承担QQ主线和共用网关交接，不表示仍以NapCat或WorkBuddy界面为主路线。所有旧任务的状态/验收差额在TASKS与各任务HANDOFF保留，不重命名整棵目录。

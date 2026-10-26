@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-**当前是42识图实际闭环详规，未实施**：[新计划](tasks/LAP-42/VISION_CLOSURE_PLAN.md) / [CLI输入合同](tasks/LAP-42/CLI_PROMPT_CONTRACT.md) / [新medium指令](tasks/LAP-42/VISION_CLOSURE_MEDIUM_START.md)。锁定CLI在产品追加之后调用官方prompt.compose，可经项目所有的当次Mod原样提供完整system；无须修改第三方内部。计划明确真实CLI零生成检查、固定6原生/人工质量、安全active/vision事务、实际加载及最多2群图ACK/显示，不再仅交固定缺项。其余功能/21未领取，最新运行态本轮未探测。
+**LAP-42视觉闭环代码与离线检查点已交付，真实阶段等待操作者。** [本轮结果](../../reports/lap-42-vision-closure-result.md) / [定向报告](../../reports/lap-42-vision-offline.json) / [新来源](../../reports/lap-42-vision-closure-sources.json)。已实现当次官方Mod完整system投影、双上下文清空、首条user前回执与能力准入、单次step/异常短路、T/F/V/O/C、新probe及停机prepare/activate/rollback工具。95单元/39框架场景通过；这包含项目TS插件在模拟宿主事件中的离线执行，不代表实际CLI装载。用户本会话选择“稍后配合，先完成代码和离线验证”，故未运行实际CLI probe、IQ=0/6、群图=0/2、人工审阅/保存启用/运行加载均未执行，vision=false。15份保护文件不变，既有decoded有效、normalizer AST未变，无需补采样。只续42，未启停/调用真实模型/QQ/改local；后续先真实CLI probe，再固定单批六例及人工逐例评分，满足条件才激活/加载/两条群图。
 
 **LAP-42视觉续作代码/定向验证已交付，真实识图未完成**：[本轮实际结果](../../reports/lap-42-vision-result.md)。已修hosted字节/原生分账、null窗口/容量语义、三字段身份与固定新报告；88单元/39原事件框架场景通过，0生成握手确认当前模型supportsImages/low/1M输入/128000输出。完整CLI模板F仍因自定义system后渲染与产品agent追加文字未能界定，未开IQ/启用/群图；vision=false。旧decoded结构有效且normalizer未变，无需新采样。现场stopped/disconnected，未启停/加载，local/persona/图库/21 pending不变。session LAP-42-hosted-vision-implementation交付后释放唯一归属，停止于42具体缺口。
 

@@ -45,7 +45,7 @@ class HostedBudgetTests(unittest.TestCase):
         from qqbot_gateway.config import configuration_lock,require_stopped
         from qqbot_gateway.vision_quality import BatchLedger
         with tempfile.TemporaryDirectory() as directory:
-            root=Path(directory);bound='b'*64;batch='lap42-lock-test'
+            root=Path(directory);bound='b'*64;batch='lap42-vision-closure-v2'
             data=b'synthetic fixture';sha=hashlib.sha256(data).hexdigest()
             spec={'cases':{case:dict(sha256=sha,truth={}) for case in vc.CASES}}
             spec_path=root/'spec.json';spec_path.write_text(json.dumps(spec),encoding='utf-8')
@@ -66,7 +66,8 @@ class HostedBudgetTests(unittest.TestCase):
                  patch.object(observer,'observe',side_effect=failing_observation),\
                  patch('qqbot_gateway.config_files.read_project',return_value=SimpleNamespace(settings=settings())),\
                  patch('qqbot_gateway.vision.binding',return_value=bound),\
-                 patch.object(vc,'static_diagnostics',return_value=[]),patch.object(vc,'offline_valid',return_value=True):
+                 patch.object(vc,'static_diagnostics',return_value=[]),patch.object(vc,'offline_valid',return_value=True),\
+                 patch('qqbot_gateway.vision_mod_guard.probe_valid',return_value=True):
                 self.assertEqual(observer.main(),1)
             self.assertEqual(acquired,[True])
             snapshot=ledger.snapshot(batch)
@@ -130,15 +131,16 @@ class HostedBudgetTests(unittest.TestCase):
             with self.subTest(field=field),self.assertRaises(ValueError):vc.reviewed(row)
         with self.assertRaisesRegex(ValueError,'UNKNOWN_VISION_RULE_KIND'):vc.reviewed({'kind':'unknown'})
 
-    def test_null_window_is_valid_but_partial_template_never_grants_native(self):
+    def test_null_window_and_finite_framework_budget(self):
         s=settings();record=review_record()
         with patch('qqbot_gateway.token_budget.known_models',return_value={record['model']:model()}):
             missing=vc.static_diagnostics(s,RUNTIME)
-            self.assertEqual(missing,['CLI_POST_OVERRIDE_TEMPLATE_UNBOUNDED'])
+            self.assertEqual(missing,[])
             self.assertIn('HOSTED_RUNTIME_MISMATCH',vc.static_diagnostics(s,RUNTIME|dict(version='other')))
         b=InputBudget.from_settings(s)
-        with self.assertRaisesRegex(ValueError,'CLI_POST_OVERRIDE_TEMPLATE_UNBOUNDED'):
-            final_budget(record,b,'policy','text',12,8,model())
+        terms=final_budget(record,b,'policy','text',12,8,model())
+        self.assertGreater(terms['F'],219)
+        self.assertLessEqual(sum(terms[k] for k in ('T','F','V','O')),terms['C'])
         with self.assertRaisesRegex(ValueError,'FINAL_NATIVE_CAPACITY_EXCEEDED'):
             final_budget(record,b,'policy','text',12,8,model(contextWindow=dict(defaultLength=10000,supportedLengths=[10000,1000000])))
 
@@ -230,7 +232,7 @@ class HostedRunnerTests(unittest.IsolatedAsyncioTestCase):
                     with patch.object(vc,'runtime_identity',return_value=identity),patch('qqbot_gateway.workbuddy_cli_runner.known_models',return_value={metadata['id']:model()}):
                         from qqbot_gateway.errors import GatewayError
                         with self.assertRaises(GatewayError):await runner.run('policy','user','lap42-zero-user')
-                    reason={'complete':'CLI_POST_OVERRIDE_TEMPLATE_UNBOUNDED','identity_changed':'HOSTED_RUNTIME_MISMATCH'}.get(change,'HOSTED_CURRENT_CAPABILITIES_CHANGED')
+                    reason={'complete':'VISION_PLUGIN_NOT_READY_OR_MISMATCH','identity_changed':'HOSTED_RUNTIME_MISMATCH'}.get(change,'HOSTED_CURRENT_CAPABILITIES_CHANGED')
                     self.assertEqual(runner.last_parameters['vision_rejection'],reason)
                     self.assertEqual(runner.control_attempts,1)
                     self.assertEqual(runner.user_messages_sent,0,change)

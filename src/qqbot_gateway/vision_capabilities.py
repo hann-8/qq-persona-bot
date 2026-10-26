@@ -160,7 +160,7 @@ def offline_valid(settings):
             if (value.get('rule_hash')!=digest(record) or
                 value.get('verifier_sha256')!=hashlib.sha256(verifier.read_bytes()).hexdigest() or
                 value.get('tests_sha256')!=hashlib.sha256(tests.read_bytes()).hexdigest() or
-                value.get('source_audit_sha256')!=hashlib.sha256((ROOT/'reports/lap-42-vision-sources.json').read_bytes()).hexdigest()):return False
+                value.get('source_audit_sha256')!=hashlib.sha256((ROOT/'reports/lap-42-vision-closure-sources.json').read_bytes()).hexdigest()):return False
         return True
     except (OSError,ValueError,TypeError,KeyError):return False
 
@@ -192,6 +192,13 @@ def production_diagnostics(settings, evidence, runtime, *, table=None):
         if (not isinstance(row,dict) or row.get('state') != 'scored' or type(row.get('attempts')) is not int or
             row.get('attempts') != 1 or any(row.get(k) is not True for k in checks)):
             missing.append(case+'_UNVERIFIED')
+        if record.get('kind'):
+            human=row.get('human_review',{}) if isinstance(row,dict) else {}
+            if (not isinstance(human,dict) or human.get('source') not in
+                ('operator_tty_explicit','conversation_explicit_feedback') or human.get('case')!=case or
+                type(human.get('timestamp')) not in (int,float) or
+                not isinstance(human.get('answer_sha256'),str) or not re.fullmatch('[a-f0-9]{64}',human['answer_sha256'])):
+                missing.append(case+'_HUMAN_REVIEW_MISSING')
     if evidence.get('unresolved_attempts', True) is not False:
         missing.append('FAILED_OR_UNKNOWN_ATTEMPTS')
     return missing
@@ -205,7 +212,12 @@ def load_production(settings, root=None):
         return None, ['ACTIVE_OBSERVATION_MISSING']+production_diagnostics(settings,{}, {})
     if not path.resolve().is_relative_to((root/'state').resolve()):
         raise ValueError('VISION_EVIDENCE_PATH_INVALID')
-    evidence = read_json(path)
+    return validate_production_evidence(settings, read_json(path), root)
+
+
+def validate_production_evidence(settings, evidence, root=None):
+    """Same complete validation for private candidates and saved active evidence."""
+    root = Path(root) if root is not None else ROOT
     runtime = evidence.get('runtime', {})
     missing = production_diagnostics(settings, evidence, runtime)
     for marker in ('state/cli-cleanup/unresolved.json','state/ollama-remote-result-unknown.json'):
@@ -238,6 +250,10 @@ def load_production(settings, root=None):
         except (ValueError,KeyError):missing.append('DURABLE_IQ_LEDGER_INVALID')
     if not offline_valid(settings):
         missing.append('CURRENT_OFFLINE_PROOF_MISSING')
+    record=selected_record(settings)
+    if record and record.get('kind'):
+        from .vision_mod_guard import probe_valid
+        if not probe_valid(root,settings):missing.append('CURRENT_CLI_PROBE_MISSING')
     # Configured digest must still match the reviewed, observed selected model.
     from .backends import resolve_backend
     cfg = resolve_backend(settings)

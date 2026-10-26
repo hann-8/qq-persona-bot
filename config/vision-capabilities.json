@@ -2,7 +2,7 @@
   "schema_version": 1,
   "records": [
     {
-      "kind": "hosted_codebuddy_deepseek_v41_v1",
+      "kind": "hosted_codebuddy_deepseek_v41_mod_v2",
       "backend": "codebuddy_cli",
       "model": "deepseek-v4.1-flash",
       "reasoning_effort": "low",
@@ -19,7 +19,8 @@
           "encoding/encoding.py": "13231c592e958fb39e2af6001dae69d90e7a36b265702b9b390236fb387599e2",
           "encoding/README.md": "a34a5ca98c65e5b5b2bedd693cc2e18e732fe50192723fb6937ae07219c23739"
         },
-        "audit": "reports/lap-42-vision-sources.json"
+        "audit": "reports/lap-42-vision-closure-sources.json",
+        "plugin_assets_sha256": "13521253fac136148d57cea5853e3d8c058d37d21eadad3a5c164ca7fc10e7d9"
       },
       "bounds": {
         "text_tokens_per_byte": 1,
@@ -30,7 +31,7 @@
         "max_pixels": 1000000,
         "max_images": 1
       },
-      "template_contract": "partial_encoder_only_cli_post_override_unbounded"
+      "template_contract": "post_render_single_session_system_dual_empty_context_v2"
     }
   ],
   "unverified": [

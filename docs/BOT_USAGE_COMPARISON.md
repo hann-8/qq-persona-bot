@@ -4,6 +4,10 @@
 
 这里比较的是你已经使用过的 `E:/CodexWS/QQbot` 和当前 `E:/CodexWS/QQbot_Snowluma` 里的bot，依据两边实际配置、最近启动快照、共用源码和本机资产，不比较框架宣传功能。
 
+## 2026-10-26视觉续作当前状态
+
+[闭环代码/离线结果](../reports/lap-42-vision-closure-result.md)：官方当次Mod、完整system投影/双上下文清空、预算及安全启用工具已实现，95单元/39框架场景通过。用户选择先完成代码和离线验证，实际CLI装载probe、六例模型理解/人工质量、启用加载与两条原群图仍待配合；vision继续false，没有把离线执行TS插件当成模型看懂图片。其他模型/low/free/记忆/成员/web/memes与冷却0/0、图库/pending不变。
+
 ## 2026-10-25 LAP-42实际整合结果
 
 已按[42计划](../tracks/laptop-workbuddy/tasks/LAP-42/PLAN.md)实际实施，见[结果](../reports/lap-42-2026-10-25.md)。长期群记忆读取/学习、成员/受控@、关注已经保存并加载；B站字幕运行服务与入口撤下。仍用当前CodeBuddy/deepseek-v4.1-flash/low/free和原额度，不改Snow/QQ/CLI内部。164单元与19项AstrBot原事件组合回环通过。
