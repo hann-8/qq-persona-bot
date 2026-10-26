@@ -1,15 +1,12 @@
 # 旧NapCat bot与当前SnowLuma bot：实际使用对照
 
-## 2026-10-26 当前缩减验收
+## 2026-10-26 识图已启用并完成用户指定的缩减验收
 
-用户已将六例验收缩减为“已通过的IQ-01 + 一张大图IQ-05”，IQ-02/03/04/06明确未测豁免，不是全通过。首张真实回答与用户通过反馈已保留；TTY评分记录异常留下failed_or_unknown原行，不重跑或洗批。新operator acceptance与生产共享校验只适用于该明确授权，复查当前绑定、离线/probe、有效decoded、原行及大图独次持久测量/人工反馈；没有force配置。原c135f83冻结保留为历史；用户变更验收后仅调整验收/脚本/签名，插件和runner未改。真实请求目前2次（早前意外1+IQ-01 1），大图还未调用；vision=false、群图0/2、服务停止。102单元/39框架已通过；真实CLI新probe正向1本地user/0 next，反向0/0。最终offline摘要正在刷新，完成后冻结并仅调用大图一次。
+识图已保存并运行加载为true，用户已确认真实授权群中收到正确识图回复，原事件任务completed、投递sent且有消息ACK。按用户决定只完成IQ-01和1000×1000大图IQ-05，两张真实理解均获人工通过；其余四例豁免，旧六例账本与首张评分记录异常保留，不称六例全通过。104单元/39框架、当前真实CLI零生成契约通过。双图片/成员凭证兼容已修；随后用户明确允许提高输入预算，仅将所选CodeBuddy文字政策30000→48000字节，overhead/output各2048、视觉reserve4096、模型/low/free/账号不变。15项保护中仅features与models的这两个授权标量改变，人设/图库/21 pending等保持。详见本轮closure-result；不续其他验收。
 
+开关方法：先双击根目录“关闭机器人.cmd”；在config/local/features.yaml的vision节把enabled设为true（开）或false（关）；保存后双击“启动机器人.cmd”。不删除active证明，当前相同配置关闭后可以再开启。仅看当前消息第一张图；GIF只看首帧。文字政策48000按UTF-8字节计算，不是48000个汉字或精确模型token。
 
-返回[项目入口](../PROGRESS.md) / [日常操作](../SnowLuma使用说明.md) / [本次整理交接](../tracks/laptop-workbuddy/tasks/LAP-41/HANDOFF.md)。核对日期：2026-10-25，Asia/Shanghai。
-
-这里比较的是你已经使用过的 `E:/CodexWS/QQbot` 和当前 `E:/CodexWS/QQbot_Snowluma` 里的bot，依据两边实际配置、最近启动快照、共用源码和本机资产，不比较框架宣传功能。
-
-## 2026-10-26视觉续作当前状态
+## 2026-10-26 早期视觉续作记录（历史）
 
 [当前进度](../reports/lap-42-vision-closure-result.md)：真实CLI接线和零生成契约已通过（正向0 next，反向0 user），97单元/39框架通过，已冻结源码进入固定六例人工质量审阅。用户授权总上限7（原意外1+六例6），旧失败保留；vision仍false，尚未激活/加载/群图。目前无需操作者发群图，后续就绪时再提示。开关是config/local/features.yaml的vision.enabled，正常切换需先关闭再改标量并启动，true仍须有效生产证据。
 

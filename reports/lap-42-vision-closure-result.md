@@ -1,13 +1,29 @@
 # LAP-42视觉闭环实际进度
 
-## 2026-10-26 当前缩减验收
+## 2026-10-26 识图已启用并完成用户指定的缩减验收
 
-用户已将六例验收缩减为“已通过的IQ-01 + 一张大图IQ-05”，IQ-02/03/04/06明确未测豁免，不是全通过。首张真实回答与用户通过反馈已保留；TTY评分记录异常留下failed_or_unknown原行，不重跑或洗批。新operator acceptance与生产共享校验只适用于该明确授权，复查当前绑定、离线/probe、有效decoded、原行及大图独次持久测量/人工反馈；没有force配置。原c135f83冻结保留为历史；用户变更验收后仅调整验收/脚本/签名，插件和runner未改。真实请求目前2次（早前意外1+IQ-01 1），大图还未调用；vision=false、群图0/2、服务停止。102单元/39框架已通过；真实CLI新probe正向1本地user/0 next，反向0/0。最终offline摘要正在刷新，完成后冻结并仅调用大图一次。
+识图已保存并运行加载为true，用户已确认真实授权群中收到正确识图回复，原事件任务completed、投递sent且有消息ACK。按用户决定只完成IQ-01和1000×1000大图IQ-05，两张真实理解均获人工通过；其余四例豁免，旧六例账本与首张评分记录异常保留，不称六例全通过。104单元/39框架、当前真实CLI零生成契约通过。双图片/成员凭证兼容已修；随后用户明确允许提高输入预算，仅将所选CodeBuddy文字政策30000→48000字节，overhead/output各2048、视觉reserve4096、模型/low/free/账号不变。15项保护中仅features与models的这两个授权标量改变，人设/图库/21 pending等保持。详见本轮closure-result；不续其他验收。
 
+| 证据层 | 最终实际结果 |
+| --- | --- |
+| 代码与离线 | 双cap图片解析修复；真实loopback覆盖1/2cap与0/3拒绝；104单元、39框架通过 |
+| 原生质量 | IQ-01真实1次、用户通过；TTY记录异常原行保留。IQ-05真实1次、1000×1000四角精确、用户通过；四例未测豁免 |
+| 真实CLI契约 | 正向1本地user/0 next；缺插件/错回执0 user；当前48000配置重新probe通过，无新增远端生成 |
+| 生产事务 | stopped下备份、prepare/activate、重读共享校验通过；当前binding 13fc6525cb150461ef18905213d438386b176ab762fa0da13bb529fd9bd9ec66 |
+| 运行加载 | vision=true、文字政策48000、DeepSeek/low/free，OneBot ready；其他保护摘要符合授权 |
+| 真实群图 | 一次原生图片模型调用，guard live/next1/completed/wire verified；T25814+F8985+V1024+O128000=163823≤C1000000 |
+| 原消息ACK与客户端 | trace aa8ab95e717f4e3dbf4d11aa7c9bdcfe，任务completed、投递sent、part0有ACK；用户确认客户端回复且图片理解正确 |
+| 限制 | 该回复走已有v2_core_recovery，未据此认定全部辅助字段/记忆学习/受控@通过；GIF群内未测。旧采样target与本次实际群不匹配，本次群符合当前授权白名单且由用户亲自发送，不冒称旧记录同群 |
 
-返回[PROGRESS](../PROGRESS.md) / [42交接](../tracks/laptop-workbuddy/tasks/LAP-42/HANDOFF.md) / [闭环计划](../tracks/laptop-workbuddy/tasks/LAP-42/VISION_CLOSURE_PLAN.md)。2026-10-26，Asia/Shanghai；session `LAP-42-vision-closure-implementation`。
+本机受控真实请求总3（历史意外1+两张质量图各1）；最终真实群图片模型1次。首次两条群图片在本地退化且各有ACK，0图片模型调用；后续预算拒绝仍0生成，失败记录全保留。首次free恢复窗口另有自然文字CLI成功记录，独立于受控视觉计数，不能称全程只有这些调用。
 
-## 当前续作：真实CLI契约通过，进入固定六例
+群接线修复后大图保持原观察binding，不伪称在新binding重跑。改前原生执行指纹与当前一致（CLI/预算算法/归一化/插件未改；材料客户端和本地提示是单独修复）；当前配置另通过静态容量、真实零生成probe及完整人设+图片/成员cap+表情分支的零模型组合验证（实际政策占用27467字节），最终还有上述真实群调用。用户追加允许48000后未改model_gateway.py，原保守预留分支保留，没有在原30000限制下偷偷放行。
+
+AstrBot独立Python环境readability-lxml0.9、lxml-html-clean0.4.5、cssselect1.3.0、chardet5.2.0已按项目现有版本补齐；未改第三方源码。原环境缺项导致的首次启动失败留档。所有备份、old active、旧IQ/unknown/ACK/清理台账均保留；当前last_error=null、remote_result_unknown=false、清理未阻断。配置回滚仍只撤本次vision/配对active；48000是用户另授权字段，有独立models原字节备份，不能覆盖后续变更。
+
+本session完成LAP-42视觉用户指定范围，Git核对后释放唯一运行/验证归属，保留服务运行供用户使用；其他旧验收差额不自动推进。
+
+## 历史检查点：真实CLI契约通过，原固定六例启动
 
 2026-10-26T20:42:55.248901+08:00：用户明确授权7次本机真实请求总上限（已耗1+固定六例6），群图仍最多2。当前97单元/39框架通过，实际正向1本地user/0 next/0远端、反向缺插件/错回执均0 user。当前源码/资产/helper/来源/测试与offline、probe绑定已冻结，不能在IQ后变动。尚未启用vision或开始群图，当前代码检查点不等于识图完整验收。
 

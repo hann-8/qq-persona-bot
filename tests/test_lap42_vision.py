@@ -278,3 +278,37 @@ class OperatorAcceptanceTests(unittest.TestCase):
         from qqbot_gateway.vision_operator_review import durable_diagnostics
         with tempfile.TemporaryDirectory() as directory:
             self.assertTrue(durable_diagnostics(Path(directory),self.review(),'b'*64))
+
+
+class ImageMemberCapTests(unittest.IsolatedAsyncioTestCase):
+    async def test_image_with_optional_member_cap_resolves_image_cap_only(self):
+        import base64
+        from aiohttp import web
+        from qqbot_gateway.vision import MaterialClient
+        blob=image().blob;seen=[]
+        async def handler(request):
+            body=await request.json();seen.append((request.path,body['cap']))
+            if request.path.endswith('/bind'):return web.json_response({'bound':True})
+            return web.json_response(dict(descriptor=blob.descriptor('i_'+'a'*32),original_sha256=blob.original_sha256,
+                ttl_seconds=30,data=base64.b64encode(blob.data).decode()))
+        app=web.Application();app.router.add_post('/context/vision/bind',handler);app.router.add_post('/context/vision/resolve',handler)
+        runner=web.AppRunner(app);await runner.setup();site=web.TCPSite(runner,'127.0.0.1',0);await site.start()
+        port=site._server.sockets[0].getsockname()[1]
+        client=MaterialClient(f'http://127.0.0.1:{port}/context/vision/resolve','f'*64,4096)
+        source={'images':[{'image_ref':'i_'+'a'*32}]}
+        header=dict(resource_caps=['a'*64],request_key='b'*64,target_seq=1,source_digest='c'*64,epoch='d'*64)
+        try:
+            for caps in (['a'*64],['a'*64,'e'*64]):
+                header['resource_caps']=caps
+                actual,_=await client.resolve(header,source,time.monotonic()+10)
+                self.assertEqual(actual.blob.sha256,blob.sha256)
+            self.assertEqual([cap for _,cap in seen],['a'*64]*4)
+            for caps in ([],['a'*64,'e'*64,'f'*64]):
+                header['resource_caps']=caps
+                with self.assertRaisesRegex(ValueError,'IMAGE_CAP_REQUIRED'):
+                    await client.resolve(header,source,time.monotonic()+10)
+        finally:await runner.cleanup()
+
+    async def test_native_observation_contract_unchanged_by_material_cap_fix(self):
+        from qqbot_gateway.vision_operator_review import native_contract_signature,NATIVE_CONTRACT
+        self.assertEqual(native_contract_signature(ROOT),NATIVE_CONTRACT)

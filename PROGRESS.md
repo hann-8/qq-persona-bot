@@ -1,11 +1,8 @@
 # QQ bot项目入口：SnowLuma主线
 
-## 2026-10-26 当前缩减验收
+## 2026-10-26 识图已启用并完成用户指定的缩减验收
 
-用户已将六例验收缩减为“已通过的IQ-01 + 一张大图IQ-05”，IQ-02/03/04/06明确未测豁免，不是全通过。首张真实回答与用户通过反馈已保留；TTY评分记录异常留下failed_or_unknown原行，不重跑或洗批。新operator acceptance与生产共享校验只适用于该明确授权，复查当前绑定、离线/probe、有效decoded、原行及大图独次持久测量/人工反馈；没有force配置。原c135f83冻结保留为历史；用户变更验收后仅调整验收/脚本/签名，插件和runner未改。真实请求目前2次（早前意外1+IQ-01 1），大图还未调用；vision=false、群图0/2、服务停止。102单元/39框架已通过；真实CLI新probe正向1本地user/0 next，反向0/0。最终offline摘要正在刷新，完成后冻结并仅调用大图一次。
-
-
-本文件是唯一项目进度入口，不另建根HANDOFF。更新：2026-10-26（Asia/Shanghai）。
+识图已保存并运行加载为true，用户已确认真实授权群中收到正确识图回复，原事件任务completed、投递sent且有消息ACK。按用户决定只完成IQ-01和1000×1000大图IQ-05，两张真实理解均获人工通过；其余四例豁免，旧六例账本与首张评分记录异常保留，不称六例全通过。104单元/39框架、当前真实CLI零生成契约通过。双图片/成员凭证兼容已修；随后用户明确允许提高输入预算，仅将所选CodeBuddy文字政策30000→48000字节，overhead/output各2048、视觉reserve4096、模型/low/free/账号不变。15项保护中仅features与models的这两个授权标量改变，人设/图库/21 pending等保持。详见本轮closure-result；不续其他验收。
 
 ## 当前结论
 
@@ -44,7 +41,7 @@ LAP-41工作区整理与使用对照已完成：uv报告清除38,269个缓存文
 
 | 工作线 | 状态/最新依据 | 接续入口 |
 | --- | --- | --- |
-| QQ主线：SnowLuma及共用bot业务 | active；真实CLI probe意外请求1次后停止；guard修复96单元39场景通过，未重跑真实；IQ/启用/群图仍未过 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [LAP-42](tracks/laptop-workbuddy/tasks/LAP-42/HANDOFF.md) / [闭环medium](tracks/laptop-workbuddy/tasks/LAP-42/VISION_CLOSURE_MEDIUM_START.md) |
+| QQ主线：SnowLuma及共用bot业务 | 视觉按用户缩减验收通过并已启用，运行文字政策48000；旧差额保留，不自动推进 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [LAP-42](tracks/laptop-workbuddy/tasks/LAP-42/HANDOFF.md) |
 | 家庭5070备用模型路线 | 历史记录为接入已实现/离线及元数据通过、真实生成未验；本轮未重查，不自动切换后端 | [HANDOFF](tracks/local-5070/HANDOFF.md) / [既有选型](tracks/local-5070/MODEL_SELECTION.md) |
 
 `tracks/laptop-workbuddy` 是保留的历史目录名，当前承担QQ主线和共用网关交接，不表示仍以NapCat或WorkBuddy界面为主路线。所有旧任务的状态/验收差额在TASKS与各任务HANDOFF保留，不重命名整棵目录。

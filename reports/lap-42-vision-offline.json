@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "passed": true,
-  "adapter_signature": "c59cc08e4548275ce038886f649477e8160e1fb09f2c4ea002f844abb0bbb00f",
+  "adapter_signature": "ba45159d4338b9e05743aadb280633040ccdfc3adbd776d90a0f42c7b296134e",
   "rule_hash": "4dfb239d768f5c439ee7c718afc0827c90965de91295ef6b3e4e985586bb1b85",
   "verifier_sha256": "6449174489fe926aed870d8363ed878a82e2e8208d9239ce4644d4a90d278f69",
-  "tests_sha256": "faa212dd7561396048d246028675ef0519dcceb25d3b01dfbf11dbb97e7d2dbf",
+  "tests_sha256": "7f958315983086a813f1a1820b719e0347476542ed62fba8128002b1754c6894",
   "source_audit_sha256": "7c24fa759b061c28e2dfc07e0a5d4195a10eaecdec18c5c190effa8119e4e640",
-  "unit_tests": 102,
+  "unit_tests": 104,
   "failures": 0,
   "errors": 0,
   "modules": [
