@@ -79,6 +79,44 @@ def semantic_body(tree):
     return None,None
 
 
+def extract_dates(tree):
+    rows=[]
+    def add(kind,source,value):
+        if isinstance(value,str) and len(value)<=80 and len(rows)<24:
+            rows.append(dict(kind=kind,source=source,value=value))
+    for kind in ('published','modified'):
+        for value in tree.xpath('//meta[@property="article:'+kind+'_time"]/@content')[:8]:add(kind,'meta',value)
+    count=0;nodes=0
+    def walk(value,depth=0):
+        nonlocal nodes
+        nodes+=1
+        if nodes>256 or depth>8:return
+        if isinstance(value,list):
+            for child in value:walk(child,depth+1)
+        elif isinstance(value,dict):
+            typ=value.get('@type',[]);typ=[typ] if isinstance(typ,str) else typ
+            if isinstance(typ,list) and any(t in ('Article','NewsArticle','BlogPosting') for t in typ):
+                # Only a unique article without an unrelated explicit URL is usable.
+                canonical=tree.xpath('//link[@rel="canonical"]/@href')
+                url=value.get('url')
+                if url is None or canonical and url==canonical[0]:
+                    add('published','jsonld',value.get('datePublished'))
+                    add('modified','jsonld',value.get('dateModified'))
+            for child in value.values():
+                if isinstance(child,(dict,list)):walk(child,depth+1)
+    for script in tree.xpath('//script[@type="application/ld+json"]')[:8]:
+        text=script.text or '';count+=len(text.encode())
+        if count>65536:break
+        try:walk(json.loads(text))
+        except (ValueError,RecursionError):continue
+    if not any(r['kind']=='published' for r in rows):
+        # A single article/main scope prevents recommendation dates being pooled.
+        scopes=tree.xpath('//article') or tree.xpath('//main|//*[@role="main"]')
+        if len(scopes)==1:
+            for node in scopes[0].xpath('.//time[@datetime][not(ancestor::aside or ancestor::nav or ancestor::footer)]')[:8]:add('published','time',node.get('datetime'))
+    return rows
+
+
 def extract_html(text):
     from lxml import html
     from readability import Document
@@ -92,6 +130,7 @@ def extract_html(text):
         try:datetime.fromisoformat(value.replace('Z','+00:00'))
         except ValueError:continue
         published=value;break
+    date_candidates=extract_dates(tree)
     for node in tree.xpath('//script|//style|//nav|//form|//iframe|//footer|//header[not(ancestor::main or ancestor::article or ancestor::section or ancestor::*[@role="main"])]|//aside|//noscript|//svg|//template|//object|//embed|//*[@hidden or @aria-hidden="true"]'):
         if node.getparent() is not None:node.drop_tree()
     for node in list(tree.iter()):
@@ -106,7 +145,7 @@ def extract_html(text):
         if node.getparent() is not None:node.drop_tree()
     content=body_text(body)
     if len(content)<80 or re.search(r'verify you are human|access denied|登录后阅读|付费阅读|人机验证',content,re.I):raise ValueError('empty_shell')
-    return dict(title=title,text=content,published_at=published,body_method=method,body_scope='extracted_main')
+    return dict(title=title,text=content,published_at=published,date_candidates=date_candidates,body_method=method,body_scope='extracted_main')
 
 
 def main():
@@ -119,7 +158,7 @@ def main():
             parser=Extractor();parser.feed(text)
             body=' '.join(' '.join(parser.text).split())
             if len(body)<80:raise ValueError('empty_shell')
-            result=dict(title=' '.join(' '.join(parser.title).split())[:120],text=body,published_at=parser.published,body_method='legacy',body_scope='extracted_main')
+            result=dict(title=' '.join(' '.join(parser.title).split())[:120],text=body,published_at=parser.published,date_candidates=[],body_method='legacy',body_scope='extracted_main')
         else:result=extract_html(text)
         result['elapsed_seconds']=time.monotonic()-started
         data=json.dumps(result,ensure_ascii=False,separators=(',',':')).encode()

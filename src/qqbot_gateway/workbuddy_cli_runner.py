@@ -412,8 +412,9 @@ class CLIRunner:
                     try:self.last_parameters['vision_guard_observed']=guard.read()
                     except (OSError,ValueError) as error:self.last_parameters['vision_guard_read_error']=str(error)
                     try:
-                        self.last_parameters['probe_evidence']=guard.preserve_probe(
-                            self.root/'state/lap42-vision-closure/probe-request-evidence'/work.name)
+                        from .vision_regression import PROBE_BASE
+                        destination=PROBE_BASE.get() or self.root/'state/lap42-vision-closure/probe-request-evidence'
+                        self.last_parameters['probe_evidence']=guard.preserve_probe(destination/work.name)
                     except (OSError,ValueError):self.last_parameters['probe_evidence_error']=True
                 self.last_protocol = parser.events
                 owner.begin(process, io, watcher, owned_root, generation, self.cleanup_seconds)

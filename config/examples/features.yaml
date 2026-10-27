@@ -4,7 +4,10 @@
 public_network:  # 项目公共网络策略；默认无额外CA
   resolver: system  # 仅system/cloudflare_doh，失败不自动切换
   ca_bundle_file: null  # 仅显式secrets/public-network-ca.local.pem，禁止任意路径/私钥/链接
-web:  # 配置节，子字段见下方；保留既有校验约束
+web:
+  search_enabled: false # Independent switch and code quality gate
+  freshness_days: 7 # 1..30; Asia/Shanghai
+  # 配置节，子字段见下方；保留既有校验约束
   enabled: false  # 共用网页读取开关；搜索质量门槛仍关闭，不代表完整搜索可用；新装默认 false
   trigger: auto  # 联网触发auto/explicit；新装默认 "auto"
   extractor: readability  # 按需受管worker提取；legacy仅显式回滚

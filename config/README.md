@@ -71,7 +71,7 @@ LAP-24可选管理token独立于五文件配置和QQ密码，仅用`scripts/conf
 
 ## 群临时停言（LAP-35）
 
-`local/chat.yaml` 中唯一新增设置为 `participation.silence.enabled: true`，缺省true。开启只表示接受控制，各授权群启动时仍为普通。普通成员明确指向bot要求停言（例如“肥鱼先别参与讨论了”）后，本群不确认、不发表情，直到非黑名单群友下一条原始真实@恢复；同条@并要求停言时停言优先。别名复用 `participation.attention.aliases`，不因此开启叫名回复。模糊、否定、引用/转述或超长表达不保证识别，不额外调用分类模型。
+`local/chat.yaml` 中唯一新增设置为 `participation.silence.enabled: true`，缺省true。开启只表示接受控制，各授权群启动时仍为普通。LAP-43隔离版本中，只有 `access.admin_users` 规范化去重后的唯一操作者可明确暂停/恢复；固定命令为“@bot 暂停发言 / @bot 恢复发言”，本人定向自然叫名也支持。暂停后本群不确认、不发表情，任何普通真实@或本人裸@均不解除；须本人明确恢复。该行为尚未部署到生产main。别名复用 `participation.attention.aliases`，不因此开启叫名回复。模糊、否定、引用/转述或超长表达不保证识别，不额外调用分类模型。
 
 状态只在gate内存中。gate/完整bot/电脑重启回普通；WS、QQ离线、插件或模型重连不解除，没有自动超时。恢复后继续原有free/mentions合同；不补答哑巴期间消息、不清历史/记忆，不解除真实unknown/清理阻断。已经提交到QQ的消息可能晚到，无法撤回；旧结果不能借唤醒后的新状态发送。
 
@@ -142,3 +142,13 @@ Snow运行准入另要求online/good、已armed且pipe/login/rx/outbound健康�
 - `rollback`：只接受本任务完整激活账本；若有已完成登记的trial，仅停止该instance的受管进程，再核验确退。未知/部分/实例变化拒绝。恢复仅本次provider字段；无后改时原字节还原（含BOM/引号/无尾换行），无关后改保留，provider后改拒绝覆盖。不自动启动NapCat，不清理登录、人设、记忆或事故预算。
 
 采样由gate既有健康任务消费，没有新增进程/监听/nonce客户端。从首次真实channel_ready开始，每60秒记录封闭布尔/计数、核验PID的RSS/句柄与允许项目目录的元数据字节；不存QQ号、消息ID/echo、正文或栈。每条<=512B，采样日志总<=16MiB，按日桶保留至多14天；容量/资源/时钟/覆盖缺口UNKNOWN并断开连续段。QQ/Node/epoch/build/policy/配置摘要变化另起段，旧失败计数保留。QQ发送ACK/失败/unknown及延迟与控制ACK分开；未知不重试。72h包含于168h，但这些时间标记仍不能替代真实新消息驱动的7天收发验收。8小时中位数资源趋势须由操作者评估，不自动重启抹平；真实重新扫码的观测接线仍受阶段3缺口阻断。
+
+## LAP-43隔离版本新增合同（尚未部署）
+
+`access.admin_users` 去重后必须恰好1项合法QQ，且不等于bot、不在blocked；真实号码只保留本机忽略配置。框架管理名单、router及群背景记忆均同源，群管理员角色/显示名/引用不赋权。重置命令沿用现有语法且只允许唯一操作者，暂停中不回应或执行。
+
+`web.search_enabled` 默认false；`web.freshness_days` 默认7，范围1..30。网页读取仍由 `web.enabled` 控制，不随search关闭而失效。search还须代码质量门槛通过，本轮保持false；时效意图无法核实时本地说明，0生成。日期按北京时间解释，小时窗要求精确有时区的日期，缺失/冲突/未来日期不能给最新结论；修改日期不是事件日期。配置变更下次正常启动生效，所有绑定设置改变须配对视觉证据，不能热改。
+
+`activate_lap43_memes.py` 默认inspect；显式activate要求本次inspect JSON作为expected，停机/配置锁内复核基线、保存原字节与不存在标记，激活既有7条且不扩库。只做离线交付时不得对生产运行helper激活。公共搜索探测用 `probe_lap43_search.py`，默认不联网；后续阶段B才允许冻结3题/最多3搜索+6页面入口、人工对照和0模型批次。
+
+`revalidate_lap43_vision.py` 默认inspect；新证据固定在 `state/lap43-vision-regression/<binding>/`，acceptance_mode为 `lap43_current_regression`。新授权、当前offline、实际CLI正反契约、单次IQ-05及人工答案hash/反馈、历史IQ-01接受、当前ingress和配对active全部必须通过。旧42证据及unknown保留，不改旧binding、不缩小签名；离线报告本身不能启动生产vision。

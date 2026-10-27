@@ -27,12 +27,16 @@ def called(text,names):
     # ask about a URL or a quotation without losing its direct classification.
     if text.startswith(('他说','她说','有人说')):return False
     text=re.sub(r'```.*?```|`[^`]*`|"[^"]*"|“[^”]*”|「[^」]*」|https?://\S+',' ',text,flags=re.S)
+    text=' '.join(line for line in text.splitlines() if not line.lstrip().startswith('>'))
     text=re.sub(r'\s+',' ',text).strip()
     for name in sorted(names,key=len,reverse=True):
         name=unicodedata.normalize('NFKC',name).strip().casefold()
         boundary=r'[\s,，。.!！?？:：~～、]'
         if text==name or re.match('^'+re.escape(name)+boundary,text) or re.search(boundary+re.escape(name)+'[!！?？~～。]*$',text):return True
-        if re.match('^'+re.escape(name)+r'(?:请|帮我|能不能|你|在吗|说说|解释|看看|算一下)',text):return True
+        if name.isascii():continue  # word boundaries above apply to Latin aliases
+        request=r'(?:请|帮我|帮忙|能不能|能否|你|在吗|说说|解释|看看|算一下|查查|查一下|给我|来(?:看看|说说)|这个.*怎么看)'
+        if re.match('^'+re.escape(name)+request,text):return True
+        if re.match(r'^我想问'+re.escape(name)+r'(?:一个问题|一下|[，,：: ?？])',text):return True
     return False
 
 @dataclass
@@ -85,6 +89,8 @@ class Attention(Participation):
         state=self.state(group);now=self.clock()
         while state.ack and now-state.ack[0]['at']>900:state.ack.popleft()
         if sender not in state.refs:state.refs[sender]='p_'+uuid.uuid4().hex[:16]
+        if state.focus and now-state.focus['at']>self.cfg['attention']['focus_ttl_seconds']:
+            state.focus=None;state.version+=1
         other=any(q!=self.bot for q in at_ids)
         known=list(self.window(group).rows)+list(state.ack)
         reference=next((r for r in reversed(known) if r['mid']==reply),None) if reply else None
@@ -107,7 +113,7 @@ class Attention(Participation):
             if called(text,self.cfg['attention']['aliases']):addressing='direct_name'
             elif reference and reference['sender']=='bot':addressing='reply_bot';required.add(reference['seq'])
             elif state.focus and now-state.focus['at']<=self.cfg['attention']['focus_ttl_seconds']:
-                addressing='focused_followup' if re.search(r'你|您',text) and re.search(r'[?？]|吗|么|请|帮|能|要|说|解释|觉得|怎么|为何|为什么',text) else 'focused_candidate'
+                addressing='focused_followup' if (re.fullmatch(r'(?:那怎么办|为什么呢|再详细点|继续|还有呢)[。!！?？\s]*',text.strip()) or re.search(r'你|您',text) and re.search(r'[?？]|吗|么|请|帮|能|要|说|解释|觉得|怎么|为何|为什么',text)) else 'focused_candidate'
                 required.update(r['seq'] for r in state.focus['rows'])
         if other or reply and (not reference or reference['sender']!='bot'):
             state.focus=None
@@ -180,7 +186,7 @@ class Attention(Participation):
                 len(pergroup)>=bound or sum(t.size for t in live)+ticket.size>262144):
                 raise SessionError('SESSION_QUEUE_FULL',kind in DIRECT)
         self.pending.append(ticket)
-        LOG.info('ATTENTION trace=%s stage=queued addressing=%s',ticket.trace,kind)
+        LOG.info('ATTENTION trace=%s stage=queued queue_result=accepted addressing=%s',ticket.trace,kind)
         try:
             while True:
                 if ticket.cancelled or not valid() or ticket.epoch!=self.group_epoch(ticket.group):raise SessionError('INVALIDATED',False)

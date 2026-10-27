@@ -7,6 +7,6 @@ access:  # 配置节，子字段见下方；保留既有校验约束
   allowed_groups:  # 授权群，必填非空正整数列表，不自动加群；新装默认 ["REQUIRED_TEST_GROUP"]
   - REQUIRED_TEST_GROUP
   blocked_users: []  # 全群前置屏蔽QQ列表，不进入框架/模型/新增记忆；新装默认 []
-  admin_users:  # bot管理员QQ，通常填你自己的QQ，非QQ群管理员；可真实@重置上下文，不豁免授权群/黑名单；新装默认 ["REQUIRED_ADMIN_QQ"]
+  admin_users:  # 唯一操作者QQ，去重后恰好1项，不能等于bot或blocked，非QQ群管理员；可真实@重置上下文，不豁免授权群/黑名单；新装默认 ["REQUIRED_ADMIN_QQ"]
   - REQUIRED_ADMIN_QQ
   private_enabled: false  # 私聊固定false，不能手工开启；新装默认 false

@@ -46,6 +46,17 @@ def silence_request(text, aliases, mentioned=False, limit=2000):
         if mentioned and re.fullmatch(modifier+rf'(?:{negative}{modifier}{participate}|{quiet})'+tail,clause):return True
     return False
 
+def resume_request(text, aliases, mentioned=False, limit=2000):
+    if not isinstance(text,str) or len(text)>limit:return False
+    text=unicodedata.normalize('NFKC',text).casefold().strip()
+    names=[re.escape(unicodedata.normalize('NFKC',n).casefold()) for n in sorted(aliases,key=len,reverse=True)]
+    target='(?:'+'|'.join(names)+')'
+    action=r'(?:恢复发言|可以说话了|继续说话)'
+    tail=r'[。!！,，?？\s]*'
+    return bool(re.fullmatch(target+r'[，,:：\s]*(?:你)?'+action+tail,text) or
+                mentioned and re.fullmatch(r'(?:请)?'+action+tail,text))
+
+
 def decode_ticket(ticket):
     if not isinstance(ticket,str) or len(ticket)>2048:raise ValueError(DENIED)
     body,signature=ticket.split('.')
@@ -81,8 +92,8 @@ class GroupSilence:
 
     def normal(self,group):return group in self.states and self.states[group]['mode']=='normal'
 
-    def control(self,group,stop,mention):
-        state=self.states[group];mode='muted' if stop else 'normal' if mention else state['mode']
+    def control(self,group,stop,resume):
+        state=self.states[group];mode='muted' if stop else 'normal' if resume else state['mode']
         if mode!=state['mode']:state.update(mode=mode,generation=state['generation']+1);return True
         return False
 

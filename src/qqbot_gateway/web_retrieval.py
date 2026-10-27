@@ -21,6 +21,7 @@ from .token_budget import dialog_text
 from .reply_plan import ReplyPlan, make_reply_plan, truncate
 
 LOG=logging.getLogger(__name__)
+REQUEST_TIME=ContextVar('web_requested_at',default=None)
 CURRENT_TEXT=ContextVar('public_current_text',default=(False,None))
 MATERIAL_TRACE=ContextVar('public_material_trace',default='')
 BODY_METHODS={'none','semantic_main','semantic_article','readability','legacy','plain'}
@@ -104,6 +105,16 @@ def parse_rss(text,query,cfg):
     return items
 
 
+# Narrow, topic-bound source preference. A generic gov/GitHub domain earns no authority.
+FIRST_PARTY={'python':('python.org',),'node.js':('nodejs.org',),'openai':('openai.com',),
+             '微软':('microsoft.com',),'chromium':('chromium.org',)}
+def first_party(query,row):
+    host=(urlsplit(row['url']).hostname or '').casefold()
+    visible=(row.get('title','')+' '+row.get('text','')).casefold()
+    return any(topic in query.casefold() and topic in visible and any(host==domain or host.endswith('.'+domain) for domain in domains)
+               for topic,domains in FIRST_PARTY.items())
+
+
 NOTICES=dict(disabled='网页读取尚未开启，请由本机操作者停机配置后重启。',video='视频正文和评论还没接入，请贴出需要讨论的文字。',
              blocked='这个链接不在允许的公共网页范围。',clarify='请补充要查询的明确对象，不会把聊天历史上传搜索。',
              sensitive='请改写为简短且不含账号、凭据或本机路径的公共查询。',
@@ -123,8 +134,8 @@ class Retrieval:
 
 
 class Retriever:
-    def __init__(self,cfg,private_ids=(),http_factory=PublicHTTP,*,network=None,root=None,bilibili=None):
-        self.cfg=DEFAULTS|cfg;self.cfg.update(public_network=network or {},_root=root)
+    def __init__(self,cfg,private_ids=(),http_factory=PublicHTTP,*,network=None,root=None,bilibili=None,aliases=()):
+        self.cfg=DEFAULTS|cfg;self.cfg.update(public_network=network or {},_root=root,_aliases=tuple(aliases))
         self.private_ids=private_ids;self.http_factory=http_factory;self.last_audit={};self.extractor=None
     async def extract(self,text,url,mime):
         if mime=='text/plain':
@@ -136,7 +147,7 @@ class Retriever:
         result=await self.extractor.extract(text,self.cfg['extractor'])
         body=result['text']
         return dict(title=result['title'],url=safe_url(url),fetched_at=datetime.now(timezone.utc).isoformat(),
-                    published_at=result['published_at'],status='body',text=body,_full_text=body,truncated=False,
+                    published_at=result['published_at'],_date_candidates=result['date_candidates'],status='body',text=body,_full_text=body,truncated=False,
                     body_method=result['body_method'],body_scope=result['body_scope'])
     async def retrieve(self,question):
         trace=secrets.token_hex(8);token=MATERIAL_TRACE.set(trace)
@@ -157,8 +168,12 @@ class Retriever:
         material_log('intent',decision.kind,failure='search_unverified' if decision.kind=='search' and not SEARCH_QUALITY_PASSED else 'blocked' if decision.kind=='blocked' else 'none')
         if decision.kind=='none':return Retrieval()
         if decision.kind in NOTICES:return Retrieval(decision.kind,notice=NOTICES[decision.kind])
-        if decision.kind=='search' and not SEARCH_QUALITY_PASSED:return Retrieval('search',notice=NOTICES['unavailable'])
+        if decision.kind=='search' and (not self.cfg['search_enabled'] or not SEARCH_QUALITY_PASSED):return Retrieval('search',notice=NOTICES['unavailable'])
+        return await self._fetch(decision,question)
+
+    async def _fetch(self,decision,question):
         audit=Audit();started=time.monotonic();sources=[];failed=0
+        requested_at=REQUEST_TIME.get() or datetime.now(timezone.utc).isoformat()
         try:
             async with asyncio.timeout(self.cfg['timeout_seconds']):
                 http=self.http_factory(self.cfg,audit)
@@ -167,6 +182,10 @@ class Retriever:
                     audit.search_calls+=1
                     text,_,_=await http.get('https://cn.bing.com/search?'+urlencode({'q':decision.query,'format':'rss'}),rss=True)
                     candidates=parse_rss(text,decision.query,self.cfg)
+                    from .evidence_selection import question_terms
+                    terms=question_terms(decision.query)
+                    score=lambda row:sum(t.casefold() in (row['title']+' '+row['text']).casefold() for t in terms)
+                    candidates=sorted((r for r in candidates if not terms or score(r)>0),key=lambda row:(first_party(decision.query,row),score(row)),reverse=True)
                     urls=tuple(x['url'] for x in candidates[:self.cfg['max_pages']])
                 for url in urls:
                     audit.fetch_calls+=1
@@ -177,6 +196,16 @@ class Retriever:
                         stage='body';body_started=time.monotonic()
                         source=await self.extract(text,final,mime)
                         if mime!='text/plain':material_log('body',decision.kind,method=source['body_method'],size=len(source['text'].encode()),count=len(source['text'].splitlines()),elapsed=time.monotonic()-body_started)
+                        from .web_freshness import facts
+                        source['freshness']=facts(source.get('_date_candidates',[]),requested_at,source['fetched_at'],question if decision.kind=='search' else '',self.cfg['freshness_days'])
+                        source['published_at']=source['freshness']['published_at']
+                        if decision.kind=='search' and source['freshness']['freshness_status']=='version_dated' and not first_party(decision.query,source):
+                            source['freshness']=facts(source.get('_date_candidates',[]),requested_at,source['fetched_at'],'最新消息',self.cfg['freshness_days'])
+                        if decision.kind=='search' and source['freshness']['freshness_status'] not in ('fresh','version_dated'):continue
+                        if decision.kind=='search':
+                            from .evidence_selection import question_terms,term_hits
+                            terms=question_terms(decision.query)
+                            if terms and not term_hits(source['text'],terms):continue
                         if source['url'] not in {s['url'] for s in sources}:sources.append(source)
                     except (WebFailure,aiohttp.ClientError,OSError,TimeoutError) as error:
                         from .public_network import failure_status
@@ -193,7 +222,7 @@ class Retriever:
             return Retrieval(decision.kind,notice=NOTICES['failed'])
         finally:
             audit.latency=round(time.monotonic()-started,3);self.last_audit=vars(audit)
-        return Retrieval(decision.kind,sources[:self.cfg['max_sources']],None if sources else NOTICES['failed'],bool(failed))
+        return Retrieval(decision.kind,sources[:self.cfg['max_sources']],None if sources else ('这次没查到能确认时效的可靠材料，暂时无法核实最新情况。' if decision.kind=='search' else NOTICES['failed']),bool(failed))
 
 
 def evidence_prompt(system,prompt,retrieval,budget,cfg):
@@ -244,7 +273,12 @@ def source_plan(raw,sources,output,question,partial=False):
                 ranges='、'.join(f'{a:g}–{b:g}秒' for a,b in x['time_ranges'])
                 return f'（P{x["page"]}，'+('自动' if x['subtitle_type']=='automatic' else '人工')+f'字幕/{x["language"]}，'+('字幕节选，可能遗漏细节' if x['coverage']=='excerpt' else '字幕全文')+f'；实际时间范围：{ranges}；字幕时间覆盖{x["time_coverage"]:.1%}，不代表已看画面）'
             return '（仅搜索摘要）' if x['status']=='summary' else '（基于正文节选，可能遗漏细节）' if x.get('coverage')=='excerpt' else '（提取主体全文）'
-        suffix=('\n本次仅取得部分页面。' if partial else '')+'\n来源：'+'\n'.join(title+' '+x['url']+label(x) for x,title in zip(rows,titles))
+        freshness=next((x.get('freshness') for x in rows if x.get('freshness')),None)
+        stamp=''
+        if freshness:
+            from .web_freshness import parse,SH
+            stamp='\n截至本次查询（北京时间'+parse(freshness['requested_at'])[0].astimezone(SH).strftime('%Y-%m-%d %H:%M')+'），页面日期不等于事件日期。'
+        suffix=stamp+('\n本次仅取得部分页面。' if partial else '')+'\n来源：'+'\n'.join(title+' 日期：'+str(x.get('published_at') or '未知')+' '+x['url']+label(x) for x,title in zip(rows,titles))
         check_decoded_tools(suffix)
         room=output['max_reply_chars']-len(suffix)
         if room>=40:
@@ -256,7 +290,7 @@ def source_plan(raw,sources,output,question,partial=False):
                 from .reply_plan import PreparedPart,digest
                 result=ReplyPlan('answer',(text,),text,prepared_parts=(PreparedPart('text',digest(text),text,text,mentions[0]),))
             return result
-        rows.pop()
+        break  # Oversized complete source suffix becomes a local failure, not an omitted source.
     text='来源链接超出当前回复长度限制，请换个较短的公共链接。'
     return ReplyPlan('answer',(text,),text)
 
@@ -270,8 +304,9 @@ class WebRunner:
         request=request or {}
         mentioned=request.get('addressing')=='mention' or request.get('trigger')=='mention'
         token=CURRENT_TEXT.set((mentioned,request.get('epoch') or request_id))
+        frozen=REQUEST_TIME.set(request.get('requested_at'))
         try:return await self.retriever.retrieve(question)
-        finally:CURRENT_TEXT.reset(token)
+        finally:CURRENT_TEXT.reset(token);REQUEST_TIME.reset(frozen)
     async def run_group(self,system,prompt,request_id,request):
         if request.get('version')==2:return await self.run_v2(system,prompt,request_id,request)
         from .backends import BackendResult

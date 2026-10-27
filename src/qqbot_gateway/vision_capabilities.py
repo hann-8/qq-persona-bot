@@ -143,24 +143,26 @@ def static_diagnostics(settings, runtime, *, table=None):
     return missing
 
 
-def offline_path(settings):
+def offline_path(settings,mode=None):
+    if mode=='lap43_current_regression':return ROOT/'reports/lap-43-vision-offline.json'
+    if mode is not None and mode!='lap42_first_plus_large_operator_acceptance':raise ValueError('EVIDENCE_MODE_INVALID')
     record=selected_record(settings)
     return ROOT/('reports/lap-42-vision-offline.json' if record and record.get('kind') else 'reports/lap-28-C-offline.json')
 
 
-def offline_valid(settings):
+def offline_valid(settings,mode=None):
     from .vision import adapter_signature
     try:
-        value=read_json(offline_path(settings))
+        value=read_json(offline_path(settings,mode))
         if value.get('passed') is not True or value.get('adapter_signature')!=adapter_signature():return False
         record=selected_record(settings)
         if record and record.get('kind'):
-            verifier=ROOT/'scripts/verify_lap42_vision.py'
-            tests=ROOT/'tests/test_lap42_vision.py'
+            verifier=ROOT/('scripts/verify_lap43.py' if mode=='lap43_current_regression' else 'scripts/verify_lap42_vision.py')
+            tests=ROOT/('tests/test_lap43.py' if mode=='lap43_current_regression' else 'tests/test_lap42_vision.py')
             if (value.get('rule_hash')!=digest(record) or
                 value.get('verifier_sha256')!=hashlib.sha256(verifier.read_bytes()).hexdigest() or
                 value.get('tests_sha256')!=hashlib.sha256(tests.read_bytes()).hexdigest() or
-                value.get('source_audit_sha256')!=hashlib.sha256((ROOT/'reports/lap-42-vision-closure-sources.json').read_bytes()).hexdigest()):return False
+                value.get('source_audit_sha256')!=hashlib.sha256((ROOT/('reports/lap-43-vision-sources.json' if mode=='lap43_current_regression' else 'reports/lap-42-vision-closure-sources.json')).read_bytes()).hexdigest()):return False
         return True
     except (OSError,ValueError,TypeError,KeyError):return False
 
@@ -179,6 +181,10 @@ def production_diagnostics(settings, evidence, runtime, *, table=None):
         return missing + ['OBSERVATION_BINDING_MISMATCH']
     if evidence.get('offline_passed') is not True or evidence.get('ingress_decoded') is not True:
         missing.append('OFFLINE_OR_INGRESS_UNVERIFIED')
+    if evidence.get('acceptance_mode')=='lap43_current_regression':
+        if not record.get('kind'):return missing+['REGRESSION_BACKEND_INVALID']
+        from .vision_regression import diagnostics
+        return missing+diagnostics(evidence.get('operator_review'),expected)
     if evidence.get('acceptance_mode')=='lap42_first_plus_large_operator_acceptance':
         if not record.get('kind'):return missing+['OPERATOR_ACCEPTANCE_BACKEND_INVALID']
         from .vision_operator_review import diagnostics
@@ -243,7 +249,10 @@ def validate_production_evidence(settings, evidence, root=None):
     from .vision_quality import BatchLedger
     from .vision import adapter_signature
     ledger_path=root/'state/vision-evidence/iq-batches.sqlite3'
-    if evidence.get('acceptance_mode')=='lap42_first_plus_large_operator_acceptance':
+    if evidence.get('acceptance_mode')=='lap43_current_regression':
+        from .vision_regression import durable
+        missing.extend(durable(root,evidence.get('operator_review'),evidence.get('binding')))
+    elif evidence.get('acceptance_mode')=='lap42_first_plus_large_operator_acceptance':
         from .vision_operator_review import durable_diagnostics
         missing.extend(durable_diagnostics(root,evidence.get('operator_review'),evidence.get('binding')))
     elif not ledger_path.is_file():
@@ -255,12 +264,13 @@ def validate_production_evidence(settings, evidence, root=None):
                 missing.append('DURABLE_IQ_LEDGER_MISMATCH')
             if ledger.unresolved(evidence['binding']):missing.append('FAILED_OR_UNKNOWN_ATTEMPTS')
         except (ValueError,KeyError):missing.append('DURABLE_IQ_LEDGER_INVALID')
-    if not offline_valid(settings):
+    mode=evidence.get('acceptance_mode')
+    if not offline_valid(settings,mode):
         missing.append('CURRENT_OFFLINE_PROOF_MISSING')
     record=selected_record(settings)
     if record and record.get('kind'):
         from .vision_mod_guard import probe_valid
-        if not probe_valid(root,settings):missing.append('CURRENT_CLI_PROBE_MISSING')
+        if not probe_valid(root,settings,mode=mode):missing.append('CURRENT_CLI_PROBE_MISSING')
     # Configured digest must still match the reviewed, observed selected model.
     from .backends import resolve_backend
     cfg = resolve_backend(settings)

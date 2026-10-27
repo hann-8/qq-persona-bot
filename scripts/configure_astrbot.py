@@ -21,6 +21,7 @@ async def configure():
     path=ROOT/'runtime/astrbot/data/cmd_config.json'
     config=json.loads(path.read_text(encoding='utf-8-sig'))
     tokens=json.loads((ROOT/settings['secrets_file']).read_text(encoding='utf-8'))
+    config['admins_id']=list(settings['access']['admin_users'])
     config['provider_sources']=[]
     config['provider']=[{'id':'workbuddy-local','type':'qqbot_openai','provider':'openai',
         'provider_type':'chat_completion','enable':True,'key':[tokens['model_gateway']],

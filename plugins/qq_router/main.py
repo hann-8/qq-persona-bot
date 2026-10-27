@@ -157,13 +157,23 @@ class QQRouter(Star):
         if not self.silence_allowed(event):event.should_call_llm(False);event.stop_event()
 
     async def local_notice(self,event,text):
+        from qqbot_gateway.reply_delivery import EventReceiptProxy,KnownNotSent
         guard=event.get_extra('qq_send_guard')
-        if not text or not self.delivery_allowed(event) or (event.get_extra('qq_connection') and event.get_extra('qq_connection')!=self.connection()):return
+        if not text or not self.delivery_allowed(event) or (event.get_extra('qq_connection') and event.get_extra('qq_connection')!=self.connection()):return 'failed'
+        original=event.bot;proxy=EventReceiptProxy(original,event.get_group_id());state='failed'
         try:
             async with self.delivery.queue.hold(str(event.get_group_id()),lambda:self.delivery_allowed(event)):
                 with guard.grant():
-                    await cancellable(event.send(event.plain_result(text)),lambda:self.delivery_allowed(event),3)
-        except Exception:pass
+                    event.bot=proxy
+                    try:await cancellable(event.send(event.plain_result(text)),lambda:self.delivery_allowed(event),3)
+                    finally:event.bot=original
+            state='sent' if proxy.calls==1 and proxy.message_id else 'unknown' if proxy.calls else 'failed'
+        except KnownNotSent:state='failed'
+        except Exception:state='sent' if proxy.calls==1 and proxy.message_id else 'unknown' if proxy.calls else 'failed'
+        finally:
+            event.bot=original
+            event.set_extra('qq_local_delivery_state',state)
+        return state
 
     async def initialize(self):
         await self.tasks.recover_deliveries(self.context.conversation_manager)
@@ -409,6 +419,46 @@ class QQRouter(Star):
         event.platform_meta=replace(event.platform_meta,support_proactive_message=False)
         event.set_extra('qq_delivery_version',self.persona_id)
         event.set_extra('qq_delivery_identity',(str(event.get_self_id()),str(event.get_group_id()),str(event.get_sender_id())))
+        from qqbot_gateway.input_policy import normalize
+        from qqbot_gateway.attention import called
+        components=event.get_messages()
+        raw=raw if isinstance(raw,dict) else {}
+        actual=''.join(c.text for c in components if isinstance(c,Plain))
+        image=raw.get('qqbot_image') if self.vision['enabled'] else None
+        current=normalize(raw,actual,image)
+        from datetime import datetime,timezone
+        event.set_extra('qq_requested_at',raw.get('qqbot_requested_at') or datetime.now(timezone.utc).isoformat())
+        mentioned=any(isinstance(c,At) and str(c.qq)==self.bot for c in components)
+        others=any(str(q)!=self.bot for q in raw.get('qqbot_at_ids',[]))
+        directed=mentioned or not others and not raw.get('qqbot_reference') and called(current.text,self.participation['attention']['aliases'])
+        if len(current.text)>self.participation['message_max_chars']:
+            if directed:await self.local_notice(event,MESSAGES['INPUT_TOO_LONG'])
+            event.should_call_llm(False);event.stop_event();return
+        if current.kind in ('empty','unsupported','image_failed'):
+            trace=uuid.uuid4().hex;key=self.bot+':'+str(event.get_group_id())+':'+str(event.message_obj.message_id)
+            if self.tasks.accept(key,trace):
+                LOG.info('ATTENTION trace=%s input_kind=%s addressing=%s must_reply=%s filtered_reason=local_input generation_performed=False',trace,current.kind,'direct' if directed else 'ambient',directed)
+                delivery=await self.local_notice(event,current.notice) if directed else None
+                self.tasks.set(key,'completed' if delivery in (None,'sent') else 'send_unknown' if delivery=='unknown' else 'failed')
+            event.should_call_llm(False);event.stop_event();return
+        # Only actual text enters all three branches. Literal placeholder text survives.
+        if isinstance(getattr(event.message_obj,'raw_message',None),dict):
+            event.message_obj.raw_message['qqbot_text']=current.text
+        if mentioned and current.kind=='text' and current.text in ('重置本群上下文','重置会话','/重置'):
+            sender=str(event.get_sender_id())
+            if sender not in self.admins:await self.local_notice(event,'当前只允许操作者重置上下文。')
+            elif current.text=='重置本群上下文':
+                self.group_turns.reset(str(event.get_group_id()));await self.local_notice(event,'本群当前上下文已重置。')
+            else:
+                try:lease=await self.coordinator.acquire(event.unified_msg_origin,lambda:self.silence_allowed(event))
+                except SessionError:
+                    await self.local_notice(event,'这条重置请求排队已满、超时或暂时受限，请稍后再试。')
+                    event.should_call_llm(False);event.stop_event();return
+                try:
+                    await self.context.conversation_manager.new_conversation(event.unified_msg_origin,persona_id=self.persona_id)
+                    await self.local_notice(event,'你在这个群里的当前会话已重置，重新聊吧。')
+                finally:lease.release()
+            event.should_call_llm(False);event.stop_event();return
         if self.attention_effective or (self.vision['enabled'] or self.members['enabled'] or self.memory.cfg['enabled'] or self.bilibili['enabled']) and self.participation['mode']=='free':
             async for item in self.on_attention_group(event):yield item
         elif self.participation['mode']=='free':
@@ -445,11 +495,11 @@ class QQRouter(Star):
                 event.should_call_llm(False);event.stop_event();self.tasks.set(key,'failed');return
             self.tasks.set(key,'running')
             if any(not isinstance(c,(At,AtAll,Plain,Reply)) for c in components) or media and not image:
-                self.tasks.set(key,'failed');yield event.plain_result('目前只接通文字聊天，图片、音频和视频还没接入。');return
+                self.tasks.set(key,'failed');yield event.plain_result('本条媒体暂不能读取，请贴文字。');return
             prompt=''.join(c.text for c in components if isinstance(c,Plain)).strip()
             if image:prompt=raw.get('qqbot_text','').strip() or '[当前消息含图片]'
             if not prompt:
-                self.tasks.set(key,'failed');yield event.plain_result('我在~ 带上想问的文字再叫我吧。');return
+                self.tasks.set(key,'failed');yield event.plain_result('我在，怎么啦？');return
             if re.search(r'https?://\S+',prompt,re.I) and not self.web['enabled']:
                 self.tasks.set(key,'failed');yield event.plain_result('网页读取尚未开启，视频正文还没接入。贴段文字，我先帮你捋捋。');return
             try:self.budget.select_history(self.persona,prompt,[])
@@ -495,7 +545,7 @@ class QQRouter(Star):
                 from qqbot_gateway.web_policy import intent
                 if intent(prompt,self.web).kind!='none':source['web_anchor']=prompt
                 request=dict(version=2,kind='member_turn',mode='mentions',request_key=digest(key),epoch=self.group_turns.group_epoch(str(event.get_group_id())),
-                    config_version=digest(self.persona_id),source_digest=sha(source),addressing='mention',must_reply=True,target_seq=1,resource_caps=[image['cap']] if image else [])
+                    config_version=digest(self.persona_id),source_digest=sha(source),addressing='mention',must_reply=True,target_seq=1,resource_caps=[image['cap']] if image else [],requested_at=event.get_extra('qq_requested_at'))
                 member_cap=raw.get('qqbot_member_cap') if isinstance(raw,dict) and self.members['enabled'] else None
                 if member_cap:request['resource_caps'].append(member_cap)
                 from qqbot_gateway.turn_v2 import fit
@@ -576,12 +626,13 @@ class QQRouter(Star):
         row,addressing,required=self.group_turns.observe(group,sender,str(event.message_obj.message_id),
             getattr(event.message_obj.sender,'nickname',''),prompt or '[非文本未解析]',ats,reference)
         row['memory_received_at']=time.time()
+        row['requested_at']=event.get_extra('qq_requested_at')
         if not self.attention_effective:
             addressing='mention' if mention else 'ambient';required={row['seq']}
-        has_text=bool(prompt.replace('[非文本未解析]','').strip())
+        has_text=bool(prompt.strip())
         if not has_text and not image or len(prompt)>self.participation['message_max_chars']:
             LOG.info('ATTENTION trace=%s stage=filtered reason=unsupported_or_oversized_text',trace)
-            if mention:await self.local_notice(event,MESSAGES['INPUT_TOO_LONG'] if has_text else '我在，目前只接通文字聊天。')
+            if mention:await self.local_notice(event,MESSAGES['INPUT_TOO_LONG'] if has_text else '我在，怎么啦？')
             self.tasks.set(key,'failed');event.stop_event();return
         epoch=self.group_turns.group_epoch(group);direct=addressing in DIRECT;ticket=None;lease=None
         LOG.info('ATTENTION trace=%s stage=attention_reason addressing=%s',trace,addressing)
@@ -591,6 +642,7 @@ class QQRouter(Star):
                 (direct or time.monotonic()-created<=min(90,self.participation['max_ambient_age_seconds'])))
         try:
             ticket=self.group_turns.freeze(group,addressing,row,required,trace)
+            ticket.requested_at=event.get_extra('qq_requested_at')
             ticket.memory_event=(sender,str(event.message_obj.message_id),row['memory_received_at'])
             # Keep the cap with the frozen target, outside model material. Ambient
             # merging must replace both together, never reuse the carrier image.
@@ -611,6 +663,7 @@ class QQRouter(Star):
                         pending.member_cap=ticket.member_cap
                         pending.received=ticket.received
                         pending.memory_event=ticket.memory_event
+                        pending.requested_at=ticket.requested_at
                         LOG.info('ATTENTION trace=%s stage=merged owner_trace=%s',trace,pending.trace)
                     return
                 if not await self.group_turns.batch(group,valid):return
@@ -636,10 +689,17 @@ class QQRouter(Star):
             if image:
                 from qqbot_gateway.vision import attach_image
                 attach_image(source,image)
+            if source['web_anchor']:
+                anchor=next(r for r in reversed(source['messages']) if r['text']==source['web_anchor'] and r['seq'] in source['eligible_seq'])
+                anchor_event=events.get(anchor['seq'])
+                if anchor_event:
+                    from datetime import datetime,timezone
+                    event.set_extra('qq_requested_at',ticket.requested_at if anchor['seq']==source['target_seq'] else datetime.fromtimestamp(anchor_event[2],timezone.utc).isoformat())
+            else:event.set_extra('qq_requested_at',ticket.requested_at)
             if eligible:state.web_evaluated_seq=max(state.web_evaluated_seq,max(r['seq'] for r in eligible))
             request=dict(version=2,kind='group_turn',mode='free',request_key=digest(key),epoch=epoch,
                 config_version=digest(self.persona_id),source_digest=sha(source),addressing=addressing,must_reply=direct,
-                target_seq=target['seq'],resource_caps=[image['cap']] if image else [])
+                target_seq=target['seq'],resource_caps=[image['cap']] if image else [],requested_at=event.get_extra('qq_requested_at'))
             from qqbot_gateway.turn_budget import candidate_instruction
             suffix=candidate_instruction([]) if self.memes.cfg['enabled'] else ''
             body=fit(source,request,self.persona,self.budget,suffix)
@@ -721,8 +781,8 @@ class QQRouter(Star):
                 await self.local_notice(event,'本群当前上下文已重置。')
             else:await self.local_notice(event,'当前只允许管理员重置本群上下文。')
             self.tasks.set(key,'completed');event.stop_event();return
-        if mention and (not prompt or media and not prompt.replace('[非文本未解析]','').strip()):
-            await self.local_notice(event,'我在，目前只接通文字聊天，图片、音频和视频还没接入。')
+        if mention and (not prompt or media and not prompt.strip()):
+            await self.local_notice(event,'我在，怎么啦？')
             self.tasks.set(key,'completed');event.stop_event();return
         if mention and len(prompt)>self.participation['message_max_chars']:
             await self.local_notice(event,MESSAGES['INPUT_TOO_LONG']);self.tasks.set(key,'failed');event.stop_event();return
@@ -739,7 +799,7 @@ class QQRouter(Star):
                 if mention:await self.local_notice(event,'本群发送结果需要本机核对，暂时不能继续。')
                 return
             if not mention:
-                if not prompt.replace('[非文本未解析]','').strip():return
+                if not prompt.strip():return
                 if not await self.group_turns.batch(group,valid):return
             try:lease=await self.group_turns.acquire(group,mention,valid)
             except SessionError as error:

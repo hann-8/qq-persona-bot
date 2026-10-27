@@ -1,10 +1,12 @@
 # QQ bot项目入口：SnowLuma主线
 
-## 当前任务：LAP-43规划已交付，main整合完成
+## 当前任务：LAP-43阶段A隔离实现与离线交付
 
-2026-10-27，LAP-43详细规划与分阶段medium指令已交付，包含表情激活、时效搜索、空@/free漏答及唯一操作者控制。用户明确授权的Snow分支快进main已完成，规划提交`2986667cf88c85db39947871941a81a0014acba4`在两条远端分支核对一致，本根已切main、切换文件树无变化。7份文档登记重读、232本地链接和17项保护检查通过；本轮仅文档与Git，不实施功能、不改local/persona/图库/pending，不启停/模型/QQ。[43交接](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md) / [详规](tracks/laptop-workbuddy/tasks/LAP-43/PLAN.md) / [medium指令](tracks/laptop-workbuddy/tasks/LAP-43/MEDIUM_START.md)。回执交付后停止，后续从main按用户选中的阶段接续。
+2026-10-27，阶段A在隔离分支 `codex/lap-43-stage-a` 实施，起点为本地/实时远端main `52866fe10cc654d2e12c5520f7afc5aa8bbe0179`（含规划及整合回执）。实现唯一操作者控制、当前输入分流/叫名续聊、当前根7图激活helper、搜索开关/日期/证据链和独立当前版本视觉回归入口。检查与最终Git回执见[43交接](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)及[阶段A结果](reports/lap-43-stage-a-result.md)。[PLAN](tracks/laptop-workbuddy/tasks/LAP-43/PLAN.md) / [后续分阶段指令](tracks/laptop-workbuddy/tasks/LAP-43/MEDIUM_START.md)。
 
-当前只读核实：7张表情资产/7条pending有效，active未激活；搜索代码质量门槛false；保存的free/attention/web/vision等开关为true。唯一admin已与用户本人一致，但旧停言入口仍允许普通成员控制、任意真实@恢复，owner-only是本次规划合同，**尚未实施**。真实号码仅留本机忽略配置。
+**尚未部署。** 生产 `E:/CodexWS/QQbot_Snowluma` 的main和运行实例保留，生产识图保持原版本true；本轮未合main、启停、公共probe、真实模型/QQ/SSH或图库激活。搜索默认false且质量常量仍false，网页读取保留。当前persona预算的CodeBuddy组合可容纳；Ollama 12288字节示例政策会在必需输入阶段拒绝，不能声称两者都可容纳当前persona。旧18/21/27/35/42差额不变；后续仅由用户明确选中B/C/D，不能把离线报告当运行凭证。
+
+历史规划提交 `2986667c` 已整合main，回执提交 `52866fe1` 为本轮起点。既有7图仍pending/active未激活，正常运行仍是既有版本；owner-only等新行为只在本隔离实现内。
 
 ## 2026-10-26 识图已启用并完成用户指定的缩减验收
 
@@ -47,7 +49,7 @@ LAP-41工作区整理与使用对照已完成：uv报告清除38,269个缓存文
 
 | 工作线 | 状态/最新依据 | 接续入口 |
 | --- | --- | --- |
-| QQ主线：SnowLuma及共用bot业务 | main已整合；LAP-43四项功能/权限仅规划已交付，等待用户选择medium阶段；识图既有缩减验收/48000保留 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [LAP-43](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md) |
+| QQ主线：SnowLuma及共用bot业务 | main规划整合已完成；LAP-43阶段A隔离实现/离线交付，未部署；既有生产识图/48000保留 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [LAP-43](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md) |
 | 家庭5070备用模型路线 | 历史记录为接入已实现/离线及元数据通过、真实生成未验；本轮未重查，不自动切换后端 | [HANDOFF](tracks/local-5070/HANDOFF.md) / [既有选型](tracks/local-5070/MODEL_SELECTION.md) |
 
 `tracks/laptop-workbuddy` 是保留的历史目录名，当前承担QQ主线和共用网关交接，不表示仍以NapCat或WorkBuddy界面为主路线。所有旧任务的状态/验收差额在TASKS与各任务HANDOFF保留，不重命名整棵目录。

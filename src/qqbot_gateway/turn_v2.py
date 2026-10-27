@@ -18,13 +18,16 @@ def ref(x):return isinstance(x,str) and (x=='bot' or re.fullmatch(r'p_[a-f0-9]{1
 def sha(obj):return digest(canonical(obj))
 
 def validate_header(obj):
-    if (not isinstance(obj,dict) or set(obj)!=HEAD or type(obj['version']) is not int or obj['version']!=2 or
+    if (not isinstance(obj,dict) or set(obj)-{'requested_at'}!=HEAD or type(obj['version']) is not int or obj['version']!=2 or
         obj['mode'] not in ('free','mentions') or obj['kind']!=('group_turn' if obj['mode']=='free' else 'member_turn') or
         obj['addressing'] not in PRIORITY or type(obj['must_reply']) is not bool or obj['must_reply']!=(obj['addressing'] in DIRECT) or
         obj['mode']=='mentions' and obj['addressing']!='mention' or not integer(obj['target_seq']) or
         any(not hexa(obj[k],64) for k in ('request_key','epoch','config_version','source_digest')) or
         not isinstance(obj['resource_caps'],list) or len(obj['resource_caps'])>2 or
         any(not hexa(c,64) for c in obj['resource_caps']) or len(set(obj['resource_caps']))!=len(obj['resource_caps'])):raise GatewayError('UNSUPPORTED_REQUEST')
+    if 'requested_at' in obj:
+        from .web_freshness import parse
+        if parse(obj['requested_at'])[1]!='second':raise GatewayError('UNSUPPORTED_REQUEST')
     return dict(obj)
 
 def validate_source(text,request):

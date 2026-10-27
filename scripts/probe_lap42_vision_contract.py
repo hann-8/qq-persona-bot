@@ -14,7 +14,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path[:0]=[str(ROOT/'src'),str(ROOT)]
 
 
-async def probe(root,settings,journal):
+async def probe(root,settings,journal,mode=None):
     from PIL import Image
     from qqbot_gateway.backends import create_runner
     from qqbot_gateway.token_budget import InputBudget
@@ -55,7 +55,7 @@ async def probe(root,settings,journal):
                 row['local_refusal_zero_next']=local_refusal
                 atomic(journal,json.dumps(rows).encode())
                 if runner.user_messages_sent and not local_refusal:
-                    atomic(root/'state/vision-evidence/lap42-cli-probe-unknown.json',json.dumps(dict(
+                    atomic(journal.parent/'probe-unknown.json' if mode=='lap43_current_regression' else root/'state/vision-evidence/lap42-cli-probe-unknown.json',json.dumps(dict(
                         state='unknown',users=runner.user_messages_sent,timestamp=time.time(),journal=journal.name)).encode())
                 if not fault or runner.user_messages_sent or runner.last_parameters.get('vision_rejection')!='VISION_PLUGIN_NOT_READY_OR_MISMATCH':
                     raise ValueError('CLI_PROBE_FAILED_OR_GENERATION_UNKNOWN') from error
@@ -63,6 +63,8 @@ async def probe(root,settings,journal):
             if fault is None and (not result.get('local_probe') or result['guard']['next_calls']!=0):
                 raise ValueError('CLI_PROBE_GENERATION_UNKNOWN')
             row.update(state='verified',users=runner.user_messages_sent,result=result)
+            if mode=='lap43_current_regression':
+                row.update(probe_evidence=runner.last_parameters.get('probe_evidence'),protocol_events=runner.last_protocol)
             atomic(journal,json.dumps(rows).encode())
         finally:
             CURRENT.reset(token);await runner.cleanup_close()

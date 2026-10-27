@@ -91,7 +91,9 @@ def adapter_signature():
          'scripts/observe_lap28.py','scripts/observe_lap42_operator.py','config/persona.md',
          'scripts/probe_lap42_vision_contract.py','scripts/activate_lap42_vision.py',
          'scripts/verify_lap42_vision.py','tests/test_vision_mod_guard.py','tests/test_lap42_vision.py',
-         'reports/lap-42-vision-closure-sources.json'} |
+         'reports/lap-42-vision-closure-sources.json','scripts/revalidate_lap43_vision.py',
+         'scripts/verify_lap43.py','scripts/verify_lap43_framework.py','tests/test_lap43.py','tests/test_web_freshness.py',
+         'scripts/activate_lap43_memes.py','scripts/probe_lap43_search.py','scripts/configure_astrbot.py','reports/lap-43-vision-sources.json'} |
         {str(p.relative_to(root)).replace('\\','/') for p in (root/'adapters/codebuddy_vision_guard').rglob('*') if p.is_file()})
     from importlib.metadata import version
     for package in ('readability-lxml','lxml','lxml_html_clean','chardet','cssselect'):

@@ -19,9 +19,9 @@ vision:  # 配置节，子字段见下方；保留既有校验约束
   enabled: false  # production_eligible未证明；true会在启动时拒绝，不自动调用验证；原生识图desired开关；生产能力未验证，true仍拒绝启动
   input_reserve_tokens: 4096  # 待验证假设，不能当视觉token/patch上界；视觉预留4096仅假设，容量/上界未证，true仍拒启动
 participation:  # 配置节，子字段见下方；保留既有校验约束
-  # 临时停言默认开启；普通成员明确要求后本群静默，下一条真实@恢复；重启复位，无超时解除。
-  silence:  # 每群RAM临时停言；真实@恢复，gate重启复位，重连保持；默认enabled=true
-    enabled: true  # 下次正常启动生效；false关闭此能力，省略仍默认true；临时停言开关；明确停言后本群静默，新真实@恢复，gate重启复位
+  # 临时停言默认开启；仅操作者明确暂停后本群静默，须本人明确恢复；重启复位，无超时解除。
+  silence:  # 每群RAM临时停言；仅操作者明确恢复，gate重启复位，重连保持；默认enabled=true
+    enabled: true  # 下次正常启动生效；false关闭此能力，省略仍默认true；临时停言开关；明确停言后本群静默，新仅操作者明确恢复，gate重启复位
   # LAP-27仅free显式开启生效，mentions保留真实@；保存须停机/重启加载
   attention:  # 配置节，子字段见下方；保留既有校验约束
     enabled: false  # free中的叫名/指代与自然续聊开关，mentions不生效
@@ -45,6 +45,8 @@ participation:  # 配置节，子字段见下方；保留既有校验约束
   max_ambient_age_seconds: 90  # 普通候选最大年龄秒
   allow_ambient_web: true  # 普通候选可用联网，还必须开启web；不上传历史
 web:
+  search_enabled: false # Independent search switch; quality gate also required
+  freshness_days: 7 # 1..30; Asia/Shanghai
   extractor: readability  # 本地受管正文提取，可显式legacy回滚
   long_text_policy: excerpt  # 六区节选或reject；完整要求超限直接拒绝  # 配置节，子字段见下方；保留既有校验约束
   selection_policy: coverage  # coverage六区或question当前问题本地相关整段；保存后正常重启生效
@@ -66,7 +68,7 @@ access:  # 配置节，子字段见下方；保留既有校验约束
   allowed_groups:  # 授权群，必填非空正整数列表，不自动加群
   - REQUIRED_TEST_GROUP
   blocked_users: []  # 全群前置屏蔽QQ列表，不进入框架/模型/新增记忆
-  admin_users:  # bot管理员QQ，通常填你自己的QQ，非QQ群管理员；可真实@重置上下文，不豁免授权群/黑名单
+  admin_users:  # 唯一操作者QQ，去重后恰好1项，不能等于bot或blocked，非QQ群管理员；可真实@重置上下文，不豁免授权群/黑名单
   - REQUIRED_ADMIN_QQ
   private_enabled: false  # 私聊固定false，不能手工开启
 onebot:  # 配置节，子字段见下方；保留既有校验约束

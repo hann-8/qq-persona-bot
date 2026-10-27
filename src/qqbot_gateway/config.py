@@ -127,6 +127,8 @@ class GateConfig:
             raise ValueError('Invalid transport health configuration')
         if type(self.silence_enabled) is not bool:raise ValueError('Invalid silence enabled')
         if self.participation_mode not in ('mentions','free'):raise ValueError('Invalid participation mode')
+        if len(self.admin_users)!=1 or self.bot_qq in self.admin_users or self.admin_users & self.blocked_users:
+            raise ValueError('Exactly one independent unblocked owner required')
         if not qq_id(self.bot_qq) or not self.allowed_groups or not self.admin_users:
             raise ValueError('Bot, allowed groups and admins must be nonempty')
         if any(not qq_id(x) for x in self.allowed_groups | self.admin_users | self.blocked_users):
@@ -181,6 +183,8 @@ def normalize_settings(raw):
         access[key] = list(dict.fromkeys(qq_id(v) for v in values))
         if key != 'blocked_users' and not access[key]:
             raise ValueError(f'access.{key} must not be empty')
+    if len(access['admin_users'])!=1 or bot['qq'] in access['admin_users'] or set(access['admin_users']) & set(access['blocked_users']):
+        raise ValueError('Exactly one independent unblocked owner required')
     if access.get('private_enabled') is not False:
         raise ValueError('Private messages must be disabled')
     if onebot.get('host') != '127.0.0.1':

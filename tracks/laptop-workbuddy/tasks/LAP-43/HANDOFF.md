@@ -2,7 +2,19 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线HANDOFF](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [详细规划](PLAN.md) / [medium指令](MEDIUM_START.md)。继承根AGENTS边界；本任务不替代LAP-18/21/27/35/42的历史证据及未验差额。
 
-## 当前状态：规划及main整合完成，等待用户下一阶段指令
+## 当前状态：阶段A隔离实现/离线验证完成，未部署
+
+2026-10-27 19:50 Asia/Shanghai，session `LAP-43-stage-a-implementation` 登记并重读TASKS，按A1→A4完成本阶段。起点main/实时远端 `52866fe10cc654d2e12c5520f7afc5aa8bbe0179`，隔离根 `C:/Users/yutha/.codex/worktrees/lap-43-stage-a/QQbot`，实施分支 `codex/lap-43-stage-a`。生产main/运行实例未改；原识图true未写改或重新加载。只领取43，旧任务差额保留。
+
+已实现：唯一owner配置/控制及公共重置、输入类型分流/空@/直接叫名与短续聊、七图当前根inspect/摘要锁激活helper、搜索独立开关/日期worker/manifest/来源/公共probe、独立当前视觉证据模式与配对事务。实际47单元/74框架通过；隔离实际configure/database/registry检查通过，两后端真实runner底层替身及图片材料链均覆盖。当前persona在CodeBuddy48000组合下33846字节可容纳；Ollama12288示例政策必需输入拒绝，未改预算，不称两者均可容纳。
+
+详见[本阶段实际结果](../../../../reports/lap-43-stage-a-result.md) / [机器报告](../../../../reports/lap-43-vision-offline.json)。本轮0公共probe/真实CLI probe/原生IQ/真实模型/QQ/SSH/启停/激活，不执行旧报告主入口/A4，不复制生产数据作为夹具。当前persona仅进程内预算读取，不输出持久化原文。
+
+后续：本分支Git交付后停止，不合生产main；仅用户选B才做有限公共质量，选C才做停机部署/最终冻结后的当前离线及CLI契约、新授权单次IQ-05/人工反馈/配对active/图库与群ACK。search_enabled缺省false、质量常量false；read继续。旧42记录/常量和全部gateway签名集合保留，不沿用旧active冒充新版本。表情helper只在临时根测试，真实7图pending不动。若选择家庭后端，当前persona/其实际配置预算需要独立明确处理，不能自动提高额度。
+
+归属清单及补登记见TASKS顶部；全部本轮修改以隔离分支diff审阅。验证命令与结果/限制/回滚见实际报告。Git代码检查点和远端核对在交付回执补充，最终tip以实时分支/会话答复为准，不自引用。
+
+## 历史规划交付
 
 2026-10-27 19:01（Asia/Shanghai）登记并重读，session `LAP-43-snow-memes-web-attention-plan`。用户累计五项意图全部纳入：表情、最新消息搜索、空@/free漏答、Snow分支合main、本人唯一控制权。只有Git整合为本轮实际动作，其余仅详规/medium指令，**没有实施或启用新功能**。
 

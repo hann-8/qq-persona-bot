@@ -126,24 +126,56 @@ class Guard:
             if total>4*1024*1024:raise ValueError('PROBE_EVIDENCE_TOO_LARGE')
             target=destination/('plugin' if path.is_relative_to(self.root) else 'receipts')/path.name
             target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(path,target)
+        wire=Path(self.request['wire_path'])
+        if wire.is_file():shutil.copyfile(wire,destination/'native-user.json')
         return str(destination)
 
 
-def probe_valid(root, settings):
+def probe_valid(root, settings,mode=None):
     """A real CLI probe is a separate prerequisite, never an IQ prerequisite of itself."""
     from .vision import binding
     from .vision_capabilities import read_json, runtime_identity
     try:
-        item = read_json(Path(root)/'state/vision-evidence/lap42-cli-probe.json')
+        current=mode=='lap43_current_regression'
+        if mode not in (None,'lap42_first_plus_large_operator_acceptance','lap43_current_regression'):return False
+        if current:
+            from .vision_regression import directory,unknown,authorized
+            base=directory(root,binding(settings,runtime_identity(Path(root),settings)))
+            if unknown(root) or not authorized(root,base.name):return False
+        else:base=Path(root)/'state/lap42-vision-closure'
+        item = read_json(base/'probe.json' if current else Path(root)/'state/vision-evidence/lap42-cli-probe.json')
         import re
         name=item.get('journal','')
         if not isinstance(name,str) or not re.fullmatch('probe-[a-f0-9]{32}\\.json',name):return False
-        journal=Path(root)/'state/lap42-vision-closure'/name
+        journal=base/name
         rows=read_json(journal)
         if sha(journal.read_bytes())!=item.get('journal_sha256') or not isinstance(rows,list) or len(rows)!=3:return False
         if ([r.get('fault') for r in rows]!=[None,'missing_plugin','wrong_receipt'] or
             any(r.get('state')!='verified' for r in rows) or
             [r.get('users') for r in rows]!=[1,0,0]):return False
+        if current:
+            raw=rows[0].get('probe_evidence','')
+            if not isinstance(raw,str):return False
+            raw=Path(raw)
+            if not raw.resolve().is_relative_to(base.resolve()):return False
+            manifest=raw/'plugin/plugin.json'
+            request=json.loads(read_json(manifest)['options']['request'])
+            from .backends import resolve_backend
+            profile=resolve_backend(settings)
+            if request.get('model')!=profile['model'] or request.get('effort')!=profile['reasoning_effort'] or request.get('mode')!='probe':return False
+            for n,h in request['assets'].items():
+                if sha((raw/'plugin'/Path(n).name).read_bytes())!=h:return False
+            receipt=read_json(raw/'receipts/receipt.json')
+            canonical=json.dumps(request,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()
+            if receipt.get('request_sha256')!=sha(canonical):return False
+            if any(receipt.get(k)!=request[k] for k in ('nonce','system_sha256','system_bytes','assets_sha256','model','effort','mode')):return False
+            if sha((raw/'native-user.json').read_bytes())!=request['wire_sha256']:return False
+            phases=[read_json(p) for p in (raw/'receipts').glob('phase-*.json')]
+            if any(p.get('nonce')!=request['nonce'] for p in phases):return False
+            stages={p.get('stage') for p in phases}
+            if 'next' in stages or not {'composed','context_cleared','probe_short_circuit'}<=stages:return False
+            if not any(p.get('transcript_verified') is True for p in phases):return False
+            if rows[0].get('protocol_events') is None:return False
         proof=rows[0]['result']['guard']
         if (proof.get('mode')!='probe' or proof.get('next_calls')!=0 or proof.get('transcript_verified') is not True or
             not {'ready','composed','context_cleared','probe_short_circuit'}.issubset(proof.get('stages',[])) or

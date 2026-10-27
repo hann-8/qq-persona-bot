@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "mode": "lap43_current_regression",
+  "native_source_review": "reports/lap-42-vision-closure-sources.json",
+  "native_source_review_sha256": "7c24fa759b061c28e2dfc07e0a5d4195a10eaecdec18c5c190effa8119e4e640",
+  "scope": "Existing hosted native review retained; new code owns independent mode dispatch, attempt, authorization and human review. Public search quality remains unverified."
+}

@@ -1,4 +1,5 @@
 import argparse
+from datetime import datetime,timezone
 import asyncio
 import json
 import logging
@@ -388,6 +389,7 @@ class OneBotGate:
                 if frame.type == aiohttp.WSMsgType.BINARY:
                     await downstream.close(code=1003, message=b'TEXT_JSON_REQUIRED')
                 break
+            received_at=datetime.now(timezone.utc).isoformat()
             try:
                 event = json.loads(frame.data)
             except (ValueError,UnicodeError,RecursionError):
@@ -401,14 +403,19 @@ class OneBotGate:
                 if self.store.reserve(event):
                     output_ticket=None
                     if self.config.silence_enabled:
-                        from .group_silence import silence_request,real_at
+                        from .group_silence import silence_request,resume_request,real_at
                         group=str(event['group_id'])
                         async with self.silence.locks[group]:
                             if self.snow() and not self.channel_ready():continue
                             mention=real_at(event,self.config.bot_qq)
                             text=''.join(p['data'].get('text','') for p in event['message'] if p['type']=='text' and isinstance(p['data'].get('text'),str))
                             stop=silence_request(text,self.config.silence_aliases,mention,self.config_message_limit)
-                            changed=self.silence.control(group,stop,mention)
+                            pure=all(p['type'] in ('text','at') for p in event['message'])
+                            stop=stop and pure
+                            resume=pure and resume_request(text,self.config.silence_aliases,mention,self.config_message_limit)
+                            authorized=str(event['user_id']) in self.config.admin_users
+                            changed=self.silence.control(group,stop and authorized,resume and authorized)
+                            if stop or resume:LOG.info('CONTROL trace=%s authorized=%s action=%s result=%s',secrets.token_hex(8),authorized,'pause' if stop else 'resume','changed' if changed else 'unchanged')
                             if changed:
                                 for cap,row in list(self.materials.entries.items()):
                                     if row['identity'][1]==group:self.materials.expire(cap)
@@ -419,22 +426,15 @@ class OneBotGate:
                                 for key in list(self.members.events):
                                     if key[1]==group:self.members.events.pop(key,None)
                                 self.publish_connection()
-                            if stop or not self.silence.normal(group):continue
+                            if stop or resume or not self.silence.normal(group):continue
                             if not admitted_message(event,self.config):continue
                             output_ticket=self.silence.issue(event,self.connection_id)
                     if self.snow() and not output_ticket:output_ticket=self.silence.issue(event,self.connection_id)
                     if self.config.ingress_diagnostics:
                         from .vision_ingress import inspect_event,encode
                         LOG.info(encode(inspect_event(event)))
-                    if (not self.snow() and not self.config.silence_enabled and self.config.participation_mode=='mentions' and not self.config.vision_enabled and not self.config.members_enabled and
-                        all(s['type'] in ('text','at') for s in event['message']) and
-                        not any(k.startswith('qqbot_') for k in event)):
-                        # Unchanged legacy text-only frame. Attachments and
-                        # embedded replies always take the stripping path below.
-                        await upstream.send_str(frame.data)
-                        continue
                     # Never let adapter quote expansion fetch or expose embedded bodies.
-                    safe=[];reference=None;media=False
+                    safe=[];reference=None;media=False;media_kinds=[]
                     for segment in event['message']:
                         if not isinstance(segment,dict):continue
                         kind=segment.get('type');data=segment.get('data',{})
@@ -442,18 +442,22 @@ class OneBotGate:
                         if kind=='text' and isinstance(data.get('text'),str):safe.append({'type':'text','data':{'text':data['text']}})
                         elif kind=='at' and qq_id(data.get('qq'))==self.config.bot_qq:safe.append({'type':'at','data':{'qq':self.config.bot_qq}})
                         elif kind=='reply':reference=str(data.get('id',''))[:128]
-                        elif kind!='at':media=True;safe.append({'type':'text','data':{'text':'[非文本未解析]'}})
-                    at_ids=[qq_id(s['data'].get('qq')) or 'other_member' for s in event['message'] if s['type']=='at'][:8] if self.config.attention_enabled else []
+                        elif kind!='at':
+                            media=True
+                            mapped={'image':'image','record':'audio','audio':'audio','video':'video','file':'file','forward':'forward'}.get(kind,'unknown')
+                            if mapped not in media_kinds:media_kinds.append(mapped)
+                    at_ids=[qq_id(s['data'].get('qq')) or 'other_member' for s in event['message'] if s['type']=='at'][:8]
                     member_cap=self.members.issue(event,self.connection_id) if self.config.members_enabled else None
                     image=self.materials.issue(event,self.connection_id) if self.config.vision_enabled else None
                     image_text=''.join(s['data'].get('text','') for s in event['message'] if s['type']=='text' and isinstance(s['data'].get('text'),str))
                     event={k:v for k,v in event.items() if k in ('post_type','message_type','sub_type','self_id','group_id','user_id','message_id','time','font','sender')}
                     event=dict(event,message=safe,raw_message='',qqbot_reference=reference,qqbot_media=media,
-                               qqbot_connection=self.connection_id)
+                               qqbot_connection=self.connection_id,qqbot_text=image_text,
+                               qqbot_has_direct_text=bool(image_text.strip()),qqbot_requested_at=received_at,qqbot_media_kinds=media_kinds[:6])
                     if output_ticket:event['qqbot_output_ticket']=output_ticket
                     if member_cap:event['qqbot_member_cap']=member_cap
                     if image:event['qqbot_image']=image;event['qqbot_text']=image_text
-                    if self.config.attention_enabled:event['qqbot_at_ids']=at_ids
+                    event['qqbot_at_ids']=at_ids
                     if not self.snow() or self.channel_ready():await upstream.send_json(event)
             elif (event.get('post_type')=='notice' and event.get('notice_type') in ('group_increase','group_decrease') and
                   qq_id(event.get('self_id'))==self.config.bot_qq and qq_id(event.get('group_id')) in self.config.allowed_groups):

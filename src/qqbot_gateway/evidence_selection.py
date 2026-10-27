@@ -127,6 +127,10 @@ def manifest(sources):
     for row in sources:
         item=dict(url=row['url'],coverage=row['coverage'],ranges=row['ranges'],input_bytes=row['input_bytes'],
                   selected_bytes=row['selected_bytes'],sha256=hashlib.sha256(row['text'].encode()).hexdigest())
+        if row.get('freshness'):
+            from .web_freshness import validate_facts
+            item['freshness']=validate_facts(row['freshness'])
+            item['freshness_sha256']=hashlib.sha256(encoded(item['freshness'])).hexdigest()
         if row.get('status')=='subtitle':
             item['subtitle']={k:row[k] for k in ('bvid','cid','page','language','subtitle_type','duration','time_ranges','time_gaps','time_coverage')}
         result.append(item)
@@ -137,7 +141,13 @@ def validate_manifest(rows,source):
     from .public_network import page_url
     if not source.get('web_anchor') or not isinstance(rows,list) or not 1<=len(rows)<=2:raise ValueError('web manifest')
     for row in rows:
-        if not isinstance(row,dict) or set(row)-{'subtitle'}!={'url','coverage','ranges','input_bytes','selected_bytes','sha256'}:raise ValueError('web fields')
+        if not isinstance(row,dict) or set(row)-{'subtitle','freshness','freshness_sha256'}!={'url','coverage','ranges','input_bytes','selected_bytes','sha256'}:raise ValueError('web fields')
+        if ('freshness' in row)!=('freshness_sha256' in row):raise ValueError('web freshness pairing')
+        if 'freshness' in row:
+            import hashlib
+            from .web_freshness import validate_facts
+            validate_facts(row['freshness'])
+            if row['freshness_sha256']!=hashlib.sha256(encoded(row['freshness'])).hexdigest():raise ValueError('web freshness hash')
         if not isinstance(row['url'],str):raise ValueError('web url')
         try:
             if '/video/' in row['url'] and row['url'].startswith('https://www.bilibili.com/'):
