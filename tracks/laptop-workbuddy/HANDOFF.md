@@ -1,10 +1,14 @@
 # QQ主线交接：SnowLuma与共用bot业务
 
+## 当前任务：LAP-43规划与main整合
+
+2026-10-27 session `LAP-43-snow-memes-web-attention-plan`已登记重读7份文档归属，完成[详细规划](tasks/LAP-43/PLAN.md)和[分阶段medium指令](tasks/LAP-43/MEDIUM_START.md)：表情激活、时效搜索、空@/free漏答、唯一操作者控制；另按用户明确授权整合已有Snow分支到main。文档/Git最终检查与实际合并见[43 HANDOFF](tasks/LAP-43/HANDOFF.md)。只读确认active缺失/7条pending与资产有效、搜索false、当前单admin为用户本人；旧停言仍可被普通成员控制，新owner-only尚未实施。不改代码/local/persona或运行状态，旧任务差额保留，交付后停止。
+
 ## 2026-10-26 识图已启用并完成用户指定的缩减验收
 
 识图已保存并运行加载为true，用户已确认真实授权群中收到正确识图回复，原事件任务completed、投递sent且有消息ACK。按用户决定只完成IQ-01和1000×1000大图IQ-05，两张真实理解均获人工通过；其余四例豁免，旧六例账本与首张评分记录异常保留，不称六例全通过。104单元/39框架、当前真实CLI零生成契约通过。双图片/成员凭证兼容已修；随后用户明确允许提高输入预算，仅将所选CodeBuddy文字政策30000→48000字节，overhead/output各2048、视觉reserve4096、模型/low/free/账号不变。15项保护中仅features与models的这两个授权标量改变，人设/图库/21 pending等保持。详见本轮closure-result；不续其他验收。
 
-## 当前状态
+## 历史阶段摘要（不覆盖顶部最新结论）
 
 **LAP-42真实CLI接线与当前零生成契约检查已通过，代码冻结，开始固定六例人工审阅。** 用户明确追加授权本机总上限7次（既有意外1+固定六例6），群图仍最多2。新规则/视图/回执问题已修，97单元/39框架通过；当前实际正向1本地user/0 next、缺插件与错回执均0 user，无新增远端生成。双上下文纯函数、仅视觉子进程关闭CLI rules注入，原system/项目材料保留；API文字视图不冒充图片视图，原生帧由子进程与父进程分别校验。回执置于插件目录之外并按阶段独立留证。现有真实耗次1、IQ待逐例、vision=false，尚未激活/群图。实际结果与当前私有frozen-before-iq绑定见[报告](../../reports/lap-42-vision-closure-result.md)。
 
@@ -20,7 +24,7 @@ LAP-41已完成新根整理：uv报告清除38,269缓存文件约626.1MiB、5份
 
 ## 当前需要读的文件
 
-- 当前：[42 HANDOFF](tasks/LAP-42/HANDOFF.md) → [闭环详规](tasks/LAP-42/VISION_CLOSURE_PLAN.md) / [输入合同](tasks/LAP-42/CLI_PROMPT_CONTRACT.md) / [本次medium指令](tasks/LAP-42/VISION_CLOSURE_MEDIUM_START.md)，再读使用对照；旧42整合及VISION_MEDIUM_START仅历史，不重跑接入、首试或已加载功能。
+- 当前：[43 HANDOFF](tasks/LAP-43/HANDOFF.md) → [详规](tasks/LAP-43/PLAN.md) / [medium指令](tasks/LAP-43/MEDIUM_START.md)，只执行用户后续选中的阶段。42识图当前事实见[最终结果](../../reports/lap-42-vision-closure-result.md)，旧42各启动指令均为历史，不重跑接入、首试、六例或已加载功能。
 - 上轮：[21实际数据准备](tasks/LAP-21/SNOW_MIGRATION_RESULT.md)保留；active未激活/真实未验不阻塞42，42不动其pending。
 - 日常使用：[SnowLuma使用说明](../../SnowLuma使用说明.md)。
 - 旧NapCat用户：[实际bot使用对照](../../docs/BOT_USAGE_COMPARISON.md)。
@@ -38,7 +42,7 @@ NapCat旧根和旧C根不修改/启停；保留本根仍被导入的NapCat兼容
 
 ## 后续排序与含义
 
-上轮42记忆/关注/成员及字幕退役已实际交付，本轮后续排序：先42当前DeepSeek视觉外层预算/原生质量/群闭环；再独立续21激活既有7图/7条pending；最后少量人工验证已开记忆/关注/成员的真实效果。只展开第一项，其余未领取，不作视觉前置。识图支持由用户确认且本轮有官方来源，保持当前CLI/模型/low/账号/额度，网页读取和搜索质量差额保留。
+42缩减识图验收已交付，不再按旧排序重跑。当前由43统一后续表情/搜索/输入/权限合同；推荐先隔离代码/离线交付，再有限公共搜索批次，最后用户选定时做配对运行事务。也可只选43指令D先激活既有7图；所有阶段均等用户明确后续指令，不自动展开。保持当前CLI/模型/low/账号/额度，记忆/成员真实差额和网页搜索质量差额保留。
 
 成员是小群名册候选/受控@，42已补官方只读强刷来源并保留1..49/双TTL/8项768字节/单cap/最多1受控@；缺来源、人数无效/大群只暂停增强。关注是free叫名/引用/短续聊，已加载，无新消息不主动发言。字幕专用网络/认证服务及vendor已删除，纯材料schema/选择函数和旧报告保留；旧专用报告脚本不适用于当前退役版本，不重跑。真实效果按42报告逐项保留，不能用开关/代码替代群验收。
 

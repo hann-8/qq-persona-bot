@@ -1,5 +1,11 @@
 # QQ bot项目入口：SnowLuma主线
 
+## 当前任务：LAP-43详规与主线整合
+
+2026-10-27，LAP-43详细规划与分阶段medium指令已落盘，包含表情激活、时效搜索、空@/free漏答及唯一操作者控制；用户另明确授权将已有Snow分支合并main。session/时间/7份文档归属已先登记重读，本轮仅文档与Git整合，不实施功能、不改local/persona/图库/pending，不启停/模型/QQ。当前进入文档检查与Git交付，实际合并结果见[43交接](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)；[详规](tracks/laptop-workbuddy/tasks/LAP-43/PLAN.md) / [medium指令](tracks/laptop-workbuddy/tasks/LAP-43/MEDIUM_START.md)。交付后停止，后续仅按用户选中的阶段推进。
+
+当前只读核实：7张表情资产/7条pending有效，active未激活；搜索代码质量门槛false；保存的free/attention/web/vision等开关为true。唯一admin已与用户本人一致，但旧停言入口仍允许普通成员控制、任意真实@恢复，owner-only是本次规划合同，**尚未实施**。真实号码仅留本机忽略配置。
+
 ## 2026-10-26 识图已启用并完成用户指定的缩减验收
 
 识图已保存并运行加载为true，用户已确认真实授权群中收到正确识图回复，原事件任务completed、投递sent且有消息ACK。按用户决定只完成IQ-01和1000×1000大图IQ-05，两张真实理解均获人工通过；其余四例豁免，旧六例账本与首张评分记录异常保留，不称六例全通过。104单元/39框架、当前真实CLI零生成契约通过。双图片/成员凭证兼容已修；随后用户明确允许提高输入预算，仅将所选CodeBuddy文字政策30000→48000字节，overhead/output各2048、视觉reserve4096、模型/low/free/账号不变。15项保护中仅features与models的这两个授权标量改变，人设/图库/21 pending等保持。详见本轮closure-result；不续其他验收。
@@ -12,7 +18,7 @@ LAP-41工作区整理与使用对照已完成：uv报告清除38,269个缓存文
 
 **LAP-42已实际实施并加载可用部分**：[实际报告](reports/lap-42-2026-10-25.md) / [交接](tracks/laptop-workbuddy/tasks/LAP-42/HANDOFF.md)。长期群记忆读取/学习、关注、成员与受控@已保存并加载；B站字幕运行服务/入口已退役，普通web保留。164项定向单元、19项AstrBot原事件组合回环通过。新根独立记忆key/context token已初始化，人设/图库/21 pending未变，CodeBuddy/DeepSeek/low/free及原预算保留。
 
-上轮用户配合的追加单图采样已真实下载并解码JPEG（1260×709→1024×576），该样本0模型/0bot输出；首窗口超时保留，不抹失败。当前CLI原生图片封套与四种格式像素hash已用实际runner底层替身验证；模型支持由用户确认，但视觉token/模板上界与组合原生容量未获证，六例IQ/群图片生成未执行，vision仍false。记忆持久学习、成员/受控@群内真实效果与客户端显示均未据加载晋升通过。最终OneBot就绪；本轮实施期间旧实例有4次可见自然CLI尝试，不能称全程0调用。只完成42，不续其他任务。
+以下42阶段记录为历史，已被顶部2026-10-26识图缩减验收结论覆盖的状态不能当作当前。上轮追加单图采样真实下载并解码JPEG（1260×709→1024×576），该样本0模型/0bot输出，首窗口超时保留；当时CLI原生图片封套/像素hash仅替身验证、vision=false、IQ/群图未执行。记忆/成员真实效果仍不能据加载晋升通过，实施期间自然CLI尝试单列。完整差额见42结果，不重跑旧阶段。
 
 上轮LAP-21[实际数据准备](tracks/laptop-workbuddy/tasks/LAP-21/SNOW_MIGRATION_RESULT.md)已交付：7图复制、7条暂存，运行中未激活/加载/真实验收。用户说图片完成，不据此扩写为图片ACK/客户端显示已通过；42不复做图库、不动21 pending，也不拿该尾项作前置。
 
@@ -23,7 +29,7 @@ LAP-41工作区整理与使用对照已完成：uv报告清除38,269个缓存文
 ## 从哪里继续
 
 1. 使用bot：[日常操作](SnowLuma使用说明.md) / [与旧NapCat bot的使用对照](docs/BOT_USAGE_COMPARISON.md)。
-2. 项目接续：本文件 → [AGENTS](AGENTS.md) → [QQ主线HANDOFF](tracks/laptop-workbuddy/HANDOFF.md)和[TASKS](tracks/laptop-workbuddy/TASKS.md) → [LAP-42交接](tracks/laptop-workbuddy/tasks/LAP-42/HANDOFF.md)、[闭环详规](tracks/laptop-workbuddy/tasks/LAP-42/VISION_CLOSURE_PLAN.md)、[输入合同](tracks/laptop-workbuddy/tasks/LAP-42/CLI_PROMPT_CONTRACT.md)、[本次medium指令](tracks/laptop-workbuddy/tasks/LAP-42/VISION_CLOSURE_MEDIUM_START.md) → [使用对照](docs/BOT_USAGE_COMPARISON.md)。旧42整合及VISION_MEDIUM_START均为历史，不整轮再跑；原功能合同只按具体接点补读，表情上轮结果见[LAP-21](tracks/laptop-workbuddy/tasks/LAP-21/SNOW_MIGRATION_RESULT.md)。
+2. 项目接续：本文件 → [AGENTS](AGENTS.md) → [QQ主线HANDOFF](tracks/laptop-workbuddy/HANDOFF.md)和[TASKS](tracks/laptop-workbuddy/TASKS.md) → [LAP-43交接](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)、[详规](tracks/laptop-workbuddy/tasks/LAP-43/PLAN.md)、[当前medium指令](tracks/laptop-workbuddy/tasks/LAP-43/MEDIUM_START.md)。43交付后等待用户明确选择阶段，不自动实施；旧42指令只作历史，不重复六例/接入/首试。识图已验事实见[42最终结果](reports/lap-42-vision-closure-result.md)，表情旧证据见[21结果](tracks/laptop-workbuddy/tasks/LAP-21/SNOW_MIGRATION_RESULT.md)。
 3. 故障找文件：[目录与日志](项目目录与日志说明.md)。只按实际问题检索，不从历史清单自动展开新任务。
 
 ## 路线和边界
@@ -41,7 +47,7 @@ LAP-41工作区整理与使用对照已完成：uv报告清除38,269个缓存文
 
 | 工作线 | 状态/最新依据 | 接续入口 |
 | --- | --- | --- |
-| QQ主线：SnowLuma及共用bot业务 | 视觉按用户缩减验收通过并已启用，运行文字政策48000；旧差额保留，不自动推进 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [LAP-42](tracks/laptop-workbuddy/tasks/LAP-42/HANDOFF.md) |
+| QQ主线：SnowLuma及共用bot业务 | LAP-43四项功能/权限详规已落盘，Git主线整合检查中；识图既有缩减验收/48000保留，不自动实施 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [LAP-43](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md) |
 | 家庭5070备用模型路线 | 历史记录为接入已实现/离线及元数据通过、真实生成未验；本轮未重查，不自动切换后端 | [HANDOFF](tracks/local-5070/HANDOFF.md) / [既有选型](tracks/local-5070/MODEL_SELECTION.md) |
 
 `tracks/laptop-workbuddy` 是保留的历史目录名，当前承担QQ主线和共用网关交接，不表示仍以NapCat或WorkBuddy界面为主路线。所有旧任务的状态/验收差额在TASKS与各任务HANDOFF保留，不重命名整棵目录。
@@ -50,7 +56,7 @@ LAP-41工作区整理与使用对照已完成：uv报告清除38,269个缓存文
 
 LAP-41历史比较共同使用deepseek-v4.1-flash/low、free、adaptive最多3条、16轮历史，persona内容相同。上轮LAP-21配置/persona保护摘要不变；memes=true、冷却0/0保持，目标7图/7条pending已准备。42只读确认active仍不存在、pending存在，未查当前运行态。详见[实际迁移结果](tracks/laptop-workbuddy/tasks/LAP-21/SNOW_MIGRATION_RESULT.md)；保存数据不等于加载/真实通过。
 
-网页材料读取保持开启，搜索质量门槛仍未通过。42后记忆/学习/关注开启，成员/受控@仅已审阅官方Snow强刷来源、1..49人及双TTL有效时增强；NapCat/未知版本继续暂停，大群/失败保留普通文字。B站字幕已退役，旧false节兼容且未改本机原字节，true拒绝恢复服务。视觉仍关闭；真实入站成功不等于模型理解/群ACK成功。旧差额保留，不把资格/proof/probe/长稳变成前置；微信不推进。
+网页材料读取保存为开启，搜索质量门槛仍未通过。42后记忆/学习/关注开启，成员/受控@仅已审阅官方Snow强刷来源、1..49人及双TTL有效时增强；NapCat/未知版本继续暂停，大群/失败保留普通文字。B站字幕已退役，旧false节兼容、true拒绝恢复服务。视觉已按顶部2026-10-26缩减验收启用；本轮未查进程或重做真实验收。未来源码/配置会影响视觉binding，必须按43配对验证后部署。旧差额保留，不加资格/长稳前置；微信不推进。
 
 ## 历史与检查点
 
