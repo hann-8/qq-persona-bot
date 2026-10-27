@@ -2,11 +2,11 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线HANDOFF](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [详细规划](PLAN.md) / [medium指令](MEDIUM_START.md)。继承根AGENTS边界；本任务不替代LAP-18/21/27/35/42的历史证据及未验差额。
 
-## 当前状态：规划完成，Git整合待执行
+## 当前状态：规划及main整合完成，等待用户下一阶段指令
 
 2026-10-27 19:01（Asia/Shanghai）登记并重读，session `LAP-43-snow-memes-web-attention-plan`。用户累计五项意图全部纳入：表情、最新消息搜索、空@/free漏答、Snow分支合main、本人唯一控制权。只有Git整合为本轮实际动作，其余仅详规/medium指令，**没有实施或启用新功能**。
 
-19:24检查点：PLAN和分阶段medium指令已完成；7份文档初检通过，17项保护与起点相同。实时远端main/Snow仍等于下面的起点，无未知修改。接下来仅精确暂存/commit/push、main快进整合和实际回执同步，不执行medium模板。
+19:27检查点：PLAN和分阶段medium指令已交付，规划提交已快进main并在两条远端核对一致，本根已切main、切换文件树无变化。7份文档/232本地链接等检查通过，17项保护与起点相同。当前仅同步Git回执；回执push/远端核对后释放归属并停止，不执行medium模板。
 
 ## 起点和精确文件归属
 
@@ -35,7 +35,7 @@
 - 只读Git：`git status --short --branch`、`git log`、`git branch -vv`、`git worktree list --porcelain`、`git ls-remote --symref origin HEAD`、两分支`ls-remote --heads`及`git rev-list --left-right --count origin/main...HEAD`。19:24远端起点未变。
 - 无I/O的`called` AST独立计算8个自造短句，结果写PLAN，不当作项目测试或线上命中率。
 - Python `-B -X utf8`只读取YAML必要metadata及SHA；7条引用资产hash匹配、base对应空catalog，17项保护无变化。未调用旧迁移helper或项目配置加载/运行管理入口。
-- 7份文档严格UTF-8、229个本地链接、8行围栏、41个唯一任务表ID/无重复、真实号码未写入、`git diff --check`初检通过；本HANDOFF更新后交付前重核实际结果。
+- 7份文档严格UTF-8、最终232个本地链接、8行围栏、41个唯一任务表ID/无重复、真实号码未写入、`git diff --check`与暂存差异/7文件白名单通过。写后重读并按最终回执差异再次核对。
 - 没有运行项目单元/框架测试、公共候选probe、bot状态、启停、安装、登录/扫码、模型/QQ/群/SSH。本session主动模型/消息为0，未读取或统计自然free流量，不宣称运行进程/状态保持已被实测。
 
 ## medium接续及未完成范围
@@ -48,4 +48,8 @@
 
 ## Git交付回执
 
-规划内容即将按7文件白名单提交推送Snow，再快进main。合并后在此写入实际规划提交/主线SHA与核验；最终回执文档自身SHA以main HEAD和会话最终报告为准，不自引用。确认远端后释放本规划session归属并停止，不实施或推进下一项。
+2026-10-27 19:27（Asia/Shanghai）：规划内容提交`2986667cf88c85db39947871941a81a0014acba4`，已推送`origin/codex/lap-40-snowluma`并普通快进`origin/main`。刷新main后`merge-base --is-ancestor`通过，合并前独立提交数0/66（原65+本轮文档1）。无强推/无冲突/未删除原分支。
+
+为避免运行目录临时回到旧代码，先`git push origin HEAD:refs/heads/main`，再无force的`git fetch origin refs/heads/main:refs/heads/main`更新未占用本地main；`git diff --exit-code HEAD refs/heads/main`为0才`git switch main`。本地HEAD/main/Snow和两条实时远端均为上述完整SHA，检查点工作区干净；相对本轮起点只改7份Markdown，业务文件未变。
+
+随后只提交本次归属内的入口/交接回执到main并核对最终远端；原Snow分支保留在已合入的规划提交，main的回执后续提交不代表原分支未合并。最终回执文档自身SHA以main HEAD和会话最终报告为准，不自引用。确认远端后释放本规划session归属并停止，不实施或推进下一项。

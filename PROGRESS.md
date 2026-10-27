@@ -1,8 +1,8 @@
 # QQ bot项目入口：SnowLuma主线
 
-## 当前任务：LAP-43详规与主线整合
+## 当前任务：LAP-43规划已交付，main整合完成
 
-2026-10-27，LAP-43详细规划与分阶段medium指令已落盘，包含表情激活、时效搜索、空@/free漏答及唯一操作者控制；用户另明确授权将已有Snow分支合并main。session/时间/7份文档归属已先登记重读，本轮仅文档与Git整合，不实施功能、不改local/persona/图库/pending，不启停/模型/QQ。当前进入文档检查与Git交付，实际合并结果见[43交接](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)；[详规](tracks/laptop-workbuddy/tasks/LAP-43/PLAN.md) / [medium指令](tracks/laptop-workbuddy/tasks/LAP-43/MEDIUM_START.md)。交付后停止，后续仅按用户选中的阶段推进。
+2026-10-27，LAP-43详细规划与分阶段medium指令已交付，包含表情激活、时效搜索、空@/free漏答及唯一操作者控制。用户明确授权的Snow分支快进main已完成，规划提交`2986667cf88c85db39947871941a81a0014acba4`在两条远端分支核对一致，本根已切main、切换文件树无变化。7份文档登记重读、232本地链接和17项保护检查通过；本轮仅文档与Git，不实施功能、不改local/persona/图库/pending，不启停/模型/QQ。[43交接](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md) / [详规](tracks/laptop-workbuddy/tasks/LAP-43/PLAN.md) / [medium指令](tracks/laptop-workbuddy/tasks/LAP-43/MEDIUM_START.md)。回执交付后停止，后续从main按用户选中的阶段接续。
 
 当前只读核实：7张表情资产/7条pending有效，active未激活；搜索代码质量门槛false；保存的free/attention/web/vision等开关为true。唯一admin已与用户本人一致，但旧停言入口仍允许普通成员控制、任意真实@恢复，owner-only是本次规划合同，**尚未实施**。真实号码仅留本机忽略配置。
 
@@ -47,7 +47,7 @@ LAP-41工作区整理与使用对照已完成：uv报告清除38,269个缓存文
 
 | 工作线 | 状态/最新依据 | 接续入口 |
 | --- | --- | --- |
-| QQ主线：SnowLuma及共用bot业务 | LAP-43四项功能/权限详规已落盘，Git主线整合检查中；识图既有缩减验收/48000保留，不自动实施 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [LAP-43](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md) |
+| QQ主线：SnowLuma及共用bot业务 | main已整合；LAP-43四项功能/权限仅规划已交付，等待用户选择medium阶段；识图既有缩减验收/48000保留 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [LAP-43](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md) |
 | 家庭5070备用模型路线 | 历史记录为接入已实现/离线及元数据通过、真实生成未验；本轮未重查，不自动切换后端 | [HANDOFF](tracks/local-5070/HANDOFF.md) / [既有选型](tracks/local-5070/MODEL_SELECTION.md) |
 
 `tracks/laptop-workbuddy` 是保留的历史目录名，当前承担QQ主线和共用网关交接，不表示仍以NapCat或WorkBuddy界面为主路线。所有旧任务的状态/验收差额在TASKS与各任务HANDOFF保留，不重命名整棵目录。

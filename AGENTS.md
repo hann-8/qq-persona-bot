@@ -15,14 +15,14 @@
 
 ## LAP-40官方接入边界（覆盖冲突旧规划，进度以PROGRESS为准）
 
-- 唯一活动工作根为`E:/CodexWS/QQbot_Snowluma`、分支`codex/lap-40-snowluma`。使用官方原版SnowLuma的现成OneBot连接既有gate/AstrBot/gateway/CodeBuddy CLI；不维护SnowLuma私有分支。优先官方能力及现有组件，只有实际阻断基本使用的问题才做最小适配，默认在项目外部接入层解决。
+- 唯一活动工作根为`E:/CodexWS/QQbot_Snowluma`、主线分支`main`（2026-10-27已快进纳入原`codex/lap-40-snowluma`成果）。使用官方原版SnowLuma的现成OneBot连接既有gate/AstrBot/gateway/CodeBuddy CLI；不维护SnowLuma私有分支。优先官方能力及现有组件，只有实际阻断基本使用的问题才做最小适配，默认在项目外部接入层解决。
 - 首次试用目标仅为能启动、登录、在目标授权群接收并回复文字。其他旧功能按实际需要恢复；极端竞态、自动恢复、性能、72h/7天长稳及完整旧功能验收均不作首次试用前置，未确认的问题不升级为新任务或门槛。
 - 旧私有改造路线整体被用户最新决定取代，停止B/C；A4代码、产物、证据原样保留，记为已实现/合成通过、路线停止采用。不删除、不回滚，不再追加A4复核或测试；旧私有过滤、资格、proof、DROP probe、原生数据范围证明等不再作为官方接入的前置工作。
 - 原接入/桌面入口计划只作已交付合同参考；当前任务及接续指令从PROGRESS进入，不重复执行旧SOL_MEDIUM_START。新功能仍按下节规划→用户选择medium实施；不自动派代理或切模型。原NapCat根/旧C根不修改，真实安装/启停/登录/模型/群操作按用户对应授权范围执行，工作区整理不自动包含这些操作。
 
 ## 2026-10-27主线整合与后续行为合同
 
-- 用户明确SnowLuma就是主线，授权把`codex/lap-40-snowluma`合入远端默认`main`。本轮先交付LAP-43文档，再快进整合及核对远端；完成回执见[43 HANDOFF](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)。合并后后续从main接续，原分支/其他worktree保留，旧文档中的分支名只作历史，不全库替换或操作旧根。
+- 用户明确SnowLuma就是主线，已授权并完成把`codex/lap-40-snowluma`快进合入远端默认`main`、核对远端及本根切换main；完成回执见[43 HANDOFF](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)。后续从main接续，原分支/其他worktree保留，旧文档中的分支名只作历史，不全库替换或操作旧根。
 - [LAP-43](tracks/laptop-workbuddy/tasks/LAP-43/PLAN.md)是表情/搜索/空@与free判定/唯一操作者的后续详细合同；本轮没有实施这些功能。暂停/恢复发言、现有上下文重置等必须仅用户本人真实sender可执行；真实QQ号只放本机忽略的`access.admin_users`，该字段未来合同为去重后恰好1项，不能从群角色、昵称、引用、人设或模型取得权限。当前旧停言逻辑仍允许普通成员控制/任何真实@恢复，不得宣称规划已生效。
 - 真实@必答适用于normal状态；未来owner明确暂停后的muted状态优先，普通@/空@/叫名/媒体/本地错误提示都不能解除或绕过暂停；恢复必须owner明确命令。普通聊天偏好仍按当轮请求处理，不等于持久运维权限。长期记忆删除/导出、配置/模型/账号/额度、启停/群发仍保留本机管理边界，不新增QQ远程shell或运维。
 - 当前识图已按用户两例缩减验收启用；gateway源码和完整配置改变会影响vision binding。后续代码先在隔离分支完成离线验证，生产根保留；新版本配对回归/运行操作须用户选中43对应指令，不能伪改旧证据或静默关掉已有识图。本轮Git主线整合业务文件内容不变，不代表部署。

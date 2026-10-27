@@ -2,7 +2,7 @@
 
 ## 当前任务：LAP-43规划与main整合
 
-2026-10-27 session `LAP-43-snow-memes-web-attention-plan`已登记重读7份文档归属，完成[详细规划](tasks/LAP-43/PLAN.md)和[分阶段medium指令](tasks/LAP-43/MEDIUM_START.md)：表情激活、时效搜索、空@/free漏答、唯一操作者控制；另按用户明确授权整合已有Snow分支到main。文档/Git最终检查与实际合并见[43 HANDOFF](tasks/LAP-43/HANDOFF.md)。只读确认active缺失/7条pending与资产有效、搜索false、当前单admin为用户本人；旧停言仍可被普通成员控制，新owner-only尚未实施。不改代码/local/persona或运行状态，旧任务差额保留，交付后停止。
+2026-10-27 session `LAP-43-snow-memes-web-attention-plan`完成[详细规划](tasks/LAP-43/PLAN.md)和[分阶段medium指令](tasks/LAP-43/MEDIUM_START.md)：表情激活、时效搜索、空@/free漏答、唯一操作者控制；并按用户明确授权把已有Snow分支快进main，本根已切main，切换业务文件树未变。规划提交`2986667cf88c85db39947871941a81a0014acba4`已在两条远端核对一致；实际检查/回执见[43 HANDOFF](tasks/LAP-43/HANDOFF.md)。7文档/232链接/17保护通过；active缺失/7条pending有效、搜索false、当前单admin为用户本人。新owner-only及其他改进尚未实施，不改代码/local/persona或运行状态，旧任务差额保留；回执Git核对后释放规划归属并停止，后续从main等待用户选择阶段。
 
 ## 2026-10-26 识图已启用并完成用户指定的缩减验收
 
