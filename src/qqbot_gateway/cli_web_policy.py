@@ -43,3 +43,22 @@ from contextvars import ContextVar
 SCOPE=ContextVar('native_web_scope',default=(True,''))
 PROOF_FILES=('scripts/revalidate_lap43_native_web.py','tests/test_cli_native_web.py',
              'tests/test_lap43.py','tests/test_vision_mod_guard.py','reports/lap-42-vision-closure-sources.json')
+
+
+def anchor_candidate(question,web):
+    if web.get('engine')=='codebuddy_cli':return bool(question)
+    from .web_policy import intent
+    return intent(question,web).kind!='none'
+
+
+def current_question(prompt):
+    import json
+    try:
+        value=json.loads(prompt)[-1]['content']
+        try:
+            body=json.loads(value)
+            if isinstance(body,dict):
+                return next((r['text'] for r in body.get('messages',[]) if r.get('seq')==body.get('target_seq')),body.get('web_anchor') or '')
+        except (ValueError,TypeError):pass
+        return value if isinstance(value,str) else ''
+    except (ValueError,KeyError,TypeError,IndexError):return ''

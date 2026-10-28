@@ -496,8 +496,8 @@ class QQRouter(Star):
                 self.prepare_memory(event,source,{ref:str(event.get_sender_id())},
                     {1:(str(event.get_sender_id()),str(event.message_obj.message_id),time.time())},digest(key))
                 if image:attach_image(source,image)
-                from qqbot_gateway.web_policy import intent
-                if intent(prompt,self.web).kind!='none':source['web_anchor']=prompt
+                from qqbot_gateway.cli_web_policy import anchor_candidate
+                if anchor_candidate(prompt,self.web):source['web_anchor']=prompt
                 request=dict(version=2,kind='member_turn',mode='mentions',request_key=digest(key),epoch=self.group_turns.group_epoch(str(event.get_group_id())),
                     config_version=digest(self.persona_id),source_digest=sha(source),addressing='mention',must_reply=True,target_seq=1,resource_caps=[image['cap']] if image else [])
                 member_cap=raw.get('qqbot_member_cap') if isinstance(raw,dict) and self.members['enabled'] else None
@@ -636,9 +636,9 @@ class QQRouter(Star):
             target=next(r for r in source['messages'] if r['seq']==source['target_seq'])
             state=self.group_turns.state(group)
             eligible=[target] if direct else [r for r in source['messages'] if r['seq'] in source['eligible_seq'] and r['seq']>state.web_evaluated_seq]
-            from qqbot_gateway.web_policy import intent
+            from qqbot_gateway.cli_web_policy import anchor_candidate
             if direct or self.participation['allow_ambient_web']:
-                source['web_anchor']=next((r['text'] for r in reversed(eligible) if intent(r['text'],self.web).kind!='none'),None)
+                source['web_anchor']=next((r['text'] for r in reversed(eligible) if anchor_candidate(r['text'],self.web)),None)
             source['meme_question']=target['text']
             rows={r['seq']:r for r in self.group_turns.window(group).rows}
             now=time.time();mono=time.monotonic()
@@ -770,13 +770,13 @@ class QQRouter(Star):
             snapshot=self.group_turns.snapshot(group)
             if mention and not any(r['seq']==target_seq for r in snapshot):
                 await self.local_notice(event,'这条问题已超过当前上下文窗口，请再问一次。');return
-            from qqbot_gateway.web_policy import intent
+            from qqbot_gateway.cli_web_policy import anchor_candidate
             w=self.group_turns.window(group)
             eligible=[r for r in snapshot if r['speaker']!='bot' and
                       (r['seq']==target_seq if mention else r['seq']>w.evaluated_seq)]
             anchor=None
             if mention or self.participation['allow_ambient_web']:
-                anchor=next((r['text'] for r in reversed(eligible) if '[非文本未解析]' not in r['text'] and intent(r['text'],self.web).kind!='none'),None)
+                anchor=next((r['text'] for r in reversed(eligible) if '[非文本未解析]' not in r['text'] and anchor_candidate(r['text'],self.web)),None)
             w.evaluated_seq=w.seq
             from qqbot_gateway.turn_budget import fit_snapshot,candidate_instruction
             suffix=candidate_instruction([]) if self.memes.cfg['enabled'] else ''

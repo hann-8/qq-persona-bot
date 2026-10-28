@@ -82,6 +82,15 @@ class NativeTests(unittest.TestCase):
             with self.assertRaises(ValueError):validate_web({key:value})
         self.assertEqual(native_contract(cfg,(),InputBudget(),'不要联网')['allowed_tools'],[])
 
+    def test_native_weather_anchor_does_not_call_python_intent(self):
+        from unittest.mock import patch
+        from qqbot_gateway.cli_web_policy import anchor_candidate,current_question
+        with patch('qqbot_gateway.web_policy.intent',side_effect=AssertionError('legacy intent')):
+            self.assertTrue(anchor_candidate('明天杭州下雨吗',dict(engine='codebuddy_cli')))
+            self.assertTrue(anchor_candidate('你好',dict(engine='codebuddy_cli')))
+        prompt=json.dumps([dict(role='user',content=json.dumps(dict(target_seq=2,messages=[dict(seq=1,text='old'),dict(seq=2,text='不要联网')])) )])
+        self.assertEqual(current_question(prompt),'不要联网')
+
     def test_public_urls(self):
         for url in ('file:///x','http://127.0.0.1','http://localhost/x','http://169.254.169.254','https://x.local','http://[::1]','https://user:pass@example.com'):
             self.assertFalse(public_url(url),url)

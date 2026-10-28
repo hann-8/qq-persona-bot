@@ -1,3 +1,5 @@
+2026-10-29 补充归属plugins/qq_router/main.py：原生模式的当前消息anchor须绕开旧intent关键词判断；天气等普通问法由CLI决策，仍保留ambient权限及本轮target绑定。
+
 2026-10-29 补充归属src/qqbot_gateway/{backends,evidence_selection}.py：统一生产/零生成探针的原生工具接线，以及原生来源manifest验证；用户追加memory，已只读确认enabled/learning_enabled均true，本轮保持并在health展示加载值。
 
 2026-10-29 本session补充精确归属：config/vision-capabilities.json（当前完整guard策略登记，不改旧报告/active）；scripts/probe_lap42_vision_contract.py（新native私有路径）；tests/test_cli_runner.py（思考关闭预期）。
