@@ -1,3 +1,7 @@
+2026-10-28 LAP-43阶段B完成：2026-10-28：LAP-43阶段B唯一冻结公共批次完成，质量未过：一般正文0/3、时效正文/日期0/3；3搜索+4页面入口，7 HTTP尝试/0重定向/0DoH/7系统解析，4提取失败，零重试。日期合同修复和25项定向离线通过，质量门槛false、本机search_enabled未保存true。生产main仍52866fe1、未部署/启停/模型/QQ/SSH，不推进C；独立owner/输入/表情可将来单独选中部署。[B实际报告](../../reports/lap-43-stage-b-result.md)。
+
+2026-10-28T18:42:46.186049+08:00：session `LAP-43-stage-b-public-quality`，领取43阶段B。隔离根 `C:/Users/yutha/.codex/worktrees/lap-43-stage-a/QQbot`，分支codex/lap-43-stage-a，起点/实时远端17d44dc6a3cab81016bda16dcd91920dfe4b5087；生产main仍52866fe10cc654d2e12c5520f7afc5aa8bbe0179，初始干净。精确归属：PROGRESS.md、tracks/laptop-workbuddy/HANDOFF.md、TASKS.md、tasks/LAP-43/HANDOFF.md；scripts/probe_lap43_search.py、src/qqbot_gateway/web_freshness.py、tests/test_web_freshness.py、新tests/test_lap43_search_probe.py、reports/lap-43-stage-b-{manifest.json,public.json,result.md}。独占一次冻结公共批次3搜索/最多6页面入口，重定向/DoH/失败分计，15秒/零重试；仅probe绕过质量门槛，生产false。只读features网络字段确认无覆盖，沿system/null；不改生产main/local/persona/数据/运行，无模型/QQ/SSH/登录/启停/部署，不推进C。先登记重读，后修复/冻结/执行/交付并释放。
+
 2026-10-28（Asia/Shanghai，用户继续）：LAP-43-stage-a-implementation原session收尾；只续原归属3份换行/配对报告修复及PROGRESS、工作线HANDOFF/TASKS、43 HANDOFF、阶段A结果Git回执。不推进B/C/D，不改生产。47单元/74框架为2026-10-27最后实际运行结果，本次只读确认当前签名匹配、旧报告拒绝及实时main仍52866fe1；写后重读再同步交接。
 
 2026-10-27 阶段A归属补充：config/examples/chat.yaml、bot.yaml，仅唯一操作者/暂停恢复旁注同步。
@@ -146,7 +150,7 @@ LAP-15内容提交`632fdc5`已推送origin/main，2026-10-17 11:09用ls-remote�
 
 | ID | 单一任务 | 状态与已有证据 | 依赖/推荐顺序 | 执行session | 下一步/完成出口 |
 | --- | --- | --- | --- | --- | --- |
-| LAP-43 | Snow表情/时效搜索/输入关注/唯一操作者与主线整合 | 阶段A隔离实现/离线交付；未部署；[HANDOFF](tasks/LAP-43/HANDOFF.md) / [PLAN](tasks/LAP-43/PLAN.md) / [指令](tasks/LAP-43/MEDIUM_START.md) | 规划main整合已完成；旧18/21/27/35/42差额保留 | LAP-43-stage-a-implementation，2026-10-27 19:50 Asia/Shanghai登记重读；归属补充见顶部，交付后释放 | codex/lap-43-stage-a；不合生产main，不推进B/C/D；搜索质量/真实回归/群ACK均未验 |
+| LAP-43 | Snow表情/时效搜索/输入关注/唯一操作者与主线整合 | 阶段A隔离实现/离线通过；B公共质量未过，未部署；[HANDOFF](tasks/LAP-43/HANDOFF.md) / [PLAN](tasks/LAP-43/PLAN.md) / [B结果](../../reports/lap-43-stage-b-result.md) | 规划main整合已完成；旧18/21/27/35/42差额保留 | LAP-43-stage-b-public-quality，2026-10-28 18:42:46 Asia/Shanghai登记重读；本轮交付后释放 | codex/lap-43-stage-a；一般/时效均0/3；不合生产main，不推进C/D；独立owner/输入/表情可另选部署，真实回归/群ACK仍未验 |
 | LAP-42 | Snow整合；识图闭环 | 视觉按用户“两张本机+一张群图”缩减验收通过，104单元/39框架及真实CLI契约通过；[HANDOFF](tasks/LAP-42/HANDOFF.md) / [结果](../../reports/lap-42-vision-closure-result.md) | 保留运行供用户使用，不续21/其他验收；GIF/旧辅助差额未测 | LAP-42-vision-closure-implementation，Git核对后释放唯一运行/验证归属 | vision=true已加载；授权输入政策48000；原事件ACK及用户客户端/内容确认通过；原六例四项豁免与历史失败保留 |
 | LAP-41 | Snow主线工作区整理与两套bot使用对照 | 完成；主线入口已整理，缓存/网页快照/退役提示已清，4文档归档；[HANDOFF](tasks/LAP-41/HANDOFF.md) / [清单](tasks/LAP-41/CLEANUP.md) / [使用对照](../../docs/BOT_USAGE_COMPARISON.md) | 承接40用户文字首试成功；字节码缓存因自动审批拒绝保留，不扩功能 | LAP-41-snow-mainline-cleanup-comparison，2026-10-25 12:03登记重读；Git交付后释放归属 | 正常使用Snow；新根缺旧7条表情登记，未自动迁移；配置/历史/其他根/A4保留，不自动推进新功能 |
 | LAP-40 | 官方原版SnowLuma最小文字接入/日常入口 | 接入/桌面入口已实现及离线通过；用户现场确认Snow可运行、QQ群可回复，最小文字首试通过；[HANDOFF](tasks/LAP-40/HANDOFF.md) | 用户确认与独立模型/ACK追踪分开；其他功能/长稳不晋升；B/C停止、A4未动 | LAP-40-user-text-confirmation，2026-10-25 11:47登记重读；本次仅文档，交付后释放归属 | 按[使用说明](../../SnowLuma使用说明.md)日常使用，按实际异常处理；不重复首试、不增证明/长稳前置、不自动推进其他功能 |

@@ -30,6 +30,7 @@ def window(question,requested_at,days=7):
         start,_=parse(dates[0]);end,_=parse(dates[-1])
         if not start or not end or end<start or (end-start).days>=30:raise ValueError('WINDOW_INVALID')
         return start,min(end+timedelta(days=1)-timedelta(microseconds=1),now),False
+    if n:return now-timedelta(days=days),now,False
     if re.search(r'近\d+|过去\d+|去年|上个月',question):raise ValueError('WINDOW_UNSUPPORTED')
     return now-timedelta(days=days),now,False
 
@@ -60,7 +61,8 @@ def facts(rows,requested_at,fetched_at,question='',days=7):
             # Day precision can prove a natural-day window, never a rolling-hour boundary.
             in_range=(start<=d<=end) if precision=='second' else (start.astimezone(SH).date()<=d.date()<=end.astimezone(SH).date())
             result['freshness_status']='fresh' if in_range else 'stale'
-            if re.search(r'最新.*(?:发布|版本)|最新版本',question) and not hour:result['freshness_status']='version_dated'
+            if (re.search(r'最新.*(?:发布|版本)|最新版本',question) and not hour
+                    and not re.search(r'\d{4}-\d{2}-\d{2}|今天|本周|(?:近|过去|最近)\d+天',question)):result['freshness_status']='version_dated'
     if result['published_at'] and result['modified_at']:
         published,_=parse(result['published_at']);modified,_=parse(result['modified_at'])
         if modified<published:result['freshness_status']='conflict'

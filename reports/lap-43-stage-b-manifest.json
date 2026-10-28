@@ -1,0 +1,26 @@
+{
+  "queries": [
+    {
+      "query": "搜索 NASA 官方公告 2026-10-22 2026-10-28 site:nasa.gov",
+      "expected_object": "NASA official announcement; concrete mission or agency announcement, not navigation",
+      "window": "2026-10-22 through 2026-10-28 Asia/Shanghai, capped at request time",
+      "comparison_basis": "NASA official News https://www.nasa.gov/news/ ; independently check dated announcement body and facts; no assumed event"
+    },
+    {
+      "query": "搜索 Python 最新发布版本 2026-10-01 2026-10-28 site:python.org",
+      "expected_object": "Python latest stable release announced in window; version and release date from official body",
+      "window": "2026-10-01 through 2026-10-28 Asia/Shanghai, capped at request time",
+      "comparison_basis": "Python downloads https://www.python.org/downloads/ and official release page; check stable version/date, cannot prove all-web latest"
+    },
+    {
+      "query": "搜索 Sudan 最新新闻 2026-10-22 2026-10-28 site:news.un.org",
+      "expected_object": "UN News public Sudan event report; distinguish publication date from event date",
+      "window": "2026-10-22 through 2026-10-28 Asia/Shanghai, capped at request time",
+      "comparison_basis": "UN News https://news.un.org/en/ ; independently compare dated Sudan report and concrete public event; no assumed event"
+    }
+  ],
+  "network": {
+    "resolver": "system",
+    "ca_bundle_file": null
+  }
+}

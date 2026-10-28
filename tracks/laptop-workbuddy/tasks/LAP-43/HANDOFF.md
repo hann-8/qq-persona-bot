@@ -1,8 +1,10 @@
 # LAP-43：Snow表情、时效搜索、群参与、唯一操作者与主线整合
 
+2026-10-28：LAP-43阶段B唯一冻结公共批次完成，质量未过：一般正文0/3、时效正文/日期0/3；3搜索+4页面入口，7 HTTP尝试/0重定向/0DoH/7系统解析，4提取失败，零重试。日期合同修复和25项定向离线通过，质量门槛false、本机search_enabled未保存true。生产main仍52866fe1、未部署/启停/模型/QQ/SSH，不推进C；独立owner/输入/表情可将来单独选中部署。[B实际报告](../../../../reports/lap-43-stage-b-result.md)。
+
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线HANDOFF](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [详细规划](PLAN.md) / [medium指令](MEDIUM_START.md)。继承根AGENTS边界；本任务不替代LAP-18/21/27/35/42的历史证据及未验差额。
 
-## 当前状态：阶段A隔离实现/离线验证完成，未部署
+## 当前状态：阶段B质量未过，隔离交付，未部署
 
 2026-10-27 19:50 Asia/Shanghai，session `LAP-43-stage-a-implementation` 登记并重读TASKS，按A1→A4完成本阶段。起点main/实时远端 `52866fe10cc654d2e12c5520f7afc5aa8bbe0179`，隔离根 `C:/Users/yutha/.codex/worktrees/lap-43-stage-a/QQbot`，实施分支 `codex/lap-43-stage-a`。生产main/运行实例未改；原识图true未写改或重新加载。只领取43，旧任务差额保留。
 

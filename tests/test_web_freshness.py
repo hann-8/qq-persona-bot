@@ -24,6 +24,12 @@ class Dates(unittest.TestCase):
         self.assertEqual(facts([date('2026-10-27',kind='modified')],NOW,NOW)['freshness_status'],'unknown')
         self.assertEqual(facts([date('2025-10-27')],NOW,NOW,'最新发布版本')['freshness_status'],'version_dated')
         with self.assertRaises(ValueError):window('近31天新闻',NOW)
+    def test_latest_release_respects_explicit_window(self):
+        for question in ('Python最新发布版本 2026-10-22 2026-10-27','Python最新版本近3天','Python最新版本今天','Python最新版本本周'):
+            self.assertEqual(facts([date('2025-10-27')],NOW,NOW,question)['freshness_status'],'stale')
+        self.assertEqual(facts([],NOW,NOW,'最新发布版本')['freshness_status'],'unknown')
+        self.assertEqual(facts([date('2026-10-26'),date('2026-10-27')],NOW,NOW,'最新发布版本')['freshness_status'],'conflict')
+
     def test_intents(self):
         cfg=validate_web(dict(enabled=True))
         self.assertFalse(cfg['search_enabled']);self.assertEqual(cfg['freshness_days'],7)
@@ -58,6 +64,31 @@ class Worker(unittest.IsolatedAsyncioTestCase):
                 result=await worker.extract('<html><head>'+metadata+'</head><body>'+body+'</body></html>')
                 validate_candidates(result['date_candidates']);self.assertEqual(result['date_candidates'][0]['source'],source)
                 self.assertTrue(worker.last_metrics['cleanup']);self.assertTrue(worker.last_metrics['exited'])
+    async def test_reject_all_date_counterexamples(self):
+        from qqbot_gateway.web_retrieval import Retriever,REQUEST_TIME
+        metadata=''
+        class HTTP:
+            def __init__(self,cfg,audit):pass
+            async def get(self,url,rss=False):
+                if rss:return '<rss><channel><item><title>public news</title><link>https://example.com/article</link></item></channel></rss>',url,'text/xml'
+                return '<html><head>'+metadata+'</head><body><article><h1>public news</h1><p>'+('public news facts '*40)+'</p><p>'+('public details '*30)+'</p></article></body></html>',url,'text/html'
+        cases=[('', 'unknown'),
+            ('<meta property="article:modified_time" content="2026-10-27">','unknown'),
+            ('<meta property="article:published_time" content="2026-10-26"><meta property="article:published_time" content="2026-10-27">','conflict'),
+            ('<meta property="article:published_time" content="2020-01-01">','stale'),
+            ('<meta property="article:published_time" content="2026-10-28">','invalid')]
+        with tempfile.TemporaryDirectory() as t:
+            r=Retriever(dict(enabled=True,search_enabled=True),http_factory=HTTP,root=Path(t))
+            token=REQUEST_TIME.set(NOW)
+            try:
+                with patch('qqbot_gateway.web_retrieval.SEARCH_QUALITY_PASSED',True):
+                    for metadata,status in cases:
+                        with self.subTest(status=status,metadata=metadata):
+                            result=await r.retrieve('public最新news新闻')
+                            self.assertFalse(result.sources);self.assertTrue(result.notice)
+                            self.assertEqual(r.last_audit['fetch_calls'],1)
+            finally:REQUEST_TIME.reset(token)
+
     async def test_transport_gates_and_freshness(self):
         from qqbot_gateway.web_retrieval import Retriever,REQUEST_TIME
         class HTTP:
