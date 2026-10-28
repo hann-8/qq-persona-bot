@@ -1,5 +1,7 @@
 # LAP-43：给gpt-6.1-sol/medium的实施指令
 
+> 当前默认接续已改为[新medium指令R1](MATERIALS_CHAT_MEDIUM_START.md)及[新详规](MATERIALS_CHAT_PLAN.md)。原A已交付、原B实际失败；本页B/C只保留历史和未冲突的运行边界，不能直接重放旧B或据旧C自动部署。其他旧子项仅按用户明确范围单独选中。
+
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [43交接](HANDOFF.md) / [详细规划](PLAN.md)。
 
 这是下一轮可复制的用户指令模板，不是本轮已经授权执行的动作。会话模型/档位由用户选择，不自动切换或派代理。每次只执行用户选中的一个阶段，按长期Git授权交付后停止，不自动推进下一阶段。真实QQ号不写进模板或Git；当前本机唯一管理员已与用户本人声明一致。

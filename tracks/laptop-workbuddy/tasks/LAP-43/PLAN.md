@@ -1,5 +1,7 @@
 # LAP-43详细规划：Snow表情、时效搜索、群参与与唯一操作者
 
+> 2026-10-28续规入口：[按需联网/URL大意/自然图片对话](MATERIALS_CHAT_PLAN.md) / [新的medium指令](MATERIALS_CHAT_MEDIUM_START.md)。用户最新合同覆盖本页第5节统一正文/日期门槛、普通URL完整覆盖要求和默认分析式呈现；本页其他边界与A/B历史保留。B已执行且失败，不重跑旧批次或把旧失败改成通过。
+
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [本任务交接](HANDOFF.md) / [medium指令](MEDIUM_START.md)。
 
 日期：2026-10-27，Asia/Shanghai。session：`LAP-43-snow-memes-web-attention-plan`。本轮是用户指定的sol/max规划轮；模型/推理档位由用户会话设置选择，未自动检测或切换、未派代理。

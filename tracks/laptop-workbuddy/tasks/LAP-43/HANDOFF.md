@@ -1,10 +1,24 @@
 # LAP-43：Snow表情、时效搜索、群参与、唯一操作者与主线整合
 
+## 当前续作：联网与自然材料对话续规已完成，待Git核对
+
+2026-10-28 18:58（Asia/Shanghai），session `LAP-43-materials-natural-chat-replan`按用户最新指令只续详细规划与medium指令。用户目标：搜索为回答补时效，不要求网页存档/完整复刻；URL读懂大意；图片结合上下文自然接话，明确要求时才讲解。
+
+起点HEAD/实时远端`09c338e26f69b6db1825f741dee3c873b2e034bf`，隔离根`C:/Users/yutha/.codex/worktrees/lap-43-stage-a/QQbot`、分支`codex/lap-43-stage-a`，开始干净；生产main仍`52866fe10cc654d2e12c5520f7afc5aa8bbe0179`。TASKS已登记并重读8文档：PROGRESS、工作线HANDOFF/TASKS、本HANDOFF、旧PLAN/MEDIUM_START入口及新MATERIALS_CHAT_PLAN/MATERIALS_CHAT_MEDIUM_START。17项生产配置/persona/active/pending/library保护已取只读基线。
+
+已完成[新详规](MATERIALS_CHAT_PLAN.md) / [新medium指令](MATERIALS_CHAT_MEDIUM_START.md)。合同明确：先定位extract_failed再改善候选；搜索正文/实质摘要/简介分级，不把全部无日期材料丢弃；严格时间、现行状态、近期提示分开；普通URL以gist为目标；图片同轮原生输入默认结合语境接话。字段/默认/文件/顺序、worker/manifest配对、验收、视觉binding与回滚均已写明。
+
+本轮保留A/B代码、旧B失败/manifest/attempt及42缩减验收，不改业务代码/报告/local/persona/库或运行，不公共探测/模型/QQ/CLI/SSH/启停/部署/合main。默认下一步等待用户选R1离线；R2为另授权的新有限批次，R3为另授权的配对部署/自然性人工验收，不能重放旧B/C。新行为尚未实现/离线/真实验收。
+
+本轮8份文档严格UTF-8、268个本地链接、14行围栏、41个唯一任务表ID及真实号码排除检查通过；`git diff --check`通过，17项生产保护摘要前后相同，生产main工作区干净。新详规/指令及本次入口差异已写后重读，Git差异只含登记Markdown；没有项目测试/公共网络批次/模型/QQ/CLI/运行操作，未读取群消息/记忆事实。旧报告、冻结manifest及A/B源码未变。
+
+仅以8文件白名单commit/push到`codex/lap-43-stage-a`；最终SHA以本分支tip/会话答复为准，不自引用。实时远端SHA核对通过后本规划session释放归属并停止，生产main不合入；下一步仍是用户另选R1，不能把本次Git交付当作实现/质量/自然性通过。
+
 2026-10-28：LAP-43阶段B唯一冻结公共批次完成，质量未过：一般正文0/3、时效正文/日期0/3；3搜索+4页面入口，7 HTTP尝试/0重定向/0DoH/7系统解析，4提取失败，零重试。日期合同修复和25项定向离线通过，质量门槛false、本机search_enabled未保存true。生产main仍52866fe1、未部署/启停/模型/QQ/SSH，不推进C；独立owner/输入/表情可将来单独选中部署。[B实际报告](../../../../reports/lap-43-stage-b-result.md)。
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线HANDOFF](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [详细规划](PLAN.md) / [medium指令](MEDIUM_START.md)。继承根AGENTS边界；本任务不替代LAP-18/21/27/35/42的历史证据及未验差额。
 
-## 当前状态：阶段B质量未过，隔离交付，未部署
+## 历史检查点：阶段B质量未过，隔离交付，未部署
 
 2026-10-27 19:50 Asia/Shanghai，session `LAP-43-stage-a-implementation` 登记并重读TASKS，按A1→A4完成本阶段。起点main/实时远端 `52866fe10cc654d2e12c5520f7afc5aa8bbe0179`，隔离根 `C:/Users/yutha/.codex/worktrees/lap-43-stage-a/QQbot`，实施分支 `codex/lap-43-stage-a`。生产main/运行实例未改；原识图true未写改或重新加载。只领取43，旧任务差额保留。
 
