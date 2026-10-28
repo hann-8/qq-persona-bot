@@ -1,6 +1,16 @@
 # LAP-43：Snow表情、时效搜索、群参与、唯一操作者与主线整合
 
-## 当前R1：代码/离线完成，隔离Git交付
+## 当前R2：有限公共验证已结束，仅隔离Git交付
+
+2026-10-28，session `LAP-43-materials-r2-public`，20:01:36+08:00先登记重读9文件；起点HEAD/实时远端854fef4eef14a5795c3674d85e3bc6cae6e7e262、隔离分支干净。20:04:43冻结manifest SHA `c3d510b72173d28b836f511d654afc7ca78b98193d47f4ffafe64af3b07d84b8` 后唯一执行，20:05:06左右结束；3搜索+6页面入口、10 HTTP/1重定向/0DoH/10系统解析，零重试/额外网络。
+
+搜索确认通过0/3（Python文档版本仅部分资料，即使计入仍最多1/3）；Firefox摘要只是产品/组织介绍，空间站无相关候选。URL短页提取body/internal_error；长教程取得35698字节正文/1910字节选材，但仅留章名/引言/if标题摘录，不能完成冻结的两个构造/用途gist人工审阅，独立记unverified，不伪称通过或正文失败。门槛未过/未证实，SEARCH_QUALITY_PASSED仍false，生产search_enabled不改。四条最终来源日期均unknown，今天/24h严格复用检查全部拒绝；无源项不造日期。
+
+新probe/test与manifest/public/result报告，实际31项离线通过，精确文件/实际命令/计数/审阅限制与回滚见[本轮报告](../../../../reports/lap-43-materials-r2.md)。旧B/R1/旧attempt等14历史工件hash不变，生产6项配置/persona保护及main52866fe1/tracked干净不变，未探活/操作运行。4次新提取失败只定位body/internal_error，不能推断旧B根因。无HTML/整页保存，0CLI/模型/QQ/SSH/登录/启停/部署；未用额度不转新诊断。
+
+下一步不自动执行。候选可回答性、body内部失败定位、URL gist人工证据和严格日期能力分别保留缺口，需要另规划/授权批次；不换题/网络/provider、仅翻常量或重跑旧probe。仅9文件commit/push当前隔离分支，核对实时远端SHA成功后释放归属停止，不合main、不推进R3。未来生产部署前仍须最终全部新源码/配置视觉配对，不能使用旧active替代。
+
+## 历史R1：代码/离线完成，隔离Git交付
 
 2026-10-28T19:56:38+08:00（Asia/Shanghai）：`LAP-43-materials-r1-implementation`按新续规R1完成封闭worker诊断、分级来源/时间/gist、固定自然图片政策和v1/v2材料metadata/预算guard。新74单元/6组合78框架通过；当前persona CodeBuddy48000组合35074字节可容纳，Ollama12288必需输入拒绝。新writer `scripts/verify_lap43_materials.py` → `reports/lap-43-materials-offline.json`；保持43当前模式，完整签名/审阅引用/读取路径配对，实际offline_valid=true。旧报告不覆盖，真实CLI/probe/IQ均未运行，生产资格false。
 

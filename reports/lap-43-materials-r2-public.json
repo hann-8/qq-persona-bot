@@ -1,0 +1,832 @@
+{
+  "schema": "lap43_materials_r2_result_v1",
+  "manifest_sha256": "c3d510b72173d28b836f511d654afc7ca78b98193d47f4ffafe64af3b07d84b8",
+  "source_head": "854fef4eef14a5795c3674d85e3bc6cae6e7e262",
+  "source_sha256": "af3e1a717d627b35279e793e771b8a599a7843039686b3cc336e5f714386c5f6",
+  "started_at": "2026-10-28T12:04:55.892515+00:00",
+  "items": [
+    {
+      "id": "S1",
+      "requested_at": "2026-10-28T12:04:55.892515+00:00",
+      "time_policy": "current_status",
+      "expired": false,
+      "notice": null,
+      "partial": true,
+      "sources": [
+        {
+          "url": "https://docs.python.org/zh-cn/3/",
+          "material": {
+            "kind": "page_excerpt",
+            "scope": "main",
+            "reported_at": null,
+            "reported_date_source": "none"
+          },
+          "body_method": "semantic_main",
+          "selected_bytes": 1319,
+          "selected_sha256": "c4f610d2364f92d28e5761dbd58e81520242b5f3407f12681431b5b2a947d0f3",
+          "freshness": {
+            "requested_at": "2026-10-28T12:04:55.892515+00:00",
+            "fetched_at": "2026-10-28T12:04:57.914184+00:00",
+            "published_at": null,
+            "modified_at": null,
+            "date_source": "none",
+            "date_precision": "unknown",
+            "freshness_status": "unknown"
+          },
+          "time_policy": "current_status",
+          "strict_checks": {
+            "today": {
+              "freshness": {
+                "requested_at": "2026-10-28T12:04:55.892515+00:00",
+                "fetched_at": "2026-10-28T12:04:57.914184+00:00",
+                "published_at": null,
+                "modified_at": null,
+                "date_source": "none",
+                "date_precision": "unknown",
+                "freshness_status": "unknown"
+              },
+              "usable": false
+            },
+            "rolling_24h": {
+              "freshness": {
+                "requested_at": "2026-10-28T12:04:55.892515+00:00",
+                "fetched_at": "2026-10-28T12:04:57.914184+00:00",
+                "published_at": null,
+                "modified_at": null,
+                "date_source": "none",
+                "date_precision": "unknown",
+                "freshness_status": "unknown"
+              },
+              "usable": false
+            }
+          },
+          "public_fragments": [
+            "Python 3.15.2 文档",
+            "欢迎！这里是 Python 3.15.2 的官方文档。",
+            "Python 3.15 有什么新变化？"
+          ],
+          "topic_match": true,
+          "substantive": false
+        }
+      ],
+      "status": "selected",
+      "audit": {
+        "dns_calls": 0,
+        "failures": [
+          {
+            "status": "extract_failed",
+            "stage": "body",
+            "reason": "internal_error"
+          }
+        ],
+        "search_calls": 1,
+        "fetch_calls": 2,
+        "http_calls": 4,
+        "redirect_hops": 1,
+        "bytes": 97555,
+        "latency": 2.344
+      },
+      "events": [
+        {
+          "kind": "search",
+          "url": "https://cn.bing.com/search?q=Python+%E6%9C%80%E6%96%B0%E7%A8%B3%E5%AE%9A%E7%89%88%E6%9C%AC&format=rss",
+          "status": "ok",
+          "final_url": "https://cn.bing.com/search?q=Python+%E6%9C%80%E6%96%B0%E7%A8%B3%E5%AE%9A%E7%89%88%E6%9C%AC&format=rss",
+          "mime": "text/xml",
+          "decoded_bytes": 5897,
+          "decoded_sha256": "0df5060d1da05f9794236b0d29c2e17683521834e6bb82b013f193804153db43",
+          "elapsed_seconds": 0.204,
+          "http_attempts": 1,
+          "redirect_hops": 0,
+          "doh_attempts": 0
+        },
+        {
+          "kind": "system_resolution",
+          "status": "ok"
+        },
+        {
+          "kind": "page",
+          "url": "https://docs.python.org/zh-cn/",
+          "status": "ok",
+          "final_url": "https://docs.python.org/zh-cn/3/",
+          "mime": "text/html",
+          "decoded_bytes": 19473,
+          "decoded_sha256": "dd7af9e95aaefa887f26dc031cd8f182b52e165aeb5e574cee8dfb67049e0488",
+          "elapsed_seconds": 1.609,
+          "http_attempts": 2,
+          "redirect_hops": 1,
+          "doh_attempts": 0
+        },
+        {
+          "kind": "system_resolution",
+          "status": "ok"
+        },
+        {
+          "kind": "system_resolution",
+          "status": "ok"
+        },
+        {
+          "kind": "extract",
+          "url": "https://docs.python.org/zh-cn/3/",
+          "status": "ok",
+          "body_method": "semantic_main",
+          "body_bytes": 1319,
+          "body_sha256": "c4f610d2364f92d28e5761dbd58e81520242b5f3407f12681431b5b2a947d0f3",
+          "metrics": {
+            "peak_rss": 32251904,
+            "elapsed_seconds": 0.156,
+            "exited": true,
+            "input_bytes": 19473,
+            "input_sha256": "dd7af9e95aaefa887f26dc031cd8f182b52e165aeb5e574cee8dfb67049e0488",
+            "mode": "readability",
+            "cleanup": true
+          }
+        },
+        {
+          "kind": "page",
+          "url": "https://www.runoob.com/python/python-tutorial.html",
+          "status": "ok",
+          "final_url": "https://www.runoob.com/python/python-tutorial.html",
+          "mime": "text/html",
+          "decoded_bytes": 72185,
+          "decoded_sha256": "8d70d9e773cf3dc85ebf05852f0877dea56bf8335d0c6c618c69f071a0cd9b6f",
+          "elapsed_seconds": 0.188,
+          "http_attempts": 1,
+          "redirect_hops": 0,
+          "doh_attempts": 0
+        },
+        {
+          "kind": "system_resolution",
+          "status": "ok"
+        },
+        {
+          "kind": "extract",
+          "url": "https://www.runoob.com/python/python-tutorial.html",
+          "status": "extract_failed",
+          "metrics": {
+            "peak_rss": 31764480,
+            "elapsed_seconds": 0.125,
+            "exited": true,
+            "input_bytes": 72185,
+            "input_sha256": "8d70d9e773cf3dc85ebf05852f0877dea56bf8335d0c6c618c69f071a0cd9b6f",
+            "mode": "readability",
+            "stage": "body",
+            "reason": "internal_error",
+            "cleanup": true
+          }
+        }
+      ],
+      "candidates": [
+        {
+          "url": "https://www.python.org/",
+          "text_sha256": "1d9dbd1dc1fadf071a1c529a05a83b34049c3faa1693208759fc3796911792ed",
+          "text_bytes": 219,
+          "topic_match": true,
+          "substantive": true,
+          "reported_date": "周二, 27 10月 2026 18:50:00 GMT"
+        },
+        {
+          "url": "https://www.python.org/downloads/",
+          "text_sha256": "2b79d6540ceb5f163550acf22f6db37187d454a1cd520bc1bc277a27c63320d7",
+          "text_bytes": 189,
+          "topic_match": true,
+          "substantive": true,
+          "reported_date": "周三, 28 10月 2026 04:58:00 GMT"
+        },
+        {
+          "url": "https://www.runoob.com/python/python-tutorial.html",
+          "text_sha256": "0ce67bdf7cbcdc8daf8ecc4eb9216660cb296ce16680a03e0d162ceae9802b49",
+          "text_bytes": 304,
+          "topic_match": true,
+          "substantive": false,
+          "reported_date": "周二, 27 10月 2026 18:50:00 GMT"
+        },
+        {
+          "url": "https://pythonlang.cn/",
+          "text_sha256": "3f8c9ee9f824081f6935e4fbcb68413d726eb69670c43009612886400fab36e6",
+          "text_bytes": 348,
+          "topic_match": true,
+          "substantive": false,
+          "reported_date": "周日, 25 10月 2026 16:36:00 GMT"
+        },
+        {
+          "url": "https://docs.python.org/zh-cn/",
+          "text_sha256": "d2d3dba049b27cdb6b487fac8be01b95527e8f4bc5d0ab0083e3bd373843999b",
+          "text_bytes": 313,
+          "topic_match": true,
+          "substantive": false,
+          "reported_date": "周三, 28 10月 2026 10:20:00 GMT"
+        }
+      ],
+      "human_review": {
+        "verdict": "partial_not_passed",
+        "reason": "取得官方文档当前自报版本，缺“稳定版/最新稳定版”命题，不能据文档版本推出最新稳定版。不是纯标题空壳，但未满足冻结问题。",
+        "counted_pass": false
+      },
+      "date_review": {
+        "page_date": "unknown",
+        "strict_today_or_24h_supported": false,
+        "required_behavior": "限定为本次来源支持的背景/状态；严格时点缺证据拒答，不以RSS时间或抓取时间作fresh。"
+      }
+    },
+    {
+      "id": "S2",
+      "requested_at": "2026-10-28T12:04:58.289989+00:00",
+      "time_policy": "recent_hint",
+      "expired": false,
+      "notice": null,
+      "partial": true,
+      "sources": [
+        {
+          "url": "https://www.mozilla.org/zh-CN/products/",
+          "material": {
+            "kind": "search_snippet",
+            "scope": "summary",
+            "reported_at": null,
+            "reported_date_source": "none"
+          },
+          "body_method": "none",
+          "selected_bytes": 342,
+          "selected_sha256": "a9ea7471241c52f6b8ab85fffcf2a78c3e0a2884491becd376af812531eac4fd",
+          "freshness": {
+            "requested_at": "2026-10-28T12:04:58.289989+00:00",
+            "fetched_at": "2026-10-28T12:04:58.486960+00:00",
+            "published_at": null,
+            "modified_at": null,
+            "date_source": "none",
+            "date_precision": "unknown",
+            "freshness_status": "unknown"
+          },
+          "time_policy": "recent_hint",
+          "strict_checks": {
+            "today": {
+              "freshness": {
+                "requested_at": "2026-10-28T12:04:58.289989+00:00",
+                "fetched_at": "2026-10-28T12:04:58.486960+00:00",
+                "published_at": null,
+                "modified_at": null,
+                "date_source": "none",
+                "date_precision": "unknown",
+                "freshness_status": "unknown"
+              },
+              "usable": false
+            },
+            "rolling_24h": {
+              "freshness": {
+                "requested_at": "2026-10-28T12:04:58.289989+00:00",
+                "fetched_at": "2026-10-28T12:04:58.486960+00:00",
+                "published_at": null,
+                "modified_at": null,
+                "date_source": "none",
+                "date_precision": "unknown",
+                "freshness_status": "unknown"
+              },
+              "usable": false
+            }
+          },
+          "public_fragments": [
+            "Mozilla 的客户控制内部企业浏览器平台。 旨在帮助组织更好地控制数据、IT 基础设施和浏览器环境来增强其数字自主权和运营弹性。 部"
+          ],
+          "topic_match": true,
+          "substantive": true
+        },
+        {
+          "url": "https://www.mozilla.org/",
+          "material": {
+            "kind": "search_snippet",
+            "scope": "summary",
+            "reported_at": null,
+            "reported_date_source": "none"
+          },
+          "body_method": "none",
+          "selected_bytes": 134,
+          "selected_sha256": "a9665d79d7c8801542690b210c6ea090150f4e7c9520a1a0fab91710845caee2",
+          "freshness": {
+            "requested_at": "2026-10-28T12:04:58.289989+00:00",
+            "fetched_at": "2026-10-28T12:04:58.486960+00:00",
+            "published_at": null,
+            "modified_at": null,
+            "date_source": "none",
+            "date_precision": "unknown",
+            "freshness_status": "unknown"
+          },
+          "time_policy": "recent_hint",
+          "strict_checks": {
+            "today": {
+              "freshness": {
+                "requested_at": "2026-10-28T12:04:58.289989+00:00",
+                "fetched_at": "2026-10-28T12:04:58.486960+00:00",
+                "published_at": null,
+                "modified_at": null,
+                "date_source": "none",
+                "date_precision": "unknown",
+                "freshness_status": "unknown"
+              },
+              "usable": false
+            },
+            "rolling_24h": {
+              "freshness": {
+                "requested_at": "2026-10-28T12:04:58.289989+00:00",
+                "fetched_at": "2026-10-28T12:04:58.486960+00:00",
+                "published_at": null,
+                "modified_at": null,
+                "date_source": "none",
+                "date_precision": "unknown",
+                "freshness_status": "unknown"
+              },
+              "usable": false
+            }
+          },
+          "public_fragments": [
+            "Mozilla is the not-for-profit behind the lightning fast Firefox bro"
+          ],
+          "topic_match": true,
+          "substantive": true
+        }
+      ],
+      "status": "selected",
+      "audit": {
+        "dns_calls": 0,
+        "failures": [
+          {
+            "status": "extract_failed",
+            "stage": "body",
+            "reason": "internal_error"
+          },
+          {
+            "status": "extract_failed",
+            "stage": "body",
+            "reason": "internal_error"
+          }
+        ],
+        "search_calls": 1,
+        "fetch_calls": 2,
+        "http_calls": 3,
+        "redirect_hops": 0,
+        "bytes": 111643,
+        "latency": 4.953
+      },
+      "events": [
+        {
+          "kind": "search",
+          "url": "https://cn.bing.com/search?q=Mozilla+Firefox+%E8%BF%91%E6%9C%9F%E5%8F%91%E5%B8%83%E5%85%AC%E5%91%8A&format=rss",
+          "status": "ok",
+          "final_url": "https://cn.bing.com/search?q=Mozilla+Firefox+%E8%BF%91%E6%9C%9F%E5%8F%91%E5%B8%83%E5%85%AC%E5%91%8A&format=rss",
+          "mime": "text/xml",
+          "decoded_bytes": 5388,
+          "decoded_sha256": "ccee5b352b2a22d9b4b7e0c22f8ea01472a98fa6b21053cc2d1af75bfce304ff",
+          "elapsed_seconds": 0.188,
+          "http_attempts": 1,
+          "redirect_hops": 0,
+          "doh_attempts": 0
+        },
+        {
+          "kind": "system_resolution",
+          "status": "ok"
+        },
+        {
+          "kind": "page",
+          "url": "https://www.mozilla.org/zh-CN/products/",
+          "status": "ok",
+          "final_url": "https://www.mozilla.org/zh-CN/products/",
+          "mime": "text/html",
+          "decoded_bytes": 58451,
+          "decoded_sha256": "c50eb9fea7a6b81881be99ec75d7367837592fa04e14d55f61e2d769453611cc",
+          "elapsed_seconds": 2.656,
+          "http_attempts": 1,
+          "redirect_hops": 0,
+          "doh_attempts": 0
+        },
+        {
+          "kind": "system_resolution",
+          "status": "ok"
+        },
+        {
+          "kind": "extract",
+          "url": "https://www.mozilla.org/zh-CN/products/",
+          "status": "extract_failed",
+          "metrics": {
+            "peak_rss": 31510528,
+            "elapsed_seconds": 0.156,
+            "exited": true,
+            "input_bytes": 58451,
+            "input_sha256": "c50eb9fea7a6b81881be99ec75d7367837592fa04e14d55f61e2d769453611cc",
+            "mode": "readability",
+            "stage": "body",
+            "reason": "internal_error",
+            "cleanup": true
+          }
+        },
+        {
+          "kind": "page",
+          "url": "https://www.mozilla.org/",
+          "status": "ok",
+          "final_url": "https://www.mozilla.org/",
+          "mime": "text/html",
+          "decoded_bytes": 47804,
+          "decoded_sha256": "979bb455cf6520315e741151911aef22f1e8dd53e654f2a4301b3f37665022ea",
+          "elapsed_seconds": 1.797,
+          "http_attempts": 1,
+          "redirect_hops": 0,
+          "doh_attempts": 0
+        },
+        {
+          "kind": "system_resolution",
+          "status": "ok"
+        },
+        {
+          "kind": "extract",
+          "url": "https://www.mozilla.org/",
+          "status": "extract_failed",
+          "metrics": {
+            "peak_rss": 31514624,
+            "elapsed_seconds": 0.125,
+            "exited": true,
+            "input_bytes": 47804,
+            "input_sha256": "979bb455cf6520315e741151911aef22f1e8dd53e654f2a4301b3f37665022ea",
+            "mode": "readability",
+            "stage": "body",
+            "reason": "internal_error",
+            "cleanup": true
+          }
+        }
+      ],
+      "candidates": [
+        {
+          "url": "https://www.mozilla.org/",
+          "text_sha256": "a9665d79d7c8801542690b210c6ea090150f4e7c9520a1a0fab91710845caee2",
+          "text_bytes": 134,
+          "topic_match": true,
+          "substantive": true,
+          "reported_date": "周二, 27 10月 2026 11:12:00 GMT"
+        },
+        {
+          "url": "https://www.firefox.com/es-ES/",
+          "text_sha256": "986f7ca35848d1c09983f4bf2a3e47ce933d1ae68995e7e303b13615655768dd",
+          "text_bytes": 156,
+          "topic_match": false,
+          "substantive": false,
+          "reported_date": "周二, 27 10月 2026 18:50:00 GMT"
+        },
+        {
+          "url": "https://www.mozilla.org/zh-CN/products/",
+          "text_sha256": "a9ea7471241c52f6b8ab85fffcf2a78c3e0a2884491becd376af812531eac4fd",
+          "text_bytes": 342,
+          "topic_match": true,
+          "substantive": true,
+          "reported_date": "周二, 27 10月 2026 20:23:00 GMT"
+        },
+        {
+          "url": "https://baike.baidu.com/item/Mozilla%E5%9F%BA%E9%87%91%E4%BC%9A/10167516",
+          "text_sha256": "4a69e08d38b5e8ece9d0eb4238047d0fe651797ca772dcece9727a469c02e029",
+          "text_bytes": 342,
+          "topic_match": false,
+          "substantive": false,
+          "reported_date": "周六, 24 10月 2026 17:20:00 GMT"
+        },
+        {
+          "url": "https://zhuanlan.zhihu.com/p/304604991",
+          "text_sha256": "10f498a9fb1c9fec04579438f8ca8d485d1263acdff51d1536d55eaf393d6f60",
+          "text_bytes": 281,
+          "topic_match": false,
+          "substantive": false,
+          "reported_date": "周二, 27 10月 2026 02:29:00 GMT"
+        }
+      ],
+      "human_review": {
+        "verdict": "failed",
+        "reason": "实际退化search_snippet是Mozilla产品/组织介绍，未支持近期Firefox发布/版本更新命题；程序substantive/topic_match=true不等同题目可回答。",
+        "counted_pass": false
+      },
+      "date_review": {
+        "page_date": "unknown",
+        "strict_today_or_24h_supported": false,
+        "required_behavior": "限定为本次来源支持的背景/状态；严格时点缺证据拒答，不以RSS时间或抓取时间作fresh。"
+      }
+    },
+    {
+      "id": "S3",
+      "requested_at": "2026-10-28T12:05:03.253293+00:00",
+      "time_policy": "recent_hint",
+      "expired": false,
+      "notice": "这次没查到能确认时效的可靠材料，暂时无法核实最新情况。",
+      "partial": false,
+      "sources": [],
+      "status": "no_material",
+      "audit": {
+        "dns_calls": 0,
+        "failures": [],
+        "search_calls": 1,
+        "fetch_calls": 0,
+        "http_calls": 1,
+        "redirect_hops": 0,
+        "bytes": 5428,
+        "latency": 0.187
+      },
+      "events": [
+        {
+          "kind": "search",
+          "url": "https://cn.bing.com/search?q=%E4%B8%AD%E5%9B%BD%E7%A9%BA%E9%97%B4%E7%AB%99+%E6%9C%80%E8%BF%91%E5%8A%A8%E6%80%81&format=rss",
+          "status": "ok",
+          "final_url": "https://cn.bing.com/search?q=%E4%B8%AD%E5%9B%BD%E7%A9%BA%E9%97%B4%E7%AB%99+%E6%9C%80%E8%BF%91%E5%8A%A8%E6%80%81&format=rss",
+          "mime": "text/xml",
+          "decoded_bytes": 5428,
+          "decoded_sha256": "ee04a2ec35217713fc941e661c7bdd3653047bb96507396a8038542c6e1a75f6",
+          "elapsed_seconds": 0.187,
+          "http_attempts": 1,
+          "redirect_hops": 0,
+          "doh_attempts": 0
+        },
+        {
+          "kind": "system_resolution",
+          "status": "ok"
+        }
+      ],
+      "candidates": [
+        {
+          "url": "https://baike.baidu.com/item/%E4%B8%AD%E5%8D%8E%E4%BA%BA%E6%B0%91%E5%85%B1%E5%92%8C%E5%9B%BD/106554",
+          "text_sha256": "609ab8685a882931bea004fcd324f903f9882c7ccc7f2905e82ef747fc6cf43b",
+          "text_bytes": 344,
+          "topic_match": false,
+          "substantive": false,
+          "reported_date": "周一, 26 10月 2026 07:17:00 GMT"
+        },
+        {
+          "url": "https://www.gov.cn/?home",
+          "text_sha256": "db53147652c2236f917d557d574c7023db3c8510bfdf8240c0147b652e6dc7bb",
+          "text_bytes": 334,
+          "topic_match": false,
+          "substantive": false,
+          "reported_date": "周四, 06 8月 2026 15:26:00 GMT"
+        },
+        {
+          "url": "https://baike.baidu.com/item/%E4%B8%AD%E5%9B%BD/1122445",
+          "text_sha256": "829a82e310524b3e281973133079a5afcbcd6a16e2f995298fd734faabae1043",
+          "text_bytes": 308,
+          "topic_match": false,
+          "substantive": false,
+          "reported_date": "周三, 28 10月 2026 02:06:00 GMT"
+        },
+        {
+          "url": "https://www.china.com.cn/",
+          "text_sha256": "d012cb057f6ec6f690255e14d8042bdf4f91701136478b93e765587e6d4aefb3",
+          "text_bytes": 199,
+          "topic_match": false,
+          "substantive": false,
+          "reported_date": "周五, 03 7月 2026 03:06:00 GMT"
+        },
+        {
+          "url": "http://www.zgbk.com/",
+          "text_sha256": "dc755737e44c01c711a67599882d7e59f96009bee93ba91b5f57a63d6ba6d9fe",
+          "text_bytes": 221,
+          "topic_match": false,
+          "substantive": false,
+          "reported_date": "周三, 28 10月 2026 03:04:00 GMT"
+        }
+      ],
+      "human_review": {
+        "verdict": "failed",
+        "reason": "五个候选均未过主题相关性；0页面入口、0来源，不能据中国通用百科/门户回答空间站动态。",
+        "counted_pass": false
+      },
+      "date_review": {
+        "page_date": "no_source",
+        "strict_today_or_24h_supported": false,
+        "required_behavior": "限定为本次来源支持的背景/状态；严格时点缺证据拒答，不以RSS时间或抓取时间作fresh。"
+      }
+    },
+    {
+      "id": "U1",
+      "requested_at": "2026-10-28T12:05:03.452836+00:00",
+      "time_policy": "none",
+      "expired": false,
+      "notice": "当前无法安全取得可用网页正文，本次没有送入模型；请换个公共网页链接。",
+      "partial": true,
+      "sources": [],
+      "status": "no_material",
+      "audit": {
+        "dns_calls": 0,
+        "failures": [
+          {
+            "status": "extract_failed",
+            "stage": "body",
+            "reason": "internal_error"
+          }
+        ],
+        "search_calls": 0,
+        "fetch_calls": 1,
+        "http_calls": 1,
+        "redirect_hops": 0,
+        "bytes": 7560,
+        "latency": 1.078
+      },
+      "events": [
+        {
+          "kind": "page",
+          "url": "https://www.python.org/doc/essays/blurb/",
+          "status": "ok",
+          "final_url": "https://www.python.org/doc/essays/blurb/",
+          "mime": "text/html",
+          "decoded_bytes": 34030,
+          "decoded_sha256": "7ba1e76e88de68fbd2ace8ddebf014d32a0cb4c40fcc4137b6582a69860d608e",
+          "elapsed_seconds": 0.922,
+          "http_attempts": 1,
+          "redirect_hops": 0,
+          "doh_attempts": 0
+        },
+        {
+          "kind": "system_resolution",
+          "status": "ok"
+        },
+        {
+          "kind": "extract",
+          "url": "https://www.python.org/doc/essays/blurb/",
+          "status": "extract_failed",
+          "metrics": {
+            "peak_rss": 31199232,
+            "elapsed_seconds": 0.125,
+            "exited": true,
+            "input_bytes": 34030,
+            "input_sha256": "7ba1e76e88de68fbd2ace8ddebf014d32a0cb4c40fcc4137b6582a69860d608e",
+            "mode": "readability",
+            "stage": "body",
+            "reason": "internal_error",
+            "cleanup": true
+          }
+        }
+      ],
+      "candidates": [],
+      "human_review": {
+        "verdict": "failed",
+        "reason": "PublicHTTP下载成功，当前worker body/internal_error，未取得gist；没有URL摘要退化。",
+        "counted_pass": false
+      },
+      "date_review": {
+        "page_date": "no_source",
+        "strict_today_or_24h_supported": false,
+        "required_behavior": "限定为本次来源支持的背景/状态；严格时点缺证据拒答，不以RSS时间或抓取时间作fresh。"
+      }
+    },
+    {
+      "id": "U2",
+      "requested_at": "2026-10-28T12:05:04.525400+00:00",
+      "time_policy": "none",
+      "expired": false,
+      "notice": null,
+      "partial": false,
+      "sources": [
+        {
+          "url": "https://docs.python.org/3/tutorial/controlflow.html",
+          "material": {
+            "kind": "page_excerpt",
+            "scope": "excerpt",
+            "reported_at": null,
+            "reported_date_source": "none"
+          },
+          "body_method": "semantic_main",
+          "selected_bytes": 1910,
+          "selected_sha256": "c3d3d6d12543387668dca6b9aff8e78e160a0845a9015ea3bc519c7432b5d6e8",
+          "freshness": {
+            "requested_at": "2026-10-28T12:05:04.525400+00:00",
+            "fetched_at": "2026-10-28T12:05:06.539267+00:00",
+            "published_at": null,
+            "modified_at": null,
+            "date_source": "none",
+            "date_precision": "unknown",
+            "freshness_status": "unknown"
+          },
+          "time_policy": "none",
+          "strict_checks": {
+            "today": {
+              "freshness": {
+                "requested_at": "2026-10-28T12:05:04.525400+00:00",
+                "fetched_at": "2026-10-28T12:05:06.539267+00:00",
+                "published_at": null,
+                "modified_at": null,
+                "date_source": "none",
+                "date_precision": "unknown",
+                "freshness_status": "unknown"
+              },
+              "usable": false
+            },
+            "rolling_24h": {
+              "freshness": {
+                "requested_at": "2026-10-28T12:05:04.525400+00:00",
+                "fetched_at": "2026-10-28T12:05:06.539267+00:00",
+                "published_at": null,
+                "modified_at": null,
+                "date_source": "none",
+                "date_precision": "unknown",
+                "freshness_status": "unknown"
+              },
+              "usable": false
+            }
+          },
+          "public_fragments": [
+            "4. More Control Flow Tools¶",
+            "As well as the while statement just introduced, Python uses a few more that we will encounter in this chapter.",
+            "4.1. if Statements¶"
+          ],
+          "topic_match": false,
+          "substantive": false
+        }
+      ],
+      "status": "selected",
+      "audit": {
+        "dns_calls": 0,
+        "failures": [],
+        "search_calls": 0,
+        "fetch_calls": 1,
+        "http_calls": 1,
+        "redirect_hops": 0,
+        "bytes": 140178,
+        "latency": 2.016
+      },
+      "events": [
+        {
+          "kind": "page",
+          "url": "https://docs.python.org/3/tutorial/controlflow.html",
+          "status": "ok",
+          "final_url": "https://docs.python.org/3/tutorial/controlflow.html",
+          "mime": "text/html",
+          "decoded_bytes": 140178,
+          "decoded_sha256": "dba3fca12222fe2e74601723f22a5697400791d0a294d3ea9a7bf6162068e5d3",
+          "elapsed_seconds": 1.797,
+          "http_attempts": 1,
+          "redirect_hops": 0,
+          "doh_attempts": 0
+        },
+        {
+          "kind": "system_resolution",
+          "status": "ok"
+        },
+        {
+          "kind": "extract",
+          "url": "https://docs.python.org/3/tutorial/controlflow.html",
+          "status": "ok",
+          "body_method": "semantic_main",
+          "body_bytes": 35698,
+          "body_sha256": "40e7a684a8a78844269a59a5251a96a29dce0124359c15dba14defcab25ee3a7",
+          "metrics": {
+            "peak_rss": 37654528,
+            "elapsed_seconds": 0.203,
+            "exited": true,
+            "input_bytes": 140178,
+            "input_sha256": "dba3fca12222fe2e74601723f22a5697400791d0a294d3ea9a7bf6162068e5d3",
+            "mode": "readability",
+            "cleanup": true
+          }
+        }
+      ],
+      "candidates": [],
+      "human_review": {
+        "verdict": "unverified_review_gap",
+        "reason": "PublicHTTP/semantic_main成功，35698字节正文选为1910字节gist片段。但留存摘录仅章名、while引言及if标题，无法人工核实冻结的两个主要构造/用途。完整选材仅RAM，进程已结束；不补抓、不把正文hash/字节或标题当gist质量通过。",
+        "counted_pass": false
+      },
+      "date_review": {
+        "page_date": "unknown",
+        "strict_today_or_24h_supported": false,
+        "required_behavior": "限定为本次来源支持的背景/状态；严格时点缺证据拒答，不以RSS时间或抓取时间作fresh。"
+      }
+    }
+  ],
+  "real_model_calls": 0,
+  "qq_calls": 0,
+  "human_review": "completed_with_url_evidence_gap",
+  "quality_passed": false,
+  "counters": {
+    "search_entries": 3,
+    "page_entries": 6,
+    "http_attempts": 10,
+    "redirect_hops": 1,
+    "doh_attempts": 0,
+    "system_resolutions": 10
+  },
+  "completed_at": "2026-10-28T12:05:06.541284+00:00",
+  "quality_review": {
+    "search_verified_passes": 0,
+    "search_partial": 1,
+    "search_required": 2,
+    "search_total": 3,
+    "search_threshold_passed": false,
+    "url_verified_gist_passes": 0,
+    "url_failed": 1,
+    "url_review_unverified": 1,
+    "url_required": 1,
+    "url_total": 2,
+    "url_threshold_proven": false,
+    "search_quality_constant": false,
+    "production_search_enabled_written": false
+  },
+  "protection_checks": {
+    "historical_equal": true,
+    "production_files_equal": true,
+    "production_head_equal": true,
+    "production_status_equal": true,
+    "historical_count": 14,
+    "production_file_count": 6,
+    "production_head": "52866fe10cc654d2e12c5520f7afc5aa8bbe0179",
+    "production_tracked_clean": true
+  }
+}

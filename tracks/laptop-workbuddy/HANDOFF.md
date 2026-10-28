@@ -1,6 +1,10 @@
 # QQ主线交接：SnowLuma与共用bot业务
 
-## 当前续作：LAP-43 R1已隔离实现/离线交付
+## 当前检查点：LAP-43 R2新批次已结束
+
+2026-10-28：LAP-43 R2唯一新冻结公共批次已完成。3搜索/6页面入口、10 HTTP尝试/1重定向/0DoH/10系统解析、零重试；4页新body/internal_error。搜索确认通过0/3（另1项部分资料，仍低于2/3）；URL 1失败/1正文选材成功但人工摘录证据不足，未证实1/2 gist门槛。31项离线边界/材料/日期通过；搜索质量false，生产main52866fe1及配置/persona保护不变。旧B0/3及manifest/attempt/result原样保留，0模型/QQ/SSH/登录/启停/部署，不合main、不推进R3。[本轮报告](../../reports/lap-43-materials-r2.md) / [43交接](tasks/LAP-43/HANDOFF.md)。仅本轮9文件隔离Git交付；远端SHA核对成功后释放归属停止，部署前最终新源码仍须完整视觉配对。
+
+## 历史R1：已隔离实现/离线交付
 
 2026-10-28：session `LAP-43-materials-r1-implementation`完成R1，新74单元/6组合78框架及当前persona预算/新offline配对通过；实现与失败过程、限制见[报告](../../reports/lap-43-materials-r1.md) / [43交接](tasks/LAP-43/HANDOFF.md)。搜索双门槛false；生产main52866fe1/tracked干净，运行未操作，旧A/B/42证据保留。Ollama12288仍拒绝当前persona，不自动提高预算。仅隔离分支commit/push并核对后停止，后续另选R2/R3。
 

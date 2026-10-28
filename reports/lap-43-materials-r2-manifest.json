@@ -1,0 +1,66 @@
+{
+  "schema": "lap43_materials_r2_v1",
+  "frozen_at": "2026-10-28T20:04:43.667306+08:00",
+  "source_head": "854fef4eef14a5795c3674d85e3bc6cae6e7e262",
+  "source_sha256": "af3e1a717d627b35279e793e771b8a599a7843039686b3cc336e5f714386c5f6",
+  "network": {
+    "resolver": "system",
+    "ca_bundle_file": null
+  },
+  "limits": {
+    "search_entries": 3,
+    "page_entries": 8,
+    "pages_per_search": 2,
+    "direct_entries": 2,
+    "seconds_per_item": 15,
+    "redirects_per_entry": 2,
+    "retries": 0
+  },
+  "items": [
+    {
+      "id": "S1",
+      "kind": "search",
+      "query": "搜索 Python 最新稳定版本",
+      "expected_object": "Python 当前稳定版本",
+      "time_policy": "current_status",
+      "expectation": "相关实质材料须明确Python及具体稳定版本/支持状态；首页标题本身不算。仅可称本次来源列出，不声称全网唯一最新。",
+      "comparison_basis": "人工对照锚点：https://www.python.org/downloads/ 的官方稳定版清单/具体release页；当前版本号在冻结前未另行联网核实，不预填答案；检索结果必须实际给出版本命题。"
+    },
+    {
+      "id": "S2",
+      "kind": "search",
+      "query": "搜索 Mozilla Firefox 近期发布公告",
+      "expected_object": "Mozilla Firefox 近期发布/更新公告",
+      "time_policy": "recent_hint",
+      "expectation": "正文或实质摘要至少给出Firefox某次发布、版本或具体更新命题；日期缺证据可限定所搜资料，不能声称最近七天已确认。",
+      "comparison_basis": "人工对照锚点：https://www.mozilla.org/en-US/firefox/releases/ 的官方版本说明结构（版本/发布日期/新增或修复）；不预设本周发生某次发布，不另发对照网络请求。"
+    },
+    {
+      "id": "S3",
+      "kind": "search",
+      "query": "搜索 中国空间站 最近动态",
+      "expected_object": "中国空间站公开任务或活动动态",
+      "time_policy": "recent_hint",
+      "expectation": "中文实质正文/摘要给出空间站任务、活动或状态的可回答命题；只有官网导航/新闻标题不算，未知日期须限定。",
+      "comparison_basis": "人工对照锚点：中国载人航天工程办公室 https://www.cmse.gov.cn/ 的公开空间站任务/新闻；主题应有具体任务或活动事实，不猜冻结当日任务，不另抓官网用于诊断。"
+    },
+    {
+      "id": "U1",
+      "kind": "read",
+      "query": "这页讲什么 https://www.python.org/doc/essays/blurb/",
+      "expected_object": "What is Python 短介绍",
+      "time_policy": "none",
+      "expectation": "取得主要内容而非仅meta；大意应能支撑Python是什么及语言/应用特点，至少两个相连要点；不要求完整复刻。",
+      "comparison_basis": "人工对照锚点：Python官方“What is Python? Executive Summary”短介绍；预期是语言简介、可读语法/标准库/扩展等特性。若页面改变或无正文则按实测记录失败，不换URL。"
+    },
+    {
+      "id": "U2",
+      "kind": "read",
+      "query": "这页讲什么 https://docs.python.org/3/tutorial/controlflow.html",
+      "expected_object": "Python More Control Flow Tools 长教程",
+      "time_policy": "none",
+      "expectation": "长页gist须支撑主题及至少两个主要构造/用途，如if、for、range、函数定义；仅目录标题/meta不算，不要求逐项覆盖所有语法。",
+      "comparison_basis": "人工对照锚点：Python官方教程第4章More Control Flow Tools，已知结构包括if/for/range及函数定义等；只判断本次选材能支撑的要点，章节存在不等同正文已取得。"
+    }
+  ]
+}
