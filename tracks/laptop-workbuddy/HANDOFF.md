@@ -1,6 +1,10 @@
 # QQ主线交接：SnowLuma与共用bot业务
 
-## 当前检查点：LAP-43 R2新批次已结束
+## 当前方向：原生联网与删减自建层
+
+2026-10-28 session `LAP-43-native-web-simplify-plan`已登记重读11文档，补简洁原则、撤下冗长自建材料续规，完成[原生最小方案](tasks/LAP-43/NATIVE_WEB_PLAN.md) / [新medium指令](tasks/LAP-43/NATIVE_WEB_MEDIUM_START.md)。runner当前主动清空工具并拒绝工具过程；后续只改会话权限/解析/路由和必要轮次，不再续修B/R2。Fetch用户演示与Search实际能力分开，不夸大为bot验收通过。独立owner/图片风格/表情/记忆及历史报告保留；本轮只有文档，生产main不动，Git核对后停止。接续以本段和43最新交接为准，以下材料阶段均历史。
+
+## 历史检查点：LAP-43 R2新批次已结束
 
 2026-10-28：LAP-43 R2唯一新冻结公共批次已完成。3搜索/6页面入口、10 HTTP尝试/1重定向/0DoH/10系统解析、零重试；4页新body/internal_error。搜索确认通过0/3（另1项部分资料，仍低于2/3）；URL 1失败/1正文选材成功但人工摘录证据不足，未证实1/2 gist门槛。31项离线边界/材料/日期通过；搜索质量false，生产main52866fe1及配置/persona保护不变。旧B0/3及manifest/attempt/result原样保留，0模型/QQ/SSH/登录/启停/部署，不合main、不推进R3。[本轮报告](../../reports/lap-43-materials-r2.md) / [43交接](tasks/LAP-43/HANDOFF.md)。仅本轮9文件隔离Git交付；远端SHA核对成功后释放归属停止，部署前最终新源码仍须完整视觉配对。
 
@@ -44,7 +48,7 @@ LAP-41已完成新根整理：uv报告清除38,269缓存文件约626.1MiB、5份
 
 ## 当前需要读的文件
 
-- 当前：[43 HANDOFF](tasks/LAP-43/HANDOFF.md) → [续规](tasks/LAP-43/MATERIALS_CHAT_PLAN.md) / [新medium指令](tasks/LAP-43/MATERIALS_CHAT_MEDIUM_START.md)，R1已离线交付，只执行用户后续选中的R2/R3。42识图当前事实见[最终结果](../../reports/lap-42-vision-closure-result.md)，旧42启动及旧B/C指令不自动重放。
+- 当前：[43 HANDOFF](tasks/LAP-43/HANDOFF.md) → [原生最小方案](tasks/LAP-43/NATIVE_WEB_PLAN.md) / [当前medium指令](tasks/LAP-43/NATIVE_WEB_MEDIUM_START.md)。旧自建B/R2/R3/C不续跑，图片/owner/表情等独立差额保留；42既有事实见[最终结果](../../reports/lap-42-vision-closure-result.md)。
 - 上轮：[21实际数据准备](tasks/LAP-21/SNOW_MIGRATION_RESULT.md)保留；active未激活/真实未验不阻塞42，42不动其pending。
 - 日常使用：[SnowLuma使用说明](../../SnowLuma使用说明.md)。
 - 旧NapCat用户：[实际bot使用对照](../../docs/BOT_USAGE_COMPARISON.md)。
@@ -62,7 +66,7 @@ NapCat旧根和旧C根不修改/启停；保留本根仍被导入的NapCat兼容
 
 ## 后续排序与含义
 
-42缩减识图验收已交付，43的A已完成/B失败已交付；R1已完成隔离离线交付，后续另选R2公共/R3生产验收，不重复旧A/B或直接续旧C。独立表情/owner子项仍可由用户单独指定，但不能顺带覆盖本次新材料合同。保持CLI/模型/low/账号/额度，记忆/成员/图片和搜索真实差额保留。
+42既有识图、43中owner/输入/自然图片等独立成果保留。当前先等用户用原生联网medium指令实施最小接线及删除自建层，离线交付后再选有限运行验收，不追加旧B/R2批次或整轮旧C。表情/owner真实缺项以后按实际补，不重新部署已完成动作；模型/账号/额度不自动改。
 
 成员是小群名册候选/受控@，42已补官方只读强刷来源并保留1..49/双TTL/8项768字节/单cap/最多1受控@；缺来源、人数无效/大群只暂停增强。关注是free叫名/引用/短续聊，已加载，无新消息不主动发言。字幕专用网络/认证服务及vendor已删除，纯材料schema/选择函数和旧报告保留；旧专用报告脚本不适用于当前退役版本，不重跑。真实效果按42报告逐项保留，不能用开关/代码替代群验收。
 

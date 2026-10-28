@@ -1,6 +1,8 @@
 # LAP-43详细规划：Snow表情、时效搜索、群参与与唯一操作者
 
-> 2026-10-28续规入口：[按需联网/URL大意/自然图片对话](MATERIALS_CHAT_PLAN.md) / [新的medium指令](MATERIALS_CHAT_MEDIUM_START.md)。用户最新合同覆盖本页第5节统一正文/日期门槛、普通URL完整覆盖要求和默认分析式呈现；本页其他边界与A/B历史保留。B已执行且失败，不重跑旧批次或把旧失败改成通过。
+> 当前联网路线已收敛为[CodeBuddy原生联网](NATIVE_WEB_PLAN.md) / [新medium指令](NATIVE_WEB_MEDIUM_START.md)。本页自建bing_rss、外层正文/日期质量链及旧B/R2均停止续修，不作原生能力前置；其他独立功能历史与边界保留。
+
+> 旧材料续规已退役，仅保留[兼容入口](MATERIALS_CHAT_PLAN.md)；当前统一使用上方原生方案。本页其他独立功能和历史证据保留。
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [本任务交接](HANDOFF.md) / [medium指令](MEDIUM_START.md)。
 

@@ -1,3 +1,5 @@
+2026-10-28 20:20（Asia/Shanghai）：session `LAP-43-native-web-simplify-plan`续43。用户提供CodeBuddy会话Fetch成功演示，纠正优先用原生联网，授权删除/回退过度设计并在项目准则补充简洁原则。本轮收敛详细规划、撤下旧自建联网实施指令及更新准则，不实施新的原生工具接入/生产操作；后续由medium依新指令实现及代码清理。隔离根C:/Users/yutha/.codex/worktrees/lap-43-stage-a/QQbot，分支codex/lap-43-stage-a；起点HEAD/实时远端bf115759df64dd0a6f19b592aa99c3c67530b4ea，初始干净；生产main仍52866fe10cc654d2e12c5520f7afc5aa8bbe0179。独占11文档：AGENTS.md、PROGRESS.md、工作线HANDOFF.md/TASKS.md、43 HANDOFF.md、PLAN.md、MEDIUM_START.md、MATERIALS_CHAT_PLAN.md、MATERIALS_CHAT_MEDIUM_START.md、新NATIVE_WEB_PLAN.md/NATIVE_WEB_MEDIUM_START.md。登记后重读再写其他文档。原报告/失败/真实状态保留，旧冗长材料计划正文可压缩为兼容入口，Git历史可恢复；不删共享图片网络组件或其他session成果，不改业务代码/local/persona/密钥/图库/状态，不启停/真实CLI/模型/QQ/SSH，不合生产main，不派代理。只提交本任务11份已检查文档、push当前隔离分支/核对远端后释放归属停止。
+
 ## LAP-43 R2 session ownership / final checkpoint
 
 2026-10-28T20:01:36.928880+08:00 (Asia/Shanghai): session `LAP-43-materials-r2-public` owns only one new frozen public batch. Baseline HEAD/live remote 854fef4eef14a5795c3674d85e3bc6cae6e7e262; clean isolation branch codex/lap-43-stage-a. Exact files: PROGRESS.md, tracks/laptop-workbuddy/HANDOFF.md, tracks/laptop-workbuddy/TASKS.md, tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md, scripts/probe_lap43_materials.py, tests/test_lap43_materials_probe.py, reports/lap-43-materials-r2-manifest.json, reports/lap-43-materials-r2-public.json, reports/lap-43-materials-r2.md. New attempt/result only under ignored state/lap43-materials-r2/<manifest-sha> (no HTML); temporary synthetic tests. Maximum 3 search + 8 page entries (2/search + 2 direct), 15s/item, 2 redirects/entry, zero retries; counters separate. Freeze before network. Old B manifest/attempt/result unchanged; no old probe, extra diagnostic network, production bypass parameter, model/CLI/QQ/SSH/login/runtime/production writes/main merge/R3. Read back before other edits; delivery commit/push/live SHA then release.
@@ -124,6 +126,8 @@ LAP-13实现提交`ee7f2d4`已成功推送origin/main；随后仅同步交付检
 
 ## 当前任务
 
+2026-10-28 20:20最新：用户要求优先复用原生联网并删减过度设计，[最小方案](tasks/LAP-43/NATIVE_WEB_PLAN.md) / [medium指令](tasks/LAP-43/NATIVE_WEB_MEDIUM_START.md)覆盖旧自建联网路线；本session仅11文档/准则收敛，检查及Git后释放。后续不续B/R2/R3/C，先等用户指定原生接线与代码清理；旧独立功能和报告保留。
+
 2026-10-28最新：LAP-43材料自然对话续规已落盘，[43交接](tasks/LAP-43/HANDOFF.md) / [新详规](tasks/LAP-43/MATERIALS_CHAT_PLAN.md) / [新medium指令](tasks/LAP-43/MATERIALS_CHAT_MEDIUM_START.md)。本轮只文档/隔离分支Git，完成核对后释放归属停止；后续仅用户选中R1才离线实施，R2/R3另选。以下2026-10-26段落为历史，不再自动续42。
 
 2026-10-26最新：当前续42识图实际闭环，[HANDOFF](tasks/LAP-42/HANDOFF.md) / [新详规](tasks/LAP-42/VISION_CLOSURE_PLAN.md) / [输入合同](tasks/LAP-42/CLI_PROMPT_CONTRACT.md) / [本次medium指令](tasks/LAP-42/VISION_CLOSURE_MEDIUM_START.md)。session LAP-42-vision-prompt-closure-plan已登记重读；采用官方后组装Mod、实际CLI零生成检查、原六例、安全候选激活和两条原群闭环。本轮只读/7文档，未实施或真实运行；只续42，不新ID、不重做其他增强、不激活21。旧42整合和VISION_MEDIUM_START不整轮再跑。
@@ -164,7 +168,7 @@ LAP-15内容提交`632fdc5`已推送origin/main，2026-10-17 11:09用ls-remote�
 
 | ID | 单一任务 | 状态与已有证据 | 依赖/推荐顺序 | 执行session | 下一步/完成出口 |
 | --- | --- | --- | --- | --- | --- |
-| LAP-43 | Snow表情/搜索/自然材料对话/唯一操作者与主线整合 | A/B/R1保留；R2公共批次结束，搜索未过/URL gist未证实；[HANDOFF](tasks/LAP-43/HANDOFF.md) / [续规](tasks/LAP-43/MATERIALS_CHAT_PLAN.md) / [R2报告](../../reports/lap-43-materials-r2.md) | 保留旧B0/3、A/R1/42及差额；不部署 | LAP-43-materials-r2-public，2026-10-28 20:01:36领取重读，远端SHA核对后释放停止 | 31离线通过；3搜索/6页面/10HTTP/1跳/0DoH/10系统解析；搜索0/3+1部分，URL1失败/1待审证据不足；质量false，不合main或R3 |
+| LAP-43 | Snow原生联网与精简；独立owner/图片/表情保留 | 最小方案已规划，旧自建联网停止续修；[HANDOFF](tasks/LAP-43/HANDOFF.md) / [PLAN](tasks/LAP-43/NATIVE_WEB_PLAN.md) / [指令](tasks/LAP-43/NATIVE_WEB_MEDIUM_START.md)；旧B/R2失败不改写 | 复用CodeBuddy会话原生Fetch，Search按实际提供；A/R1独立成果保留，不再以旧公共质量批次为前置 | LAP-43-native-web-simplify-plan，2026-10-28 20:20登记重读11文档，Git核对后释放 | 等用户指定medium做原生接线/删除过度自建层；本轮无代码/生产操作，不按旧R123/C串行执行 |
 | LAP-42 | Snow整合；识图闭环 | 视觉按用户“两张本机+一张群图”缩减验收通过，104单元/39框架及真实CLI契约通过；[HANDOFF](tasks/LAP-42/HANDOFF.md) / [结果](../../reports/lap-42-vision-closure-result.md) | 保留运行供用户使用，不续21/其他验收；GIF/旧辅助差额未测 | LAP-42-vision-closure-implementation，Git核对后释放唯一运行/验证归属 | vision=true已加载；授权输入政策48000；原事件ACK及用户客户端/内容确认通过；原六例四项豁免与历史失败保留 |
 | LAP-41 | Snow主线工作区整理与两套bot使用对照 | 完成；主线入口已整理，缓存/网页快照/退役提示已清，4文档归档；[HANDOFF](tasks/LAP-41/HANDOFF.md) / [清单](tasks/LAP-41/CLEANUP.md) / [使用对照](../../docs/BOT_USAGE_COMPARISON.md) | 承接40用户文字首试成功；字节码缓存因自动审批拒绝保留，不扩功能 | LAP-41-snow-mainline-cleanup-comparison，2026-10-25 12:03登记重读；Git交付后释放归属 | 正常使用Snow；新根缺旧7条表情登记，未自动迁移；配置/历史/其他根/A4保留，不自动推进新功能 |
 | LAP-40 | 官方原版SnowLuma最小文字接入/日常入口 | 接入/桌面入口已实现及离线通过；用户现场确认Snow可运行、QQ群可回复，最小文字首试通过；[HANDOFF](tasks/LAP-40/HANDOFF.md) | 用户确认与独立模型/ACK追踪分开；其他功能/长稳不晋升；B/C停止、A4未动 | LAP-40-user-text-confirmation，2026-10-25 11:47登记重读；本次仅文档，交付后释放归属 | 按[使用说明](../../SnowLuma使用说明.md)日常使用，按实际异常处理；不重复首试、不增证明/长稳前置、不自动推进其他功能 |

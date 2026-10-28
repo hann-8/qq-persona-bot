@@ -1,6 +1,18 @@
 # LAP-43：Snow表情、时效搜索、群参与、唯一操作者与主线整合
 
-## 当前R2：有限公共验证已结束，仅隔离Git交付
+## 当前方向：原生联网最小方案已规划，停止旧联网路线
+
+2026-10-28 20:20（Asia/Shanghai），session `LAP-43-native-web-simplify-plan`按用户最新指令收敛设计。起点HEAD/实时远端`bf115759df64dd0a6f19b592aa99c3c67530b4ea`，隔离分支`codex/lap-43-stage-a`开始干净；生产main仍`52866fe10cc654d2e12c5520f7afc5aa8bbe0179`。TASKS先登记11文档并重读，归属仅AGENTS/PROGRESS、工作线HANDOFF/TASKS、本HANDOFF、PLAN/MEDIUM_START、MATERIALS_CHAT两文件和新NATIVE_WEB两文件。
+
+已完成[最小方案](NATIVE_WEB_PLAN.md) / [medium指令](NATIVE_WEB_MEDIUM_START.md)：复用CodeBuddy会话原生WebFetch，Search单独核对；当前阻断是--tools空、deny和ResultParser拒绝工具。后续改本次工具白名单/解析/轮次与gateway接线，删除失去必要性的自建联网增量，保留共享图片网络与owner/暂停/自然图片/表情/记忆。
+
+AGENTS新增“优先原生、最小适配、避免过度设计”；旧MATERIALS_CHAT详规173行压缩为9行兼容入口、旧指令55行压缩为7行，Git历史可恢复，报告/失败/状态证据不删。旧B/R2/R3/C联网指令不再顺序推进。当前只是文档收敛，**业务代码尚未删除或接通原生工具**，生产local/persona/数据/运行未改，无CLI/模型/QQ/SSH/启停/合main；后续medium只做实现/离线后停止，运行另选。
+
+本轮11文档UTF-8、最终288本地链接、10行围栏、41唯一任务表ID/无重复和真实号码排除检查通过，git diff --check通过；17项生产配置/persona/图库保护相同，生产main工作区干净。当前CLI安装包只读核对了工具参数/内置名，不运行CLI或模型；本轮没有代码测试、公共probe或运行操作。写后重读，Git差异仅上述Markdown，原A/B/R1/R2源码/报告未改。
+
+仅提交上述11文档、push当前隔离分支并核对实时SHA；最终SHA以分支tip/会话答复为准，不自引用。核对远端后释放归属并停止，不自动实施。以下为保留历史材料/失败记录，不能继续用其资格门槛阻挡原生Fetch接入。
+
+## 历史R2：有限公共验证已结束，仅隔离Git交付
 
 2026-10-28，session `LAP-43-materials-r2-public`，20:01:36+08:00先登记重读9文件；起点HEAD/实时远端854fef4eef14a5795c3674d85e3bc6cae6e7e262、隔离分支干净。20:04:43冻结manifest SHA `c3d510b72173d28b836f511d654afc7ca78b98193d47f4ffafe64af3b07d84b8` 后唯一执行，20:05:06左右结束；3搜索+6页面入口、10 HTTP/1重定向/0DoH/10系统解析，零重试/额外网络。
 

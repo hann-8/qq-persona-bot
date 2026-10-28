@@ -1,6 +1,8 @@
 # LAP-43：给gpt-6.1-sol/medium的实施指令
 
-> 当前默认接续已改为[新medium指令R1](MATERIALS_CHAT_MEDIUM_START.md)及[新详规](MATERIALS_CHAT_PLAN.md)。原A已交付、原B实际失败；本页B/C只保留历史和未冲突的运行边界，不能直接重放旧B或据旧C自动部署。其他旧子项仅按用户明确范围单独选中。
+> 当前请使用[原生联网与删减指令](NATIVE_WEB_MEDIUM_START.md)及[最小方案](NATIVE_WEB_PLAN.md)。旧B/C/R1/R2/R3联网路线不再原样推进；未完表情、owner等独立验收仅按实际缺项另选。本页保留历史，不自动执行。
+
+> 原A已交付、原B/R2实际结果保留。本页只作历史及未冲突边界参考，默认接续由上方原生指令取代。
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [43交接](HANDOFF.md) / [详细规划](PLAN.md)。
 
