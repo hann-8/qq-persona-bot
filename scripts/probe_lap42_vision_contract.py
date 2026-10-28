@@ -30,7 +30,13 @@ async def probe(root,settings,journal,trial=False):
     for fault in (None,'missing_plugin','wrong_receipt'):
         row=dict(fault=fault,state='started',users=0)
         rows.append(row);atomic(journal,json.dumps(rows).encode())
-        runner=create_runner(root,settings,InputBudget.from_settings(settings))
+        from copy import deepcopy
+        runner_settings=deepcopy(settings)
+        # Probe has no active permission yet: use the established observation
+        # context only in this stopped helper. The native Guard still checks the
+        # current record, final budget, wire, tools and zero-next short circuit.
+        if trial:runner_settings['vision']['enabled']=False
+        runner=create_runner(root,runner_settings,InputBudget.from_settings(settings))
         token=CURRENT.set(NativeImage(blob,4096,time.monotonic()+60,time.monotonic()+15))
         try:
             try:
