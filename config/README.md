@@ -22,7 +22,7 @@ LAP-24可选管理token独立于五文件配置和QQ密码，仅用`scripts/conf
 
 新装默认仍CodeBuddy/deepseek-v4.1-flash、mentions、single；web/memes/attention/vision/members/memory/learning默认关闭。推理强度受模型能力元数据约束；CLI原生窗口仍仅null，预算是可见UTF-8字节保守计数，不是精确token或积分。本地模型仅显式选择，不自动下载或切换；启用前须核对digest。模板每个字段标明用途、单位/选项、新装默认与重要约束。
 
-迁移保留实际旧值，包括free、两个profile和所有开关，不能拿模板默认覆盖。私聊固定关闭、黑名单前置、单次尝试和工具隔离不变。web搜索质量门槛仍关闭；vision true仍拒启动；members desired开启仍生产暂停，不能用手写字段冒充验证。记忆学习必须同时开启读取。
+迁移保留实际旧值，包括free、两个profile和所有开关，不能拿模板默认覆盖。私聊固定关闭、黑名单前置、单次尝试和工具隔离不变。当前web搜索须同时启用web.enabled/search_enabled，个人试用不宣称质量已过；vision true须有配对运行许可（包括LAP-43明确待用户实测试用）；members仍逐次按来源/人数/双TTL判定，不能用手写字段冒充验证。记忆学习必须同时开启读取。
 
 ## 首次建立与迁移（均须显式操作）
 
@@ -71,7 +71,7 @@ LAP-24可选管理token独立于五文件配置和QQ密码，仅用`scripts/conf
 
 ## 群临时停言（LAP-35）
 
-`local/chat.yaml` 中唯一新增设置为 `participation.silence.enabled: true`，缺省true。开启只表示接受控制，各授权群启动时仍为普通。普通成员明确指向bot要求停言（例如“肥鱼先别参与讨论了”）后，本群不确认、不发表情，直到非黑名单群友下一条原始真实@恢复；同条@并要求停言时停言优先。别名复用 `participation.attention.aliases`，不因此开启叫名回复。模糊、否定、引用/转述或超长表达不保证识别，不额外调用分类模型。
+`local/chat.yaml` 中唯一新增设置为 `participation.silence.enabled: true`，缺省true。开启只表示接受控制，各授权群启动时仍为普通。仅本机access.admin_users中唯一操作者的真实sender可明确暂停/恢复。操作者发真实@加“暂停发言”后，本群不确认、不发表情；仅本人真实@加“恢复发言”或明确叫名“鱼鱼可以说话了/继续说话”才能恢复。普通成员命令和任何人的裸@均不能解除暂停；同条暂停优先。别名复用 `participation.attention.aliases`，不因此开启叫名回复。模糊、否定、引用/转述或超长表达不保证识别，不额外调用分类模型。
 
 状态只在gate内存中。gate/完整bot/电脑重启回普通；WS、QQ离线、插件或模型重连不解除，没有自动超时。恢复后继续原有free/mentions合同；不补答哑巴期间消息、不清历史/记忆，不解除真实unknown/清理阻断。已经提交到QQ的消息可能晚到，无法撤回；旧结果不能借唤醒后的新状态发送。
 
@@ -142,3 +142,11 @@ Snow运行准入另要求online/good、已armed且pipe/login/rx/outbound健康�
 - `rollback`：只接受本任务完整激活账本；若有已完成登记的trial，仅停止该instance的受管进程，再核验确退。未知/部分/实例变化拒绝。恢复仅本次provider字段；无后改时原字节还原（含BOM/引号/无尾换行），无关后改保留，provider后改拒绝覆盖。不自动启动NapCat，不清理登录、人设、记忆或事故预算。
 
 采样由gate既有健康任务消费，没有新增进程/监听/nonce客户端。从首次真实channel_ready开始，每60秒记录封闭布尔/计数、核验PID的RSS/句柄与允许项目目录的元数据字节；不存QQ号、消息ID/echo、正文或栈。每条<=512B，采样日志总<=16MiB，按日桶保留至多14天；容量/资源/时钟/覆盖缺口UNKNOWN并断开连续段。QQ/Node/epoch/build/policy/配置摘要变化另起段，旧失败计数保留。QQ发送ACK/失败/unknown及延迟与控制ACK分开；未知不重试。72h包含于168h，但这些时间标记仍不能替代真实新消息驱动的7天收发验收。8小时中位数资源趋势须由操作者评估，不自动重启抹平；真实重新扫码的观测接线仍受阶段3缺口阻断。
+
+## LAP-43搜索与识图试用
+
+`web.search_enabled`新增，模板默认false；本机本轮经明确授权保存true。`web.freshness_days`默认7，范围1..30，当前请求明确时间窗优先；启用须同时web.enabled=true，正常停机保存后重启。搜索保持bing_rss、最多1次搜索/5候选/2页/2来源、6000字节材料和既有PublicHTTP/TLS/SSRF约束。旧SEARCH_QUALITY_PASSED=false及历史报告不改为通过；运行状态为operator_trial_unverified，逐请求校验正文/日期，失败在模型前准确说明。
+
+`access.admin_users`字段保持，但去重后必须恰好1项，不等于bot、不在blocked_users；框架名单与router/记忆管理员同源。群角色、昵称、引用或模型均不授予控制权。
+
+识图当前`lap43_operator_trial`为操作者显式试用许可，质量pending_user_test。它绑定完整源码/配置/实际runtime/所选记录、当前定向检查与真实CLI零生成接线，继续保留预算/工具隔离/unknown限制；不代表新IQ或人工评分通过。固定私有材料位于state/lap43-vision-trial，旧IQ和人工记录不改。详情及配对备份位置见[43交接](../tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)。旧任务段落按其日期解释。

@@ -2,15 +2,35 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线HANDOFF](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [详细规划](PLAN.md) / [medium指令](MEDIUM_START.md)。继承根AGENTS边界；本任务不替代LAP-18/21/27/35/42的历史证据及未验差额。
 
-## 当前状态：LAP-43统一实施与部署进行中
+## 当前状态：四项已实现、已启用并部署main，通道就绪
 
-2026-10-28 22:24（Asia/Shanghai）session `LAP-43-rollout`，用户已提交统一实施prompt并明确授权四项启用、受管停启和main部署；QQ群实测由用户执行。隔离树`E:/CodexWS/QQbot_LAP43`、分支`codex/lap-43-rollout`，生产起点main/c4c52ca，开始无非忽略差异。唯一实现和运行执行者为本session，无代理。目标/成功条件：四项实现、必要权限/材料/预算检查、7表情锁内激活、vision完整当前绑定试用、正常加载就绪、main提交推送。文件归属见TASKS首段；不改persona/账号/模型/预算，不主动真实模型/QQ测试。
+2026-10-28，唯一session `LAP-43-rollout`，用户提交统一实施prompt，明确授权四项启用、受管停启/main部署；又单独授权仅从本机npm缓存恢复项目内CLI。起点main/c4c52ca工作区干净；隔离树`E:/CodexWS/QQbot_LAP43`、分支`codex/lap-43-rollout`实现，生产确认停机后快进main。无代理，不修改原NapCat根/旧C/A4/家庭主机，不登录/扫码或接管外部QQ。
 
-已完成输入/叫名/同人续聊、唯一owner停言/恢复与重置、搜索正文日期/manifest/来源及识图明确试用代码；37项针对性检查通过（包含受管worker、真实gate发送栅栏、当前CLI来源预算和TS工具隔离替身）。两项历史测试分别固定旧30000/persona和旧native签名，本轮不重写或作为当前成功证明；改用当前实际配置预算检查。尚未部署。
+| 项目 | 当前实际结果 |
+| --- | --- |
+| 表情 | 原7条pending通过路径/hash/格式/锁和expected摘要核对；内置activate_pending停机事务已完成，active=7、pending按原事务消费，候选7条/1134字节，资产及标签未改；真实发送/GIF待用户试用 |
+| 输入/关注 | 空@本地短应声，媒体提示取真实类型，字面占位文本不抹掉；图片保留原入站链；有限直接叫名与同人已ACK短续聊进入must_reply，ambient原频控保持 |
+| 控制 | admin_users去重后恰好1项，不能等于bot/blocked；gate仅真实owner新文字可明确暂停/恢复，非owner控制事件消费而不改状态；裸@/媒体不能解除muted；现有重置三种精确指令统一owner鉴权；未增远程运维 |
+| 搜索 | 本机web.search_enabled=true、freshness_days=7，模板默认false；唯一bing_rss、原PublicHTTP/单次/页数/材料预算保持；HTML日期→正文筛选→manifest/元数据→来源后缀贯通，失败0模型准确说明；质量operator_trial_unverified |
+| 识图 | vision=true保持；当前完整adapter/settings/runtime/selected-record绑定，固定当前报告和私有零生成probe及操作者授权配对，acceptance_mode=lap43_operator_trial、quality_state=pending_user_test；旧IQ/人工接受/失败不改写，不称新质量通过 |
+| 运行 | 最近生产复核running、OneBot connected、can_receive=true、router_ready=true；搜索及识图试用已加载，磁盘/实例快照一致，当前错误null；启动后模型user_messages=0，QQ群效果由用户自己测 |
+| CLI恢复 | 全局已升级2.177.1导致原锁定bundle不符/原bot停止；获追加授权后从本机npm缓存解包2.168.0到runtime/codebuddy-2.168.0/package，3333文件、bundle SHA与原13e6dd30…相同；项目使用相对路径，不联网下载/修改全局CLI，不换模型/账号/credits |
 
-发现全局CLI已升级2.177.1，与锁定2.168.0 bundle不符，当前受管bot stopped/disconnected。用户随后明确授权仅从本机npm缓存恢复旧版到项目runtime；已解包并核对原bundle hash完全一致，不改全局CLI/不下载/不换模型或账号。对应新增归属versions.lock、workbuddy_cli_runner、hosted_cli_budget；项目改用相对路径，完整签名仍绑定。真实CLI零生成、当前配置预算、配对激活与就绪检查尚待部署事务执行。若出现技术失败保留具体证据及配对备份，不因缺用户质量评分停下。
+### 必要验证与证据边界
 
-下一步：补必要框架/图库与最小公共连通性检查，审阅提交；正常受管停止确认后合入main，备份及一次保存新增search字段、7条表情、当前vision试用记录，正常启动；同步结果/用法及远端SHA。原旧验收/unknown/人工记录保持，搜索及新版本识图质量待用户实测。
+- `python -B -X utf8 scripts/revalidate_lap43_vision.py check`当前最终40项通过，报告[lap-43-vision-offline.json](../../../../reports/lap-43-vision-offline.json)。包含真实gate权限/发送代际栅栏、实际AstrBot事件转换/空@/媒体提示/owner重置、受管worker、日期及manifest、当前公开来源读取/预算、TS Guard工具隔离替身。生产实际48000/overhead2048/output2048、4096 reserve保留；可见政策样例28917字节；叠加6000公共材料/7表情候选的大图native检查通过。
+- `revalidate_lap43_vision.py probe --expected-binding …`实际锁定CLI正例1条本地user/next=0、两个反例user=0，真实生成0；摘要和3条journal保存在固定state/lap43-vision-trial。最初探针在创建CLI前被旧active许可前置拦截，0 user/0生成；helper随后使用既有纯观察上下文，仍执行static/final预算/wire/Guard工具隔离后成功，没有改变生产runner边界。
+- 一次实际PublicHTTP公共查询（Python最新消息），1搜索/2正文请求/3 HTTP，37582字节/约2.47秒；RSS及网络响应可达，2页extract_failed，0可用来源，正确本地无法核实说明，0模型/QQ。没有第二次查询刷通过，不保证后续候选正文/日期质量。
+- 探索性旧42全模块中两项固定旧30000/persona或旧native签名，不适用于当前授权变更，原测试/证据均保留；本轮明确排除这两项，改用当前实际预算与完整新绑定。旧transport_router的私有健康/45秒夹具3例不匹配官方路线，未当当前通过；本轮新增实际AstrBot+gate控制/提示/发送栅栏检查通过。没有全库、旧六例或真实模型质量批次，没有agent群发。
+- 最终仅4个已授权忽略路径变化：config/local/features.yaml、config/memes.local.yaml、state/memes-pending.local.yaml、state/vision-evidence/active.json；其余13项保护（含persona、其他local、7资产）字节相同。framework admin与本机唯一名单一致，CLI web工具关闭。没有读取/输出群消息或长期记忆事实。
+
+### 事务、文件与回滚
+
+代码提交`ce2425b`及探针接点修复`b6e0d86`已快进main；随后仅同步本轮报告/文档并推送，最终SHA以Git/会话回执为准。实现文件归属见TASKS首段及该提交；新增模块为input_policy、web_freshness、vision_trial，新增helper为activate_lap43_memes及revalidate_lap43_vision；templates、router/gate、权限、source/manifest、runner相对路径接点和必要测试已配对。
+
+原字节/不存在标记与17项保护在`state/lap43-deployment/20261028/baseline.json`及同目录备份，当前事务摘要在transaction.json、deployment-result.json；7表情原pending/active备份在state/lap43-memes/<pending-sha>/；识图旧active、授权、候选在state/lap43-vision-trial/<完整binding>/，旧42文件原样保留。需要回滚时先正常停止，仅在目标仍匹配本事务after摘要时恢复本任务配对代码/配置/catalog/pending/active，禁止覆盖后续用户改动或删除unknown/锁/记忆。原基线本身已因全局CLI升级不可启动，恢复原字节不等于恢复可用；项目内锁定CLI是本次已授权修复，不能回到全局漂移的entry后声称就绪。
+
+独立运行结果已经交付，不再有待激活事项。剩余仅用户正常群测空@/叫名/owner控制、JPEG/GIF、搜索正文时效和当前识图质量；没有反馈不回退成未部署，旧任务真实验收差额不抹掉。Git提交推送/实时远端一致后释放唯一执行归属；下一步按用户具体反馈修复，不自动扩新验收或变更配置。
 
 ## 2026-10-28前轮文档修订记录（历史）
 

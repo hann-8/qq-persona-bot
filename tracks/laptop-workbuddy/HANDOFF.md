@@ -1,4 +1,4 @@
-2026-10-28 LAP-43统一实施进行中，唯一执行session `LAP-43-rollout`；用户已授权四项启用/main部署及项目内缓存CLI恢复。状态从[PROGRESS](../../PROGRESS.md)及[43交接](tasks/LAP-43/HANDOFF.md)读取。
+2026-10-28 LAP-43四项已实现/启用/main部署：7表情、输入/叫名、唯一操作者、时效搜索；识图完整当前绑定试用保留。40定向及真实CLI零生成通过，组件running/OneBot connected/can_receive=true，群质量待用户实测；项目内缓存CLI恢复获单独授权。唯一session `LAP-43-rollout`，交付后释放归属；证据从[PROGRESS](../../PROGRESS.md)及[43交接](tasks/LAP-43/HANDOFF.md)读取。
 
 # QQ主线交接：SnowLuma与共用bot业务
 

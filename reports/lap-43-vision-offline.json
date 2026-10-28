@@ -1,0 +1,39 @@
+{
+  "adapter_signature": "692b9a12631d83fe742ed4d46a0d265abbaadb3444e95f0e8a164977deec2f1f",
+  "binding": "5952f27e8a04ddad1b19ab77dffc69c1b020948a7cd747b0cdb7212cfdeec46a",
+  "budget": {
+    "final_visible_policy_bytes": 28917,
+    "limit": 48000,
+    "member_candidates": 0,
+    "memory_records": 4,
+    "output_reserve": 2048,
+    "overhead": 2048,
+    "passed": true,
+    "persona_bytes": 19256,
+    "persona_sha256": "ff6f629d92afab7ea1c47830bd4a7e8735e944862573a90764645604e96f2804",
+    "system_bytes": 24450
+  },
+  "files": {
+    "reports/lap-42-vision-closure-sources.json": "7c24fa759b061c28e2dfc07e0a5d4195a10eaecdec18c5c190effa8119e4e640",
+    "scripts/revalidate_lap43_vision.py": "191e16cb0c4a920926d420e4c51c0768e3b3f4cbc6e7164fa20ee5faf9aafb57",
+    "tests/test_lap42_vision.py": "7f958315983086a813f1a1820b719e0347476542ed62fba8128002b1754c6894",
+    "tests/test_lap43.py": "cf66a2589f9c20ea7aa09fb57205a1344535ec332c3d3386b65f04098aa60d44",
+    "tests/test_vision_mod_guard.py": "c5afb4053140b939549547669bc0c144315f0f5d0ce6ad25761560097a59051b",
+    "tests/test_web_freshness.py": "09c6f3d60b0a19b14000bfe6bbf98cef404f585ae7b8812ee66e7ca3921fefeb"
+  },
+  "native": {
+    "C": 1000000,
+    "F": 8985,
+    "O": 128000,
+    "T": 31874,
+    "V": 1024
+  },
+  "passed": true,
+  "quality_state": "pending_user_test",
+  "real_model_calls": 0,
+  "real_qq_outputs": 0,
+  "rule_hash": "4dfb239d768f5c439ee7c718afc0827c90965de91295ef6b3e4e985586bb1b85",
+  "schema_version": 1,
+  "static_missing": [],
+  "tests_run": 40
+}
