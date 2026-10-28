@@ -93,8 +93,8 @@ def adapter_signature():
          'scripts/verify_lap42_vision.py','tests/test_vision_mod_guard.py','tests/test_lap42_vision.py',
          'reports/lap-42-vision-closure-sources.json','scripts/revalidate_lap43_vision.py',
          'scripts/verify_lap43.py','scripts/verify_lap43_framework.py','tests/test_lap43.py','tests/test_web_freshness.py',
-         'scripts/activate_lap43_memes.py','scripts/probe_lap43_search.py','scripts/configure_astrbot.py','reports/lap-43-vision-sources.json',
-         'scripts/verify_lap43_materials.py','tests/test_lap43_materials.py','reports/lap-43-materials-sources.json'} |
+         'scripts/activate_lap43_memes.py','scripts/configure_astrbot.py','reports/lap-43-vision-sources.json',
+         'tests/test_native_web.py','reports/lap-43-materials-sources.json','reports/lap-43-native-web-sources.json'} |
         {str(p.relative_to(root)).replace('\\','/') for p in (root/'adapters/codebuddy_vision_guard').rglob('*') if p.is_file()})
     from importlib.metadata import version
     for package in ('readability-lxml','lxml','lxml_html_clean','chardet','cssselect'):

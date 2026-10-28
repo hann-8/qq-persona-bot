@@ -494,10 +494,6 @@ def main():
     from .vision import require_production
     require_production(settings,root=root)
     runner=create_runner(root,settings,budget)
-    from .web_retrieval import WebRunner, Retriever
-    ids=[settings['bot']['qq']]+sum((settings['access'][k] for k in ('allowed_groups','admin_users','blocked_users')),[])
-    runner=WebRunner(runner,Retriever(settings['web'],ids,network=settings['public_network'],root=root,bilibili=settings['bilibili'],aliases=settings['participation']['attention']['aliases']),budget,settings['output'],root)
-    runner.allow_ambient_web=settings['participation']['allow_ambient_web']
     from .meme_catalog import MemeCatalog
     memes=MemeCatalog(root,settings['memes'])
     runner.memes=memes

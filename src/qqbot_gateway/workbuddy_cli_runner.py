@@ -29,7 +29,12 @@ class _ProbeReady(Exception):
 
 
 class ResultParser:
-    def __init__(self, expected_model=None):
+    def __init__(self, expected_model=None, allowed_tools=()):
+        if not set(allowed_tools) <= {'WebFetch', 'WebSearch'}:
+            raise ValueError('Read-only native web tools required')
+        self.allowed_tools = frozenset(allowed_tools)
+        self.tool_calls = {}
+        self.completed_tools = set()
         self.expected_model = expected_model
         self.decoder = codecs.getincrementaldecoder('utf-8')('strict')
         self.buffer = ''
@@ -74,16 +79,36 @@ class ResultParser:
         if kind == 'error' or event.get('is_error') or event.get('errors'):
             raise GatewayError(classify_error({k:event.get(k) for k in ('error','errors','message','result')}))
         if kind == 'system' and event.get('subtype') == 'init':
-            if event.get('tools') != [] or event.get('mcp_servers') != []:
+            tools = event.get('tools')
+            if (not isinstance(tools,list) or any(not isinstance(t,str) for t in tools) or
+                    set(tools) != self.allowed_tools or len(tools) != len(set(tools)) or
+                    event.get('mcp_servers') != [] or event.get('mcp_servers_unavailable')):
                 raise GatewayError('TOOL_ISOLATION_FAILED')
+            if self.initialized:raise GatewayError('PROTOCOL_ERROR')
             if self.expected_model is not None and event.get('model') != self.expected_model:
                 raise GatewayError('PROTOCOL_ERROR')
             self.initialized = True
         content = event.get('message', {}).get('content', []) if isinstance(event.get('message'), dict) else []
-        if isinstance(content, list) and any(isinstance(b, dict) and b.get('type') in ('tool_use', 'tool_call') for b in content):
+        # Only the installed CLI's complete assistant tool_use / user tool_result
+        # envelopes are accepted. Never promote intermediate text to the answer.
+        if kind in ('tool_use','tool_call','tool_result'):
             raise GatewayError('TOOL_ISOLATION_FAILED')
+        for block in content if isinstance(content,list) else []:
+            if not isinstance(block,dict):continue
+            if block.get('type') in ('tool_use','tool_call'):
+                name,call_id=block.get('name'),block.get('id')
+                if (not self.initialized or self.result is not None or kind!='assistant' or
+                        not isinstance(name,str) or name not in self.allowed_tools or not isinstance(call_id,str) or not call_id or
+                        call_id in self.tool_calls):raise GatewayError('TOOL_ISOLATION_FAILED')
+                self.tool_calls[call_id]=name
+            elif block.get('type')=='tool_result':
+                call_id=block.get('tool_use_id')
+                if (kind!='user' or self.result is not None or not isinstance(call_id,str) or
+                        call_id not in self.tool_calls or call_id in self.completed_tools):
+                    raise GatewayError('TOOL_ISOLATION_FAILED')
+                self.completed_tools.add(call_id)
         if kind == 'result':
-            if self.result is not None or not self.initialized:
+            if self.result is not None or not self.initialized or set(self.tool_calls)!=self.completed_tools:
                 raise GatewayError('PROTOCOL_ERROR')
             if (event.get('subtype') != 'success' or event.get('is_error') is not False or
                     event.get('terminal_reason') not in (None, 'end_turn', 'stop', 'completed', 'success') or
@@ -152,16 +177,28 @@ class CLIRunner:
         """Same isolated controls and cleanup, with no user or model generation."""
         return await self._execute('', '', request_id, control_only=True)
 
-    async def run(self, system, prompt, request_id):
-        return await self._execute(system, prompt, request_id)
+    async def run(self, system, prompt, request_id, *, group_request=None):
+        return await self._execute(system, prompt, request_id,group_request=group_request)
+
+    async def run_group(self, system, prompt, request_id, request):
+        return await self.run(system,prompt,request_id,group_request=request)
 
     async def probe_image_contract(self, system, prompt, request_id, *, fault=None):
         """Local single-user turn.step short circuit; never a business answer."""
         if fault not in (None,'missing_plugin','wrong_receipt'):raise ValueError('INVALID_PROBE_FAULT')
         return await self._execute(system,prompt,request_id,probe=True,probe_fault=fault)
 
-    async def _execute(self, system, prompt, request_id, *, control_only=False,probe=False,probe_fault=None):
+    async def _execute(self, system, prompt, request_id, *, control_only=False,probe=False,probe_fault=None,group_request=None):
         from .vision import CURRENT,text_budget,cli_message,wire_check,production_budget
+        from .lifecycle import stopping
+        if stopping(self.root):raise GatewayError('SHUTTING_DOWN')
+        from .web_policy import native_tools, current_question
+        tools=native_tools(getattr(self,'web_settings',{}),current_question(prompt,group_request),
+            image=bool(CURRENT.get()),disabled=control_only or probe or bool(group_request and
+                not group_request.get('must_reply') and not getattr(self,'allow_ambient_web',True)))
+        denied=[name for name in self.denied if name not in tools]
+        if getattr(self,'web_settings',None) and not control_only and not CURRENT.get():
+            system+='\n本次会话只读联网工具：'+('、'.join(tools) if tools else '无')+'。未列出的工具不可用；没有实际工具结果不得声称已联网。图片会话不联网，图+URL不代表已读网页。\n'
         if control_only and CURRENT.get():raise GatewayError('PROTOCOL_ERROR')
         if not control_only:production_budget(self.root,getattr(self,'vision_settings',{}),self.budget,system,prompt)
         text_budget(self.budget).check(system, prompt)
@@ -176,10 +213,11 @@ class CLIRunner:
             system_file = work/'system.txt'
             system_file.write_text(system, encoding='utf-8')
             args = [str(self.node),str(self.entry),'-p','--output-format','stream-json',
-                    '--tools','','--strict-mcp-config','--mcp-config',str(self.root/'config/mcp-empty.json'),
-                    '--permission-mode','dontAsk','--no-session-persistence','--max-turns','2',
+                    '--tools',','.join(tools),'--strict-mcp-config','--mcp-config',str(self.root/'config/mcp-empty.json'),
+                    '--permission-mode','dontAsk','--no-session-persistence','--max-turns','8' if tools else '2',
                     '--model',self.model,'--system-prompt-file',str(system_file),
-                    '--setting-sources','none','--disallowedTools',*self.denied]
+                    '--setting-sources','none','--disallowedTools',*denied]
+            if tools:args += ['--allowedTools',*tools]
             local_settings={'autoCompactEnabled':False}
             if self.reasoning_effort != 'auto':local_settings['alwaysThinkingEnabled']=True
             args += ['--settings',json.dumps(local_settings)]
@@ -238,8 +276,9 @@ class CLIRunner:
                 clean = await owner.join()
                 if not clean:raise GatewayError('CLEANUP_FAILED') from None
                 raise GatewayError('BACKEND_UNAVAILABLE') from None
-            parser = ResultParser(self.model)
+            parser = ResultParser(self.model,tools)
             self.last_parameters = {'model':self.model,'effort_requested':self.reasoning_effort,
+                                    'native_web_tools':list(tools),'cli_max_turns':8 if tools else 2,
                                     'effort_effective':None,'auto_compact_setting':False,
                                     'forced_compact_exclusion_verified':False,'native_window':'unverified'}
             self.last_parameters['effort_evidence']='auto_default' if self.reasoning_effort=='auto' else 'awaiting_current_capabilities'
@@ -373,7 +412,11 @@ class CLIRunner:
                 process.stdin.close()
 
             watcher = asyncio.create_task(monitor())
-            io = [asyncio.create_task(coro()) for coro in (read_stdout,read_stderr,write_stdin)]
+            async def watch_shutdown():
+                while process.returncode is None:
+                    if stopping(self.root):raise GatewayError('SHUTTING_DOWN')
+                    await asyncio.sleep(.05)
+            io = [asyncio.create_task(coro()) for coro in (read_stdout,read_stderr,write_stdin,watch_shutdown)]
             generation = 'pending'
             try:
                 async with asyncio.timeout(self.timeout):
@@ -381,6 +424,7 @@ class CLIRunner:
                 if guard:
                     try:self.last_parameters['vision_guard']=guard.finish()
                     except (OSError,ValueError):raise GatewayError('MODEL_CONFIG_UNSUPPORTED') from None
+                if stopping(self.root):raise GatewayError('SHUTTING_DOWN')
                 result = BackendResult(parser.finish(process.returncode),parser.usage,self.last_parameters,'stop')
                 generation = 'success'
                 return result

@@ -5,26 +5,9 @@ public_network:  # 项目公共网络策略；默认无额外CA
   resolver: system  # 仅system/cloudflare_doh，失败不自动切换
   ca_bundle_file: null  # 仅显式secrets/public-network-ca.local.pem，禁止任意路径/私钥/链接
 web:
-  search_enabled: false # Independent switch and code quality gate
-  freshness_days: 7 # 1..30; Asia/Shanghai
-  # 配置节，子字段见下方；保留既有校验约束
-  enabled: false  # 共用网页读取开关；搜索质量门槛仍关闭，不代表完整搜索可用；新装默认 false
-  trigger: auto  # 联网触发auto/explicit；新装默认 "auto"
-  extractor: readability  # 按需受管worker提取；legacy仅显式回滚
-  long_text_policy: excerpt  # 六区节选或reject；完整要求超限拒绝
-  material_goal: gist  # gist读主要内容；coverage保留原覆盖合同；正常重启生效
-  search_fallback: snippet  # 正文失败可用实际实质摘要；none关闭退化；搜索双门槛仍优先
-  selection_policy: coverage  # coverage六区或question当前问题本地相关整段；保存后正常重启生效
-  provider: bing_rss  # 搜索提供方固定bing_rss，当前搜索质量门槛关闭；新装默认 "bing_rss"
-  max_searches: 1  # 搜索最多1次；新装默认 1
-  max_results: 5  # 搜索结果1..5条；新装默认 5
-  max_pages: 2  # 正文1..2页；新装默认 2
-  timeout_seconds: 15  # 联网总超时秒5..15；新装默认 15
-  max_redirects: 2  # 重定向0..2次；新装默认 2
-  max_response_bytes: 1048576  # 响应上限65536..1048576字节；新装默认 1048576
-  max_page_text_bytes: 4000  # 单页正文1000..8000字节；新装默认 4000
-  max_evidence_bytes: 6000  # 兼容保存1000..12000；公共材料实际最多6000且受最终预算约束
-  max_sources: 2  # 来源1..2项；新装默认 2
+  provider: codebuddy_native  # 只用当前CodeBuddy CLI原生工具；Ollama无联网
+  enabled: false  # WebFetch开关；保存后正常重启生效，本轮不改local
+  search_enabled: false  # 独立Search开关；当前供给未证实，即使true也不开放
 memes:  # 配置节，子字段见下方；保留既有校验约束
   enabled: false  # 发送已登记表情图片的开关，不开放任意媒体；新装默认 false
   inbox_dir: assets/memes/inbox  # 固定项目assets/memes/inbox，本机素材不提交；新装默认 "assets/memes/inbox"

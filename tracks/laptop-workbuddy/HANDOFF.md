@@ -1,6 +1,10 @@
 # QQ主线交接：SnowLuma与共用bot业务
 
-## 当前方向：原生联网与删减自建层
+## 当前交付：原生Fetch隔离实现完成
+
+2026-10-28，session `LAP-43-native-web-implementation`完成原生WebFetch最小接线、当次工具许可/解析/8轮限制和gateway去WebRunner；模板provider=codebuddy_native、Fetch/Search默认false，生产local未写。Search仅有静态定义，当前账号/model/headless供给未证实，保持不开放。删除6个43专用probe/材料测试/writer；共享图片网络/协议兼容、owner/暂停/输入/自然图片/表情/记忆和全部历史报告保留。21定向单元+62两后端框架+3菜单回归通过，新43 offline配对及4种hash漂移拒绝/旧offline拒绝通过。当前安装CLI2.177.1与锁定2.168.0不匹配，视觉template检查拒绝；真实CLI/Fetch/Search/新图片配对均未验，不能据离线结果部署。只隔离Git交付，不合main/不运行。 [实际报告](../../reports/lap-43-native-web.md) / [43交接](tasks/LAP-43/HANDOFF.md)。当前下一步为用户另选有限运行阶段，先处理CLI版本审阅缺口；不续旧联网流水线。
+
+## 历史规划检查点：原生联网与删减自建层
 
 2026-10-28 session `LAP-43-native-web-simplify-plan`已登记重读11文档，补简洁原则、撤下冗长自建材料续规，完成[原生最小方案](tasks/LAP-43/NATIVE_WEB_PLAN.md) / [新medium指令](tasks/LAP-43/NATIVE_WEB_MEDIUM_START.md)。runner当前主动清空工具并拒绝工具过程；后续只改会话权限/解析/路由和必要轮次，不再续修B/R2。Fetch用户演示与Search实际能力分开，不夸大为bot验收通过。独立owner/图片风格/表情/记忆及历史报告保留；本轮只有文档，生产main不动，Git核对后停止。接续以本段和43最新交接为准，以下材料阶段均历史。
 

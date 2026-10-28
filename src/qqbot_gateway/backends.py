@@ -47,6 +47,8 @@ def create_runner(root, settings, budget):
     if cfg['backend'] == 'codebuddy_cli':
         from .workbuddy_cli_runner import CLIRunner
         runner = CLIRunner(root,cfg['model'],cfg['run_timeout_seconds'],cfg['cleanup_seconds'],cfg['reasoning_effort'],budget)
+        runner.web_settings = deepcopy(settings.get('web',{}))
+        runner.allow_ambient_web = settings.get('participation',{}).get('allow_ambient_web',True)
     else:
         from .ollama_ssh_runner import OllamaSSHRunner
         runner = OllamaSSHRunner(root,cfg,budget,settings['output'])

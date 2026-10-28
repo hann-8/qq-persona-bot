@@ -48,7 +48,7 @@ def show(settings):
         supported=known_models().get(llm['model'],{}).get('reasoning',{}).get('supportedEfforts',[])
         print('当前模型可显式选强度：'+('/'.join(supported) or '未知，仅auto'))
     print(f"回复方式：{settings['output']['delivery_mode']}；闲聊最多{settings['output']['max_bubbles']}条/{settings['output']['casual_max_chars']}字符，认真问题单条；切换后新上下文，旧历史保留。")
-    print(f"共用网页：{settings.get('web',{}).get('enabled',False)}；搜索候选未通过质量门槛，仅受控公共URL读取；不上传历史。")
+    print(f"原生WebFetch：{settings.get('web',{}).get('enabled',False)}；WebSearch尚未证实可用；Ollama与图片会话无联网。")
     from qqbot_gateway.members import suspend_unverified
     effective=suspend_unverified(settings)
     print(f"小群成员：desired={settings['members']['enabled']}；effective={effective['enabled']}；受控@={effective['mentions_enabled']}；仅官方Snow v2.1.1强刷人数1..49，失败暂停增强。")
@@ -534,9 +534,9 @@ class ConfigMenu:
         while True:
             settings,digest=read_settings(self.path)
             self.ui.page('联网搜索')
-            self.ui.write('搜索候选未通过质量门槛，目前仅明确URL可读取。公共查询会外发；不上传历史。保存须停机，重启生效；不自动重启或探测。')
-            self.ui.write('enabled: true/false；trigger: auto/explicit；provider仅bing_rss；搜索固定1次；结果1..5、页1..2、总时限5..15秒、跳转0..2、响应65536..1048576字节、每页1000..8000字节、材料1000..12000字节、来源1..2。')
-            keys=list(DEFAULTS)
+            self.ui.write('CodeBuddy原生WebFetch按需读公共URL；Search供给尚未证实。公共问题会外发；不上传群历史/记忆/身份。保存须停机，重启生效；不自动重启或探测。')
+            self.ui.write('provider=codebuddy_native；enabled控制Fetch；search_enabled独立控制Search（当前不可用）。原生工具会话最多8 CLI轮次，沿原请求超时；内部模型/Fetch可多次。旧提取/日期/页数等字段已退役，不控制原生工具。')
+            keys=['provider','enabled','search_enabled']
             for index,key in enumerate(keys,1):self.ui.write(f'{index} {key}: {settings["web"][key]}')
             self.ui.write('0 返回')
             choice=self.ui.choose({'0'}|{str(i) for i in range(1,len(keys)+1)})
@@ -544,7 +544,7 @@ class ConfigMenu:
             key=keys[int(choice)-1];value=self.ui.read('新值（回车保留）：').strip()
             if not value:continue
             try:
-                if key=='enabled':
+                if key in ('enabled','search_enabled'):
                     if value not in ('true','false'):raise ValueError('Expected true/false')
                     value=value=='true'
                 elif type(DEFAULTS[key]) is int:value=int(value)

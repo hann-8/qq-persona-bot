@@ -1,6 +1,16 @@
 # LAP-43：Snow表情、时效搜索、群参与、唯一操作者与主线整合
 
-## 当前方向：原生联网最小方案已规划，停止旧联网路线
+## 当前交付：原生Fetch完成，真实能力未验
+
+2026-10-28，session `LAP-43-native-web-implementation`完成原生WebFetch最小接线、当次工具许可/解析/8轮限制和gateway去WebRunner；模板provider=codebuddy_native、Fetch/Search默认false，生产local未写。Search仅有静态定义，当前账号/model/headless供给未证实，保持不开放。删除6个43专用probe/材料测试/writer；共享图片网络/协议兼容、owner/暂停/输入/自然图片/表情/记忆和全部历史报告保留。21定向单元+62两后端框架+3菜单回归通过，新43 offline配对及4种hash漂移拒绝/旧offline拒绝通过。当前安装CLI2.177.1与锁定2.168.0不匹配，视觉template检查拒绝；真实CLI/Fetch/Search/新图片配对均未验，不能据离线结果部署。只隔离Git交付，不合main/不运行。
+
+起点本地/实时远端9edbbbcf47e49188da0d8f269027caa4fc365bd0，20:39:53+08:00登记并重读；开始干净，全部变更仅本session归属。精确新增/删除/修改文件、引用审查、失败过程、验证命令和回滚见[实际报告](../../../../reports/lap-43-native-web.md)，[新offline](../../../../reports/lap-43-native-web-offline.json) / [source audit](../../../../reports/lap-43-native-web-sources.json)。不伪改旧active，既有lap43_current_regression模式现在读取native报告/writer/test配对，完整gateway签名保留。旧报告不覆盖，新offline有效不代表真实图片/CLI供给通过。
+
+当前剩余：用户下一轮先选择如何处理安装CLI与锁定审阅不匹配，再做许可范围内的真实URL、Search供给核对及必要新图片配对/原event ACK。Search缺口不转自建搜索任务；owner/表情旧真实差额仍保留。不改生产main/local/persona/框架/CLI源码，不运行模型/QQ/SSH/probe/启停。仅本任务commit/push隔离分支、实时SHA核对成功后释放归属停止；最终提交以分支tip/会话回执为准。
+
+以下均历史记录，不作为当前待执行步骤。
+
+## 历史规划检查点：原生联网最小方案已规划
 
 2026-10-28 20:20（Asia/Shanghai），session `LAP-43-native-web-simplify-plan`按用户最新指令收敛设计。起点HEAD/实时远端`bf115759df64dd0a6f19b592aa99c3c67530b4ea`，隔离分支`codex/lap-43-stage-a`开始干净；生产main仍`52866fe10cc654d2e12c5520f7afc5aa8bbe0179`。TASKS先登记11文档并重读，归属仅AGENTS/PROGRESS、工作线HANDOFF/TASKS、本HANDOFF、PLAN/MEDIUM_START、MATERIALS_CHAT两文件和新NATIVE_WEB两文件。
 

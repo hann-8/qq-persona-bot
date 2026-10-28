@@ -1,6 +1,10 @@
 # QQ bot项目入口：SnowLuma主线
 
-## 当前方向：CodeBuddy原生联网，停止扩建自建搜索层
+## 当前交付：原生Fetch已实现/离线通过，未部署
+
+2026-10-28，session `LAP-43-native-web-implementation`完成原生WebFetch最小接线、当次工具许可/解析/8轮限制和gateway去WebRunner；模板provider=codebuddy_native、Fetch/Search默认false，生产local未写。Search仅有静态定义，当前账号/model/headless供给未证实，保持不开放。删除6个43专用probe/材料测试/writer；共享图片网络/协议兼容、owner/暂停/输入/自然图片/表情/记忆和全部历史报告保留。21定向单元+62两后端框架+3菜单回归通过，新43 offline配对及4种hash漂移拒绝/旧offline拒绝通过。当前安装CLI2.177.1与锁定2.168.0不匹配，视觉template检查拒绝；真实CLI/Fetch/Search/新图片配对均未验，不能据离线结果部署。只隔离Git交付，不合main/不运行。 [实际报告](reports/lap-43-native-web.md) / [43交接](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)。当前下一步为用户另选有限运行阶段，先处理CLI版本审阅缺口；不续旧联网流水线。
+
+## 历史规划检查点：CodeBuddy原生联网最小方案
 
 2026-10-28，用户要求简化设计、优先复用已试通的会话Fetch，并允许删减/回退过度设计。已补AGENTS简洁原则，当前[最小方案](tracks/laptop-workbuddy/tasks/LAP-43/NATIVE_WEB_PLAN.md) / [medium指令](tracks/laptop-workbuddy/tasks/LAP-43/NATIVE_WEB_MEDIUM_START.md)。旧材料续规已压缩为历史入口，不再按B/R2/R3/C串行推进；自建代码清理由后续medium与原生接线一起实施。owner/自然图片/表情/记忆独立成果和实际报告保留。本轮11文档，无代码/local/生产main或运行变更；交付核对后停止。
 
@@ -71,7 +75,7 @@ LAP-41工作区整理与使用对照已完成：uv报告清除38,269个缓存文
 
 | 工作线 | 状态/最新依据 | 接续入口 |
 | --- | --- | --- |
-| QQ主线：SnowLuma及共用bot业务 | 当前转原生Fetch/可用Search，最小方案已规划；停止自建联网续修，独立成果保留；生产main/识图/48000未改 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [LAP-43](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md) |
+| QQ主线：SnowLuma及共用bot业务 | 原生Fetch接线/离线完成，Search未证实；CLI版本漂移待后续处理；独立成果和生产保留 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [LAP-43](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md) |
 | 家庭5070备用模型路线 | 历史记录为接入已实现/离线及元数据通过、真实生成未验；本轮未重查，不自动切换后端 | [HANDOFF](tracks/local-5070/HANDOFF.md) / [既有选型](tracks/local-5070/MODEL_SELECTION.md) |
 
 `tracks/laptop-workbuddy` 是保留的历史目录名，当前承担QQ主线和共用网关交接，不表示仍以NapCat或WorkBuddy界面为主路线。所有旧任务的状态/验收差额在TASKS与各任务HANDOFF保留，不重命名整棵目录。

@@ -3,12 +3,15 @@ from dataclasses import dataclass
 import re
 from urllib.parse import urlsplit
 
-DEFAULTS = dict(enabled=False, search_enabled=False, freshness_days=7, trigger='auto', provider='bing_rss', max_searches=1,
+DEFAULTS = dict(enabled=False, search_enabled=False, freshness_days=7, trigger='auto', provider='codebuddy_native', max_searches=1,
                 max_results=5, max_pages=2, timeout_seconds=15, max_redirects=2,
                 max_response_bytes=1048576, max_page_text_bytes=4000,
                 max_evidence_bytes=6000, max_sources=2, extractor='readability', long_text_policy='excerpt', selection_policy='coverage', material_goal='gist', search_fallback='snippet')
 # Candidate has not passed the public quality gate. This is code-owned, not config.
 SEARCH_QUALITY_PASSED = False
+# Definition in the bundle is not evidence of current model/headless availability.
+# No CLI/model probe is authorized in this offline delivery. Do not enable Search.
+NATIVE_SEARCH_AVAILABLE = False
 URL = re.compile(r'https?://[^\s<>"\u3000，。！？；、（）]+', re.I)
 VIDEO = re.compile(r'(^|\.)(bilibili\.com|b23\.tv|youtube\.com|youtu\.be|douyin\.com)$', re.I)
 
@@ -19,7 +22,7 @@ def validate_web(raw):
     if cfg['material_goal'] not in ('gist','coverage') or cfg['search_fallback'] not in ('snippet','none'):raise ValueError('Invalid web material policy')
     if cfg['selection_policy'] not in ('coverage','question'):raise ValueError('Invalid web.selection_policy')
     if cfg['extractor'] not in ('readability','legacy') or cfg['long_text_policy'] not in ('excerpt','reject'):raise ValueError('Invalid web extraction policy')
-    if type(cfg['enabled']) is not bool or cfg['trigger'] not in ('auto','explicit') or cfg['provider'] != 'bing_rss':
+    if type(cfg['enabled']) is not bool or cfg['trigger'] not in ('auto','explicit') or cfg['provider'] not in ('codebuddy_native','bing_rss'):
         raise ValueError('Invalid web mode/provider')
     if type(cfg['search_enabled']) is not bool:raise ValueError('Invalid web.search_enabled')
     for key, lo, hi in [('freshness_days',1,30),('max_searches',1,1),('max_results',1,5),('max_pages',1,2),
@@ -28,6 +31,27 @@ def validate_web(raw):
                         ('max_evidence_bytes',1000,12000),('max_sources',1,2)]:
         if type(cfg[key]) is not int or not lo <= cfg[key] <= hi:raise ValueError('Invalid web.'+key)
     return cfg
+
+
+def current_question(prompt,request=None):
+    """Permission opt-out is based on current human input, never old history."""
+    import json
+    try:
+        content=json.loads(prompt)[-1]['content']
+        if request:
+            source=json.loads(content)
+            if source.get('target_seq') is not None:
+                return next(r['text'] for r in source['messages'] if r['seq']==source['target_seq'])
+            return next(r['text'] for r in reversed(source['messages']) if r.get('speaker')!='bot')
+        return content if isinstance(content,str) else ''
+    except (ValueError,TypeError,KeyError,IndexError,StopIteration):return ''
+
+
+def native_tools(cfg,question,*,image=False,disabled=False):
+    if image or disabled or cfg.get('provider')!='codebuddy_native':return ()
+    if re.search(r'不要联网|别联网|不联网|禁止联网|只根据这段文字|只凭记忆|do not (?:browse|fetch|search)|don.t (?:browse|fetch|search)|no (?:web|internet)',question,re.I):return ()
+    return tuple(name for name,enabled in (('WebFetch',cfg.get('enabled')),
+        ('WebSearch',cfg.get('search_enabled') and NATIVE_SEARCH_AVAILABLE)) if enabled)
 
 
 @dataclass(frozen=True)

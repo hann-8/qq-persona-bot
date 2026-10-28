@@ -1,5 +1,18 @@
 LAP-24可选管理token独立于五文件配置和QQ密码，仅用`scripts/configure_bot.py napcat-login set-observer-token / clear-observer-token / observer-status`管理；无回显TTY录入、停机/配置锁/原子保存，CurrentUser DPAPI密文在忽略的`secrets/napcat-observer.local.json`（schema1/16KiB）。status只检查文件schema，不解密/认证；没有token不阻断原生快登，不能解除data_scope。登录观察和Startup命令见[根说明](../README.md)，本轮仅代码/离线交付，真实录入、登录和部署未执行。
 
+## LAP-43当前联网合同：CodeBuddy原生Fetch（隔离实现，未部署）
+
+`web.provider=codebuddy_native`；`web.enabled`控制WebFetch，`web.search_enabled`独立控制WebSearch，模板都为false。当前Search仅有安装包静态定义，同账号/model/headless供给未证实，代码保持不开放；Fetch接线只交付URL阅读，不表示实际bot已通过联网验收。`bing_rss`仅兼容旧配置读取，不再接入生产聊天链，不自动改local。
+
+文字会话只开放明确许可的只读工具；dontAsk、strict空MCP、setting-sources none及其余工具deny保留。工具会话最多8 CLI代理轮次，无工具/图片路径仍2轮；请求超时不变，一次CLI执行尝试、无自动重试。内部可能多次模型推理/Fetch，起始输入预算不能代表全部工具材料或credits。中间文字、工具JSON和进度不发送，只有最终result走原event投递/ACK。
+
+Ollama保留聊天且无此联网，不自动换模型。图片专用guard保留无工具路径及自然接话政策，图+URL不能声称已读网页。用户当前输入禁止联网时移除本次许可。公共问题以外的群历史/记忆/身份/凭据禁止作查询材料。
+
+旧trigger、freshness_days、extractor、material_goal、search_fallback、max_pages/max_results、超时/响应/来源等自建字段仅兼容读取并继续校验，不控制原生工具。配置页只编辑provider/enabled/search_enabled，保存仍须停机、正常启动生效。删除LAP-43专用公共probe和材料writer，历史失败/报告保留；不再运行B/R2。下述18B/18C/43材料段只作历史合同。
+
+当前43视觉配对模式仍是`lap43_current_regression`；offline入口改为`reports/lap-43-native-web-offline.json`，writer为`verify_lap43.py`，不缩小完整gateway签名。真实CLI/图片及新的active仍待下一轮授权；当前安装CLI bundle与锁定视觉审阅hash不一致，不能据本轮离线结果放行生产。详见[本轮报告](../reports/lap-43-native-web.md)。
+
+
 # 配置文件索引
 
 模板和本机文件均在每个参数旁写中文注释，列表参数在列表名旁说明。注释中的“新装默认”只供参考，不会覆盖右侧当前值；既有用户备注保留。`participation.mode`控制mentions/free，`output.mode`固定plain_chat，分条方式另由`output.delivery_mode`控制。
@@ -22,7 +35,7 @@ LAP-24可选管理token独立于五文件配置和QQ密码，仅用`scripts/conf
 
 新装默认仍CodeBuddy/deepseek-v4.1-flash、mentions、single；web/memes/attention/vision/members/memory/learning默认关闭。推理强度受模型能力元数据约束；CLI原生窗口仍仅null，预算是可见UTF-8字节保守计数，不是精确token或积分。本地模型仅显式选择，不自动下载或切换；启用前须核对digest。模板每个字段标明用途、单位/选项、新装默认与重要约束。
 
-迁移保留实际旧值，包括free、两个profile和所有开关，不能拿模板默认覆盖。私聊固定关闭、黑名单前置、单次尝试和工具隔离不变。web搜索质量门槛仍关闭；vision true仍拒启动；members desired开启仍生产暂停，不能用手写字段冒充验证。记忆学习必须同时开启读取。
+迁移保留实际旧值，包括free、两个profile和所有开关，不能拿模板默认覆盖。私聊固定关闭、黑名单前置、单次尝试和工具隔离不变。联网当前以顶部原生合同为准；vision/members资格以实际配对证据为准，不能用手写字段冒充验证。记忆学习必须同时开启读取。
 
 ## 首次建立与迁移（均须显式操作）
 
@@ -149,7 +162,7 @@ Snow运行准入另要求online/good、已armed且pipe/login/rx/outbound健康�
 
 `web.search_enabled` 默认false；`web.freshness_days` 默认7，范围1..30。网页读取仍由 `web.enabled` 控制，不随search关闭而失效。search还须代码质量门槛通过，本轮保持false；时效意图无法核实时本地说明，0生成。日期按北京时间解释，小时窗要求精确有时区的日期，缺失/冲突/未来日期不能给最新结论；修改日期不是事件日期。配置变更下次正常启动生效，所有绑定设置改变须配对视觉证据，不能热改。
 
-`activate_lap43_memes.py` 默认inspect；显式activate要求本次inspect JSON作为expected，停机/配置锁内复核基线、保存原字节与不存在标记，激活既有7条且不扩库。只做离线交付时不得对生产运行helper激活。公共搜索探测用 `probe_lap43_search.py`，默认不联网；后续阶段B才允许冻结3题/最多3搜索+6页面入口、人工对照和0模型批次。
+`activate_lap43_memes.py` 默认inspect；显式activate要求本次inspect JSON作为expected，停机/配置锁内复核基线、保存原字节与不存在标记，激活既有7条且不扩库。只做离线交付时不得对生产运行helper激活。旧公共搜索probe已退役删除，原B/R2报告留档，不作为原生联网前置。
 
 `revalidate_lap43_vision.py` 默认inspect；新证据固定在 `state/lap43-vision-regression/<binding>/`，acceptance_mode为 `lap43_current_regression`。新授权、当前offline、实际CLI正反契约、单次IQ-05及人工答案hash/反馈、历史IQ-01接受、当前ingress和配对active全部必须通过。旧42证据及unknown保留，不改旧binding、不缩小签名；离线报告本身不能启动生产vision。
 

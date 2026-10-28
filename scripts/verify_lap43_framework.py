@@ -53,7 +53,6 @@ async def verify(root,backend,mode,participation="free",attention=False,memes=Fa
     import time
     from qqbot_gateway.model_gateway import application,ModelQueue
     from qqbot_gateway.task_store import TaskStore
-    from qqbot_gateway.web_retrieval import WebRunner,Retriever,Retrieval
     from qqbot_gateway.token_budget import InputBudget
     from qqbot_gateway.group_protocol import SILENT
 
@@ -117,7 +116,15 @@ async def verify(root,backend,mode,participation="free",attention=False,memes=Fa
     with patch.dict(os.environ,{'QQBOT_ROOT':str(root)}),patch('qqbot_gateway.members.suspend_unverified',side_effect=lambda settings:settings['members']),patch('qqbot_gateway.vision.context_token',return_value='c'*64):
         router=QQRouter(SimpleNamespace(conversation_manager=manager))
     router.delivery.timeout=.5
-    harness=Harness(root,backend)
+    if backend=='codebuddy_cli':
+        # Construct the existing bottom substitute without validating the installed
+        # CLI artifact: no real CLI is executed or substituted into evidence.
+        from test_cli_runner import RunnerTests
+        fixture=RunnerTests();fixture.root=root;fixture.script=root/'synthetic_cli.py'
+        synthetic=fixture.runner(effort='auto')
+        synthetic.denied=json.loads((ROOT/'config/cli-tools-denied.json').read_text(encoding='utf-8'))
+        with patch('scripts.verify_lap17.CLIRunner',return_value=synthetic):harness=Harness(root,backend)
+    else:harness=Harness(root,backend)
     native_inputs=[]
     if backend=='codebuddy_cli':
         fake=harness.script.read_text(encoding='utf-8').replace('sys.stdin.read()',"Path(__file__).with_suffix('.input').write_text(sys.stdin.buffer.read().decode('utf-8'),encoding='utf-8')")
@@ -129,21 +136,12 @@ async def verify(root,backend,mode,participation="free",attention=False,memes=Fa
                 if path=='/api/chat':native_inputs.append(copy.deepcopy(payload))
                 return super().request(method,path,payload,**kwargs)
         harness.runner.factory=CaptureNative
-    class OfflineReader(Retriever):
-        def __init__(self):super().__init__(settings['web']);self.questions=[]
-        async def retrieve(self,q):
-            self.questions.append(q)
-            if not web_enabled:return Retrieval('none')
-            from qqbot_gateway.web_freshness import facts
-            source=dict(url='https://example.com/',title='合成公开页',text='public synthetic material '*50,status='body')
-            source.update(published_at='2026-10-27',freshness=facts([dict(kind='published',source='meta',value='2026-10-27')],'2026-10-27T11:00:00+00:00','2026-10-27T11:00:01+00:00','最新消息'))
-            if material_kind:
-                from qqbot_gateway.evidence_selection import material
-                source.update(material=material(material_kind,'summary' if material_kind=='search_snippet' else 'main'),time_policy='recent_hint')
-                if material_kind=='search_snippet':source.update(status='summary',published_at=None,freshness=facts([],'2026-10-27T11:00:00+00:00','2026-10-27T11:00:01+00:00'))
-            return Retrieval('read',[source])
-    reader=OfflineReader()
-    wrapped=WebRunner(harness,reader,InputBudget(),settings['output'])
+    # Same runner as production: no external retriever or material wrapper.
+    if backend=='codebuddy_cli':
+        harness.runner.web_settings=dict(provider='codebuddy_native',enabled=web_enabled,search_enabled=False)
+        from test_native_web import native_fake
+        harness.script.write_text(native_fake(harness.script.read_text(encoding='utf-8')),encoding='utf-8')
+    wrapped=harness.runner
     queue=ModelQueue(wrapped);token=secrets.token_urlsafe(32)
     wrapped.memes=router.memes
     gate=OneBotGate(GateConfig('222',frozenset({'111','444'}),frozenset({'333'}),'a'*40,'b'*40,root/'state/gate.db',participation_mode=participation,members_enabled=members,members_config=settings['members'],media_catalog=router.memes if memes else None,blocked_users=frozenset({'999'}),attention_enabled=attention,silence_enabled=True),root)
@@ -279,24 +277,6 @@ async def verify(root,backend,mode,participation="free",attention=False,memes=Fa
         assert harness.attempts==before+1
         return req
     try:
-        if material_kind and not (attention or memory or members):
-            e=await inbound('搜索Python最近消息');gen,req=await start(e)
-            assert e.get_extra('qq_group_request')['version']==1
-            before=harness.attempts
-            await complete(e,req,response(req,'合成检索答复'));await finish(gen)
-            assert harness.attempts==before+1 and len(e.bot.sent)==1
-            web=e.get_extra('qq_group_metadata')['web'][0]
-            assert web['material']['kind']==material_kind and '据检索摘要' in str(e.bot.sent)
-            report.append(dict(case='v1_provider_material_manifest_ACK',sends=1))
-            e=await inbound('搜索Python最近消息');gen,req=await start(e)
-            e.get_extra('qq_group_source')['web_anchor']='tampered'
-            before=harness.attempts
-            await complete(e,req,response(req,'合成检索答复'));await finish(gen)
-            assert harness.attempts==before+1 and e.get_extra('qq_group_invalid')
-            assert not any('合成检索答复' in str(row) for row in e.bot.sent)
-            report.append(dict(case='v1_provider_snapshot_drift_rejected',sends=len(e.bot.sent)))
-            return dict(backend=backend,mode=mode,participation=participation,attention=attention,memory=memory,memes=memes,members=members,
-                cases=report,material_kind=material_kind,real_model_calls=0,real_qq_calls=0,real_run_agent=True,actual_runner=True,original_event_ACK=True)
         generation=gate.silence.states['111']['generation']
         assert await inbound('暂停发言',True,sender='555') is None
         assert gate.silence.normal('111') and gate.silence.states['111']['generation']==generation
@@ -361,14 +341,14 @@ async def verify(root,backend,mode,participation="free",attention=False,memes=Fa
         report.append(dict(case='same_at_stop_blacklist_other_member_wake',sends=1))
         # Result completed after mute->wake cannot use the fresh generation.
         e=await inbound();gen,req=await start(e)
-        original_run=harness.run
+        original_run=wrapped.run
         async def late_result(*args,**kwargs):
             result=await original_run(*args,**kwargs)
             await control();await wake()
             return result
-        harness.run=late_result
+        wrapped.run=late_result
         await complete(e,req,response(req));await finish(gen)
-        harness.run=original_run
+        wrapped.run=original_run
         assert not e.bot.sent
         key=e.get_extra('qq_delivery_key')
         if key:
@@ -438,24 +418,22 @@ async def verify(root,backend,mode,participation="free",attention=False,memes=Fa
             report.append(dict(case='bubble_interval_stop_wake_partial',sends=1))
         e=await inbound('搜索合成最新消息');gen,req=await start(e)
         await complete(e,req,response(req,'合成公开资料'));await finish(gen)
-        assert 'https://example.com/' in str(e.bot.sent)
+        assert len(e.bot.sent)==1 and '合成公开资料' in str(e.bot.sent)
+        assert 'synthetic intermediate' not in str(e.bot.sent) and 'tool_use' not in str(e.bot.sent)
         metadata=e.get_extra('qq_group_metadata')
-        web_manifest=(metadata['manifest']['web'] if 'manifest' in metadata else metadata['web'])[0]
-        assert web_manifest['material']['kind']==(material_kind or 'page_excerpt')
-        if material_kind=='search_snippet':assert '据检索摘要' in str(e.bot.sent) and web_manifest['freshness']['published_at'] is None
-        else:assert web_manifest['freshness']['published_at']=='2026-10-27'
-        report.append(dict(case='dated_source_runner_metadata_ACK',sends=1))
+        assert not (metadata['manifest'].get('web',[]) if 'manifest' in metadata else metadata.get('web',[]))
+        report.append(dict(case='native_final_only_original_event_ACK',sends=1))
         if memes:
             e=await inbound('发个开心表情');gen,req=await start(e)
             await complete(e,req,response(req,image=True));await finish(gen)
             assert len(e.bot.sent)==1 and e.bot.sent[0]['message'][0]['type']=='image'
             report.append(dict(case='image_only_original_ACK_ticket',sends=1))
             e=await inbound('发个开心表情');gen,req=await start(e)
-            original_run=harness.run
+            original_run=wrapped.run
             async def old_image(*args,**kw):
                 result=await original_run(*args,**kw);await control();await wake();return result
-            harness.run=old_image
-            await complete(e,req,response(req,image=True));await finish(gen);harness.run=original_run
+            wrapped.run=old_image
+            await complete(e,req,response(req,image=True));await finish(gen);wrapped.run=original_run
             assert not e.bot.sent
             report.append(dict(case='old_image_after_wake_rejected',sends=0))
             # File failure keeps the existing short local image notice, also ticketed.
@@ -466,13 +444,13 @@ async def verify(root,backend,mode,participation="free",attention=False,memes=Fa
             assert len(e.bot.sent)==1 and e.bot.sent[0]['message'][0]['type']=='text'
             report.append(dict(case='failed_image_local_notice_ticket',sends=1))
         if members:
-            original_run=harness.run
-            async def select_member(system,prompt,request_id):
+            original_run=wrapped.run
+            async def select_member(system,prompt,request_id,**kwargs):
                 effective=json.loads(json.loads(prompt)[-1]['content'])
                 candidates=effective['member_candidates'];assert candidates
                 harness.text=harness.text.replace('$candidate',candidates[0]['member_ref'])
-                return await original_run(system,prompt,request_id)
-            harness.run=select_member
+                return await original_run(system,prompt,request_id,**kwargs)
+            wrapped.run=select_member
             e=await inbound();gen,req=await start(e)
             await complete(e,req,response(req,mention_ref='$candidate'));await finish(gen)
             assert e.bot.sent[0]['message'][0]['type']=='at'
@@ -483,7 +461,7 @@ async def verify(root,backend,mode,participation="free",attention=False,memes=Fa
                 result=await permit(*args,**kw);await control();await wake();return result
             client.permit=stop_permit
             await complete(e,req,response(req,mention_ref='$candidate'));await finish(gen)
-            client.permit=permit;harness.run=original_run
+            client.permit=permit;wrapped.run=original_run
             assert not e.bot.sent
             assert router.tasks.delivery(e.get_extra('qq_delivery_key'))['state']=='failed'
             report.append(dict(case='typed_at_permission_race_no_send',sends=0))

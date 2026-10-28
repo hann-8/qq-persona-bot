@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "mode": "lap43_current_regression",
+  "historical_native_source_review": "reports/lap-42-vision-closure-sources.json",
+  "historical_native_source_review_sha256": "7c24fa759b061c28e2dfc07e0a5d4195a10eaecdec18c5c190effa8119e4e640",
+  "prior_materials_review": "reports/lap-43-materials-sources.json",
+  "locked_bundle_sha256": "13e6dd30a22d2f11857675193f909a2ccb935da67a067f580fcfe764e474ff60",
+  "installed_bundle_sha256": "f6a04da8f7dbe9eed2fd0651c9a8d098b71a45263dcd422ac97d2e691e41dc38",
+  "installed_matches_lock": false,
+  "native_tool_names_static": [
+    "WebFetch",
+    "WebSearch"
+  ],
+  "native_search_current_model_headless": "unverified_not_enabled",
+  "real_cli_contract": "not_run",
+  "real_image_acceptance": "not_run",
+  "production_eligible": false,
+  "writer": "scripts/verify_lap43.py",
+  "tests": "tests/test_native_web.py",
+  "offline": "reports/lap-43-native-web-offline.json",
+  "scope": "Retain the historical guarded no-tool image review, not a new installed-CLI approval. Current artifact mismatch is an unresolved deployment blocker. Native Fetch route is synthetic-tested only; full gateway signatures and existing LAP-43 activation mode remain required."
+}

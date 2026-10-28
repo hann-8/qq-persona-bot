@@ -1,0 +1,319 @@
+{
+  "schema_version": 1,
+  "mode": "lap43_current_regression",
+  "passed": true,
+  "adapter_signature": "4afab5a1da94a08aeaa929ad408b0c159a145f2d3dc71816acbe9a6350d0e003",
+  "rule_hash": "4dfb239d768f5c439ee7c718afc0827c90965de91295ef6b3e4e985586bb1b85",
+  "verifier_sha256": "f5f0d2c8c576abbe51b4b5f0973cd2be79b5397df0d1c69791a72775cecf985f",
+  "tests_sha256": "5d3250aaf338297dc7bc85c108fce496cf96490e954e46c246e4fb62e7db991e",
+  "source_audit_sha256": "f059bb139fb34511d0ad76015c87c90267808f8a9daaa5d0a8fa7bdd67dcb59e",
+  "framework_verifier_sha256": "8df33119fb59e21d988d9c758e550390ea87e5e3efb88aa8d52c3945a8f1850c",
+  "unit_tests": 21,
+  "failures": 0,
+  "errors": 0,
+  "modules": [
+    "test_native_web",
+    "test_cli_runner",
+    "test_lap42_vision.HostedRunnerTests.test_real_runner_control_only_zero_user",
+    "test_lap42_vision.ImageMemberCapTests.test_image_with_optional_member_cap_resolves_image_cap_only"
+  ],
+  "frameworks": [
+    {
+      "backend": "codebuddy_cli",
+      "mode": "adaptive",
+      "participation": "free",
+      "attention": true,
+      "memory": true,
+      "memes": true,
+      "members": true,
+      "cases": [
+        {
+          "case": "owner_only_explicit_resume_muted_mentions",
+          "sends": 0
+        },
+        {
+          "case": "direct_name_grammar_one_generation",
+          "sends": 4
+        },
+        {
+          "case": "empty_at_unsupported_caption_zero_generation",
+          "sends": 5,
+          "missing_ACK": "unknown"
+        },
+        {
+          "case": "shared_reset_owner_only_three_mode_entries",
+          "sends": 6
+        },
+        {
+          "case": "direct_silent_protocol_failure_no_second_generation",
+          "sends": 1
+        },
+        {
+          "case": "normal_original_event_ACK",
+          "sends": 1
+        },
+        {
+          "case": "same_at_stop_blacklist_other_member_wake",
+          "sends": 1
+        },
+        {
+          "case": "old_result_after_wake_no_assistant_history",
+          "sends": 0
+        },
+        {
+          "case": "local_notice_ticket_old_rejected",
+          "sends": 1
+        },
+        {
+          "case": "all_local_notice_families_immutable_ticket",
+          "sends": 11
+        },
+        {
+          "case": "gate_refusal_known_not_sent_no_unknown_lock",
+          "sends": 0
+        },
+        {
+          "case": "submitted_delayed_ACK_retained",
+          "sends": 1
+        },
+        {
+          "case": "bubble_interval_stop_wake_partial",
+          "sends": 1
+        },
+        {
+          "case": "native_final_only_original_event_ACK",
+          "sends": 1
+        },
+        {
+          "case": "image_only_original_ACK_ticket",
+          "sends": 1
+        },
+        {
+          "case": "old_image_after_wake_rejected",
+          "sends": 0
+        },
+        {
+          "case": "failed_image_local_notice_ticket",
+          "sends": 1
+        },
+        {
+          "case": "typed_at_same_chain_ticket_and_permission",
+          "sends": 1
+        },
+        {
+          "case": "typed_at_permission_race_no_send",
+          "sends": 0
+        },
+        {
+          "case": "router_local_wait_no_provider_no_global_cancel",
+          "sends": 0
+        },
+        {
+          "case": "ambient_batch_discard_no_backlog",
+          "sends": 0
+        },
+        {
+          "case": "pre_HTTP_invalidated_no_generation",
+          "sends": 0
+        },
+        {
+          "case": "local_input_notice_0",
+          "sends": 1
+        },
+        {
+          "case": "local_input_notice_4200",
+          "sends": 1
+        },
+        {
+          "case": "local_input_notice_7",
+          "sends": 1
+        },
+        {
+          "case": "submitted_HTTP_internal_queue_natural_completion",
+          "sends": 0
+        },
+        {
+          "case": "wake_never_clears_real_blocking_state",
+          "sends": 0
+        },
+        {
+          "case": "true_ACK_unknown_preserved",
+          "sends": 1
+        },
+        {
+          "case": "other_group_isolated",
+          "sends": 1
+        },
+        {
+          "case": "missing_mirror_closed",
+          "sends": 0
+        },
+        {
+          "case": "malformed_mirror_closed_then_recovers",
+          "sends": 0
+        }
+      ],
+      "material_kind": null,
+      "real_model_calls": 0,
+      "real_qq_calls": 0,
+      "real_run_agent": true,
+      "actual_runner": true,
+      "original_event_ACK": true
+    },
+    {
+      "backend": "ollama_ssh",
+      "mode": "adaptive",
+      "participation": "free",
+      "attention": true,
+      "memory": true,
+      "memes": true,
+      "members": true,
+      "cases": [
+        {
+          "case": "owner_only_explicit_resume_muted_mentions",
+          "sends": 0
+        },
+        {
+          "case": "direct_name_grammar_one_generation",
+          "sends": 4
+        },
+        {
+          "case": "empty_at_unsupported_caption_zero_generation",
+          "sends": 5,
+          "missing_ACK": "unknown"
+        },
+        {
+          "case": "shared_reset_owner_only_three_mode_entries",
+          "sends": 6
+        },
+        {
+          "case": "direct_silent_protocol_failure_no_second_generation",
+          "sends": 1
+        },
+        {
+          "case": "normal_original_event_ACK",
+          "sends": 1
+        },
+        {
+          "case": "same_at_stop_blacklist_other_member_wake",
+          "sends": 1
+        },
+        {
+          "case": "old_result_after_wake_no_assistant_history",
+          "sends": 0
+        },
+        {
+          "case": "local_notice_ticket_old_rejected",
+          "sends": 1
+        },
+        {
+          "case": "all_local_notice_families_immutable_ticket",
+          "sends": 11
+        },
+        {
+          "case": "gate_refusal_known_not_sent_no_unknown_lock",
+          "sends": 0
+        },
+        {
+          "case": "submitted_delayed_ACK_retained",
+          "sends": 1
+        },
+        {
+          "case": "bubble_interval_stop_wake_partial",
+          "sends": 1
+        },
+        {
+          "case": "native_final_only_original_event_ACK",
+          "sends": 1
+        },
+        {
+          "case": "image_only_original_ACK_ticket",
+          "sends": 1
+        },
+        {
+          "case": "old_image_after_wake_rejected",
+          "sends": 0
+        },
+        {
+          "case": "failed_image_local_notice_ticket",
+          "sends": 1
+        },
+        {
+          "case": "typed_at_same_chain_ticket_and_permission",
+          "sends": 1
+        },
+        {
+          "case": "typed_at_permission_race_no_send",
+          "sends": 0
+        },
+        {
+          "case": "router_local_wait_no_provider_no_global_cancel",
+          "sends": 0
+        },
+        {
+          "case": "ambient_batch_discard_no_backlog",
+          "sends": 0
+        },
+        {
+          "case": "pre_HTTP_invalidated_no_generation",
+          "sends": 0
+        },
+        {
+          "case": "local_input_notice_0",
+          "sends": 1
+        },
+        {
+          "case": "local_input_notice_4200",
+          "sends": 1
+        },
+        {
+          "case": "local_input_notice_7",
+          "sends": 1
+        },
+        {
+          "case": "submitted_HTTP_internal_queue_natural_completion",
+          "sends": 0
+        },
+        {
+          "case": "wake_never_clears_real_blocking_state",
+          "sends": 0
+        },
+        {
+          "case": "true_ACK_unknown_preserved",
+          "sends": 1
+        },
+        {
+          "case": "other_group_isolated",
+          "sends": 1
+        },
+        {
+          "case": "missing_mirror_closed",
+          "sends": 0
+        },
+        {
+          "case": "malformed_mirror_closed_then_recovers",
+          "sends": 0
+        }
+      ],
+      "material_kind": null,
+      "real_model_calls": 0,
+      "real_qq_calls": 0,
+      "real_run_agent": true,
+      "actual_runner": true,
+      "original_event_ACK": true
+    }
+  ],
+  "framework_cases": 62,
+  "real_model_calls": 0,
+  "real_qq_outputs": 0,
+  "public_network_calls": 0,
+  "bot_start_stop_operations": 0,
+  "real_cli_contract": "not_run_native_web",
+  "native_search": "unverified_not_enabled",
+  "native_iq_eligible": false,
+  "production_eligible": false,
+  "installed_visual_template_diagnostics": [
+    "CLI_MOD_FRAMEWORK_SOURCE_CHANGED"
+  ],
+  "scope": "Existing Harness/actual runner/provider/event ACK with synthetic CLI/RPC; no live tool or image acceptance."
+}
