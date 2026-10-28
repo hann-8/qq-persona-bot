@@ -71,8 +71,9 @@ def group_plan(raw,output,question,must_reply):
         return 'error',ReplyPlan('answer',(text,),text,fallback_reason='group_protocol_error')
 
 
-def metadata(request,response_id,decision,plan):
+def metadata(request,response_id,decision,plan,web_evidence=None):
     value=dict(request=request,response_id=response_id,decision=decision,plan=plan.metadata(response_id) if plan else None)
+    if web_evidence:value['web']=list(web_evidence)
     value['plan_hash']=digest(json.dumps(value,sort_keys=True,ensure_ascii=False,separators=(',',':')))
     return value
 
@@ -82,11 +83,15 @@ def verify_metadata(value,request,response_id,text,output,source=None):
         from .turn_v2 import verify
         return verify(value,request,response_id,text,output,source)
     from .reply_plan import trusted_plan
-    if not isinstance(value,dict) or set(value)!={'request','response_id','decision','plan','plan_hash'}:raise ValueError('Missing group metadata')
+    if not isinstance(value,dict) or set(value)-{'web'}!={'request','response_id','decision','plan','plan_hash'}:raise ValueError('Missing group metadata')
     body={k:v for k,v in value.items() if k!='plan_hash'}
     if (value['request']!=request or value['response_id']!=response_id or
         value['plan_hash']!=digest(json.dumps(body,sort_keys=True,ensure_ascii=False,separators=(',',':')))):
         raise ValueError('Group identity mismatch')
+    if 'web' in value:
+        from .evidence_selection import validate_manifest
+        if not isinstance(source,dict) or digest(json.dumps(source,ensure_ascii=False,separators=(',',':')))!=request['snapshot_digest']:raise ValueError('web snapshot identity')
+        validate_manifest(value['web'],source)
     decision=value['decision']
     if decision not in ('speak','silent','error'):raise ValueError('Invalid decision')
     if value['plan'] is None:

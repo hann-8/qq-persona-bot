@@ -438,7 +438,7 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
                 if not (v2 or {}).get('learning_enabled',False) or backend_result.web_evidence:memory_proposals=[]
                 metadata['qqbot_group_plan']=v2_metadata(group_request,response_id,decision,plan,snapshot,response_to,member_receipt,memory_proposals,backend_result.web_evidence)
                 LOG.info('ATTENTION trace=%s stage=model_done decision=%s generation_performed=%s elapsed_ms=%s',request[TRACE],decision,backend_result.generation_performed,int((time.monotonic()-started)*1000))
-            else:metadata['qqbot_group_plan']=group_metadata(group_request,response_id,decision,plan)
+            else:metadata['qqbot_group_plan']=group_metadata(group_request,response_id,decision,plan,backend_result.web_evidence)
             queue.last_usage=dict(queue.last_usage,trigger=group_request.get('addressing',group_request.get('trigger')),decision=decision)
             usage_key=group_request.get('addressing',group_request.get('trigger'))+':'+decision
             queue.group_usage[usage_key]=queue.group_usage.get(usage_key,0)+1

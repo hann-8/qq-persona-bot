@@ -1,5 +1,11 @@
 # QQ bot项目入口：SnowLuma主线
 
+## 当前续作：LAP-43 R1材料对话已隔离实现/离线通过
+
+2026-10-28：R1已交付封闭worker诊断、候选去重/分级摘要、严格日期/现行/近期策略、gist与精简来源、图片自然接话固定政策。新74单元/6组合78框架通过，当前persona CodeBuddy48000组合35074字节可容纳，Ollama12288必需输入拒绝。新offline writer/路径/完整签名配对通过；真实CLI/IQ未运行。搜索双门槛false、生产main52866fe1与运行不动，旧B0/3及A/42证据保留。[实际报告](reports/lap-43-materials-r1.md) / [43交接](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)。Git核对后释放归属停止；后续须用户另选R2/R3。
+
+## 历史规划检查点
+
 ## 当前续作：LAP-43联网与自然材料对话续规完成
 
 2026-10-28 18:58，session `LAP-43-materials-natural-chat-replan`已登记重读8文档归属，完成[续规](tracks/laptop-workbuddy/tasks/LAP-43/MATERIALS_CHAT_PLAN.md)和[新medium指令](tracks/laptop-workbuddy/tasks/LAP-43/MATERIALS_CHAT_MEDIUM_START.md)：搜索材料分级/摘要退化、时间意图分离、URL默认gist、图片自然接话及提取故障定位。只交付隔离分支文档，不重跑B、不改代码/运行或合生产main。[43交接](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)。旧B0/3和A成果保留；本轮检查/Git交付后停止，默认等待用户选中R1离线实施。
@@ -39,7 +45,7 @@ LAP-41工作区整理与使用对照已完成：uv报告清除38,269个缓存文
 ## 从哪里继续
 
 1. 使用bot：[日常操作](SnowLuma使用说明.md) / [与旧NapCat bot的使用对照](docs/BOT_USAGE_COMPARISON.md)。
-2. 项目接续：本文件 → [AGENTS](AGENTS.md) → [QQ主线HANDOFF](tracks/laptop-workbuddy/HANDOFF.md)和[TASKS](tracks/laptop-workbuddy/TASKS.md) → [LAP-43交接](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)、[当前续规](tracks/laptop-workbuddy/tasks/LAP-43/MATERIALS_CHAT_PLAN.md)、[当前medium指令](tracks/laptop-workbuddy/tasks/LAP-43/MATERIALS_CHAT_MEDIUM_START.md)。仅用户选中R1/R2/R3才执行，旧B失败不重跑，旧C不自动部署。识图已验事实见[42最终结果](reports/lap-42-vision-closure-result.md)，表情旧证据见[21结果](tracks/laptop-workbuddy/tasks/LAP-21/SNOW_MIGRATION_RESULT.md)。
+2. 项目接续：本文件 → [AGENTS](AGENTS.md) → [QQ主线HANDOFF](tracks/laptop-workbuddy/HANDOFF.md)和[TASKS](tracks/laptop-workbuddy/TASKS.md) → [LAP-43交接](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)、[当前续规](tracks/laptop-workbuddy/tasks/LAP-43/MATERIALS_CHAT_PLAN.md)、[当前medium指令](tracks/laptop-workbuddy/tasks/LAP-43/MATERIALS_CHAT_MEDIUM_START.md)。R1已离线交付；仅用户后续选中R2/R3才执行真实公共/运行阶段，旧B失败不重跑，旧C不自动部署。识图已验事实见[42最终结果](reports/lap-42-vision-closure-result.md)，表情旧证据见[21结果](tracks/laptop-workbuddy/tasks/LAP-21/SNOW_MIGRATION_RESULT.md)。
 3. 故障找文件：[目录与日志](项目目录与日志说明.md)。只按实际问题检索，不从历史清单自动展开新任务。
 
 ## 路线和边界
@@ -57,7 +63,7 @@ LAP-41工作区整理与使用对照已完成：uv报告清除38,269个缓存文
 
 | 工作线 | 状态/最新依据 | 接续入口 |
 | --- | --- | --- |
-| QQ主线：SnowLuma及共用bot业务 | A已隔离交付/B失败保留；新联网分级、URL大意、图片自然对话仅详规完成；生产main/识图/48000保持 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [LAP-43](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md) |
+| QQ主线：SnowLuma及共用bot业务 | A/B保留；R1分级材料/gist/图片政策已实现/离线通过；生产main/识图/48000保持，停止待另选R2/R3 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [LAP-43](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md) |
 | 家庭5070备用模型路线 | 历史记录为接入已实现/离线及元数据通过、真实生成未验；本轮未重查，不自动切换后端 | [HANDOFF](tracks/local-5070/HANDOFF.md) / [既有选型](tracks/local-5070/MODEL_SELECTION.md) |
 
 `tracks/laptop-workbuddy` 是保留的历史目录名，当前承担QQ主线和共用网关交接，不表示仍以NapCat或WorkBuddy界面为主路线。所有旧任务的状态/验收差额在TASKS与各任务HANDOFF保留，不重命名整棵目录。

@@ -152,3 +152,6 @@ Snow运行准入另要求online/good、已armed且pipe/login/rx/outbound健康�
 `activate_lap43_memes.py` 默认inspect；显式activate要求本次inspect JSON作为expected，停机/配置锁内复核基线、保存原字节与不存在标记，激活既有7条且不扩库。只做离线交付时不得对生产运行helper激活。公共搜索探测用 `probe_lap43_search.py`，默认不联网；后续阶段B才允许冻结3题/最多3搜索+6页面入口、人工对照和0模型批次。
 
 `revalidate_lap43_vision.py` 默认inspect；新证据固定在 `state/lap43-vision-regression/<binding>/`，acceptance_mode为 `lap43_current_regression`。新授权、当前offline、实际CLI正反契约、单次IQ-05及人工答案hash/反馈、历史IQ-01接受、当前ingress和配对active全部必须通过。旧42证据及unknown保留，不改旧binding、不缩小签名；离线报告本身不能启动生产vision。
+
+
+LAP-43材料续作（隔离实现，尚未部署）：`web.material_goal`缺省`gist`，可选`coverage`；普通URL选择连贯主要段落，明确完整/逐条请求仍要求完整材料。显式legacy/coverage旧方式保留。`web.search_fallback`缺省`snippet`，可选`none`；只使用已取得且相关的实质RSS摘要，不把摘要当目标正文。搜索enabled与代码质量双门槛仍为false，字段不启用搜索。日期事实不改名为fresh；严格日期窗缺依据时本地说明，现行状态和近期提示分别处理。所有字段保存后正常停机加载，新旧worker和schema须配对部署；不热改生产。来源最多两条，摘要/仅简介明确标级。图片仍同轮原生一次生成，风格政策优先结合配文与语境，用户persona不改。

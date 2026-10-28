@@ -1,5 +1,11 @@
 # QQ主线交接：SnowLuma与共用bot业务
 
+## 当前续作：LAP-43 R1已隔离实现/离线交付
+
+2026-10-28：session `LAP-43-materials-r1-implementation`完成R1，新74单元/6组合78框架及当前persona预算/新offline配对通过；实现与失败过程、限制见[报告](../../reports/lap-43-materials-r1.md) / [43交接](tasks/LAP-43/HANDOFF.md)。搜索双门槛false；生产main52866fe1/tracked干净，运行未操作，旧A/B/42证据保留。Ollama12288仍拒绝当前persona，不自动提高预算。仅隔离分支commit/push并核对后停止，后续另选R2/R3。
+
+## 历史规划检查点
+
 ## 当前续作：联网与自然材料对话详规
 
 2026-10-28 18:58，`LAP-43-materials-natural-chat-replan`续43的8文档登记已重读；[新详规](tasks/LAP-43/MATERIALS_CHAT_PLAN.md) / [新medium指令](tasks/LAP-43/MATERIALS_CHAT_MEDIUM_START.md)已完成，检查/Git回执见[43交接](tasks/LAP-43/HANDOFF.md)。搜索允许有级别的实质摘要退化、严格时间与一般近期区分、URL默认大意、图片按配文/语境自然接话，先诊断提取故障再判断质量。旧B失败和A/B代码保留；本轮不改生产main或运行，交付后停止，后续先等用户选R1，不自动重跑B/部署C。
@@ -34,7 +40,7 @@ LAP-41已完成新根整理：uv报告清除38,269缓存文件约626.1MiB、5份
 
 ## 当前需要读的文件
 
-- 当前：[43 HANDOFF](tasks/LAP-43/HANDOFF.md) → [续规](tasks/LAP-43/MATERIALS_CHAT_PLAN.md) / [新medium指令](tasks/LAP-43/MATERIALS_CHAT_MEDIUM_START.md)，只执行用户后续选中的R1/R2/R3。42识图当前事实见[最终结果](../../reports/lap-42-vision-closure-result.md)，旧42启动及旧B/C指令不自动重放。
+- 当前：[43 HANDOFF](tasks/LAP-43/HANDOFF.md) → [续规](tasks/LAP-43/MATERIALS_CHAT_PLAN.md) / [新medium指令](tasks/LAP-43/MATERIALS_CHAT_MEDIUM_START.md)，R1已离线交付，只执行用户后续选中的R2/R3。42识图当前事实见[最终结果](../../reports/lap-42-vision-closure-result.md)，旧42启动及旧B/C指令不自动重放。
 - 上轮：[21实际数据准备](tasks/LAP-21/SNOW_MIGRATION_RESULT.md)保留；active未激活/真实未验不阻塞42，42不动其pending。
 - 日常使用：[SnowLuma使用说明](../../SnowLuma使用说明.md)。
 - 旧NapCat用户：[实际bot使用对照](../../docs/BOT_USAGE_COMPARISON.md)。
@@ -52,7 +58,7 @@ NapCat旧根和旧C根不修改/启停；保留本根仍被导入的NapCat兼容
 
 ## 后续排序与含义
 
-42缩减识图验收已交付，43的A已完成/B失败已交付；当前先按新续规等用户选R1离线，再另选R2公共/R3生产验收，不重复旧A/B或直接续旧C。独立表情/owner子项仍可由用户单独指定，但不能顺带覆盖本次新材料合同。保持CLI/模型/low/账号/额度，记忆/成员/图片和搜索真实差额保留。
+42缩减识图验收已交付，43的A已完成/B失败已交付；R1已完成隔离离线交付，后续另选R2公共/R3生产验收，不重复旧A/B或直接续旧C。独立表情/owner子项仍可由用户单独指定，但不能顺带覆盖本次新材料合同。保持CLI/模型/low/账号/额度，记忆/成员/图片和搜索真实差额保留。
 
 成员是小群名册候选/受控@，42已补官方只读强刷来源并保留1..49/双TTL/8项768字节/单cap/最多1受控@；缺来源、人数无效/大群只暂停增强。关注是free叫名/引用/短续聊，已加载，无新消息不主动发言。字幕专用网络/认证服务及vendor已删除，纯材料schema/选择函数和旧报告保留；旧专用报告脚本不适用于当前退役版本，不重跑。真实效果按42报告逐项保留，不能用开关/代码替代群验收。
 

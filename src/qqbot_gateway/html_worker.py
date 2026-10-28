@@ -7,6 +7,24 @@ import time
 from datetime import datetime
 
 MAX_BYTES=1048576
+FAILURES={
+    'dependency':{'dependency_missing','internal_error'},
+    'policy':{'entity_policy','internal_error'},
+    'parse':{'parse_error','internal_error'},
+    'body':{'empty_body','content_denied','internal_error'},
+    'date':{'date_error','internal_error'},
+    'serialize':{'output_limit','internal_error'},
+}
+
+class ExtractionFailure(Exception):
+    def __init__(self,stage,reason):self.stage=stage;self.reason=reason
+
+
+def phase(stage,reason,operation):
+    try:return operation()
+    except ExtractionFailure:raise
+    except Exception:raise ExtractionFailure(stage,reason) from None
+
 
 
 class Extractor(HTMLParser):
@@ -66,7 +84,7 @@ def semantic_body(tree):
             blocks=[x for x in blocks if x.text_content().strip()]
             links=sum(len(' '.join(x.text_content().split())) for x in node.xpath('.//a'))
             density=min(1,links/max(1,size))
-            if size>=80 and len(blocks)>=2 and density<.5:
+            if len(content.encode())>=20 and len(blocks)>=1 and density<.5:
                 if content in seen:continue
                 seen.add(content)
                 score=size*(1-density)+min(len(blocks),100)*20
@@ -118,11 +136,16 @@ def extract_dates(tree):
 
 
 def extract_html(text):
-    from lxml import html
-    from readability import Document
-    if re.search(r'<!DOCTYPE[^>]*\[|<!ENTITY|<!DOCTYPE[^>]+(?:SYSTEM|PUBLIC)',text,re.I):raise ValueError('html_entities')
+    def dependencies():
+        from lxml import html
+        from readability import Document
+        return html,Document
+    html,Document=phase('dependency','dependency_missing',dependencies)
+    # External identifiers in ordinary XHTML declarations are inert with
+    # no_network HTML parsing. Internal subsets/entities remain forbidden.
+    if re.search(r'<!DOCTYPE[^>]*\[|<!ENTITY',text,re.I):raise ExtractionFailure('policy','entity_policy')
     parser=html.HTMLParser(no_network=True,recover=True,huge_tree=False)
-    tree=html.fromstring(text,parser=parser)
+    tree=phase('parse','parse_error',lambda:html.fromstring(text,parser=parser))
     dates=tree.xpath('//meta[@property="article:published_time" or @name="date" or @name="pubdate"]/@content')
     published=None
     for value in dates:
@@ -130,21 +153,26 @@ def extract_html(text):
         try:datetime.fromisoformat(value.replace('Z','+00:00'))
         except ValueError:continue
         published=value;break
-    date_candidates=extract_dates(tree)
+    date_candidates=phase('date','date_error',lambda:extract_dates(tree))
+    description=' '.join((tree.xpath('//meta[@name="description" or @property="og:description"]/@content') or [''])[0].split())[:1000]
     for node in tree.xpath('//script|//style|//nav|//form|//iframe|//footer|//header[not(ancestor::main or ancestor::article or ancestor::section or ancestor::*[@role="main"])]|//aside|//noscript|//svg|//template|//object|//embed|//*[@hidden or @aria-hidden="true"]'):
         if node.getparent() is not None:node.drop_tree()
     for node in list(tree.iter()):
         style=node.get('style','').replace(' ','').lower()
         if ('display:none' in style or 'visibility:hidden' in style) and node.getparent() is not None:node.drop_tree()
-    doc=Document(html.tostring(tree,encoding='unicode'))
-    title=doc.short_title()[:120]
-    body,method=semantic_body(tree)
+    doc=phase('body','internal_error',lambda:Document(html.tostring(tree,encoding='unicode')))
+    title=phase('body','internal_error',lambda:doc.short_title()[:120])
+    body,method=phase('body','internal_error',lambda:semantic_body(tree))
     if body is None:
-        body=html.fromstring(doc.summary(),parser=parser);method='readability'
+        body=phase('body','internal_error',lambda:html.fromstring(doc.summary(),parser=parser));method='readability'
     for node in body.xpath('//script|//style|//iframe|//form|//nav|//img|//object|//embed'):
         if node.getparent() is not None:node.drop_tree()
-    content=body_text(body)
-    if len(content)<80 or re.search(r'verify you are human|access denied|登录后阅读|付费阅读|人机验证',content,re.I):raise ValueError('empty_shell')
+    content=phase('body','internal_error',lambda:body_text(body))
+    if re.search(r'verify you are human|access denied|登录后阅读|付费阅读|人机验证',content,re.I):raise ExtractionFailure('body','content_denied')
+    if len(content.encode())<20:
+        if len(description.encode())>=80:
+            return dict(title=title,text=description,published_at=published,date_candidates=date_candidates,body_method='metadata',body_scope='metadata')
+        raise ExtractionFailure('body','empty_body')
     return dict(title=title,text=content,published_at=published,date_candidates=date_candidates,body_method=method,body_scope='extracted_main')
 
 
@@ -152,20 +180,21 @@ def main():
     started=time.monotonic()
     try:
         raw=sys.stdin.buffer.read(MAX_BYTES+1)
-        if len(raw)>MAX_BYTES:raise ValueError('extract_input_limit')
-        text=raw.decode('utf-8')
+        if len(raw)>MAX_BYTES:raise ExtractionFailure('serialize','output_limit')
+        text=phase('parse','parse_error',lambda:raw.decode('utf-8'))
         if len(sys.argv)>2 and sys.argv[2]=='legacy':
             parser=Extractor();parser.feed(text)
             body=' '.join(' '.join(parser.text).split())
-            if len(body)<80:raise ValueError('empty_shell')
+            if len(body)<80:raise ExtractionFailure('body','empty_body')
             result=dict(title=' '.join(' '.join(parser.title).split())[:120],text=body,published_at=parser.published,date_candidates=[],body_method='legacy',body_scope='extracted_main')
         else:result=extract_html(text)
         result['elapsed_seconds']=time.monotonic()-started
-        data=json.dumps(result,ensure_ascii=False,separators=(',',':')).encode()
-        if len(data)>2*MAX_BYTES:raise ValueError('extract_output_limit')
-    except Exception:
-        # Parser exceptions may contain document contents: never return them.
-        data=b'{"error":"extract_failed"}'
+        data=phase('serialize','internal_error',lambda:json.dumps(result,ensure_ascii=False,separators=(',',':')).encode())
+        if len(data)>2*MAX_BYTES:raise ExtractionFailure('serialize','output_limit')
+    except Exception as error:
+        # Never include exception text or document content in the protocol.
+        stage,reason=(error.stage,error.reason) if isinstance(error,ExtractionFailure) else ('body','internal_error')
+        data=json.dumps(dict(error='extract_failed',stage=stage,reason=reason),separators=(',',':')).encode()
     sys.stdout.buffer.write(data)
 
 

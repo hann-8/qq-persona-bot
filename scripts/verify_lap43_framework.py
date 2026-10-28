@@ -16,7 +16,7 @@ sys.path[:0]=[str(ROOT),str(ROOT/'src'),str(ROOT/'tests')]
 os.environ['ASTRBOT_DISABLE_METRICS']='1'
 
 
-async def verify(root,backend,mode,participation="free",attention=False,memes=False,web_enabled=False,memory=False,members=False):
+async def verify(root,backend,mode,participation="free",attention=False,memes=False,web_enabled=False,memory=False,members=False,material_kind=None):
     full_lifecycle=True
     import yaml
     from aiohttp import web
@@ -137,6 +137,10 @@ async def verify(root,backend,mode,participation="free",attention=False,memes=Fa
             from qqbot_gateway.web_freshness import facts
             source=dict(url='https://example.com/',title='合成公开页',text='public synthetic material '*50,status='body')
             source.update(published_at='2026-10-27',freshness=facts([dict(kind='published',source='meta',value='2026-10-27')],'2026-10-27T11:00:00+00:00','2026-10-27T11:00:01+00:00','最新消息'))
+            if material_kind:
+                from qqbot_gateway.evidence_selection import material
+                source.update(material=material(material_kind,'summary' if material_kind=='search_snippet' else 'main'),time_policy='recent_hint')
+                if material_kind=='search_snippet':source.update(status='summary',published_at=None,freshness=facts([],'2026-10-27T11:00:00+00:00','2026-10-27T11:00:01+00:00'))
             return Retrieval('read',[source])
     reader=OfflineReader()
     wrapped=WebRunner(harness,reader,InputBudget(),settings['output'])
@@ -275,6 +279,24 @@ async def verify(root,backend,mode,participation="free",attention=False,memes=Fa
         assert harness.attempts==before+1
         return req
     try:
+        if material_kind and not (attention or memory or members):
+            e=await inbound('搜索Python最近消息');gen,req=await start(e)
+            assert e.get_extra('qq_group_request')['version']==1
+            before=harness.attempts
+            await complete(e,req,response(req,'合成检索答复'));await finish(gen)
+            assert harness.attempts==before+1 and len(e.bot.sent)==1
+            web=e.get_extra('qq_group_metadata')['web'][0]
+            assert web['material']['kind']==material_kind and '据检索摘要' in str(e.bot.sent)
+            report.append(dict(case='v1_provider_material_manifest_ACK',sends=1))
+            e=await inbound('搜索Python最近消息');gen,req=await start(e)
+            e.get_extra('qq_group_source')['web_anchor']='tampered'
+            before=harness.attempts
+            await complete(e,req,response(req,'合成检索答复'));await finish(gen)
+            assert harness.attempts==before+1 and e.get_extra('qq_group_invalid')
+            assert not any('合成检索答复' in str(row) for row in e.bot.sent)
+            report.append(dict(case='v1_provider_snapshot_drift_rejected',sends=len(e.bot.sent)))
+            return dict(backend=backend,mode=mode,participation=participation,attention=attention,memory=memory,memes=memes,members=members,
+                cases=report,material_kind=material_kind,real_model_calls=0,real_qq_calls=0,real_run_agent=True,actual_runner=True,original_event_ACK=True)
         generation=gate.silence.states['111']['generation']
         assert await inbound('暂停发言',True,sender='555') is None
         assert gate.silence.normal('111') and gate.silence.states['111']['generation']==generation
@@ -416,7 +438,12 @@ async def verify(root,backend,mode,participation="free",attention=False,memes=Fa
             report.append(dict(case='bubble_interval_stop_wake_partial',sends=1))
         e=await inbound('搜索合成最新消息');gen,req=await start(e)
         await complete(e,req,response(req,'合成公开资料'));await finish(gen)
-        assert '2026-10-27' in str(e.bot.sent) and 'https://example.com/' in str(e.bot.sent)
+        assert 'https://example.com/' in str(e.bot.sent)
+        metadata=e.get_extra('qq_group_metadata')
+        web_manifest=(metadata['manifest']['web'] if 'manifest' in metadata else metadata['web'])[0]
+        assert web_manifest['material']['kind']==(material_kind or 'page_excerpt')
+        if material_kind=='search_snippet':assert '据检索摘要' in str(e.bot.sent) and web_manifest['freshness']['published_at'] is None
+        else:assert web_manifest['freshness']['published_at']=='2026-10-27'
         report.append(dict(case='dated_source_runner_metadata_ACK',sends=1))
         if memes:
             e=await inbound('发个开心表情');gen,req=await start(e)
@@ -565,6 +592,6 @@ async def verify(root,backend,mode,participation="free",attention=False,memes=Fa
         e=await inbound();assert router.connection()==connection
         report.append(dict(case='malformed_mirror_closed_then_recovers',sends=0))
         return dict(backend=backend,mode=mode,participation=participation,attention=attention,memory=memory,memes=memes,members=members,
-                    cases=report,real_model_calls=0,real_qq_calls=0,real_run_agent=True,actual_runner=True,original_event_ACK=True)
+                    cases=report,material_kind=material_kind,real_model_calls=0,real_qq_calls=0,real_run_agent=True,actual_runner=True,original_event_ACK=True)
     finally:
         router.tasks.close();gate.store.close();await provider.client.close();await server.cleanup();await private_server.cleanup()

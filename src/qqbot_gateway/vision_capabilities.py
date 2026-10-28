@@ -144,7 +144,7 @@ def static_diagnostics(settings, runtime, *, table=None):
 
 
 def offline_path(settings,mode=None):
-    if mode=='lap43_current_regression':return ROOT/'reports/lap-43-vision-offline.json'
+    if mode=='lap43_current_regression':return ROOT/'reports/lap-43-materials-offline.json'
     if mode is not None and mode!='lap42_first_plus_large_operator_acceptance':raise ValueError('EVIDENCE_MODE_INVALID')
     record=selected_record(settings)
     return ROOT/('reports/lap-42-vision-offline.json' if record and record.get('kind') else 'reports/lap-28-C-offline.json')
@@ -157,12 +157,12 @@ def offline_valid(settings,mode=None):
         if value.get('passed') is not True or value.get('adapter_signature')!=adapter_signature():return False
         record=selected_record(settings)
         if record and record.get('kind'):
-            verifier=ROOT/('scripts/verify_lap43.py' if mode=='lap43_current_regression' else 'scripts/verify_lap42_vision.py')
-            tests=ROOT/('tests/test_lap43.py' if mode=='lap43_current_regression' else 'tests/test_lap42_vision.py')
+            verifier=ROOT/('scripts/verify_lap43_materials.py' if mode=='lap43_current_regression' else 'scripts/verify_lap42_vision.py')
+            tests=ROOT/('tests/test_lap43_materials.py' if mode=='lap43_current_regression' else 'tests/test_lap42_vision.py')
             if (value.get('rule_hash')!=digest(record) or
                 value.get('verifier_sha256')!=hashlib.sha256(verifier.read_bytes()).hexdigest() or
                 value.get('tests_sha256')!=hashlib.sha256(tests.read_bytes()).hexdigest() or
-                value.get('source_audit_sha256')!=hashlib.sha256((ROOT/('reports/lap-43-vision-sources.json' if mode=='lap43_current_regression' else 'reports/lap-42-vision-closure-sources.json')).read_bytes()).hexdigest()):return False
+                value.get('source_audit_sha256')!=hashlib.sha256((ROOT/('reports/lap-43-materials-sources.json' if mode=='lap43_current_regression' else 'reports/lap-42-vision-closure-sources.json')).read_bytes()).hexdigest()):return False
         return True
     except (OSError,ValueError,TypeError,KeyError):return False
 

@@ -33,7 +33,7 @@ class Dates(unittest.TestCase):
     def test_intents(self):
         cfg=validate_web(dict(enabled=True))
         self.assertFalse(cfg['search_enabled']);self.assertEqual(cfg['freshness_days'],7)
-        for q,kind in [('最新消息','search'),('有什么新动态','search'),('我最近很累','none'),('你现在怎么样','none'),('不要联网查最新消息','none'),('查一下那个','clarify'),('搜索QQ号123456','sensitive'),('搜索2026-10-27官方公告','search')]:
+        for q,kind in [('Python最新消息','search'),('有什么新动态','search'),('我最近很累','none'),('你现在怎么样','none'),('不要联网查最新消息','none'),('查一下那个','clarify'),('搜索QQ号123456','sensitive'),('搜索2026-10-27官方公告','search')]:
             with self.subTest(q=q):self.assertEqual(intent(q,cfg).kind,kind)
         self.assertEqual(intent('最新消息',dict(cfg,trigger='explicit')).kind,'none')
         for v in (True,0,31):
@@ -52,7 +52,7 @@ class Dates(unittest.TestCase):
         damaged=copy.deepcopy(m);damaged[0]['freshness']['published_at']='2020-01-01'
         with self.assertRaises(ValueError):validate_manifest(damaged,dict(web_anchor='news'))
         text=source_plan('Public answer',selected,OUTPUT,'news').canonical_text
-        self.assertIn('北京时间',text);self.assertIn('2026-10-27',text);self.assertIn(row['url'],text)
+        self.assertNotIn('页面日期不等于',text);self.assertIn(row['url'],text)
 
 class Worker(unittest.IsolatedAsyncioTestCase):
     async def test_real_worker_protocol(self):
@@ -84,7 +84,7 @@ class Worker(unittest.IsolatedAsyncioTestCase):
                 with patch('qqbot_gateway.web_retrieval.SEARCH_QUALITY_PASSED',True):
                     for metadata,status in cases:
                         with self.subTest(status=status,metadata=metadata):
-                            result=await r.retrieve('public最新news新闻')
+                            result=await r.retrieve('public今天news新闻')
                             self.assertFalse(result.sources);self.assertTrue(result.notice)
                             self.assertEqual(r.last_audit['fetch_calls'],1)
             finally:REQUEST_TIME.reset(token)
@@ -104,7 +104,7 @@ class Worker(unittest.IsolatedAsyncioTestCase):
             result=await r.retrieve('最新新闻');self.assertTrue(result.notice);self.assertFalse(HTTP.calls)
             token=REQUEST_TIME.set(NOW)
             try:
-                with patch('qqbot_gateway.web_retrieval.SEARCH_QUALITY_PASSED',True):result=await r.retrieve('public最新news新闻')
+                with patch('qqbot_gateway.web_retrieval.SEARCH_QUALITY_PASSED',True):result=await r.retrieve('public今天news新闻')
             finally:REQUEST_TIME.reset(token)
             self.assertEqual(len(HTTP.calls),3);self.assertEqual(len(result.sources),1)
             self.assertEqual(result.sources[0]['freshness']['requested_at'],NOW)

@@ -6,7 +6,7 @@ from urllib.parse import urlsplit
 DEFAULTS = dict(enabled=False, search_enabled=False, freshness_days=7, trigger='auto', provider='bing_rss', max_searches=1,
                 max_results=5, max_pages=2, timeout_seconds=15, max_redirects=2,
                 max_response_bytes=1048576, max_page_text_bytes=4000,
-                max_evidence_bytes=6000, max_sources=2, extractor='readability', long_text_policy='excerpt', selection_policy='coverage')
+                max_evidence_bytes=6000, max_sources=2, extractor='readability', long_text_policy='excerpt', selection_policy='coverage', material_goal='gist', search_fallback='snippet')
 # Candidate has not passed the public quality gate. This is code-owned, not config.
 SEARCH_QUALITY_PASSED = False
 URL = re.compile(r'https?://[^\s<>"\u3000，。！？；、（）]+', re.I)
@@ -16,6 +16,7 @@ VIDEO = re.compile(r'(^|\.)(bilibili\.com|b23\.tv|youtube\.com|youtu\.be|douyin\
 def validate_web(raw):
     if not isinstance(raw, dict):raise ValueError('web must be a mapping')
     cfg = DEFAULTS | raw
+    if cfg['material_goal'] not in ('gist','coverage') or cfg['search_fallback'] not in ('snippet','none'):raise ValueError('Invalid web material policy')
     if cfg['selection_policy'] not in ('coverage','question'):raise ValueError('Invalid web.selection_policy')
     if cfg['extractor'] not in ('readability','legacy') or cfg['long_text_policy'] not in ('excerpt','reject'):raise ValueError('Invalid web extraction policy')
     if type(cfg['enabled']) is not bool or cfg['trigger'] not in ('auto','explicit') or cfg['provider'] != 'bing_rss':
@@ -34,6 +35,7 @@ class Intent:
     kind: str = 'none'
     query: str = ''
     urls: tuple = ()
+    time_policy: str = 'none'
 
 
 def intent(question, cfg, private_ids=()):
@@ -46,10 +48,15 @@ def intent(question, cfg, private_ids=()):
         try:
             if any(VIDEO.search(urlsplit(x).hostname or '') for x in urls):return Intent('video')
         except ValueError:return Intent('blocked')
-        return Intent('read',urls=urls[:cfg['max_pages']])
+        from .web_freshness import time_policy,window
+        from datetime import datetime,timezone
+        try:window(re.sub(r'https?://[^\s<>]+',' ',question),datetime.now(timezone.utc).isoformat(),cfg['freshness_days'])
+        except ValueError:return Intent('clarify')
+        return Intent('read',urls=urls[:cfg['max_pages']],time_policy=time_policy(question))
     if not cfg['enabled']:return Intent()
     explicit=bool(re.search(r'搜索|搜一下|联网查|帮我查|查一下|查查',question))
-    temporal=bool(re.search(r'现在|今天|最新|最近|目前|当日|本周|近\d+天|过去24小时|新动态',question) and re.search(r'新闻|消息|动态|公告|更新|版本|价格|天气|赛程|在任|发布|汇率|股价',question))
+    temporal=bool(re.search(r'现在|今天|最新|最近|近期|目前|当前|当日|本周|近\d+天|过去24小时|新动态',question) and re.search(r'新闻|消息|动态|公告|更新|版本|价格|天气|赛程|在任|发布|汇率|股价|支持|官网|维护',question))
+    temporal=temporal or bool(re.search(r'是否仍.*维护',question))
     if not explicit and not (cfg['trigger']=='auto' and temporal):return Intent()
     if re.search(r'记不记得|口令|我的代码|这段代码|陪我|开心',question):return Intent()
     if re.search(r'刚才|那个|上述|上面|这个',question):return Intent('clarify')
@@ -57,7 +64,7 @@ def intent(question, cfg, private_ids=()):
     privacy=re.sub(r'(?<!\d)\d{4}-\d{2}-\d{2}(?!\d)','',question)
     if (len(question)>240 or re.search(r'\d{5,}|QQ|群号|密码|口令|token|secret|api.?key|[A-Za-z]:[\\/]|\\\\|@[\w]+|[\w.+-]+@[\w.-]+',privacy,re.I)
             or any(str(x) in question for x in private_ids if str(x))):return Intent('sensitive')
-    from .web_freshness import window
+    from .web_freshness import window,time_policy
     from datetime import datetime,timezone
     try:window(question,datetime.now(timezone.utc).isoformat(),cfg['freshness_days'])
     except ValueError:return Intent('clarify')
@@ -66,4 +73,5 @@ def intent(question, cfg, private_ids=()):
         query=re.sub(r'^(?:我想问)?'+re.escape(alias)+r'[，,:：\s]*','',query,flags=re.I)
     query=re.sub(r'^(?:请|帮我)?(?:搜索|搜一下|联网查|查查|查一下)[，,:：\s]*','',query).strip()
     if len(query)<2:return Intent('clarify')
-    return Intent('search',query=query)
+    if not re.sub(r'现在|目前|最近|最新|怎么样|如何|消息|动态|搜索|[，。？?\s]','',query):return Intent('clarify')
+    return Intent('search',query=query,time_policy=time_policy(question))

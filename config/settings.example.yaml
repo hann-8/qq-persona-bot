@@ -49,6 +49,8 @@ web:
   freshness_days: 7 # 1..30; Asia/Shanghai
   extractor: readability  # 本地受管正文提取，可显式legacy回滚
   long_text_policy: excerpt  # 六区节选或reject；完整要求超限直接拒绝  # 配置节，子字段见下方；保留既有校验约束
+  material_goal: gist  # gist读主要内容；coverage保留原覆盖合同；正常重启生效
+  search_fallback: snippet  # 正文失败可用实际实质摘要；none关闭退化；搜索双门槛仍优先
   selection_policy: coverage  # coverage六区或question当前问题本地相关整段；保存后正常重启生效
   enabled: false  # 共用网页读取开关；搜索质量门槛仍关闭，不代表完整搜索可用
   trigger: auto  # 联网触发auto/explicit

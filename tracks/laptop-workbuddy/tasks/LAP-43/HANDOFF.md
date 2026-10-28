@@ -1,5 +1,15 @@
 # LAP-43：Snow表情、时效搜索、群参与、唯一操作者与主线整合
 
+## 当前R1：代码/离线完成，隔离Git交付
+
+2026-10-28T19:56:38+08:00（Asia/Shanghai）：`LAP-43-materials-r1-implementation`按新续规R1完成封闭worker诊断、分级来源/时间/gist、固定自然图片政策和v1/v2材料metadata/预算guard。新74单元/6组合78框架通过；当前persona CodeBuddy48000组合35074字节可容纳，Ollama12288必需输入拒绝。新writer `scripts/verify_lap43_materials.py` → `reports/lap-43-materials-offline.json`；保持43当前模式，完整签名/审阅引用/读取路径配对，实际offline_valid=true。旧报告不覆盖，真实CLI/probe/IQ均未运行，生产资格false。
+
+起点HEAD/远端0734c26a、初始干净；精确文件/追加归属已登记重读，见TASKS本轮段。完成/修改文件/实际命令与失败过程、限制/回滚见[本轮报告](../../../../reports/lap-43-materials-r1.md)。生产仍main52866fe1且tracked干净，未写local/persona/图库/运行，0公共探测/真实模型/QQ/SSH/启停。搜索双门槛false；旧B0/3、A/42原证据和其他旧差额保留。
+
+只交付本任务归属到codex/lap-43-stage-a，commit/push并核对远端后释放归属停止。下一步须用户另选R2的新冻结公共批次；R3另授权新binding实际CLI/原生大图/人工接受/配对部署。不能沿用旧B/C或旧active，不自动继续。
+
+## 历史续规检查点
+
 ## 当前续作：联网与自然材料对话续规已完成，待Git核对
 
 2026-10-28 18:58（Asia/Shanghai），session `LAP-43-materials-natural-chat-replan`按用户最新指令只续详细规划与medium指令。用户目标：搜索为回答补时效，不要求网页存档/完整复刻；URL读懂大意；图片结合上下文自然接话，明确要求时才讲解。

@@ -12,6 +12,8 @@ web:
   trigger: auto  # 联网触发auto/explicit；新装默认 "auto"
   extractor: readability  # 按需受管worker提取；legacy仅显式回滚
   long_text_policy: excerpt  # 六区节选或reject；完整要求超限拒绝
+  material_goal: gist  # gist读主要内容；coverage保留原覆盖合同；正常重启生效
+  search_fallback: snippet  # 正文失败可用实际实质摘要；none关闭退化；搜索双门槛仍优先
   selection_policy: coverage  # coverage六区或question当前问题本地相关整段；保存后正常重启生效
   provider: bing_rss  # 搜索提供方固定bing_rss，当前搜索质量门槛关闭；新装默认 "bing_rss"
   max_searches: 1  # 搜索最多1次；新装默认 1

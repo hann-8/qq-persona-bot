@@ -7,12 +7,13 @@ from .public_http import WebFailure
 def encoded(value):return json.dumps(value,ensure_ascii=False,separators=(',',':')).encode('utf-8')
 
 
-STOP={'the','and','for','with','this','that','what','how','does','from','page','please','总结','概括','这页','网页','这个','如何','什么','请问','一下','介绍'}
+STOP={'the','and','for','with','this','that','what','how','does','from','page','please','总结','概括','这页','网页','这个','如何','什么','请问','一下','介绍','search','latest','recent','news','today','current','stable','release','version','support','supports','official','status','currently','is','still','maintained','of','in','on','a','an','官方','新闻','版本','更新','支持','维护'}
 
 
 def question_terms(question):
     # URL paths and hostnames are source identity, not target question terms.
-    question=re.sub(r'https?://[^\s<>]+',' ',question)
+    question=re.sub(r'https?://[^\s<>]+|(?i:site:)[a-zA-Z0-9.-]+|\d{4}-\d{2}-\d{2}',' ',question)
+    question=re.sub(r'搜索|搜一下|最新|最近|近期|目前|现在|消息|动态|公告|过去24小时|今天|本周|(?:近|过去)\d+天',' ',question)
     question=re.sub(r'总结|概括|这页|网页|请看|请问|一下|(?i:please|summari[sz]e|summary|this page)',' ',question)
     result=[]
     for match in re.finditer(r'[A-Za-z0-9_]+(?:[.:-][A-Za-z0-9_]+)*|[\u4e00-\u9fff]+',question[:4096]):
@@ -68,6 +69,21 @@ def select(text,cap,policy='excerpt',complete=False,selection_policy='coverage',
     if total<=cap:return dict(text=text,coverage='full',ranges=[[0,len(text)]],input_bytes=total,selected_bytes=total,truncated=False)
     if policy=='reject' or complete:raise WebFailure('evidence_full_required')
     paragraphs=[(m.start(),m.end(),m.group()) for m in re.finditer(r'[^\n]+',text) if m.group().strip()]
+    if selection_policy=='gist':
+        terms=question_terms(question)
+        ranked=sorted(range(len(paragraphs)),key=lambda i:(-term_hits(paragraphs[i][2],terms),i))
+        chosen=set();used=0
+        for i in [0]+ranked:
+            for j in (i,i+1):
+                if j>=len(paragraphs) or j in chosen:continue
+                size=len(paragraphs[j][2].encode())+(1 if chosen else 0)
+                if used+size<=cap:chosen.add(j);used+=size
+            if len(chosen)>=32:break
+        if not chosen:raise WebFailure('evidence_insufficient')
+        rows=[paragraphs[i] for i in sorted(chosen)]
+        body='\n'.join(row[2] for row in rows)
+        if len(body.encode())<20:raise WebFailure('evidence_insufficient')
+        return dict(text=body,coverage='excerpt',ranges=[[r[0],r[1]] for r in rows],input_bytes=total,selected_bytes=len(body.encode()),truncated=True)
     terms=question_terms(question) if selection_policy=='question' else []
     relevant=question_rows(paragraphs,cap,terms) if terms else None
     if relevant:
@@ -93,7 +109,7 @@ def select(text,cap,policy='excerpt',complete=False,selection_policy='coverage',
 
 
 def sources_for_budget(sources,cap,page_cap,policy,question,selection_policy='coverage'):
-    complete=bool(re.search(r'完整|逐项|不得省略|不许省略|不遗漏|in full|complete|without omissions',question,re.I))
+    complete=bool(re.search(r'完整|逐项|逐条|不能遗漏|不得省略|不许省略|不遗漏|in full|complete|without omissions',question,re.I))
     prepared=[]
     for source in sources:
         if source.get('status')=='subtitle':
@@ -106,14 +122,25 @@ def sources_for_budget(sources,cap,page_cap,policy,question,selection_policy='co
             raise WebFailure('evidence_insufficient')
         row={k:v for k,v in source.items() if not k.startswith('_')}
         body=source.get('_full_text',source['text'])
-        row.update(select(body,min(page_cap,cap),policy,complete,selection_policy,question));prepared.append((row,body))
+        try:
+            identity=validate_material(source['material']) if 'material' in source else material() if source.get('status')=='body' else None
+            if identity is None:raise ValueError('material missing')
+        except (ValueError,TypeError,KeyError):raise WebFailure('material_identity') from None
+        kind=identity['kind']
+        if complete and kind!='page_excerpt':raise WebFailure('evidence_full_required')
+        row.update(select(body,min(page_cap,cap),policy,complete,selection_policy,question))
+        row['material']=material(kind,'metadata' if kind=='link_metadata' else 'summary' if kind=='search_snippet' else 'excerpt' if row['coverage']=='excerpt' else 'main',identity['reported_at'])
+        prepared.append((row,body))
     # All fields, ranges, titles, source URLs and timestamps share one cap.
     text_cap=min(page_cap,cap)
     while text_cap>=80:
         rows=[]
         try:
             for original,body in prepared:
-                row=dict(original);row.update(select(body,text_cap,policy,complete,selection_policy,question));rows.append(row)
+                row=dict(original);row.update(select(body,text_cap,policy,complete,selection_policy,question))
+                row['material']=dict(row['material'])
+                if row['material']['kind']=='page_excerpt':row['material']['scope']='excerpt' if row['coverage']=='excerpt' else 'main'
+                rows.append(row)
         except WebFailure:
             raise
         if len(encoded(dict(partial=False,sources=rows)))<=cap:return rows
@@ -127,6 +154,13 @@ def manifest(sources):
     for row in sources:
         item=dict(url=row['url'],coverage=row['coverage'],ranges=row['ranges'],input_bytes=row['input_bytes'],
                   selected_bytes=row['selected_bytes'],sha256=hashlib.sha256(row['text'].encode()).hexdigest())
+        if row.get('material'):
+            import hashlib
+            item['material']=validate_material(row['material'])
+            item['material_sha256']=hashlib.sha256(encoded(item['material'])).hexdigest()
+        if row.get('time_policy'):
+            if row['time_policy'] not in TIME_POLICIES:raise ValueError('time policy')
+            item['time_policy']=row['time_policy']
         if row.get('freshness'):
             from .web_freshness import validate_facts
             item['freshness']=validate_facts(row['freshness'])
@@ -141,7 +175,15 @@ def validate_manifest(rows,source):
     from .public_network import page_url
     if not source.get('web_anchor') or not isinstance(rows,list) or not 1<=len(rows)<=2:raise ValueError('web manifest')
     for row in rows:
-        if not isinstance(row,dict) or set(row)-{'subtitle','freshness','freshness_sha256'}!={'url','coverage','ranges','input_bytes','selected_bytes','sha256'}:raise ValueError('web fields')
+        if not isinstance(row,dict) or set(row)-{'subtitle','freshness','freshness_sha256','material','material_sha256','time_policy'}!={'url','coverage','ranges','input_bytes','selected_bytes','sha256'}:raise ValueError('web fields')
+        if 'time_policy' in row and (not isinstance(row['time_policy'],str) or row['time_policy'] not in TIME_POLICIES):raise ValueError('time policy')
+        if ('material' in row)!=('material_sha256' in row):raise ValueError('material pairing')
+        if 'material' in row:
+            import hashlib
+            validate_material(row['material'])
+            if row['material_sha256']!=hashlib.sha256(encoded(row['material'])).hexdigest():raise ValueError('material hash')
+            scope=row['material']['scope']
+            if row['material']['kind']=='page_excerpt' and scope!=('main' if row['coverage']=='full' else 'excerpt'):raise ValueError('material scope')
         if ('freshness' in row)!=('freshness_sha256' in row):raise ValueError('web freshness pairing')
         if 'freshness' in row:
             import hashlib
@@ -157,15 +199,15 @@ def validate_manifest(rows,source):
             else:page_url(row['url'])
         except WebFailure:raise ValueError('web url') from None
         if (row['coverage'] not in ('full','excerpt') or not isinstance(row['sha256'],str) or not re.fullmatch('[a-f0-9]{64}',row['sha256']) or
-            type(row['input_bytes']) is not int or not 80<=row['input_bytes']<=4194304 or
-            type(row['selected_bytes']) is not int or not 80<=row['selected_bytes']<=min(6000,row['input_bytes'])):raise ValueError('web bounds')
+            type(row['input_bytes']) is not int or not (20 if 'material' in row and row['material']['kind']=='page_excerpt' else 80)<=row['input_bytes']<=4194304 or
+            type(row['selected_bytes']) is not int or not (20 if 'material' in row and row['material']['kind']=='page_excerpt' else 80)<=row['selected_bytes']<=min(6000,row['input_bytes'])):raise ValueError('web bounds')
         ranges=row['ranges'];previous=-1
         if not isinstance(ranges,list) or not 1<=len(ranges)<=512:raise ValueError('web ranges')
         for pair in ranges:
             if not isinstance(pair,list) or len(pair)!=2 or any(type(x) is not int for x in pair) or not previous<pair[0]<pair[1]<=row['input_bytes']:raise ValueError('web range')
             previous=pair[1]
         if row['coverage']=='full' and (len(ranges)!=1 or row['selected_bytes']!=row['input_bytes']):raise ValueError('web full')
-        if row['coverage']=='excerpt' and (row['selected_bytes']<1200 or row['selected_bytes']>=row['input_bytes']):raise ValueError('web excerpt')
+        if row['coverage']=='excerpt' and (row['selected_bytes']<(20 if 'material' in row and row['material']['kind']=='page_excerpt' else 80 if 'material' in row else 1200) or row['selected_bytes']>=row['input_bytes']):raise ValueError('web excerpt')
         if 'subtitle' in row:
             from .bilibili_policy import locator,BV
             import math
@@ -190,3 +232,20 @@ def validate_manifest(rows,source):
                 covered+=pair[1]-pair[0];last=pair[1]
             if last<sub['duration']:gaps.append([last,sub['duration']])
             if sub['time_gaps']!=gaps or sub['time_coverage']!=round(covered/sub['duration'],6):raise ValueError('subtitle coverage')
+
+
+TIME_POLICIES={'none','recent_hint','current_status','strict_window'}
+
+def material(kind='page_excerpt',scope='main',reported_at=None):
+    return validate_material(dict(kind=kind,scope=scope,reported_at=reported_at,reported_date_source='rss_item' if reported_at else 'none'))
+
+
+def validate_material(row):
+    if not isinstance(row,dict) or set(row)!={'kind','scope','reported_at','reported_date_source'}:raise ValueError('material fields')
+    scopes={'page_excerpt':{'main','excerpt'},'search_snippet':{'summary'},'link_metadata':{'metadata'}}
+    if not isinstance(row['kind'],str) or row['kind'] not in scopes or not isinstance(row['scope'],str) or row['scope'] not in scopes[row['kind']]:raise ValueError('material identity')
+    from .web_freshness import parse
+    if row['reported_at'] is not None and parse(row['reported_at'])[0] is None:raise ValueError('material reported date')
+    if row['reported_date_source']!=('rss_item' if row['reported_at'] else 'none'):raise ValueError('material date source')
+    if row['kind']!='search_snippet' and row['reported_at'] is not None:raise ValueError('material date identity')
+    return row

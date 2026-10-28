@@ -21,7 +21,7 @@ def window(question,requested_at,days=7):
         days=int(n[1])
         if not 1<=days<=30:raise ValueError('WINDOW_TOO_LONG')
     if re.search(r'过去24小时|近24小时',question):return now-timedelta(hours=24),now,True
-    if '今天' in question:return now.astimezone(SH).replace(hour=0,minute=0,second=0,microsecond=0),now,False
+    if '今天' in question or '当日' in question:return now.astimezone(SH).replace(hour=0,minute=0,second=0,microsecond=0),now,False
     if '本周' in question:
         day=now.astimezone(SH).replace(hour=0,minute=0,second=0,microsecond=0)
         return day-timedelta(days=day.weekday()),now,False
@@ -82,3 +82,19 @@ def validate_facts(row):
         future=published>requested if precision=='second' else published.date()>requested.astimezone(SH).date()
         if future and row['freshness_status'] in ('fresh','stale','version_dated'):raise ValueError('FRESHNESS_FUTURE')
     return row
+
+
+def time_policy(question):
+    question=re.sub(r'https?://[^\s<>]+',' ',question)
+    if re.search(r'今天|当日|本周|(?:过去|近)24小时|(?:近|过去|最近)\d+天|\d{4}-\d{2}-\d{2}',question):return 'strict_window'
+    if re.search(r'最新.*版本|最新稳定|(?:目前|现在|当前).*(?:支持|官网|状态|版本|维护)|是否仍.*维护',question):return 'current_status'
+    if re.search(r'最近|近期|最新|新动态',question):return 'recent_hint'
+    return 'none'
+
+
+def usable(freshness,policy,reported_at=None,question='',days=7):
+    validate_facts(freshness)
+    if policy!='strict_window':return policy in ('none','recent_hint','current_status')
+    if freshness['freshness_status']=='fresh':return True
+    # Engine-reported time alone does not verify when the event happened.
+    return False

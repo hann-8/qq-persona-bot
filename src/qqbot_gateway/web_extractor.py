@@ -14,6 +14,15 @@ from .cleanup_identity import CleanupOwner
 from .extractor_limits import WorkerLimit
 
 
+def worker_failure(result):
+    from .html_worker import FAILURES
+    if (not isinstance(result,dict) or set(result)!={'error','stage','reason'} or result['error']!='extract_failed'
+            or not isinstance(result['stage'],str) or not isinstance(result['reason'],str)
+            or result['stage'] not in FAILURES or result['reason'] not in FAILURES[result['stage']]):
+        raise WebFailure('extract_protocol')
+    return result['stage'],result['reason']
+
+
 class WebExtractor:
     def __init__(self,root=None):
         self.temporary=tempfile.TemporaryDirectory(prefix='qqbot-extract-') if root is None else None
@@ -26,7 +35,7 @@ class WebExtractor:
         if len(data)>1048576:raise WebFailure('extract_input_limit')
         async with self.lock:
             self.owner.reserve();process=None;owned=None;limit=None;tasks=[]
-            started=time.monotonic();self.last_metrics={'peak_rss':0,'elapsed_seconds':0,'exited':False}
+            started=time.monotonic();self.last_metrics={'peak_rss':0,'elapsed_seconds':0,'exited':False,'input_bytes':len(data),'input_sha256':__import__('hashlib').sha256(data).hexdigest(),'mode':mode}
             spawn=None
             try:
                 # Isolated interpreter, explicit script, no shell/user env/PYTHONPATH.
@@ -66,9 +75,16 @@ class WebExtractor:
                 if process.returncode:raise WebFailure('extract_exit')
                 try:result=json.loads(output)
                 except (ValueError,UnicodeError):raise WebFailure('extract_protocol') from None
-                if not isinstance(result,dict) or 'error' in result:raise WebFailure('extract_failed')
+                if not isinstance(result,dict):raise WebFailure('extract_protocol')
+                if 'error' in result:
+                    worker_failure(result)
+                    self.last_metrics.update(stage=result['stage'],reason=result['reason'],input_bytes=len(data),
+                        input_sha256=__import__('hashlib').sha256(data).hexdigest(),mode=mode)
+                    raise WebFailure('extract_failed')
                 if set(result)!={'title','text','published_at','elapsed_seconds','body_method','body_scope','date_candidates'} or not all(isinstance(result[k],str) for k in ('title','text')):raise WebFailure('extract_protocol')
-                if result['body_method'] not in ('semantic_main','semantic_article','readability','legacy') or result['body_scope']!='extracted_main':raise WebFailure('extract_protocol')
+                if (len(result['title'])>120 or not 20<=len(result['text'].encode())<=2097152
+                        or type(result['elapsed_seconds']) not in (int,float) or not 0<=result['elapsed_seconds']<=2):raise WebFailure('extract_protocol')
+                if result['body_method'] not in ('semantic_main','semantic_article','readability','legacy','metadata') or result['body_scope']!=('metadata' if result['body_method']=='metadata' else 'extracted_main'):raise WebFailure('extract_protocol')
                 from .web_freshness import validate_candidates
                 try:validate_candidates(result['date_candidates'])
                 except ValueError:raise WebFailure('extract_protocol') from None

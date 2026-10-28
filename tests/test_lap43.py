@@ -128,7 +128,7 @@ class Vision(unittest.TestCase):
     def test_fixed_mode_paths(self):
         from qqbot_gateway.vision_capabilities import offline_path,offline_valid
         from qqbot_gateway.vision_regression import directory,authorized,unknown,MODE
-        self.assertEqual(offline_path(settings(),MODE).name,'lap-43-vision-offline.json')
+        self.assertEqual(offline_path(settings(),MODE).name,'lap-43-materials-offline.json')
         with self.assertRaises(ValueError):offline_path(settings(),'https://evil')
         self.assertFalse(offline_valid(settings())) # changed code cannot reuse old report
         with tempfile.TemporaryDirectory() as t:

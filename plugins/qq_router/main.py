@@ -206,7 +206,7 @@ class QQRouter(Star):
                 if raw.model!='workbuddy-local' or not raw.id.startswith('chatcmpl-') or len(raw.choices)!=1:raise ValueError()
                 text=raw.choices[0].message.content
                 request=event.get_extra('qq_group_request')
-                plan=verify_metadata(getattr(raw,'qqbot_group_plan',None),request,raw.id,text,self.output,event.get_extra('qq_v2_source'))
+                plan=verify_metadata(getattr(raw,'qqbot_group_plan',None),request,raw.id,text,self.output,event.get_extra('qq_v2_source') or event.get_extra('qq_group_source'))
                 event.set_extra('qq_group_response',raw.id)
                 event.set_extra('qq_group_metadata',raw.qqbot_group_plan)
                 event.set_extra('qq_delivery_plan',plan)
@@ -348,7 +348,7 @@ class QQRouter(Star):
             if event.get_extra('qq_delivery_handled'):return
             request=event.get_extra('qq_group_request');plan=event.get_extra('qq_delivery_plan');key=event.get_extra('qq_delivery_key')
             if plan:
-                try:verify_metadata(event.get_extra('qq_group_metadata'),request,event.get_extra('qq_group_response'),plan.canonical_text,self.output,event.get_extra('qq_v2_source'))
+                try:verify_metadata(event.get_extra('qq_group_metadata'),request,event.get_extra('qq_group_response'),plan.canonical_text,self.output,event.get_extra('qq_v2_source') or event.get_extra('qq_group_source'))
                 except Exception:plan=None;event.set_extra('qq_group_invalid',True)
             if plan and self.delivery_allowed(event):
                 if request['version']==2:event.set_extra('qq_v2_delivery_started',time.monotonic())
@@ -733,7 +733,7 @@ class QQRouter(Star):
                         self.group_turns.group_epoch(group)==epoch):
                         # Reverify identity even on abnormal framework exit before ACK attribution.
                         verify_metadata(metadata,event.get_extra('qq_group_request'),event.get_extra('qq_group_response'),
-                            plan.canonical_text,self.output,event.get_extra('qq_v2_source'))
+                            plan.canonical_text,self.output,event.get_extra('qq_v2_source') or event.get_extra('qq_group_source'))
                         confirmed=[(plan.parts[i].payload_ref,mid) for i,state,mid in self.tasks.parts(key)
                             if state=='sent' and mid and plan.parts[i].type=='text']
                         ticket.source=event.get_extra('qq_v2_source')
@@ -831,6 +831,7 @@ class QQRouter(Star):
                 if mention:await self.local_notice(event,MESSAGES[error.code])
                 return
             snapshot=json.loads(body)['messages']
+            event.set_extra('qq_group_source',json.loads(body))
             request=dict(version=1,kind='group_turn',trigger='mention' if mention else 'ambient',must_reply=mention,
                          epoch=epoch,snapshot_digest=digest(body),request_key=digest(key))
             event.set_extra('qq_group_request',request);event.set_extra('qq_delivery_key',key)
