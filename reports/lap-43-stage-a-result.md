@@ -47,3 +47,9 @@
 ## Git交付
 
 提交范围仅TASKS已登记归属，旧报告/原证据/local/persona/秘密/图库不进入本轮差异。推送 `codex/lap-43-stage-a` 后核对远端SHA；生产main持续为基线 `52866fe1` 且工作树干净。实际代码提交及回执见43 HANDOFF/会话最终答复，Git交付不代表部署或真实验收。阶段A交付后释放归属停止，不自动推进B/C/D。
+
+## 阶段A Git交付回执（2026-10-28续收尾）
+
+实现检查点 `20350737d3f3eb5375075cdbc5d791bc91ba1e03`；新JSON换行修复及匹配报告提交 `21b546b06762243b0dd99147b5d708b31c035b00` 已推送 `origin/codex/lap-43-stage-a`，实时远端SHA与本地核对一致。47单元/74框架及两后端容量结果来自2026-10-27最后实际离线运行；本次继续未重跑无关矩阵，只复核当前adapter/verifier/source摘要、当前模式offline_valid=true、旧offline拒绝、全部本轮差异与换行检查。
+
+生产main仍为 `52866fe10cc654d2e12c5520f7afc5aa8bbe0179`，未合并或部署；原运行实例/local/persona/图库/证据均未操作。本次只把交付回执落盘并推送；最终回执提交自身SHA以分支tip/会话答复为准。忽略的 `state/lap43-stage-a/validation.log` 保留；无其他非忽略本机差异。阶段A交付后释放归属并停止，不推进B/C/D或任何真实动作。

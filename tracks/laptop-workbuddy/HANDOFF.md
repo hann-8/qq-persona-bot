@@ -2,6 +2,8 @@
 
 ## 当前任务：LAP-43阶段A隔离交付
 
+2026-10-28续收尾：阶段A实现及配对报告修复提交 `21b546b06762` 已推送隔离分支并核对远端；47单元/74框架证据及限制见43交接。生产main未变，交付后释放归属停止。
+
 2026-10-27 session `LAP-43-stage-a-implementation` 仅领取43阶段A；工作树 `C:/Users/yutha/.codex/worktrees/lap-43-stage-a/QQbot`，分支 `codex/lap-43-stage-a`，从已核对的main `52866fe1` 开始。唯一owner、输入/叫名续聊、表情默认inspect事务、搜索日期/证据和当前视觉回归模式已实现；实际检查见[43 HANDOFF](tasks/LAP-43/HANDOFF.md)/[阶段A结果](../../reports/lap-43-stage-a-result.md)。
 
 交付只到独立分支，不合生产main、不部署/启停/激活。生产main及原识图true保持；搜索双门槛false，网页read不变。当前persona在CodeBuddy 48000组合下可放入，Ollama 12288示例政策会拒绝必需输入；保留该限制，不提高额度或切模型。两后端框架均使用自造配置/底层替身，不是真实后端验收。后续只按用户选中的43阶段执行，旧18/21/27/35/42差额及原证据保留。

@@ -65,3 +65,9 @@
 为避免运行目录临时回到旧代码，先`git push origin HEAD:refs/heads/main`，再无force的`git fetch origin refs/heads/main:refs/heads/main`更新未占用本地main；`git diff --exit-code HEAD refs/heads/main`为0才`git switch main`。本地HEAD/main/Snow和两条实时远端均为上述完整SHA，检查点工作区干净；相对本轮起点只改7份Markdown，业务文件未变。
 
 随后只提交本次归属内的入口/交接回执到main并核对最终远端；原Snow分支保留在已合入的规划提交，main的回执后续提交不代表原分支未合并。最终回执文档自身SHA以main HEAD和会话最终报告为准，不自引用。确认远端后释放本规划session归属并停止，不实施或推进下一项。
+
+## 阶段A Git交付回执（2026-10-28续收尾）
+
+实现检查点 `20350737d3f3eb5375075cdbc5d791bc91ba1e03`；新JSON换行修复及匹配报告提交 `21b546b06762243b0dd99147b5d708b31c035b00` 已推送 `origin/codex/lap-43-stage-a`，实时远端SHA与本地核对一致。47单元/74框架及两后端容量结果来自2026-10-27最后实际离线运行；本次继续未重跑无关矩阵，只复核当前adapter/verifier/source摘要、当前模式offline_valid=true、旧offline拒绝、全部本轮差异与换行检查。
+
+生产main仍为 `52866fe10cc654d2e12c5520f7afc5aa8bbe0179`，未合并或部署；原运行实例/local/persona/图库/证据均未操作。本次只把交付回执落盘并推送；最终回执提交自身SHA以分支tip/会话答复为准。忽略的 `state/lap43-stage-a/validation.log` 保留；无其他非忽略本机差异。阶段A交付后释放归属并停止，不推进B/C/D或任何真实动作。

@@ -2,6 +2,8 @@
 
 ## 当前任务：LAP-43阶段A隔离实现与离线交付
 
+2026-10-28续收尾：阶段A实现及配对报告修复提交 `21b546b06762` 已推送隔离分支并核对远端；47单元/74框架证据及限制见43交接。生产main未变，交付后释放归属停止。
+
 2026-10-27，阶段A在隔离分支 `codex/lap-43-stage-a` 实施，起点为本地/实时远端main `52866fe10cc654d2e12c5520f7afc5aa8bbe0179`（含规划及整合回执）。实现唯一操作者控制、当前输入分流/叫名续聊、当前根7图激活helper、搜索开关/日期/证据链和独立当前版本视觉回归入口。检查与最终Git回执见[43交接](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)及[阶段A结果](reports/lap-43-stage-a-result.md)。[PLAN](tracks/laptop-workbuddy/tasks/LAP-43/PLAN.md) / [后续分阶段指令](tracks/laptop-workbuddy/tasks/LAP-43/MEDIUM_START.md)。
 
 **尚未部署。** 生产 `E:/CodexWS/QQbot_Snowluma` 的main和运行实例保留，生产识图保持原版本true；本轮未合main、启停、公共probe、真实模型/QQ/SSH或图库激活。搜索默认false且质量常量仍false，网页读取保留。当前persona预算的CodeBuddy组合可容纳；Ollama 12288字节示例政策会在必需输入阶段拒绝，不能声称两者都可容纳当前persona。旧18/21/27/35/42差额不变；后续仅由用户明确选中B/C/D，不能把离线报告当运行凭证。
