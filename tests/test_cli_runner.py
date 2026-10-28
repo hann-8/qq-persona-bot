@@ -73,7 +73,7 @@ class RunnerTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn('--effort',argv['argv']);self.assertIn('high',argv['argv'])
         index=argv['argv'].index('--settings')
         self.assertIs(json.loads(argv['argv'][index+1])['autoCompactEnabled'],False)
-        self.assertIs(json.loads(argv['argv'][index+1])['alwaysThinkingEnabled'],True)
+        self.assertIs(json.loads(argv['argv'][index+1])['alwaysThinkingEnabled'],False)
         user=json.loads((self.root/'user.json').read_text())
         self.assertEqual(user['type'],'user');self.assertEqual(user['message']['role'],'user')
         self.assertEqual(list((self.root/'runtime/requests').iterdir()),[])

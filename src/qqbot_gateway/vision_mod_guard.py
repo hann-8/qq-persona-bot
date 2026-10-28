@@ -24,7 +24,7 @@ def assets_signature():
 
 
 class Guard:
-    def __init__(self, work, system, prompt, image, terms, *, mode='live',denied_tools=None,wire_message=None):
+    def __init__(self, work, system, prompt, image, terms, *, mode='live',denied_tools=None,wire_message=None,native_web=None):
         import base64
         if wire_message is None:
             wire_message=dict(type='user',message=dict(role='user',content=[dict(type='text',text=prompt),
@@ -46,11 +46,11 @@ class Guard:
         self.request = dict(schema=2, nonce=secrets.token_hex(32), root=str(self.root.resolve()),
             receipt=str(self.receipt.resolve()),receipt_root=str(self.receipt_root.resolve()), system=system, prompt=prompt,
             system_sha256=sha(system.encode()), system_bytes=len(system.encode()),
-            prompt_sha256=sha(prompt.encode()), image_sha256=image.sha256,
+            prompt_sha256=sha(prompt.encode()), image_sha256=image.sha256 if image else None,native_web=native_web,
             wire_path=str(wire_path.resolve()),wire_sha256=sha(wire),
             assets={k:v for k,v in source.items() if k != FILES[0]}, assets_sha256=assets_signature(), model='deepseek-v4.1-flash',
             denied_tools=denied_tools if denied_tools is not None else json.loads((ROOT/'config/cli-tools-denied.json').read_text(encoding='utf-8')),
-            effort='low', mode=mode, deadline=int((time.time()+180)*1000), **terms)
+            effort='low', mode=mode, deadline=int((time.time()+90)*1000), **terms)
         self.serialized = json.dumps(self.request, ensure_ascii=False, separators=(',', ':'))
         manifest_path = self.root / FILES[0]
         manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
@@ -73,7 +73,7 @@ class Guard:
         phase_names={'context_cleared','composed','refused','admitted','probe_short_circuit','next','completed'}
         phases=list(self.receipt_root.glob('phase-*.json'))
         if len(phases)>128:raise ValueError('VISION_PLUGIN_RECEIPT_COUNT')
-        stages=['ready'];calls=0
+        stages=['ready'];calls=0;last_proof=-1
         for path in phases:
             if path.is_symlink() or path.stat().st_size>16384:raise ValueError('VISION_PLUGIN_PHASE_INVALID')
             try:row=json.loads(path.read_text(encoding='utf-8'))
@@ -83,7 +83,9 @@ class Guard:
             stages.append(row['stage'])
             for key in ('reason','hook_error','diagnostic','registered_tools','catalog_tools','transcript_verified'):
                 if key in row:value[key]=row[key]
-            if row['stage']=='next':calls=1
+            if row['stage']=='next':calls+=1
+            if 'native_web' in row and row.get('seq',-1)>last_proof:
+                value['native_web']=row['native_web'];last_proof=row['seq']
         value['stages']=stages;value['next_calls']=calls
         keys = ('nonce', 'system_sha256', 'system_bytes', 'assets_sha256', 'model', 'effort', 'mode')
         mismatches=[k for k in keys if value.get(k) != self.request[k]]
@@ -111,7 +113,7 @@ class Guard:
                     'probe_short_circuit' if self.request['mode'] == 'probe' else 'completed'}
         calls = 0 if self.request['mode'] == 'probe' else 1
         if (not required.issubset(value['stages']) or 'refused' in value['stages'] or
-                value.get('next_calls') != calls or value.get('transcript_verified') is not True):
+                (not 1<=value.get('next_calls',0)<=self.request['native_web']['max_turns'] if self.request.get('native_web') and self.request['mode']=='live' else value.get('next_calls') != calls) or value.get('transcript_verified') is not True):
             raise ValueError('VISION_PLUGIN_TURN_REJECTED')
         return value
 

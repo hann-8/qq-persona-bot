@@ -45,6 +45,10 @@ participation:  # 配置节，子字段见下方；保留既有校验约束
   max_ambient_age_seconds: 90  # 普通候选最大年龄秒
   allow_ambient_web: true  # 普通候选可用联网，还必须开启web；不上传历史
 web:
+  engine: gateway  # codebuddy_cli原生联网；gateway旧兼容链
+  cli_max_tool_calls: 3  # 原生单任务1..3次，失败计数
+  cli_max_turns: 4  # 原生主步骤1..4，90秒总时限
+  cli_tool_result_bytes: 8000  # 单结果1000..8000，合计12000字节
   search_enabled: false  # 显式启用bing_rss个人试用；逐请求校验正文与日期
   freshness_days: 7  # 默认最近7天；1..30，当前请求明确时间窗优先
   extractor: readability  # 本地受管正文提取，可显式legacy回滚

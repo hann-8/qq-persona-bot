@@ -29,8 +29,9 @@ class _ProbeReady(Exception):
 
 
 class ResultParser:
-    def __init__(self, expected_model=None):
+    def __init__(self, expected_model=None, allowed_tools=(), max_calls=3):
         self.expected_model = expected_model
+        self.allowed_tools=set(allowed_tools);self.max_calls=max_calls;self.tool_calls={};self.tool_results=set()
         self.decoder = codecs.getincrementaldecoder('utf-8')('strict')
         self.buffer = ''
         self.bytes = 0
@@ -74,14 +75,25 @@ class ResultParser:
         if kind == 'error' or event.get('is_error') or event.get('errors'):
             raise GatewayError(classify_error({k:event.get(k) for k in ('error','errors','message','result')}))
         if kind == 'system' and event.get('subtype') == 'init':
-            if event.get('tools') != [] or event.get('mcp_servers') != []:
+            tools=event.get('tools')
+            if not isinstance(tools,list) or len(tools)!=len(self.allowed_tools) or set(tools)!=self.allowed_tools or event.get('mcp_servers') != []:
                 raise GatewayError('TOOL_ISOLATION_FAILED')
             if self.expected_model is not None and event.get('model') != self.expected_model:
                 raise GatewayError('PROTOCOL_ERROR')
             self.initialized = True
         content = event.get('message', {}).get('content', []) if isinstance(event.get('message'), dict) else []
-        if isinstance(content, list) and any(isinstance(b, dict) and b.get('type') in ('tool_use', 'tool_call') for b in content):
-            raise GatewayError('TOOL_ISOLATION_FAILED')
+        for b in content if isinstance(content,list) else []:
+            if not isinstance(b,dict):raise GatewayError('PROTOCOL_ERROR')
+            if b.get('type') in ('tool_use','tool_call'):
+                ident=b.get('id');name=b.get('name')
+                if (not self.initialized or name not in self.allowed_tools or not isinstance(ident,str) or
+                        ident in self.tool_calls or len(self.tool_calls)>=self.max_calls):
+                    raise GatewayError('TOOL_ISOLATION_FAILED')
+                self.tool_calls[ident]=name
+            elif b.get('type')=='tool_result':
+                ident=b.get('tool_use_id')
+                if ident not in self.tool_calls or ident in self.tool_results:raise GatewayError('PROTOCOL_ERROR')
+                self.tool_results.add(ident)
         if kind == 'result':
             if self.result is not None or not self.initialized:
                 raise GatewayError('PROTOCOL_ERROR')
@@ -102,6 +114,7 @@ class ResultParser:
             raise GatewayError('BACKEND_UNAVAILABLE')
         if not self.initialized or self.result is None:
             raise GatewayError('PROTOCOL_ERROR')
+        if self.tool_results!=set(self.tool_calls):raise GatewayError('PROTOCOL_ERROR')
         return self.result
 
 
@@ -163,6 +176,14 @@ class CLIRunner:
 
     async def _execute(self, system, prompt, request_id, *, control_only=False,probe=False,probe_fault=None):
         from .vision import CURRENT,text_budget,cli_message,wire_check,production_budget
+        from .cli_web_policy import native_contract, SCOPE
+        web=getattr(self,'web_config',{})
+        native=bool(getattr(self,'native_web',False) and not control_only)
+        scope=SCOPE.get()
+        policy=native_contract(web,getattr(self,'web_private_ids',()),text_budget(self.budget),scope[1]) if native else None
+        if policy and not scope[0]:policy['allowed_tools']=[]
+        allowed=policy['allowed_tools'] if policy else []
+        denied=[t for t in self.denied if t not in allowed]
         if control_only and CURRENT.get():raise GatewayError('PROTOCOL_ERROR')
         if not control_only:production_budget(self.root,getattr(self,'vision_settings',{}),self.budget,system,prompt)
         text_budget(self.budget).check(system, prompt)
@@ -177,22 +198,24 @@ class CLIRunner:
             system_file = work/'system.txt'
             system_file.write_text(system, encoding='utf-8')
             args = [str(self.node),str(self.entry),'-p','--output-format','stream-json',
-                    '--tools','','--strict-mcp-config','--mcp-config',str(self.root/'config/mcp-empty.json'),
-                    '--permission-mode','dontAsk','--no-session-persistence','--max-turns','2',
+                    '--tools',','.join('NoDefer('+t+')' for t in allowed),'--strict-mcp-config','--mcp-config',str(self.root/'config/mcp-empty.json'),
+                    '--permission-mode','dontAsk','--no-session-persistence','--max-turns',str(policy['max_turns'] if policy else 2),
                     '--model',self.model,'--system-prompt-file',str(system_file),
-                    '--setting-sources','none','--disallowedTools',*self.denied]
-            local_settings={'autoCompactEnabled':False}
-            if self.reasoning_effort != 'auto':local_settings['alwaysThinkingEnabled']=True
+                    '--setting-sources','none','--disallowedTools',*denied]
+            if allowed:args+=['--allowedTools',*allowed]
+            local_settings={'autoCompactEnabled':False,'alwaysThinkingEnabled':False}
             args += ['--settings',json.dumps(local_settings)]
             guard=None
-            from .hosted_cli_budget import KIND, final_budget
-            if CURRENT.get() and self.budget.vision_kind==KIND:
+            from .hosted_cli_budget import KIND, final_budget, framework_upper, model_terms
+            if native or CURRENT.get() and self.budget.vision_kind==KIND:
                 from .vision_mod_guard import Guard
                 from .vision_capabilities import selected_record
                 try:
+                    image=CURRENT.get().blob if CURRENT.get() else None
                     terms=final_budget(selected_record(self.vision_settings),self.budget,system,prompt,
-                        CURRENT.get().blob.width,CURRENT.get().blob.height,known_models().get(self.model,{}))
-                    guard=Guard(work,system,prompt,CURRENT.get().blob,terms,mode='probe' if probe else 'live',denied_tools=self.denied,wire_message=image_message)
+                        image.width,image.height,known_models().get(self.model,{})) if image else dict(T=len((system+prompt).encode()),F=framework_upper(),V=0,
+                            O=model_terms(known_models().get(self.model,{}),self.budget.output)[1],C=1000000)
+                    guard=Guard(work,system,prompt,image,terms,mode='probe' if probe else 'live',denied_tools=denied,wire_message=image_message,native_web=policy)
                 except (OSError,ValueError,KeyError,TypeError):
                     raise GatewayError('MODEL_CONFIG_UNSUPPORTED') from None
                 if probe_fault!='missing_plugin':args += ['--plugin-dir',str(guard.root)]
@@ -200,7 +223,7 @@ class CLIRunner:
                 raise GatewayError('MODEL_CONFIG_UNSUPPORTED')
             if self.reasoning_effort != 'auto':
                 args += ['--effort',self.reasoning_effort,'--input-format','stream-json']
-            elif CURRENT.get():args += ['--input-format','stream-json']
+            elif CURRENT.get() or native:args += ['--input-format','stream-json']
             env = os.environ.copy()
             if guard:
                 env.update(CBC_ENABLE_FUNCTION_HOOKS='1',CLAUDE_CODE_ENABLE_FUNCTION_HOOKS='1')
@@ -239,9 +262,9 @@ class CLIRunner:
                 clean = await owner.join()
                 if not clean:raise GatewayError('CLEANUP_FAILED') from None
                 raise GatewayError('BACKEND_UNAVAILABLE') from None
-            parser = ResultParser(self.model)
+            parser = ResultParser(self.model,allowed,policy['max_calls'] if policy else 3)
             self.last_parameters = {'model':self.model,'effort_requested':self.reasoning_effort,
-                                    'effort_effective':None,'auto_compact_setting':False,
+                                    'effort_effective':None,'thinking_enabled':False,'allowed_tools':allowed,'auto_compact_setting':False,
                                     'forced_compact_exclusion_verified':False,'native_window':'unverified'}
             self.last_parameters['effort_evidence']='auto_default' if self.reasoning_effort=='auto' else 'awaiting_current_capabilities'
             exchange = ControlExchange('get_available_models') if control_only or self.reasoning_effort != 'auto' else None
@@ -342,22 +365,22 @@ class CLIRunner:
                     if CURRENT.get():
                         text_budget(self.budget).check(system,prompt)
                         self._native_metadata_check(system,prompt)
-                        if guard:
-                            try:
-                                ready_proof=await guard.ready(min(self.control_timeout,self.timeout))
-                                if probe:self.last_parameters['vision_guard_ready']=ready_proof
-                                if probe_fault=='wrong_receipt':
-                                    # Deliberately invalidate the expected identity after
-                                    # real engine readiness; the parent must withhold user.
-                                    guard.request['nonce']='0'*64
-                                    guard.read()
-                            except (OSError,ValueError,TimeoutError) as error:
-                                self.last_parameters['vision_rejection']='VISION_PLUGIN_NOT_READY_OR_MISMATCH'
-                                if probe:self.last_parameters['vision_guard_error']=type(error).__name__
-                                if probe:self.last_parameters['vision_guard_reason']=str(error)
-                                raise GatewayError('MODEL_CONFIG_UNSUPPORTED') from None
+                    if guard:
+                        try:
+                            ready_proof=await guard.ready(min(self.control_timeout,self.timeout))
+                            if probe:self.last_parameters['vision_guard_ready']=ready_proof
+                            if probe_fault=='wrong_receipt':
+                                # Deliberately invalidate the expected identity after
+                                # real engine readiness; the parent must withhold user.
+                                guard.request['nonce']='0'*64
+                                guard.read()
+                        except (OSError,ValueError,TimeoutError) as error:
+                            self.last_parameters['vision_rejection']='VISION_PLUGIN_NOT_READY_OR_MISMATCH'
+                            if probe:self.last_parameters['vision_guard_error']=type(error).__name__
+                            if probe:self.last_parameters['vision_guard_reason']=str(error)
+                            raise GatewayError('MODEL_CONFIG_UNSUPPORTED') from None
                     payload = (json.dumps(image_message,ensure_ascii=False,separators=(',',':'))+'\n').encode('utf-8')
-                elif CURRENT.get():
+                elif CURRENT.get() or native:
                     text_budget(self.budget).check(system,prompt)
                     payload = (json.dumps(image_message,ensure_ascii=False,separators=(',',':'))+'\n').encode('utf-8')
                 else:
@@ -382,6 +405,7 @@ class CLIRunner:
                 if guard:
                     try:self.last_parameters['vision_guard']=guard.finish()
                     except (OSError,ValueError):raise GatewayError('MODEL_CONFIG_UNSUPPORTED') from None
+                    if policy:self.last_parameters['native_web']=self.last_parameters['vision_guard'].get('native_web',{})
                 result = BackendResult(parser.finish(process.returncode),parser.usage,self.last_parameters,'stop')
                 generation = 'success'
                 return result

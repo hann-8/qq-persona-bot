@@ -4,9 +4,9 @@ import re
 from pathlib import Path
 
 MODE='lap43_operator_trial'
-OFFLINE='reports/lap-43-vision-offline.json'
-PROBE='state/lap43-vision-trial/cli-probe.json'
-JOURNALS='state/lap43-vision-trial'
+OFFLINE='reports/lap-43-native-web-offline.json'
+PROBE='state/lap43-native-web-trial/cli-probe.json'
+JOURNALS='state/lap43-native-web-trial'
 
 
 def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
@@ -18,8 +18,8 @@ def offline_valid(settings,root):
     from .vision_capabilities import runtime_identity
     try:
         value=read_json(root/OFFLINE)
-        files=('scripts/revalidate_lap43_vision.py','tests/test_lap43.py','tests/test_web_freshness.py',
-               'tests/test_lap42_vision.py','tests/test_vision_mod_guard.py','reports/lap-42-vision-closure-sources.json')
+        from .cli_web_policy import PROOF_FILES
+        files=PROOF_FILES
         return (value.get('passed') is True and value.get('adapter_signature')==adapter_signature() and
             value.get('binding')==binding(settings,runtime_identity(root,settings)) and
             value.get('rule_hash')==digest(selected_record(settings)) and value.get('files')=={p:sha(root/p) for p in files} and

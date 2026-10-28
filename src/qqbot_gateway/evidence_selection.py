@@ -140,6 +140,13 @@ def validate_manifest(rows,source):
     from .public_network import page_url
     if not source.get('web_anchor') or not isinstance(rows,list) or not 1<=len(rows)<=2:raise ValueError('web manifest')
     for row in rows:
+        if isinstance(row,dict) and row.get('engine')=='codebuddy_cli':
+            from .cli_web_policy import public_url
+            if (set(row)!={'engine','url','tool_calls','result_bytes','sha256'} or not public_url(row['url']) or
+                type(row['tool_calls']) is not int or not 1<=row['tool_calls']<=3 or
+                type(row['result_bytes']) is not int or not 1<=row['result_bytes']<=12000 or
+                not isinstance(row['sha256'],str) or not re.fullmatch('[a-f0-9]{64}',row['sha256'])):raise ValueError('native web manifest')
+            continue
         if not isinstance(row,dict) or set(row)-{'subtitle','freshness'}!={'url','coverage','ranges','input_bytes','selected_bytes','sha256'}:raise ValueError('web fields')
         if 'freshness' in row:
             from .web_freshness import validate

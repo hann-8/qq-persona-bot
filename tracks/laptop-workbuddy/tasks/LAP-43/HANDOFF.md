@@ -2,6 +2,10 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线HANDOFF](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [详细规划](PLAN.md) / [medium指令](MEDIUM_START.md)。继承根AGENTS边界；本任务不替代LAP-18/21/27/35/42的历史证据及未验差额。
 
+## 本轮实现进行中
+
+2026-10-29，session LAP-43-native-web-implementation，隔离树E:/CodexWS/QQbot_LAP43_native、codex/lap43-native-web。engine/固定工具/parser/SDK边界及最终v2和原生来源manifest已实现；33项定向替身/真实AstrBot栅栏检查通过，实际配置预算29286/48000字节、static_missing=[]。尚未部署。生产main仍保持原实例运行；不读取群消息/记忆，用户思考关闭要求显式落实alwaysThinkingEnabled=false（原runner实际为true）。唯一部署归属本session，保护文件及当前配对事务在部署前保存。剩余：定向替身/当前CLI零生成检查、受管停机、main合入、local与完整试用配对更新、正常启动、Git推送。
+
 ## 当前接续：仅WebSearch/WebFetch原生联网，合同就绪待medium实施
 
 2026-10-28 23:45（Asia/Shanghai），session `LAP-43-native-web-plan`。用户现场确认表情/管理员可用，提供旧联网故障描述，并确认仅开放这两个CLI工具以控制token。沿前述规划方→medium分工，本轮补齐[CLI_WEB_PLAN](CLI_WEB_PLAN.md)并更新[MEDIUM_START](MEDIUM_START.md)，当前CLI仍全关；不改local/persona/图库/源码/运行状态，不启停、模型、QQ或SSH，无代理。

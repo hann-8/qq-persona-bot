@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import re
 from urllib.parse import urlsplit
 
-DEFAULTS = dict(enabled=False, search_enabled=False, freshness_days=7, trigger='auto', provider='bing_rss', max_searches=1,
+DEFAULTS = dict(engine="gateway", cli_max_tool_calls=3, cli_max_turns=4, cli_tool_result_bytes=8000, enabled=False, search_enabled=False, freshness_days=7, trigger='auto', provider='bing_rss', max_searches=1,
                 max_results=5, max_pages=2, timeout_seconds=15, max_redirects=2,
                 max_response_bytes=1048576, max_page_text_bytes=4000,
                 max_evidence_bytes=6000, max_sources=2, extractor='readability', long_text_policy='excerpt', selection_policy='coverage')
@@ -16,11 +16,12 @@ VIDEO = re.compile(r'(^|\.)(bilibili\.com|b23\.tv|youtube\.com|youtu\.be|douyin\
 def validate_web(raw):
     if not isinstance(raw, dict):raise ValueError('web must be a mapping')
     cfg = DEFAULTS | raw
+    if cfg['engine'] not in ('gateway','codebuddy_cli'):raise ValueError('Invalid web.engine')
     if cfg['selection_policy'] not in ('coverage','question'):raise ValueError('Invalid web.selection_policy')
     if cfg['extractor'] not in ('readability','legacy') or cfg['long_text_policy'] not in ('excerpt','reject'):raise ValueError('Invalid web extraction policy')
     if type(cfg['enabled']) is not bool or type(cfg['search_enabled']) is not bool or cfg['trigger'] not in ('auto','explicit') or cfg['provider'] != 'bing_rss':
         raise ValueError('Invalid web mode/provider')
-    for key, lo, hi in [('freshness_days',1,30),('max_searches',1,1),('max_results',1,5),('max_pages',1,2),
+    for key, lo, hi in [('cli_max_tool_calls',1,3),('cli_max_turns',1,4),('cli_tool_result_bytes',1000,8000),('freshness_days',1,30),('max_searches',1,1),('max_results',1,5),('max_pages',1,2),
                         ('timeout_seconds',5,15),('max_redirects',0,2),
                         ('max_response_bytes',65536,1048576),('max_page_text_bytes',1000,8000),
                         ('max_evidence_bytes',1000,12000),('max_sources',1,2)]:

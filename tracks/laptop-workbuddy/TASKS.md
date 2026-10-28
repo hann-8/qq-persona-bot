@@ -1,3 +1,9 @@
+2026-10-29 补充归属src/qqbot_gateway/{backends,evidence_selection}.py：统一生产/零生成探针的原生工具接线，以及原生来源manifest验证；用户追加memory，已只读确认enabled/learning_enabled均true，本轮保持并在health展示加载值。
+
+2026-10-29 本session补充精确归属：config/vision-capabilities.json（当前完整guard策略登记，不改旧报告/active）；scripts/probe_lap42_vision_contract.py（新native私有路径）；tests/test_cli_runner.py（思考关闭预期）。
+
+2026-10-29（Asia/Shanghai）：session LAP-43-native-web-implementation 续领43，仅本session实现/部署。起点main/1d3ff80，初始干净。归属src/qqbot_gateway/{web_policy,cli_web_policy,config,config_comments,model_gateway,web_retrieval,workbuddy_cli_runner,persona,vision,vision_mod_guard,hosted_cli_budget,vision_trial}.py，adapters/codebuddy_vision_guard/hooks/register.ts，scripts/{revalidate_lap43_vision,revalidate_lap43_native_web,manage}.py，config的web模板/说明，tests/test_cli_native_web.py及必要guard夹具，reports/lap-43-native-web-offline.json，PROGRESS/工作线HANDOFF/TASKS/43 HANDOFF/使用说明。忽略归属当前local的engine/上限及当前native试用记录/部署备份。隔离codex分支实现后停机快进main、配对启用并启动；保持思考关闭、模型low/额度/预算/persona/图库/记忆，无主动真实生成/QQ测试、无代理。
+
 2026-10-28 23:45（Asia/Shanghai）：session `LAP-43-native-web-plan`续43联网反馈。用户确认第一批仅开放CodeBuddy CLI的WebSearch/WebFetch，改用CLI自身判断联网，控制工具上下文；沿用户前述规划方→medium落地分工，本轮补齐原生联网合同及下一轮同轮部署prompt，不实施/启停/真实模型/QQ。起点main/`aea4f4f5eb8e651ef10016247837d2d8ce7683e9`，工作区干净。独占7文档：AGENTS.md、PROGRESS.md、tracks/laptop-workbuddy/HANDOFF.md、TASKS.md、本tasks/LAP-43/HANDOFF.md、同目录新增CLI_WEB_PLAN.md及更新MEDIUM_START.md。登记后重读；不覆盖旧已交付43功能合同，保留表情/owner已用事实及旧搜索故障，不动local/persona/图库/运行文件、其他根或旧证据；无代理/自动模型切换。完成必要文档检查和commit/push/远端SHA核对后交medium指令并释放归属。
 
 2026-10-28 22:42收尾：LAP-43-rollout已实现四项并配对加载至main；随后复核组件running、OneBot connected、can_receive=true，不接管外部进程。40定向/当前预算/真实CLI零生成通过，7表情激活、search=true、vision当前完整绑定试用已启用。补充文档归属AGENTS.md/config/README.md/SnowLuma使用说明.md，仅同步当前事实；最终Git回执与保护检查见43 HANDOFF。

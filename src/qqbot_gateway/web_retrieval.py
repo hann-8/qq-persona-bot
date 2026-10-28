@@ -260,6 +260,7 @@ def source_plan(raw,sources,output,question,partial=False):
         from .chat_text import plain_chat
         titles=[plain_chat(x['title']).replace('\n',' ')[:60] for x in rows]
         def label(x):
+            if x['status']=='native':return '（CLI原生联网材料，可能节选）'
             if x['status']=='subtitle':
                 ranges='、'.join(f'{a:g}–{b:g}秒' for a,b in x['time_ranges'])
                 return f'（P{x["page"]}，'+('自动' if x['subtitle_type']=='automatic' else '人工')+f'字幕/{x["language"]}，'+('字幕节选，可能遗漏细节' if x['coverage']=='excerpt' else '字幕全文')+f'；实际时间范围：{ranges}；字幕时间覆盖{x["time_coverage"]:.1%}，不代表已看画面）'
@@ -291,6 +292,7 @@ class WebRunner:
     def __getattr__(self,name):return getattr(self.runner,name)
     async def retrieve_current(self,question,request=None,request_id=None):
         request=request or {}
+        if getattr(self,'native_web',False):return Retrieval()
         mentioned=request.get('addressing')=='mention' or request.get('trigger')=='mention'
         token=CURRENT_TEXT.set((mentioned,request.get('epoch') or request_id))
         try:return await self.retriever.retrieve(question)
@@ -353,6 +355,8 @@ class WebRunner:
             (not request['must_reply'] or r['seq']==source['target_seq']) for r in source['messages']):
             from .errors import GatewayError
             raise GatewayError('UNSUPPORTED_REQUEST')
+        if getattr(self,'native_web',False):
+            return await self.run_native_v2(system,prompt,request_id,request,source,question)
         if not question:return await self.guarded(self.runner.run(system,prompt,request_id))
         from .members import PREPARE_DEADLINE
         shared_deadline=PREPARE_DEADLINE.get()
@@ -381,6 +385,39 @@ class WebRunner:
                                  memory_proposals=(),web_evidence=evidence)
         from dataclasses import replace
         return replace(result,web_evidence=evidence,memory_proposals=())
+    async def run_native_v2(self,system,prompt,request_id,request,source,question):
+        from dataclasses import replace
+        from .turn_v2 import plan
+        from .cli_web_policy import source_urls
+        from .cli_web_policy import SCOPE
+        target=next((r['text'] for r in source['messages'] if r['seq']==source['target_seq']),question or '')
+        token=SCOPE.set((bool(question),target))
+        try:result=await self.guarded(self.runner.run(system,prompt,request_id))
+        finally:SCOPE.reset(token)
+        proof=result.parameters.get('native_web',{})
+        if not proof.get('calls'):return result
+        try:
+            raw=json.loads(result.text)
+            raw['memory_proposals']=[]
+            if raw.get('decision')=='speak':
+                raw.update(kind='answer',meme_id=None,memory_proposals=[])
+                raw['bubbles']=['\n'.join(raw.get('bubbles',[]))]
+            decision,reply,response=plan(json.dumps(raw,ensure_ascii=False),self.output,question or '',request,source)
+            if reply and decision=='speak':
+                allowed=set(proof.get('urls',[]))
+                if any(u not in allowed for u in source_urls(reply.canonical_text)):
+                    return self.local_failure(request,'本次联网来源无法核对，没有采用这次答复。')
+                if not allowed:
+                    return self.local_failure(request,'本次联网未取得可核实的公开来源。')
+                # source_plan checks every URL, plain text, reply limits, and caps sources.
+                sources=[dict(url=u,title='本次原生联网来源',status='native',published_at=None) for u in list(proof['urls'])[:2]]
+                reply=source_plan(reply,sources,self.output,question or '')
+                return replace(result,text=reply.canonical_text,prepared_plan=reply,response_to_seq=response,
+                               memory_proposals=(),web_evidence=tuple(dict(url=s['url'],engine='codebuddy_cli',tool_calls=proof['calls'],result_bytes=proof['result_bytes'],sha256=proof['sha256']) for s in sources))
+            return replace(result,text=json.dumps(raw,ensure_ascii=False),memory_proposals=())
+        except (ValueError,TypeError,KeyError,WebFailure):
+            return self.local_failure(request,'本次联网答复未通过格式或来源检查。')
+
     def local_failure(self,request,notice):
         from .backends import BackendResult
         from .group_protocol import SILENT

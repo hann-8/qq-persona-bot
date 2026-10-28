@@ -257,7 +257,8 @@ def show_status(report=None):
     if not model.get('alive'):print('模型：网关未运行/不可达，本次未推理探测')
     else:
         if model.get('vision',{}).get('acceptance_mode')=='lap43_operator_trial':print('识图：当前版本操作者试用已加载，质量待用户实测。')
-        if model.get('web_search_enabled'):print('时效搜索：已加载bing_rss个人试用，每次校验正文/日期；质量待用户实测。')
+        if model.get('web_engine')=='codebuddy_cli':print('原生联网：'+','.join(model.get('native_web_tools',[]))+'；质量待用户实测；CLI思考关闭。')
+        elif model.get('web_search_enabled'):print('时效搜索：已加载bing_rss个人试用，每次校验正文/日期；质量待用户实测。')
         print('模型活动：'+('处理中' if model.get('active') else '空闲' if model.get('active') is False else '未确认'))
         error=model.get('current_error')
         if error:print('模型：当前错误 '+error.get('code','UNKNOWN'))

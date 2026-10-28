@@ -6,6 +6,8 @@ RUNTIME = dict(version='2.168.0',
     artifact_sha256='13e6dd30a22d2f11857675193f909a2ccb935da67a067f580fcfe764e474ff60',
     node_sha256='ba93f9a70bd86fce3ebbb39ec758501458453467aa92a34a0a3602d1e3fc2b9c')
 MODEL = 'deepseek-v4.1-flash'
+NATIVE_SCHEMAS={'WebFetch':(9981824,9981979,'0508be604d4967fdabdb2aa4bafe980324f208ec855ce3de66e4c1337bf0cc45'),
+                'WebSearch':(10007156,10008106,'0579061f7a5a69e7cf570934e81417d711b15781b9ecee7a2c769be2eb8d58ba')}
 REVISION = '314113f8a7dadb388215396ba5fbee2c610a04d6'
 TYPES_HASH = '450476f6346507eb032a00a90c3a90c036e37ef57fbc442b52d5ec725a365a92'
 FRAMEWORK_SPANS = {'composer': (4986189, 4987069, 'a46ede57030afae34423d73373ff98860df53a3edeee722d5970241a3eb88eda'),
@@ -44,11 +46,11 @@ def review_record():
         runtime=deepcopy(RUNTIME), vision_supported=True,
         sources=dict(revision=REVISION, hashes=deepcopy(SOURCE_HASHES),
                      audit='reports/lap-42-vision-closure-sources.json',
-                     plugin_assets_sha256=assets_signature()),
+                     plugin_assets_sha256=assets_signature(),native_schema_spans={k:list(v) for k,v in NATIVE_SCHEMAS.items()}),
         bounds=dict(text_tokens_per_byte=1, visual_max_tokens=1024,
                     native_window=1000000, max_width=1024, max_height=1024,
                     max_pixels=1000000, max_images=1),
-        template_contract='post_render_single_session_system_dual_empty_context_v2')
+        template_contract='post_render_current_task_bounded_native_web_v3')
 
 
 def reviewed(record):
@@ -136,6 +138,8 @@ def framework_upper():
     if (set(audit['framework_parts'])!=set(FRAMEWORK_SPANS) or audit['types_sha256']!=TYPES_HASH or
         hashlib.sha256((bundle.parent.parent/'types/codebuddy-code.d.ts').read_bytes()).hexdigest()!=TYPES_HASH):
         raise ValueError('CLI_MOD_FRAMEWORK_SOURCE_CHANGED')
+    for a,b,expected in NATIVE_SCHEMAS.values():
+        if hashlib.sha256(source[a:b].encode()).hexdigest()!=expected:raise ValueError('CLI_NATIVE_SCHEMA_CHANGED')
     total=sum(len(p.encode('utf-8')) for p in known_template_parts())
     for name,row in audit['framework_parts'].items():
         if (row['start'],row['end'],row['sha256'])!=FRAMEWORK_SPANS[name]:

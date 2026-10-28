@@ -162,6 +162,8 @@ def normalize_settings(raw):
     data['public_network']=validate_network(data.get('public_network',{}))
     from .web_policy import validate_web
     data['web'] = validate_web(data.get('web', {}))
+    if data['web']['engine']=='codebuddy_cli' and data.get('llm',{}).get('backend')!='codebuddy_cli':
+        raise ValueError('Native web requires codebuddy_cli backend')
     from .bilibili_policy import validate as validate_bilibili
     data['bilibili']=validate_bilibili(data.get('bilibili',{}),data['web'])
     from .participation import validate_participation
