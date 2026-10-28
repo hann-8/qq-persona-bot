@@ -134,8 +134,7 @@ def main():
         verifier_sha256=sha(Path(__file__)),tests_sha256=sha(ROOT/'tests/test_lap43.py'),freshness_tests_sha256=sha(ROOT/'tests/test_web_freshness.py'),
         source_audit_sha256=sha(ROOT/'reports/lap-43-vision-sources.json'),unit_tests=result.testsRun,frameworks=rows,builtin_configuration=builtin,framework_cases=sum(len(r['cases']) for r in rows),capacity=budget,
         real_model_calls=0,real_qq_outputs=0,bot_start_stop_operations=0,public_network_calls=0,native_iq_eligible=False,production_eligible=False,real_cli_contract='not_run_stage_A')
-    (ROOT/'reports/lap-43-vision-offline.json').write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    (ROOT/'reports/lap-43-vision-offline.json').write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n',encoding='utf-8',newline='\n')
     print(json.dumps(dict(passed=True,units=result.testsRun,framework_cases=value['framework_cases'],capacity=len(budget))))
     return 0
 if __name__=='__main__':raise SystemExit(main())
-

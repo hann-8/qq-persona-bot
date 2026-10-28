@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "passed": true,
-  "adapter_signature": "e6b0f8e3776ae19763b496e82ab7187247806337fdebeb0882413dc95832819b",
+  "adapter_signature": "fe5a5f47ac4f4348e1445a61bbe97ecac8f5730aee69721422c63b0c7cea1a9c",
   "rule_hash": "4dfb239d768f5c439ee7c718afc0827c90965de91295ef6b3e4e985586bb1b85",
-  "verifier_sha256": "726f6ae55ba552f1bb5ff5d69c65c0068b273fb73dd09e91fc06bec869ea89fb",
+  "verifier_sha256": "abcd91d0a5b427dda3001e189bc2a7ebfa889ff525372951b9e642d797f31d09",
   "tests_sha256": "82f74f42898fcfbe682a09644ca56a44f4f9722b0e7ae2546fffae7a4ce2b736",
   "freshness_tests_sha256": "8a5e4983c8372db661510a3a050d254ff20e196a11ec13e378fc82eceeb331c6",
-  "source_audit_sha256": "b3a8fcfb6f11619407ecffaed14d8c2fcf39dc6a909c157c3bce34166fce96df",
+  "source_audit_sha256": "87ceb60d08c93052a84b4a1716fb063524bb4a483d49246ba7d397b2557c969b",
   "unit_tests": 47,
   "frameworks": [
     {
