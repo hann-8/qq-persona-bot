@@ -143,9 +143,13 @@ Snow运行准入另要求online/good、已armed且pipe/login/rx/outbound健康�
 
 采样由gate既有健康任务消费，没有新增进程/监听/nonce客户端。从首次真实channel_ready开始，每60秒记录封闭布尔/计数、核验PID的RSS/句柄与允许项目目录的元数据字节；不存QQ号、消息ID/echo、正文或栈。每条<=512B，采样日志总<=16MiB，按日桶保留至多14天；容量/资源/时钟/覆盖缺口UNKNOWN并断开连续段。QQ/Node/epoch/build/policy/配置摘要变化另起段，旧失败计数保留。QQ发送ACK/失败/unknown及延迟与控制ACK分开；未知不重试。72h包含于168h，但这些时间标记仍不能替代真实新消息驱动的7天收发验收。8小时中位数资源趋势须由操作者评估，不自动重启抹平；真实重新扫码的观测接线仍受阶段3缺口阻断。
 
-## LAP-43搜索与识图试用
+## LAP-43原生联网与识图试用（2026-10-29）
 
-`web.search_enabled`新增，模板默认false；本机本轮经明确授权保存true。`web.freshness_days`默认7，范围1..30，当前请求明确时间窗优先；启用须同时web.enabled=true，正常停机保存后重启。搜索保持bing_rss、最多1次搜索/5候选/2页/2来源、6000字节材料和既有PublicHTTP/TLS/SSRF约束。旧SEARCH_QUALITY_PASSED=false及历史报告不改为通过；运行状态为operator_trial_unverified，逐请求校验正文/日期，失败在模型前准确说明。
+`web.engine`缺省gateway兼容旧配置，本机已保存codebuddy_cli并加载。只有CodeBuddy后端支持原生engine；web.enabled=true/search_enabled=true恰开放WebSearch/WebFetch，search_enabled=false仅WebFetch，enabled=false不开放工具。其余工具/MCP禁用，dontAsk配合固定显式许可及NoDefer直接暴露；原gateway的trigger/provider/freshness/提取字段保留但不作用于原生模式，原搜索质量false不控制原生工具。
+
+新增cli_max_tool_calls默认3且1..3，cli_max_turns默认4且1..4，cli_tool_result_bytes默认8000且1000..8000；本机均取默认。失败计数不退还、重放不重复执行、总工具结果12000字节硬限、90秒总deadline、每步48000可见政策（含真实历史和工具描述/锁定参数schema上界），不自动扩大预算。WebFetch可能内部处理材料，限额不承诺精确HTTP/内部模型数或credits。
+
+子进程alwaysThinkingEnabled=false，DeepSeek/low配置保留；群memory.enabled/learning_enabled均true。正常停机保存后重启，health展示engine/有效工具/限额/思考开关/记忆加载值。当前已部署的识图仍为完整绑定lap43_operator_trial、pending_user_test；使用`scripts/revalidate_lap43_native_web.py`做当前check/probe/activate配对，旧43/42报告保留。联网后最终answer单条、meme_id=null、memory_proposals=[]，实际工具服务与效果由用户群测。
 
 `access.admin_users`字段保持，但去重后必须恰好1项，不等于bot、不在blocked_users；框架名单与router/记忆管理员同源。群角色、昵称、引用或模型均不授予控制权。
 

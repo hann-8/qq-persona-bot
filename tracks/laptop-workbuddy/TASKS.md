@@ -1,3 +1,5 @@
+2026-10-29 本session补充交付文档归属AGENTS.md、config/README.md、SnowLuma使用说明.md。最终main实施820a77a，当前原生web/vision完整绑定4fe02771…、20项当前检查/真实CLI零生成通过；受管正常启动后connected/can_receive/router_ready均true，memory读取/学习true、thinking=false。用户实际联网效果待群测；本次文档/Git完成后释放唯一执行归属。
+
 2026-10-29 补充归属plugins/qq_router/main.py：原生模式的当前消息anchor须绕开旧intent关键词判断；天气等普通问法由CLI决策，仍保留ambient权限及本轮target绑定。
 
 2026-10-29 补充归属src/qqbot_gateway/{backends,evidence_selection}.py：统一生产/零生成探针的原生工具接线，以及原生来源manifest验证；用户追加memory，已只读确认enabled/learning_enabled均true，本轮保持并在health展示加载值。

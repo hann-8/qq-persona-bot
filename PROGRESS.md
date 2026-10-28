@@ -1,8 +1,10 @@
 # QQ bot项目入口：SnowLuma主线
 
-## 当前任务：LAP-43原生联网仅两工具，计划就绪待medium实施
+## 当前任务：LAP-43原生联网已启用并部署，待用户群测
 
-2026-10-28用户现场确认表情和管理员控制可用，反馈旧Python联网失败，并选定第一批仅开放CLI WebSearch/WebFetch。当前已完成[最小原生联网合同](tracks/laptop-workbuddy/tasks/LAP-43/CLI_WEB_PLAN.md)及[medium同轮实施指令](tracks/laptop-workbuddy/tasks/LAP-43/MEDIUM_START.md)：CLI决定联网，当前CodeBuddy模式不再预跑Python关键词/RSS/HTML链；固定两工具及调用/步骤/上下文上限，保留现有功能。此次只改文档，实际CLI工具仍关闭；原生工具/服务未真实验证，不启停/模型/QQ。按用户前述分工，下一轮medium直接实现、启用和部署供用户实测；本轮Git和归属见[43交接](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)。
+2026-10-29，main已部署CLI原生WebSearch/WebFetch，由模型按需决定联网，router和WebRunner不再用旧关键词/RSS/HTML预筛当前CodeBuddy请求。每任务最多3次工具调用、4个主步骤、90秒，单结果8000/合计12000字节，每步48000可见政策；其他工具/MCP保持关闭，未自动切换模型/账号或回退Python。CodeBuddy CLI思考显式关闭，DeepSeek/low配置及额度来源不变。
+
+当前实际复核：组件running、OneBot connected、can_receive=true、router_ready=true，磁盘与加载快照一致；原聊天、识图、7表情、唯一操作者、free保持；群长期记忆和学习均true。20项当前定向检查及最终真实CLI零生成正反接线通过，未代用户调用实际WebSearch/WebFetch服务或群发验收，实际联网质量待群测。识图继续完整配对的lap43_operator_trial，未改写旧IQ/质量结论。实现提交651336f/7aa24fb/820a77a，完整运行/Git/回滚见[43交接](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)；使用见[日常说明](SnowLuma使用说明.md)。
 
 ## 已部署基础：LAP-43四项与原Python联网
 
@@ -44,7 +46,7 @@ LAP-41工作区整理与使用对照已完成：uv报告清除38,269个缓存文
 ## 从哪里继续
 
 1. 使用bot：[日常操作](SnowLuma使用说明.md) / [与旧NapCat bot的使用对照](docs/BOT_USAGE_COMPARISON.md)。
-2. 项目接续：本文件 → [AGENTS](AGENTS.md) → [QQ主线HANDOFF](tracks/laptop-workbuddy/HANDOFF.md)和[TASKS](tracks/laptop-workbuddy/TASKS.md) → [LAP-43交接](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)、[原生联网合同](tracks/laptop-workbuddy/tasks/LAP-43/CLI_WEB_PLAN.md)、[当前medium指令](tracks/laptop-workbuddy/tasks/LAP-43/MEDIUM_START.md)。下一轮仅续两工具原生联网，不重做已交付表情/owner/输入或旧A/B/C/D、42六例/接入/首试。[原43详规](tracks/laptop-workbuddy/tasks/LAP-43/PLAN.md)保留为已部署基础，当前CLI联网以新合同为准；QQ体验由用户实测。
+2. 项目接续：本文件 → [AGENTS](AGENTS.md) → [QQ主线HANDOFF](tracks/laptop-workbuddy/HANDOFF.md)和[TASKS](tracks/laptop-workbuddy/TASKS.md) → [LAP-43交接](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)、[原生联网合同](tracks/laptop-workbuddy/tasks/LAP-43/CLI_WEB_PLAN.md)、[当前medium指令](tracks/laptop-workbuddy/tasks/LAP-43/MEDIUM_START.md)。下一步由用户群测当前原生联网；收到具体问题按当前合同修复，不重做已交付功能或旧六例/接入/首试。[原43详规](tracks/laptop-workbuddy/tasks/LAP-43/PLAN.md)保留为已部署基础，当前CLI联网以新合同为准；QQ体验由用户实测。
 3. 故障找文件：[目录与日志](项目目录与日志说明.md)。只按实际问题检索，不从历史清单自动展开新任务。
 
 ## 路线和边界
@@ -62,7 +64,7 @@ LAP-41工作区整理与使用对照已完成：uv报告清除38,269个缓存文
 
 | 工作线 | 状态/最新依据 | 接续入口 |
 | --- | --- | --- |
-| QQ主线：SnowLuma及共用bot业务 | 43基础已部署，用户确认表情/owner可用；CLI仅WebSearch/WebFetch合同就绪待medium同轮落地，实际仍全关；预算及旧接受保留 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [LAP-43](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md) |
+| QQ主线：SnowLuma及共用bot业务 | 43基础已部署，用户确认表情/owner可用；CLI仅WebSearch/WebFetch已部署，思考关闭、群记忆读写已加载，待用户群测；预算及旧接受保留 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [LAP-43](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md) |
 | 家庭5070备用模型路线 | 历史记录为接入已实现/离线及元数据通过、真实生成未验；本轮未重查，不自动切换后端 | [HANDOFF](tracks/local-5070/HANDOFF.md) / [既有选型](tracks/local-5070/MODEL_SELECTION.md) |
 
 `tracks/laptop-workbuddy` 是保留的历史目录名，当前承担QQ主线和共用网关交接，不表示仍以NapCat或WorkBuddy界面为主路线。所有旧任务的状态/验收差额在TASKS与各任务HANDOFF保留，不重命名整棵目录。

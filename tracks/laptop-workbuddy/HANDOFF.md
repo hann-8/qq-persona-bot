@@ -1,4 +1,6 @@
-2026-10-28最新：用户确认表情和owner可用，选择原生CLI仅WebSearch/WebFetch。当前[原生联网合同](tasks/LAP-43/CLI_WEB_PLAN.md)/[medium指令](tasks/LAP-43/MEDIUM_START.md)就绪，沿既定分工下一轮同轮实施部署；此次仅文档，实际CLI工具仍全关，不启停/模型/QQ。token/轮次/工具返回控制及现有识图/表情/权限一并接线，不重做旧功能；[43交接](tasks/LAP-43/HANDOFF.md)有源证据、Git与归属。
+2026-10-29最新：LAP-43原生联网已实现、启用并部署main；固定WebSearch/WebFetch，3调用/4步骤/90秒、每步48000、单结果8000/合计12000字节。实际running/connected/can_receive/router_ready，配置无待重启；CLI思考关闭，memory读取/学习true，原识图/表情/owner/free保持。20项当前检查及真实CLI零生成正反接线通过，公共工具服务和群答复效果由用户实测。当前完整绑定/回滚/归属/Git见[43交接](tasks/LAP-43/HANDOFF.md)。下方10-28记录为历史规划/部署，不覆盖此条。
+
+2026-10-28规划记录：用户确认表情和owner可用，选择原生CLI仅WebSearch/WebFetch。当前[原生联网合同](tasks/LAP-43/CLI_WEB_PLAN.md)/[medium指令](tasks/LAP-43/MEDIUM_START.md)就绪，沿既定分工下一轮同轮实施部署；此次仅文档，实际CLI工具仍全关，不启停/模型/QQ。token/轮次/工具返回控制及现有识图/表情/权限一并接线，不重做旧功能；[43交接](tasks/LAP-43/HANDOFF.md)有源证据、Git与归属。
 
 2026-10-28历史部署：LAP-43四项已实现/启用/main，旧Python联网失败待后续原生路线替代；40定向及CLI零生成记录保留，不能据此声称原生工具已可用。
 

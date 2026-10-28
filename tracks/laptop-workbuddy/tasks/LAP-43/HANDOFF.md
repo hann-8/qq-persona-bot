@@ -2,11 +2,22 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线HANDOFF](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [详细规划](PLAN.md) / [medium指令](MEDIUM_START.md)。继承根AGENTS边界；本任务不替代LAP-18/21/27/35/42的历史证据及未验差额。
 
-## 本轮实现进行中
+## 本轮完成：原生联网已启用并部署main
 
-2026-10-29，session LAP-43-native-web-implementation，隔离树E:/CodexWS/QQbot_LAP43_native、codex/lap43-native-web。engine/固定工具/parser/SDK边界及最终v2和原生来源manifest已实现；33项定向替身/真实AstrBot栅栏检查通过，实际配置预算29286/48000字节、static_missing=[]。尚未部署。生产main仍保持原实例运行；不读取群消息/记忆，用户思考关闭要求显式落实alwaysThinkingEnabled=false（原runner实际为true）。唯一部署归属本session，保护文件及当前配对事务在部署前保存。剩余：定向替身/当前CLI零生成检查、受管停机、main合入、local与完整试用配对更新、正常启动、Git推送。
+2026-10-29，session LAP-43-native-web-implementation。实现651336f、健康展示修复7aa24fb、路由关键词绕开修复820a77a，从隔离树E:/CodexWS/QQbot_LAP43_native/codex/lap43-native-web快进main。最终部署已实际复核running、OneBot connected、can_receive=true、router_ready=true、current_error=null、pending_restart=false；启动后user_messages_sent=0。本session未主动真实模型生成、WebSearch/WebFetch服务调用或QQ发消息，群测由用户执行。
 
-## 当前接续：仅WebSearch/WebFetch原生联网，合同就绪待medium实施
+- 实际加载engine=codebuddy_cli、tools=[WebSearch,WebFetch]、3调用/4步骤/8000单结果，合计12000硬限、90秒总deadline/48000政策；其余工具/MCP关闭。router当前消息anchor及WebRunner检索均绕开旧intent/RSS/HTML/日期前置；保留同链取消/stop/图片成员和最终v2处理、受控表情/owner/free。工具结果只作不可信材料，当前实际URL至多2项，来源manifest贯通原router验证；联网结果不附图、不写长期记忆。
+- 用户要求CLI思考关闭：子进程alwaysThinkingEnabled=false；原runner曾为true，本轮明确纠正。DeepSeek/low作为配置参数、账号/credits来源和其他预算保持。用户追加群长期记忆：只读确认原enabled/learning_enabled均true，本次保留，并从实际health核对两项true；未读取长期记忆内容。
+- 检查：隔离33项定向检查（实际guard/CLI替身/原AstrBot权限与发送栅栏）通过，追加health及weather无需旧intent回归通过；最终生产根`scripts/revalidate_lap43_native_web.py check`20项通过，报告[当前offline](../../../../reports/lap-43-native-web-offline.json)。实际配置可见29286/48000字节、overhead/output2048、vision reserve4096，static_missing=[]。真实锁定CLI最终probe正例1条本地user/0 next、反例0/0 user；effective tools两项、thinking=false，工具定义上界及实际描述计11016字节。公共catalog注册65名不是模型实际执行集合；实际init由parser核对恰两项/MCP空。
+- 当前完整binding为4fe02771fe0e996855c6a255e6a72190287df362d484d94e5cad6f3ec2f8b092；原生策略及完整源码/最终设置/helper均纳入。新记录仅state/lap43-native-web-trial，使用原lap43_operator_trial/pending_user_test配对activate；旧43/42报告/IQ/unknown保留，不称新质量已过。
+- 首次启动复核发现新health的settings变量引用错误及Snow尚未恢复，未对外宣称已就绪；已正常停止、修复并加health回归，完整技术记录/零生成probe重新配对，随后由正常start-desktop恢复并复核连接。不安装/登录，不接管外部QQ。
+- 16项保护仅config/local/features.yaml的本轮4个web字段改变；persona、其他local（含模型/权限）、图库及记忆内容保持。active按授权更新，当前SHA 9dc4f270482c0a7cded291feb4935b9fd3fe31a97449551477908bf95b605628。精确本机基线features.before/active.before和保护摘要在state/lap43-native-web-deployment/20261029，运行复核在deployment-result.json；代码基线1d3ff80。
+
+回滚：先用正常stop确认受管进程退出，保留当前unknown/日志/记忆；仅在本轮features/active仍与部署结果匹配时恢复对应备份，代码回到配对旧基线/撤销本轮实现后正常启动。若已有后续修改，逐字段审阅，不覆盖整份新local。旧Python联网失败仍是历史已知缺口，不把技术回滚称为联网修复。
+
+精确实现文件与交付文档见TASKS本session段及上述提交。此次main按长期授权commit/push，实时远端SHA和最终交付号以Git/会话回执为准；完成交付后释放唯一执行归属。下一步仅由用户群测，收到具体问题再按当前合同修复，不重开旧验收/评分或规划。
+
+## 2026-10-28规划交付（历史）
 
 2026-10-28 23:45（Asia/Shanghai），session `LAP-43-native-web-plan`。用户现场确认表情/管理员可用，提供旧联网故障描述，并确认仅开放这两个CLI工具以控制token。沿前述规划方→medium分工，本轮补齐[CLI_WEB_PLAN](CLI_WEB_PLAN.md)并更新[MEDIUM_START](MEDIUM_START.md)，当前CLI仍全关；不改local/persona/图库/源码/运行状态，不启停、模型、QQ或SSH，无代理。
 
