@@ -2,6 +2,8 @@
 
 2026-10-28当前事实更新：LAP-43四项已实施并加载main，owner-only控制合同已生效，7表情已激活、搜索显式开启、识图为完整绑定的待用户实测试用。具体通道/Git状态从PROGRESS及43 HANDOFF读取；下文2026-10-27“尚未实施/未来”措辞仅为当时记录，不覆盖本条。
 
+2026-10-28原生联网选择：用户确认第一批仅开放CodeBuddy CLI的WebSearch和WebFetch，由CLI判断是否联网；已写入[LAP-43原生联网合同](tracks/laptop-workbuddy/tasks/LAP-43/CLI_WEB_PLAN.md)，当前仅规划、实际工具尚未开放。下一轮medium同轮实施/启用/部署，不重复索权；工具隔离改为固定两项白名单，其余工具/MCP继续关闭；“单次尝试”是一条群消息的一次CLI任务，内部允许合同内有限工具往返，无自动重试或主模型/账号切换。旧Python检索仅保留兼容，不再作为当前CodeBuddy模式的联网前置；token/结果/轮次上限和现有群权限、识图、表情、owner控制保持。
+
 ## 入口与范围
 
 - 先读根目录[PROGRESS.md](PROGRESS.md)，再读活动线HANDOFF和任务台账；PROGRESS是唯一项目进度入口，不另建根HANDOFF。

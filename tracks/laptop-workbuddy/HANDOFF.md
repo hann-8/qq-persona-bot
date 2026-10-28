@@ -1,8 +1,10 @@
-2026-10-28 LAP-43四项已实现/启用/main部署：7表情、输入/叫名、唯一操作者、时效搜索；识图完整当前绑定试用保留。40定向及真实CLI零生成通过，组件running/OneBot connected/can_receive=true，群质量待用户实测；项目内缓存CLI恢复获单独授权。唯一session `LAP-43-rollout`，交付后释放归属；证据从[PROGRESS](../../PROGRESS.md)及[43交接](tasks/LAP-43/HANDOFF.md)读取。
+2026-10-28最新：用户确认表情和owner可用，选择原生CLI仅WebSearch/WebFetch。当前[原生联网合同](tasks/LAP-43/CLI_WEB_PLAN.md)/[medium指令](tasks/LAP-43/MEDIUM_START.md)就绪，沿既定分工下一轮同轮实施部署；此次仅文档，实际CLI工具仍全关，不启停/模型/QQ。token/轮次/工具返回控制及现有识图/表情/权限一并接线，不重做旧功能；[43交接](tasks/LAP-43/HANDOFF.md)有源证据、Git与归属。
+
+2026-10-28历史部署：LAP-43四项已实现/启用/main，旧Python联网失败待后续原生路线替代；40定向及CLI零生成记录保留，不能据此声称原生工具已可用。
 
 # QQ主线交接：SnowLuma与共用bot业务
 
-## 当前任务：LAP-43一次实施并部署，等待medium接续
+## 2026-10-28早期指令准备（历史，基础已交付）
 
 2026-10-28用户要求尽快用起来、QQ群自己实测。本轮只修订7份文档，将足够的原功能规划改为[统一medium prompt](tasks/LAP-43/MEDIUM_START.md)：下一轮同轮实现、启用、部署四项，不再按A/B/C/D逐轮停下。AGENTS已增加个人自用/流程适度原则；搜索以显式启用和每请求正文/日期校验支持用户试用，识图用当前绑定的明确待实测试用模式保留可用能力，不补跑旧IQ。权限/秘密/预算/工具隔离/unknown和数据保护保持。本轮没有改业务、local、图库或运行状态，功能尚未实施；实际检查/Git回执见[43交接](tasks/LAP-43/HANDOFF.md)。
 

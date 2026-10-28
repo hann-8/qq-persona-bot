@@ -1,3 +1,5 @@
+2026-10-28 23:45（Asia/Shanghai）：session `LAP-43-native-web-plan`续43联网反馈。用户确认第一批仅开放CodeBuddy CLI的WebSearch/WebFetch，改用CLI自身判断联网，控制工具上下文；沿用户前述规划方→medium落地分工，本轮补齐原生联网合同及下一轮同轮部署prompt，不实施/启停/真实模型/QQ。起点main/`aea4f4f5eb8e651ef10016247837d2d8ce7683e9`，工作区干净。独占7文档：AGENTS.md、PROGRESS.md、tracks/laptop-workbuddy/HANDOFF.md、TASKS.md、本tasks/LAP-43/HANDOFF.md、同目录新增CLI_WEB_PLAN.md及更新MEDIUM_START.md。登记后重读；不覆盖旧已交付43功能合同，保留表情/owner已用事实及旧搜索故障，不动local/persona/图库/运行文件、其他根或旧证据；无代理/自动模型切换。完成必要文档检查和commit/push/远端SHA核对后交medium指令并释放归属。
+
 2026-10-28 22:42收尾：LAP-43-rollout已实现四项并配对加载至main；随后复核组件running、OneBot connected、can_receive=true，不接管外部进程。40定向/当前预算/真实CLI零生成通过，7表情激活、search=true、vision当前完整绑定试用已启用。补充文档归属AGENTS.md/config/README.md/SnowLuma使用说明.md，仅同步当前事实；最终Git回执与保护检查见43 HANDOFF。
 
 2026-10-28 22:24补充本轮实际归属：src/qqbot_gateway/{vision_trial,vision_mod_guard,workbuddy_cli_runner,hosted_cli_budget,model_gateway}.py、config/versions.lock.json、scripts/manage.py的试用状态展示（如需）。用户追加授权从本机npm缓存将锁定2.168.0解包到当前项目runtime；不联网下载、不修改全局CLI。全局已升级2.177.1是已核实阻断，缓存恢复后继续当前完整技术检查。
@@ -146,7 +148,7 @@ LAP-15内容提交`632fdc5`已推送origin/main，2026-10-17 11:09用ls-remote�
 
 | ID | 单一任务 | 状态与已有证据 | 依赖/推荐顺序 | 执行session | 下一步/完成出口 |
 | --- | --- | --- | --- | --- | --- |
-| LAP-43 | Snow表情/时效搜索/输入关注/唯一操作者落地 | 四项已实现并加载main；40定向检查/当前CLI零生成通过；[HANDOFF](tasks/LAP-43/HANDOFF.md) / [PLAN](tasks/LAP-43/PLAN.md) | 7表情激活、搜索显式试用、识图当前完整绑定试用；QQ群质量待用户实测 | LAP-43-rollout，2026-10-28；Git交付后释放归属 | 组件running，OneBot connected且可接收；用户群测后按问题修复，旧验收差额保留 |
+| LAP-43 | Snow功能落地；续仅两工具原生联网 | 基础四项已部署，用户确认表情/owner可用；旧Python联网故障保留。原生CLI两工具仅规划就绪；[HANDOFF](tasks/LAP-43/HANDOFF.md) / [CLI合同](tasks/LAP-43/CLI_WEB_PLAN.md) / [指令](tasks/LAP-43/MEDIUM_START.md) | 当前CodeBuddy改原生WebSearch/WebFetch，token/轮次有界，实际工具尚未开放；旧接受及48000保留 | LAP-43-native-web-plan，2026-10-28 23:45仅7文档；Git交付后释放 | medium按当前指令同轮实现/启用/main部署，群体验由用户实测；不重做已交付功能或开放其他工具 |
 | LAP-42 | Snow整合；识图闭环 | 视觉按用户“两张本机+一张群图”缩减验收通过，104单元/39框架及真实CLI契约通过；[HANDOFF](tasks/LAP-42/HANDOFF.md) / [结果](../../reports/lap-42-vision-closure-result.md) | 保留运行供用户使用，不续21/其他验收；GIF/旧辅助差额未测 | LAP-42-vision-closure-implementation，Git核对后释放唯一运行/验证归属 | vision=true已加载；授权输入政策48000；原事件ACK及用户客户端/内容确认通过；原六例四项豁免与历史失败保留 |
 | LAP-41 | Snow主线工作区整理与两套bot使用对照 | 完成；主线入口已整理，缓存/网页快照/退役提示已清，4文档归档；[HANDOFF](tasks/LAP-41/HANDOFF.md) / [清单](tasks/LAP-41/CLEANUP.md) / [使用对照](../../docs/BOT_USAGE_COMPARISON.md) | 承接40用户文字首试成功；字节码缓存因自动审批拒绝保留，不扩功能 | LAP-41-snow-mainline-cleanup-comparison，2026-10-25 12:03登记重读；Git交付后释放归属 | 正常使用Snow；新根缺旧7条表情登记，未自动迁移；配置/历史/其他根/A4保留，不自动推进新功能 |
 | LAP-40 | 官方原版SnowLuma最小文字接入/日常入口 | 接入/桌面入口已实现及离线通过；用户现场确认Snow可运行、QQ群可回复，最小文字首试通过；[HANDOFF](tasks/LAP-40/HANDOFF.md) | 用户确认与独立模型/ACK追踪分开；其他功能/长稳不晋升；B/C停止、A4未动 | LAP-40-user-text-confirmation，2026-10-25 11:47登记重读；本次仅文档，交付后释放归属 | 按[使用说明](../../SnowLuma使用说明.md)日常使用，按实际异常处理；不重复首试、不增证明/长稳前置、不自动推进其他功能 |

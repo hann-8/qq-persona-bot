@@ -2,7 +2,15 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线HANDOFF](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [详细规划](PLAN.md) / [medium指令](MEDIUM_START.md)。继承根AGENTS边界；本任务不替代LAP-18/21/27/35/42的历史证据及未验差额。
 
-## 当前状态：四项已实现、已启用并部署main，通道就绪
+## 当前接续：仅WebSearch/WebFetch原生联网，合同就绪待medium实施
+
+2026-10-28 23:45（Asia/Shanghai），session `LAP-43-native-web-plan`。用户现场确认表情/管理员可用，提供旧联网故障描述，并确认仅开放这两个CLI工具以控制token。沿前述规划方→medium分工，本轮补齐[CLI_WEB_PLAN](CLI_WEB_PLAN.md)并更新[MEDIUM_START](MEDIUM_START.md)，当前CLI仍全关；不改local/persona/图库/源码/运行状态，不启停、模型、QQ或SSH，无代理。
+
+新合同覆盖当前CodeBuddy的Python检索前置及旧“零工具/恰一次主模型生成”假设：固定两工具、原生决策、3工具调用/4主步骤/90秒、工具文本及逐步上下文限额；parser、SDK tool.call/turn.step、识图收据和完整试用绑定配对改，其他工具/MCP继续禁用。旧原生质量及当前工具服务均未真实验证，不制造已通过记录；沿用现有试用模式，用户上线后自己群测。原表情/owner/输入/记忆/模型预算及历史记录保持。
+
+起点main/实时远端均`aea4f4f5eb8e651ef10016247837d2d8ce7683e9`，工作区干净，TASKS登记后已重读。精确7文档归属见TASKS首段；源码只读证据及下一轮涉及文件、默认值/实施顺序/检查/回滚均在CLI_WEB_PLAN。检查通过：Python -B -X utf8内联只读文档检查确认差异/新增恰7文档、严格UTF-8/围栏/232本地链接和原生合同/统一prompt引用；git diff --check通过，无代码/配置/运行文件差异。未运行功能测试或真实CLI/模型/QQ。仅提交7文档到main并push/核对实时SHA，最终号以Git/会话回执为准；交付后释放归属。下一轮按当前MEDIUM_START同轮实现并部署，不重跑原四项交付。
+
+## 已部署基础：四项已实现、启用并部署main
 
 2026-10-28，唯一session `LAP-43-rollout`，用户提交统一实施prompt，明确授权四项启用、受管停启/main部署；又单独授权仅从本机npm缓存恢复项目内CLI。起点main/c4c52ca工作区干净；隔离树`E:/CodexWS/QQbot_LAP43`、分支`codex/lap-43-rollout`实现，生产确认停机后快进main。无代理，不修改原NapCat根/旧C/A4/家庭主机，不登录/扫码或接管外部QQ。
 
