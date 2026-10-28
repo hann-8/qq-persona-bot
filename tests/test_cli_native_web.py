@@ -147,6 +147,22 @@ class NativeTests(unittest.TestCase):
 
 
 class NativeOutputTests(unittest.IsolatedAsyncioTestCase):
+    async def test_health_reports_loaded_native_and_memory_without_generation(self):
+        from test_model_gateway import FakeRunner
+        from qqbot_gateway.model_gateway import ModelQueue,application
+        from aiohttp.test_utils import TestClient,TestServer
+        runner=FakeRunner()
+        runner.vision_settings={'memory':dict(enabled=True,learning_enabled=True)}
+        runner.web_config=validate_web(dict(engine='codebuddy_cli',enabled=True,search_enabled=True))
+        async with TestClient(TestServer(application(ModelQueue(runner),'t'*40))) as client:
+            response=await client.get('/health')
+            self.assertEqual(response.status,200)
+            health=await response.json()
+            self.assertEqual(health['native_web_tools'],['WebSearch','WebFetch'])
+            self.assertEqual(health['memory'],dict(enabled=True,learning_enabled=True))
+            self.assertIs(health['thinking_enabled'],False)
+            self.assertEqual(runner.attempts,0)
+
     async def test_web_final_only_no_meme_or_memory(self):
         from types import SimpleNamespace
         from qqbot_gateway.backends import BackendResult

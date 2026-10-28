@@ -271,7 +271,7 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
                                   'native_web_tools':__import__('qqbot_gateway.cli_web_policy',fromlist=['allowed_tools']).allowed_tools(getattr(queue.runner,'web_config',{})),
                                   'native_web_limits':{k:v for k,v in getattr(queue.runner,'web_config',{}).items() if k.startswith('cli_')},
                                   'thinking_enabled':False,
-                                  'memory':{k:settings.get('memory',{}).get(k,False) for k in ('enabled','learning_enabled')},
+                                  'memory':{k:getattr(queue.runner,'vision_settings',{}).get('memory',{}).get(k,False) for k in ('enabled','learning_enabled')},
                                   'vision':vision_status or {'enabled':bool(materials),'quality_state':'unverified'},
                                   'web_search_enabled':getattr(queue.runner,'retriever',None).cfg.get('search_enabled',False) if getattr(queue.runner,'retriever',None) else False,
                                   'web_search_state':'operator_trial_unverified' if getattr(queue.runner,'retriever',None) and queue.runner.retriever.cfg.get('search_enabled') else 'disabled',
