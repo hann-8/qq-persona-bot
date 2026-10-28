@@ -90,6 +90,7 @@ def adapter_signature():
         {'config/vision-capabilities.json','config/cli-capabilities.json','config/cli-tools-denied.json','config/versions.lock.json','uv.lock',
          'scripts/observe_lap28.py','scripts/observe_lap42_operator.py','config/persona.md',
          'scripts/probe_lap42_vision_contract.py','scripts/activate_lap42_vision.py',
+         'scripts/revalidate_lap43_vision.py','scripts/activate_lap43_memes.py','tests/test_lap43.py','tests/test_web_freshness.py',
          'scripts/verify_lap42_vision.py','tests/test_vision_mod_guard.py','tests/test_lap42_vision.py',
          'reports/lap-42-vision-closure-sources.json'} |
         {str(p.relative_to(root)).replace('\\','/') for p in (root/'adapters/codebuddy_vision_guard').rglob('*') if p.is_file()})

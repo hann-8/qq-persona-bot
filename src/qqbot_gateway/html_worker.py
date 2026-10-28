@@ -85,13 +85,11 @@ def extract_html(text):
     if re.search(r'<!DOCTYPE[^>]*\[|<!ENTITY|<!DOCTYPE[^>]+(?:SYSTEM|PUBLIC)',text,re.I):raise ValueError('html_entities')
     parser=html.HTMLParser(no_network=True,recover=True,huge_tree=False)
     tree=html.fromstring(text,parser=parser)
-    dates=tree.xpath('//meta[@property="article:published_time" or @name="date" or @name="pubdate"]/@content')
-    published=None
-    for value in dates:
-        if not re.fullmatch(r'\d{4}-\d{2}-\d{2}(?:T[0-9:+.Z-]{5,30})?',value):continue
-        try:datetime.fromisoformat(value.replace('Z','+00:00'))
-        except ValueError:continue
-        published=value;break
+    from pathlib import Path
+    sys.path.insert(0,str(Path(__file__).parent))
+    from web_freshness import page_dates
+    mains=tree.xpath('//main|//article|//*[@role="main"]')
+    date_info=page_dates(tree,mains[0] if mains else None)
     for node in tree.xpath('//script|//style|//nav|//form|//iframe|//footer|//header[not(ancestor::main or ancestor::article or ancestor::section or ancestor::*[@role="main"])]|//aside|//noscript|//svg|//template|//object|//embed|//*[@hidden or @aria-hidden="true"]'):
         if node.getparent() is not None:node.drop_tree()
     for node in list(tree.iter()):
@@ -106,7 +104,7 @@ def extract_html(text):
         if node.getparent() is not None:node.drop_tree()
     content=body_text(body)
     if len(content)<80 or re.search(r'verify you are human|access denied|登录后阅读|付费阅读|人机验证',content,re.I):raise ValueError('empty_shell')
-    return dict(title=title,text=content,published_at=published,body_method=method,body_scope='extracted_main')
+    return dict(title=title,text=content,body_method=method,body_scope='extracted_main',**date_info)
 
 
 def main():
@@ -119,7 +117,11 @@ def main():
             parser=Extractor();parser.feed(text)
             body=' '.join(' '.join(parser.text).split())
             if len(body)<80:raise ValueError('empty_shell')
-            result=dict(title=' '.join(' '.join(parser.title).split())[:120],text=body,published_at=parser.published,body_method='legacy',body_scope='extracted_main')
+            from pathlib import Path
+            sys.path.insert(0,str(Path(__file__).parent))
+            from web_freshness import parse_date
+            result=dict(title=' '.join(' '.join(parser.title).split())[:120],text=body,published_at=parser.published if parse_date(parser.published)[0] else None,
+                modified_at=None,date_source='legacy',date_conflict=False,body_method='legacy',body_scope='extracted_main')
         else:result=extract_html(text)
         result['elapsed_seconds']=time.monotonic()-started
         data=json.dumps(result,ensure_ascii=False,separators=(',',':')).encode()

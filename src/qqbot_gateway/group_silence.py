@@ -72,6 +72,16 @@ def decode_ticket(ticket):
     if json.dumps(data,sort_keys=True,separators=(',',':')).encode()!=raw or len(sig)!=32:raise ValueError(DENIED)
     return data,body,sig
 
+
+def resume_request(text, aliases, mentioned=False, limit=2000):
+    if not isinstance(text,str) or len(text)>limit:return False
+    text=unicodedata.normalize('NFKC',text).strip().casefold()
+    # Full match only: quoted, conditional, negated and forwarded commands fail.
+    names='|'.join(re.escape(unicodedata.normalize('NFKC',n).casefold()) for n in sorted(aliases,key=len,reverse=True))
+    prefix=rf'(?:(?:{names})[\s,，:：]*(?:你)?)' if names else r'(?!)'
+    if mentioned:prefix=rf'(?:{prefix})?'
+    return bool(re.fullmatch(prefix+r'(?:请|现在|你|\s)*(?:恢复发言|可以说话了|继续说话)[。!！~～\s]*',text))
+
 class GroupSilence:
     def __init__(self,bot,groups,blocked=(),enabled=True,ttl=810,clock=time.monotonic):
         self.bot=bot;self.groups=frozenset(groups);self.blocked=frozenset(blocked);self.enabled=enabled

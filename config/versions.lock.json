@@ -9,7 +9,7 @@
   "cli": {
     "package": "@tencent-ai/codebuddy-code",
     "version": "2.168.0",
-    "entry": "C:\\Users\\yutha\\AppData\\Roaming\\npm\\node_modules\\@tencent-ai\\codebuddy-code\\bin\\codebuddy",
+    "entry": "runtime/codebuddy-2.168.0/package/bin/codebuddy",
     "headless_sha256": "13e6dd30a22d2f11857675193f909a2ccb935da67a067f580fcfe764e474ff60",
     "model": "deepseek-v4.1-flash"
   },

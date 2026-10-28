@@ -41,6 +41,7 @@ class Job:
     group_request: dict | None = None
     vision: object = None
     prepare_deadline: float | None = None
+    requested_at: float = field(default_factory=time.time)
     started: asyncio.Event = field(default_factory=asyncio.Event)
     cancelled: asyncio.Event = field(default_factory=asyncio.Event)
 
@@ -109,6 +110,13 @@ class ModelQueue:
         job.group_request=group_request
         job.vision=vision
         job.prepare_deadline=prepare_deadline
+        if group_request and group_request.get('version')==2:
+            try:
+                snapshot=json.loads(json.loads(prompt)[-1]['content'])
+                target=next(r for r in snapshot['messages'] if r['seq']==snapshot['target_seq'])
+                age=target['age_ms']
+                if type(age) is int and 0<=age<=900000:job.requested_at-=age/1000
+            except (ValueError,TypeError,KeyError,IndexError,StopIteration):pass
         try:self.queue.put_nowait(job)
         except asyncio.QueueFull:raise GatewayError('QUEUE_FULL') from None
         if vision and vision.lease:vision.lease.owned=True
@@ -142,9 +150,12 @@ class ModelQueue:
             image_token=CURRENT.set(job.vision)
             from .members import PREPARE_DEADLINE
             prep_token=PREPARE_DEADLINE.set(job.prepare_deadline)
+            from .web_retrieval import REQUESTED_AT
+            from datetime import datetime,timezone
+            web_token=REQUESTED_AT.set(datetime.fromtimestamp(job.requested_at,timezone.utc))
             try:task=asyncio.create_task(call)
             finally:
-                CURRENT.reset(image_token);PREPARE_DEADLINE.reset(prep_token)
+                CURRENT.reset(image_token);PREPARE_DEADLINE.reset(prep_token);REQUESTED_AT.reset(web_token)
             cancel=asyncio.create_task(job.cancelled.wait())
             try:
                 done,_=await asyncio.wait((task,cancel),return_when=asyncio.FIRST_COMPLETED)
@@ -178,7 +189,7 @@ class ModelQueue:
                 self.active=False
 
 
-def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,root=None,output=None,memes=None,v2=None,materials=None,members=None):
+def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,root=None,output=None,memes=None,v2=None,materials=None,members=None,vision_status=None):
     budget=budget or InputBudget()
     vision_bytes=0
     output=DEFAULTS | {'max_reply_chars':max_reply_chars} | (output or {})
@@ -256,6 +267,9 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
                                   'backend_attempts':queue.runner.attempts,'local_post_attempts':getattr(queue.runner,'post_attempts',0),
                                   'web_audit':getattr(getattr(queue.runner,'retriever',None),'last_audit',{}),
                                   'web_search_quality_passed':False,
+                                  'vision':vision_status or {'enabled':bool(materials),'quality_state':'unverified'},
+                                  'web_search_enabled':getattr(queue.runner,'retriever',None).cfg.get('search_enabled',False) if getattr(queue.runner,'retriever',None) else False,
+                                  'web_search_state':'operator_trial_unverified' if getattr(queue.runner,'retriever',None) and queue.runner.retriever.cfg.get('search_enabled') else 'disabled',
                                   'last_usage':queue.last_usage,'credits':None,'credits_state':'unknown',
                                   'group_usage':queue.group_usage,
                                   'last_success':queue.last_success,'real_inference_verified':queue.last_success is not None,
@@ -496,7 +510,7 @@ def main():
     runner=create_runner(root,settings,budget)
     from .web_retrieval import WebRunner, Retriever
     ids=[settings['bot']['qq']]+sum((settings['access'][k] for k in ('allowed_groups','admin_users','blocked_users')),[])
-    runner=WebRunner(runner,Retriever(settings['web'],ids,network=settings['public_network'],root=root,bilibili=settings['bilibili']),budget,settings['output'],root)
+    runner=WebRunner(runner,Retriever(settings['web'],ids,network=settings['public_network'],root=root,bilibili=settings['bilibili'],aliases=settings['participation']['attention']['aliases']),budget,settings['output'],root)
     runner.allow_ambient_web=settings['participation']['allow_ambient_web']
     from .meme_catalog import MemeCatalog
     memes=MemeCatalog(root,settings['memes'])
@@ -515,7 +529,13 @@ def main():
     from .vision import MaterialClient,context_token
     materials=MaterialClient(f"http://127.0.0.1:{settings['onebot']['port']}/context/vision/resolve",context_token(root),settings['vision']['input_reserve_tokens']) if settings['vision']['enabled'] else None
     member_client=MemberClient(f"http://127.0.0.1:{settings['onebot']['port']}/context/members",context_token(root)) if settings['members']['enabled'] else None
-    web.run_app(application(queue,tokens['model_gateway'],root/'state/router-ready.json',budget,settings['output']['max_reply_chars'],root,settings['output'],memes,v2,materials,member_client),host=llm['host'],port=llm['port'],
+    vision_status={'enabled':settings['vision']['enabled']}
+    if settings['vision']['enabled']:
+        from .vision_capabilities import read_json
+        active=read_json(root/'state/vision-evidence/active.json')
+        vision_status.update(acceptance_mode=active.get('acceptance_mode','fixed_iq'),
+            quality_state='pending_user_test' if active.get('acceptance_mode')=='lap43_operator_trial' else 'prior_acceptance')
+    web.run_app(application(queue,tokens['model_gateway'],root/'state/router-ready.json',budget,settings['output']['max_reply_chars'],root,settings['output'],memes,v2,materials,member_client,vision_status),host=llm['host'],port=llm['port'],
                 access_log=None,handler_cancellation=True)
 
 

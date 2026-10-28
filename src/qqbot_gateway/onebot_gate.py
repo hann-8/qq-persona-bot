@@ -401,14 +401,18 @@ class OneBotGate:
                 if self.store.reserve(event):
                     output_ticket=None
                     if self.config.silence_enabled:
-                        from .group_silence import silence_request,real_at
+                        from .group_silence import silence_request,resume_request,real_at
                         group=str(event['group_id'])
                         async with self.silence.locks[group]:
                             if self.snow() and not self.channel_ready():continue
                             mention=real_at(event,self.config.bot_qq)
                             text=''.join(p['data'].get('text','') for p in event['message'] if p['type']=='text' and isinstance(p['data'].get('text'),str))
-                            stop=silence_request(text,self.config.silence_aliases,mention,self.config_message_limit)
-                            changed=self.silence.control(group,stop,mention)
+                            plain=all(p['type'] in ('text','at') for p in event['message'])
+                            stop=plain and silence_request(text,self.config.silence_aliases,mention,self.config_message_limit)
+                            resume=plain and resume_request(text,self.config.silence_aliases,mention,self.config_message_limit)
+                            authorized=str(event['user_id']) in self.config.admin_users
+                            changed=self.silence.control(group,stop,resume) if authorized and (stop or resume) else False
+                            if stop or resume:LOG.info('SILENCE_CONTROL authorized=%s action=%s changed=%s',authorized,'pause' if stop else 'resume',changed)
                             if changed:
                                 for cap,row in list(self.materials.entries.items()):
                                     if row['identity'][1]==group:self.materials.expire(cap)
@@ -419,7 +423,7 @@ class OneBotGate:
                                 for key in list(self.members.events):
                                     if key[1]==group:self.members.events.pop(key,None)
                                 self.publish_connection()
-                            if stop or not self.silence.normal(group):continue
+                            if stop or resume or not self.silence.normal(group):continue
                             if not admitted_message(event,self.config):continue
                             output_ticket=self.silence.issue(event,self.connection_id)
                     if self.snow() and not output_ticket:output_ticket=self.silence.issue(event,self.connection_id)
@@ -434,6 +438,8 @@ class OneBotGate:
                         await upstream.send_str(frame.data)
                         continue
                     # Never let adapter quote expansion fetch or expose embedded bodies.
+                    from .input_policy import facts
+                    input_facts=facts(event['message'])
                     safe=[];reference=None;media=False
                     for segment in event['message']:
                         if not isinstance(segment,dict):continue
@@ -448,7 +454,7 @@ class OneBotGate:
                     image=self.materials.issue(event,self.connection_id) if self.config.vision_enabled else None
                     image_text=''.join(s['data'].get('text','') for s in event['message'] if s['type']=='text' and isinstance(s['data'].get('text'),str))
                     event={k:v for k,v in event.items() if k in ('post_type','message_type','sub_type','self_id','group_id','user_id','message_id','time','font','sender')}
-                    event=dict(event,message=safe,raw_message='',qqbot_reference=reference,qqbot_media=media,
+                    event=dict(event,message=safe,raw_message='',qqbot_reference=reference,qqbot_media=media,qqbot_input=input_facts,
                                qqbot_connection=self.connection_id)
                     if output_ticket:event['qqbot_output_ticket']=output_ticket
                     if member_cap:event['qqbot_member_cap']=member_cap

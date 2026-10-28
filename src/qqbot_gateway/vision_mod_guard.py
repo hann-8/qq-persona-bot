@@ -129,16 +129,17 @@ class Guard:
         return str(destination)
 
 
-def probe_valid(root, settings):
+def probe_valid(root, settings, trial=False):
     """A real CLI probe is a separate prerequisite, never an IQ prerequisite of itself."""
     from .vision import binding
     from .vision_capabilities import read_json, runtime_identity
     try:
-        item = read_json(Path(root)/'state/vision-evidence/lap42-cli-probe.json')
+        from .vision_trial import PROBE,JOURNALS
+        item = read_json(Path(root)/(PROBE if trial else 'state/vision-evidence/lap42-cli-probe.json'))
         import re
         name=item.get('journal','')
         if not isinstance(name,str) or not re.fullmatch('probe-[a-f0-9]{32}\\.json',name):return False
-        journal=Path(root)/'state/lap42-vision-closure'/name
+        journal=Path(root)/(JOURNALS if trial else 'state/lap42-vision-closure')/name
         rows=read_json(journal)
         if sha(journal.read_bytes())!=item.get('journal_sha256') or not isinstance(rows,list) or len(rows)!=3:return False
         if ([r.get('fault') for r in rows]!=[None,'missing_plugin','wrong_receipt'] or

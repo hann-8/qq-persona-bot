@@ -67,7 +67,10 @@ class WebExtractor:
                 try:result=json.loads(output)
                 except (ValueError,UnicodeError):raise WebFailure('extract_protocol') from None
                 if not isinstance(result,dict) or 'error' in result:raise WebFailure('extract_failed')
-                if set(result)!={'title','text','published_at','elapsed_seconds','body_method','body_scope'} or not all(isinstance(result[k],str) for k in ('title','text')):raise WebFailure('extract_protocol')
+                if set(result)!={'title','text','published_at','modified_at','date_source','date_conflict','elapsed_seconds','body_method','body_scope'} or not all(isinstance(result[k],str) for k in ('title','text')):raise WebFailure('extract_protocol')
+                from .web_freshness import parse_date
+                if (len(result['title'])>120 or result['date_source'] not in ('none','meta','json_ld','main_time','legacy') or type(result['date_conflict']) is not bool or
+                    any(result[k] is not None and parse_date(result[k])[0] is None for k in ('published_at','modified_at'))):raise WebFailure('extract_protocol')
                 if result['body_method'] not in ('semantic_main','semantic_article','readability','legacy') or result['body_scope']!='extracted_main':raise WebFailure('extract_protocol')
                 return result
             except TimeoutError:raise WebFailure('extract_timeout') from None

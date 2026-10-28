@@ -1,16 +1,18 @@
-# features.yaml：联网、表情、记忆、视觉与成员；视觉生产拒启，成员生产暂停，搜索门槛关闭
+# features.yaml：联网、表情、记忆、视觉与成员；以当前配置及运行许可为准
 # 同目录五文件共同组成配置；其他文件见config/README.md。
 # 本机config/local不提交；保存后下次正常启动生效，不热更新。
 public_network:  # 项目公共网络策略；默认无额外CA
   resolver: system  # 仅system/cloudflare_doh，失败不自动切换
   ca_bundle_file: null  # 仅显式secrets/public-network-ca.local.pem，禁止任意路径/私钥/链接
 web:  # 配置节，子字段见下方；保留既有校验约束
-  enabled: false  # 共用网页读取开关；搜索质量门槛仍关闭，不代表完整搜索可用；新装默认 false
+  search_enabled: false  # 显式启用bing_rss个人试用；逐请求校验正文与日期，质量待用户实测
+  freshness_days: 7  # 默认最近7天；1..30，当前请求的明确时间窗优先
+  enabled: false  # 共用网页读取总开关；搜索还须显式search_enabled；新装默认 false
   trigger: auto  # 联网触发auto/explicit；新装默认 "auto"
   extractor: readability  # 按需受管worker提取；legacy仅显式回滚
   long_text_policy: excerpt  # 六区节选或reject；完整要求超限拒绝
   selection_policy: coverage  # coverage六区或question当前问题本地相关整段；保存后正常重启生效
-  provider: bing_rss  # 搜索提供方固定bing_rss，当前搜索质量门槛关闭；新装默认 "bing_rss"
+  provider: bing_rss  # 搜索提供方固定bing_rss；显式启用后为待用户实测的个人试用；新装默认 "bing_rss"
   max_searches: 1  # 搜索最多1次；新装默认 1
   max_results: 5  # 搜索结果1..5条；新装默认 5
   max_pages: 2  # 正文1..2页；新装默认 2

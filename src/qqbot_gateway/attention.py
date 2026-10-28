@@ -26,13 +26,17 @@ def called(text,names):
     # Match the call outside quoted/code/web material. A real call can itself
     # ask about a URL or a quotation without losing its direct classification.
     if text.startswith(('他说','她说','有人说')):return False
-    text=re.sub(r'```.*?```|`[^`]*`|"[^"]*"|“[^”]*”|「[^」]*」|https?://\S+',' ',text,flags=re.S)
+    text='\n'.join(line for line in text.splitlines() if not line.lstrip().startswith('>'))
+    text=re.sub(r'```[\s\S]*?(?:```|$)|`[^`]*(?:`|$)|"[^"]*"|“[^”]*”|「[^」]*」|https?://\S+',' ',text)
     text=re.sub(r'\s+',' ',text).strip()
     for name in sorted(names,key=len,reverse=True):
         name=unicodedata.normalize('NFKC',name).strip().casefold()
         boundary=r'[\s,，。.!！?？:：~～、]'
         if text==name or re.match('^'+re.escape(name)+boundary,text) or re.search(boundary+re.escape(name)+'[!！?？~～。]*$',text):return True
-        if re.match('^'+re.escape(name)+r'(?:请|帮我|能不能|你|在吗|说说|解释|看看|算一下)',text):return True
+        suffix=text[len(name):] if text.startswith(name) else ''
+        if name.isascii() and suffix and re.match(r'[a-z0-9_]',suffix):continue
+        if re.match('^'+re.escape(name)+r'(?:请|帮我|帮忙|能不能|能否|你觉得|你能|你说|在吗|说说|解释|看看|算一下|查查|查一下|这个.{0,40}怎么看|给我|来[个点一下])',text):return True
+        if re.match(r'^(?:我想问|我想请教|请问)\s*'+re.escape(name)+r'(?:一个问题|[\s,，:：?？]|能否|怎么|为什么)',text):return True
     return False
 
 @dataclass
@@ -107,7 +111,8 @@ class Attention(Participation):
             if called(text,self.cfg['attention']['aliases']):addressing='direct_name'
             elif reference and reference['sender']=='bot':addressing='reply_bot';required.add(reference['seq'])
             elif state.focus and now-state.focus['at']<=self.cfg['attention']['focus_ttl_seconds']:
-                addressing='focused_followup' if re.search(r'你|您',text) and re.search(r'[?？]|吗|么|请|帮|能|要|说|解释|觉得|怎么|为何|为什么',text) else 'focused_candidate'
+                continuation=bool(re.fullmatch(r'(?:那怎么办|为什么呢|为什么|再详细点|详细说说|继续|还有呢|然后呢)[。!！?？~～\s]*',text.strip()))
+                addressing='focused_followup' if continuation or re.search(r'你|您',text) and re.search(r'[?？]|吗|么|请|帮|能|要|说|解释|觉得|怎么|为何|为什么',text) else 'focused_candidate'
                 required.update(r['seq'] for r in state.focus['rows'])
         if other or reply and (not reference or reference['sender']!='bot'):
             state.focus=None

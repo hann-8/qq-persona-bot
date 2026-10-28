@@ -2,7 +2,17 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线HANDOFF](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [详细规划](PLAN.md) / [medium指令](MEDIUM_START.md)。继承根AGENTS边界；本任务不替代LAP-18/21/27/35/42的历史证据及未验差额。
 
-## 当前状态：一次落地prompt就绪，功能尚未实施
+## 当前状态：LAP-43统一实施与部署进行中
+
+2026-10-28 22:24（Asia/Shanghai）session `LAP-43-rollout`，用户已提交统一实施prompt并明确授权四项启用、受管停启和main部署；QQ群实测由用户执行。隔离树`E:/CodexWS/QQbot_LAP43`、分支`codex/lap-43-rollout`，生产起点main/c4c52ca，开始无非忽略差异。唯一实现和运行执行者为本session，无代理。目标/成功条件：四项实现、必要权限/材料/预算检查、7表情锁内激活、vision完整当前绑定试用、正常加载就绪、main提交推送。文件归属见TASKS首段；不改persona/账号/模型/预算，不主动真实模型/QQ测试。
+
+已完成输入/叫名/同人续聊、唯一owner停言/恢复与重置、搜索正文日期/manifest/来源及识图明确试用代码；37项针对性检查通过（包含受管worker、真实gate发送栅栏、当前CLI来源预算和TS工具隔离替身）。两项历史测试分别固定旧30000/persona和旧native签名，本轮不重写或作为当前成功证明；改用当前实际配置预算检查。尚未部署。
+
+发现全局CLI已升级2.177.1，与锁定2.168.0 bundle不符，当前受管bot stopped/disconnected。用户随后明确授权仅从本机npm缓存恢复旧版到项目runtime；已解包并核对原bundle hash完全一致，不改全局CLI/不下载/不换模型或账号。对应新增归属versions.lock、workbuddy_cli_runner、hosted_cli_budget；项目改用相对路径，完整签名仍绑定。真实CLI零生成、当前配置预算、配对激活与就绪检查尚待部署事务执行。若出现技术失败保留具体证据及配对备份，不因缺用户质量评分停下。
+
+下一步：补必要框架/图库与最小公共连通性检查，审阅提交；正常受管停止确认后合入main，备份及一次保存新增search字段、7条表情、当前vision试用记录，正常启动；同步结果/用法及远端SHA。原旧验收/unknown/人工记录保持，搜索及新版本识图质量待用户实测。
+
+## 2026-10-28前轮文档修订记录（历史）
 
 2026-10-28 21:56（Asia/Shanghai），session `LAP-43-use-first-handoff`续修同一任务。用户明确流程过重、自己实测，要求评估计划后给medium直接落地prompt，并写入AGENTS。本轮仅7文档：AGENTS、PROGRESS、工作线HANDOFF/TASKS及43 HANDOFF/PLAN/MEDIUM_START；起点main与实时远端均`52866fe10cc654d2e12c5520f7afc5aa8bbe0179`，工作区干净，TASKS登记后重读。
 

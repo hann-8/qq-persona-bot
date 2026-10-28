@@ -179,6 +179,9 @@ def production_diagnostics(settings, evidence, runtime, *, table=None):
         return missing + ['OBSERVATION_BINDING_MISMATCH']
     if evidence.get('offline_passed') is not True or evidence.get('ingress_decoded') is not True:
         missing.append('OFFLINE_OR_INGRESS_UNVERIFIED')
+    if evidence.get('acceptance_mode')=='lap43_operator_trial':
+        from .vision_trial import diagnostics
+        return missing+diagnostics(evidence.get('operator_trial'),expected,runtime,digest(record))
     if evidence.get('acceptance_mode')=='lap42_first_plus_large_operator_acceptance':
         if not record.get('kind'):return missing+['OPERATOR_ACCEPTANCE_BACKEND_INVALID']
         from .vision_operator_review import diagnostics
@@ -224,7 +227,7 @@ def validate_production_evidence(settings, evidence, root=None):
     root = Path(root) if root is not None else ROOT
     runtime = evidence.get('runtime', {})
     missing = production_diagnostics(settings, evidence, runtime)
-    for marker in ('state/cli-cleanup/unresolved.json','state/ollama-remote-result-unknown.json'):
+    for marker in ('state/cli-cleanup/unresolved.json','state/ollama-remote-result-unknown.json','state/lap43-vision-trial/probe-unknown.json'):
         if (root/marker).exists():missing.append('MODEL_CLEANUP_OR_REMOTE_UNKNOWN')
     ingress=evidence.get('ingress_instance','')
     if not isinstance(ingress,str) or not re.fullmatch('[a-f0-9]{32}',ingress):
@@ -243,7 +246,11 @@ def validate_production_evidence(settings, evidence, root=None):
     from .vision_quality import BatchLedger
     from .vision import adapter_signature
     ledger_path=root/'state/vision-evidence/iq-batches.sqlite3'
-    if evidence.get('acceptance_mode')=='lap42_first_plus_large_operator_acceptance':
+    trial=evidence.get('acceptance_mode')=='lap43_operator_trial'
+    if trial:
+        from .vision_trial import durable_diagnostics
+        missing.extend(durable_diagnostics(root,evidence,settings))
+    elif evidence.get('acceptance_mode')=='lap42_first_plus_large_operator_acceptance':
         from .vision_operator_review import durable_diagnostics
         missing.extend(durable_diagnostics(root,evidence.get('operator_review'),evidence.get('binding')))
     elif not ledger_path.is_file():
@@ -255,10 +262,10 @@ def validate_production_evidence(settings, evidence, root=None):
                 missing.append('DURABLE_IQ_LEDGER_MISMATCH')
             if ledger.unresolved(evidence['binding']):missing.append('FAILED_OR_UNKNOWN_ATTEMPTS')
         except (ValueError,KeyError):missing.append('DURABLE_IQ_LEDGER_INVALID')
-    if not offline_valid(settings):
+    if not trial and not offline_valid(settings):
         missing.append('CURRENT_OFFLINE_PROOF_MISSING')
     record=selected_record(settings)
-    if record and record.get('kind'):
+    if not trial and record and record.get('kind'):
         from .vision_mod_guard import probe_valid
         if not probe_valid(root,settings):missing.append('CURRENT_CLI_PROBE_MISSING')
     # Configured digest must still match the reviewed, observed selected model.

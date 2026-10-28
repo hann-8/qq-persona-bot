@@ -7,9 +7,9 @@ chat:  # 配置节，子字段见下方；保留既有校验约束
   session_queue_limit: 2  # 会话排队数0..100；新装默认 2
   session_queue_timeout_seconds: 600  # 会话排队超时秒1..3600；新装默认 600
 participation:  # 配置节，子字段见下方；保留既有校验约束
-  # 临时停言默认开启；普通成员明确要求后本群静默，下一条真实@恢复；重启复位，无超时解除。
-  silence:  # 每群RAM临时停言；真实@恢复，gate重启复位，重连保持；默认enabled=true
-    enabled: true  # 下次正常启动生效；false关闭此能力，省略仍默认true；临时停言开关；明确停言后本群静默，新真实@恢复，gate重启复位
+  # 临时停言默认开启；唯一操作者明确暂停后本群静默，仅本人明确恢复命令可解除；重启复位，无超时解除。
+  silence:  # 每群RAM临时停言；本人明确恢复，gate重启复位，重连保持；默认enabled=true
+    enabled: true  # 下次正常启动生效；false关闭此能力，省略仍默认true；临时停言开关；明确停言后本群静默，新本人明确恢复，gate重启复位
   mode: mentions  # mentions只回应真实@；free可参与授权群新消息，仍受黑名单和频率约束；新装默认 "mentions"
   debounce_seconds: 2  # 新群消息合批等待秒；新装默认 2
   max_batch_wait_seconds: 5  # 合批最长等待秒；新装默认 5

@@ -112,6 +112,7 @@ class CLIRunner:
         lock = json.loads((self.root/'config/versions.lock.json').read_text(encoding='utf-8'))
         self.node = Path(lock['node']['path'])
         self.entry = Path(lock['cli']['entry'])
+        if not self.entry.is_absolute():self.entry=self.root/self.entry
         self.model = model
         self.timeout = timeout
         self.cleanup_seconds = cleanup_seconds

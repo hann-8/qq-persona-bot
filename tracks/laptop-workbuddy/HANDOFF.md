@@ -1,3 +1,5 @@
+2026-10-28 LAP-43统一实施进行中，唯一执行session `LAP-43-rollout`；用户已授权四项启用/main部署及项目内缓存CLI恢复。状态从[PROGRESS](../../PROGRESS.md)及[43交接](tasks/LAP-43/HANDOFF.md)读取。
+
 # QQ主线交接：SnowLuma与共用bot业务
 
 ## 当前任务：LAP-43一次实施并部署，等待medium接续

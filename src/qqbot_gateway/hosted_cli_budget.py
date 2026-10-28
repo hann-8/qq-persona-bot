@@ -126,7 +126,9 @@ def framework_upper():
     root=Path(__file__).resolve().parents[2]
     audit=read_json(root/'reports/lap-42-vision-closure-sources.json')
     lock=read_json(root/'config/versions.lock.json')
-    bundle=Path(lock['cli']['entry']).parent.parent/'dist/codebuddy-headless.js'
+    entry=Path(lock['cli']['entry'])
+    if not entry.is_absolute():entry=root/entry
+    bundle=entry.parent.parent/'dist/codebuddy-headless.js'
     raw=bundle.read_bytes()
     if hashlib.sha256(raw).hexdigest()!=RUNTIME['artifact_sha256'] or audit['bundle_sha256']!=RUNTIME['artifact_sha256']:
         raise ValueError('CLI_MOD_FRAMEWORK_SOURCE_CHANGED')
