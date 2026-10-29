@@ -1,40 +1,41 @@
 {
-  "adapter_signature": "90f5bf261987e303e94df50a24fc73592b66529d2c612262352957ba3649029b",
-  "binding": "cc218fcd060d8d37d79a8cdc29c33049e4dbf7f1e3468c539989f81d9b1e95fa",
+  "adapter_signature": "3d2041772797799896f4e540ef810354a959f1f62a25ffe911808566f284b4e9",
+  "binding": "d12f1978907bf7dbb3a750890e0d6da6a0b5886c5285dd6ada98213a2b9b6cb9",
   "budget": {
-    "final_visible_policy_bytes": 29286,
-    "limit": 48000,
-    "member_candidates": 0,
-    "memory_records": 4,
+    "final_visible_policy_bytes": 31334,
+    "limit": 524288,
+    "member_candidates": 8,
+    "memory_records": 8,
     "output_reserve": 2048,
     "overhead": 2048,
     "passed": true,
     "persona_bytes": 19256,
     "persona_sha256": "ff6f629d92afab7ea1c47830bd4a7e8735e944862573a90764645604e96f2804",
-    "system_bytes": 24819
+    "system_bytes": 25906
   },
   "files": {
     "reports/lap-42-vision-closure-sources.json": "7c24fa759b061c28e2dfc07e0a5d4195a10eaecdec18c5c190effa8119e4e640",
-    "scripts/revalidate_lap43_native_web.py": "c4a17bcdc007414d281fa0c76fa919cba5ee90f998ce32c9df5317092b377de8",
-    "tests/test_cli_native_web.py": "23901fc08e64d5baaf64ec6aae3f21438d14f200ae40470cbf1cbb2cf4f8f635",
+    "scripts/revalidate_lap43_native_web.py": "4bc1c461e8c3b70787f52fecfc69d4efacd494e839a4b9dcc199202aea519ac0",
+    "tests/test_cli_native_web.py": "1148b336a3dfc0af15be5f1d6f66f065e4031d815fa84c957990f39e7ee6ddc3",
     "tests/test_lap43.py": "cf66a2589f9c20ea7aa09fb57205a1344535ec332c3d3386b65f04098aa60d44",
+    "tests/test_lap44_memory.py": "a16bdd12d37552486066470bcce35606e9131e8aa0ca9f33d3faa6432e9acbe6",
     "tests/test_vision_mod_guard.py": "c5afb4053140b939549547669bc0c144315f0f5d0ce6ad25761560097a59051b"
   },
   "native": {
     "C": 1000000,
     "F": 8985,
     "O": 128000,
-    "T": 32243,
+    "T": 33330,
     "V": 1024
   },
   "passed": true,
   "quality_state": "pending_user_test",
   "real_model_calls": 0,
   "real_qq_outputs": 0,
-  "rule_hash": "93b672cc88ae1fd1bca78f0927172a8c5169370fc80f368c2c5911a2d9bd8559",
+  "rule_hash": "535258d24d228ccc58068aeecc5d428133ea310526c8c70a170e632df3815c40",
   "schema_version": 1,
   "static_missing": [],
-  "tests_run": 22,
+  "tests_run": 33,
   "thinking_enabled": false,
   "tool_policy": {
     "cli_max_tool_calls": 3,

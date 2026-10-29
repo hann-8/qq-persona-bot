@@ -1,39 +1,41 @@
-## 本轮实施检查点（部署前）
+# LAP-44：群长期记忆实施交接
 
-隔离codex/lap-44-full-memory已实现schema2、全文manifest/fit/verify、同次更新aux、native/prepared路径与真实回执；旧main/b0b4573修复保留。33项定向组合已通过（含10项44核心/HTTP/实际AstrBot hook，23项当前43/CLI guard），新增保存结果状态/配额展示和停机备份迁移helper。首次→清RAM/重载、50000与100000字符、786432政策、真实容量反例、CAS/重入/写失败/混合部件/最终台账及合成ACK均覆盖；0真实生成/公共工具服务/QQ群消息。测试夹具缺失source_digest已补齐，未发现生产台账缺陷。
-
-下一步：最终重跑受最近状态/ACK改动影响的33组合；正常备份/stop、main快进、只改两份授权local字段、schema1迁移、check/probe/activate、start-desktop/status。生产尚未停止，未宣称新功能已加载。原始文件和key仅在忽略备份区。唯一执行归属仍为本session；无代理。回滚按PLAN第9节，任何新schema2内容保留，不能用旧空备份覆盖。
-
-2026-10-29 session LAP-44-full-memory-implementation 唯一实施/部署归属：按 PLAN/MEDIUM_START 完成schema2/全文/更新回执/可扩预算、定向检查、受管迁移部署及commit/push。起点main=b0b4573干净，隔离codex/lap-44-full-memory已接入465e76a规划。拥有PLAN第8节源码/adapter/config模板/manage与配对脚本、定向测试、44报告、AGENTS/使用说明/PROGRESS/工作线HANDOFF/TASKS/44文档；忽略归属生产memory/所选budget/备份与vision/native配对。无代理，不操作旧根，不主动模型/联网服务/QQ；保留其他功能和最新main修复。
-
-# LAP-44：群记忆全文方案交接
-
-返回 [PROGRESS](../../../../PROGRESS.md) / [工作线 HANDOFF](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [详细规划 PLAN](PLAN.md) / [medium实施prompt](MEDIUM_START.md)。继承根 AGENTS，用户明确要求尽快落地、避免流程拖延。
+返回 [PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [PLAN](PLAN.md) / [实施prompt](MEDIUM_START.md) / [实际报告](../../../../reports/lap-44-memory-result.md)。继承根AGENTS。
 
 ## 当前状态
 
-2026-10-29，session `LAP-44-medium-handoff-plan`。用户已review总体方向，要求补齐详细规划后交 sol/medium 落地，并要求容量/预算以后可扩大。PLAN/MEDIUM_START 已准备；**未实施、未改本机配置或运行状态，记忆故障未修复**。下一步由用户提交 MEDIUM_START 给 sol/medium，同轮实现、必要检查、受管部署和 Git 交付，不再追加规划审批或补做旧大批次验收。
+2026-10-29 LAP-44已实现、启用并部署main：schema2群记忆全文/模型增改删/实际保存回执已加载，33项定向组合及真实锁定CLI零生成正反配对通过。当前running/connected/can_receive/router_ready，current_error=null、pending_restart=false；memory读写true，3文件0条0字符。初始50000 Unicode字符/1048576文件字节/8388608总字节，所选CLI524288字节政策。容量预算可扩大，100000字符/786432政策合成检查通过，真实C/F/V/O边界仍保留。最新main/df46056联网修复完整合入；其他模型/账号/low、thinking=false、free/owner、识图/表情和工具限额保持。QQ群效果由用户实测，未由离线或加载晋升真实验收。
 
-核心：本群记忆全文注入，模型决定内容/整理/遗忘；每群正文初始 50,000 Unicode字符，约5万普通汉字，停用旧句式、类型、候选、关键词和小限额。保留最少增改删协议避免全文反复输出，代码只负责本群归属/格式/版本/容量/可靠保存。所选 CodeBuddy 字节政策初始 524,288；所有数值可配置扩大，不把默认值写成最大值。扩容合成检查须接受100000字符/786432字节政策。仍有当前完整 CLI/vision 绑定和同一工具边界。具体数字、prompt、回执、文件、顺序、迁移/回滚见 PLAN。
+唯一session为LAP-44-full-memory-implementation，无代理。用户已提交MEDIUM_START，同轮实现/部署/Git授权已执行；不重新规划、不追加阶段审批。最终main/实施分支push核对后释放实现/启停归属，下一步由用户群测。
 
-本轮补充的关键接点：memory.validate_config 当前把 DEFAULTS[k] 当上限；TS adapter native_policy 仍写死 visible_limit<=48000，Python native_contract 则已经来自budget.limit。必须一起改为加载配置/真实容量，不是只换YAML或把48000换成524288。
+## 实现与文件
 
-## 本轮证据及归属
+- group_memory：schema2 records字典、稳定HMAC演员标记、空库有效快照、全文读取、同次增改删事务，格式/版本/字符/磁盘校验，fsync+replace失败保留原件。无语义门槛、候选/TTL/固定/FIFO，旧限额兼容但忽略。schema1含所有旧事实/未确认状态/原成员归属迁移，原件独立留本机。
+- turn_v2/persona/backends/gateway/web与router：全文不因成员缺席或fit预算被裁；超限明确失败。normal/native有无工具/prepared路径保留aux。先验证gateway元数据及当前epoch/连接/权限，再保存；回执生成最终合法ReplyPlan、metadata/hash后才建立台账。hook重入不重复写，ACK及个人历史使用最终正文；silent不另发保存回执。
+- config与templates/comments：max_chars_per_group默认50000，文件1048576、总8388608；正整数配置不以DEFAULTS封顶。CLI输入预算可扩大；TS native guard移除48000常量，仍校验实际C/F/V/O。runner缓冲按加载budget派生，保留df46056全部URL/session工具接线及安全诊断。
+- manage/configure_bot：schema2计数/字符/配额/最近状态、本机导出及CRUD，无固定/确认旧语义。日志仅计数/枚举，不含正文或号码。
+- 新增scripts/deploy_lap44_memory.py、tests/test_lap44_memory.py；当前revalidate helper/proof包含新检查，capabilities仅同步当前plugin摘要。其余精确路径以实现提交及Git diff为准。
 
-- 起点生产 main/c2346cb，初始工作区干净，LAP-43 部署归属已释放。当前运行状态只引用 43 已记录证据，本轮没有重新启停/探活。
-- 本轮重查：三个 schema 1 文件 records/applied_txns 都为 0，仅读取计数，不输出原文。用户先前测试和旧日志支持“口头确认但无保存”，首个丢失点未唯一定位；新方案需逐段计数解决可观测性。
-- 源码已核对 group_memory、turn_v2、persona、gateway、WebRunner、router 和预算，PLAN 列出全文可能被二次裁剪及联网清空的接点。
-- 本地登记模型输入 1,000,000/输出 128,000，历史 F 上界 8,985 字节；5 万字符中文/emoji/转义封套做了纯本地长度核对，不是真实模型或费用测量。
-- 只拥有五份文档：PROGRESS.md、tracks/laptop-workbuddy/HANDOFF.md、TASKS.md、本目录 HANDOFF.md/PLAN.md。登记已写后重读。不改 AGENTS/代码/local/persona/记忆/key/旧报告，不操作其他根，无代理。
-- 写作中生产目录出现并行 LAP-43 修改：guard adapter/capabilities、43报告、vision_mod_guard、CLI runner/相关测试及43 HANDOFF。本轮未读取或夹带其私密运行数据，不修改这些文件。五份设计文档已转到 `E:/CodexWS/QQbot_LAP44_plan` 的 `codex/lap-44-full-memory-plan`；生产三个共享入口经逐字核对后只移除本轮内容，新44文档同步搬走，9项并行差异保留。受管 worktree 接口因聊天未登记 Snow 根不可用，普通 Git worktree 已创建；不声称已由 app 附着。
-- 前条为初次设计历史；并行43修复现已由其owner提交至main/b0b4573。本轮在独立设计分支用merge提交fec402d保留并同步该既有历史，未改其代码或重做部署。起点设计3642b97，独立树初始干净，当前仅拥有原五文档加MEDIUM_START共六文档。生产main不在本轮修改范围。
+## 验证与运行事实
 
-## 验证与 Git
+生产`.venv/Scripts/python.exe -B -X utf8 scripts/revalidate_lap43_native_web.py check`：33项通过、static_missing=[]、实际预算通过。包括首次写入→清RAM/重载/新Store读回、稳定成员和跨群隔离、50000/100000字符与全文HTTP/manifest、786432原生guard合法扩容和真实容量反例、原子增改删/CAS/重入/协议/写失败保留旧文件、schema1迁移与损坏拒绝、实际AstrBot hook最终台账/hash和合成ACK、typed文字/图/@、native有无工具和prepared路径。当前43权限/发送栅栏及锁定SDK/CLI替身往返保留。
 
-前次3642b97已通过5文档/11链接检查并推送。本轮6文档归属/严格UTF-8/围栏、28条本地链接、统一配置/单位/高于默认值的扩容合同及prompt授权一致性检查、git diff --check已通过，b0b4573祖先关系已核对；不运行功能测试或模型/QQ探针。仅提交这六份文档并 push `codex/lap-44-full-memory-plan`，核对本地/实时远端一致后释放归属；最终提交号和远端核对以 Git/本轮交付回执为准。不把规划检查记为实现验证。
+真实锁定CLI零生成probe：real_generations=0，positive_next_calls=0，两个反例user=0；配对activate使用lap43_operator_trial/pending_user_test。未主动真实生成、WebSearch/WebFetch服务或QQ消息；替身ACK不是QQ ACK，不称真实记忆效果通过。
 
-## 实施提醒
+生产代码检查点0d828829d8bb8ed45ffdfe3b79975646ba01f1ef（实现2b7bab7，合并最新df46056），binding=d12f1978907bf7dbb3a750890e0d6da6a0b5886c5285dd6ada98213a2b9b6cb9；active SHA=d94f2e4c965e81bdccaf5e7eace3f4c9aeb63acfc30620cf454b82b6a4134526。最终Git文档回执提交在该点之后，未再改运行源码。
 
-先完整阅读 PLAN。保留“5万字符全文”决定，不重新设计关键词检索/摘要层/2千或3千字符限额，不把读取预算误当固定消耗。不要用简单删 `_resolve` 或只调一个 local 数字宣称完成：source/fit/manifest/web/prepared_plan/回执都需要贯通。实施按用户选择的模型/档位进行，不能声称自动检测或切换。
+实际status已确认running/connected/can_receive/router_ready、current_error=null、pending_restart=false。加载memory.enabled/learning_enabled=true、50000/1048576/8388608，input_budget=524288，thinking=false，两工具/3调用/4步骤/8000单结果/12000总结果/90秒保留。三份schema2合计0条0字符/606文件字节，无不可用文件；尚无新协议真实保存事件。
 
-schema 1 备份和 schema 2 后续新增内容都要保留；实施时重查数据/分支/并发归属。具体真实效果交用户群测，不因只读/离线/加载通过就记为真实验收。
+## 备份、保护与回滚
+
+state/lap44-deployment/20261029-1140为停机后最新df46056基线，含23项完整本机配置/persona/图库/key/原记忆及active/offline/probe/能力表备份、baseline/migration/check/pairing/status.after/deployment-result。20261029-1136为较早备份，均忽略且不提交。并行main新增df46056导致首次快进拒绝，未覆盖生产；已在隔离分支合并，只解决能力表plugin摘要冲突，重跑33组合/静态及最终probe后部署。
+
+保护差异只有两份授权local与三份memory.json；其余persona/模型账号参数/图库/catalog/key及其他local摘要相同。active/技术报告按当前完整绑定更新，旧IQ/unknown/原始消息证据保持。
+
+回滚先正常stop，保存所有当前schema2内容和日志；配对恢复df46056代码基线、两份local与该备份的active/offline/probe/能力表。仅在迁移后无新记忆变化时恢复schema1原件；有新增内容时先导出/保留schema2，不能旧空库覆盖。正常start/status确认后才称回滚运行恢复，不动日常QQ/旧NapCat根。
+
+## 剩余
+
+用户在QQ群“记住称呼→重置本群上下文→询问”及普通自然学习/更新/遗忘实测；模型是否合理提出更新、5万字符成本/延迟和长期体验未验。扩容实际命令见使用说明/config README；100000字符/2097152文件/33554432总额/786432政策只是合成检查，生产仍用初始值。旧18/21/27/35/42验收差额保留，不作当前使用门槛。
+
+Git交付：只提交本任务归属及当前配对技术报告；main和codex/lap-44-full-memory普通push后核对实时SHA，最终提交号以本轮回执为准，不在提交中自引用。生产与隔离树无非忽略保留差异时报告干净，运行local/备份继续忽略。

@@ -2,13 +2,13 @@
 
 # QQ bot项目入口：SnowLuma主线
 
-## 当前交接：LAP-44 详细规划完成，待 sol/medium 实施
+## 当前交接：LAP-44 已部署，待用户群测
 
-2026-10-29，用户已review总体方向，[LAP-44详细规划](tracks/laptop-workbuddy/tasks/LAP-44/PLAN.md)、[实施prompt](tracks/laptop-workbuddy/tasks/LAP-44/MEDIUM_START.md)及[交接](tracks/laptop-workbuddy/tasks/LAP-44/HANDOFF.md)补齐。本群记忆全文进入上下文、模型决定增改删；初始每群50000 Unicode字符（约5万普通汉字），所选CodeBuddy初始字节政策524288，容量/文件/预算均可配置扩大，去掉memory默认值封顶和TS原生联网48000硬门槛，不换成新固定上限。无关键词检索、语义门槛或单轮2千/3千字限额；只加最少更新和可靠回执。本设计分支已同步既有main/b0b4573联网修复。用户随后提交prompt即同轮实现/必要检查/受管部署/Git交付，不再等新规划审批；效果由用户群测。当前仅文档，未实施/改local/persona/实际记忆/运行状态，记忆故障尚未修复；下方43仍是已部署基础。
+2026-10-29 LAP-44已实现、启用并部署main：schema2群记忆全文/模型增改删/实际保存回执已加载，33项定向组合及真实锁定CLI零生成正反配对通过。当前running/connected/can_receive/router_ready，current_error=null、pending_restart=false；memory读写true，3文件0条0字符。初始50000 Unicode字符/1048576文件字节/8388608总字节，所选CLI524288字节政策。容量预算可扩大，100000字符/786432政策合成检查通过，真实C/F/V/O边界仍保留。最新main/df46056联网修复完整合入；其他模型/账号/low、thinking=false、free/owner、识图/表情和工具限额保持。QQ群效果由用户实测，未由离线或加载晋升真实验收。 [交接](tracks/laptop-workbuddy/tasks/LAP-44/HANDOFF.md) / [实际报告](reports/lap-44-memory-result.md) / [使用说明](SnowLuma使用说明.md)。
 
 2026-10-29群测故障修复已合入并部署main：修复CLI工具参数封套及HTTP(S)被误判成本机路径；当前21项定向检查、真实CLI零生成正反接线通过。实际running/connected/can_receive/router_ready，配置无待重启、当前错误为空；识图与记忆保持。详见[43交接](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)及[排查报告](reports/lap-43-native-web-debug.md)。真实联网及群答复由用户自行实测。
 
-## 当前任务：LAP-43联网故障修复已部署，待用户群测
+## 已部署基础：LAP-43联网修复（预算以顶部LAP-44为准）
 
 2026-10-29，main已部署CLI原生WebSearch/WebFetch，由模型按需决定联网，router和WebRunner不再用旧关键词/RSS/HTML预筛当前CodeBuddy请求。每任务最多3次工具调用、4个主步骤、90秒，单结果8000/合计12000字节，每步48000可见政策；其他工具/MCP保持关闭，未自动切换模型/账号或回退Python。CodeBuddy CLI思考显式关闭，DeepSeek/low配置及额度来源不变。
 
@@ -72,7 +72,7 @@ LAP-41工作区整理与使用对照已完成：uv报告清除38,269个缓存文
 
 | 工作线 | 状态/最新依据 | 接续入口 |
 | --- | --- | --- |
-| QQ主线：SnowLuma及共用bot业务 | 43基础已部署，用户确认表情/owner可用；CLI仅WebSearch/WebFetch已部署，思考关闭、群记忆读写已加载，待用户群测；预算及旧接受保留 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [LAP-43](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md) |
+| QQ主线：SnowLuma及共用bot业务 | LAP-44全文群记忆/可扩配置已部署；最新43联网修复保留，群效果待用户实测 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [LAP-43](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md) |
 | 家庭5070备用模型路线 | 历史记录为接入已实现/离线及元数据通过、真实生成未验；本轮未重查，不自动切换后端 | [HANDOFF](tracks/local-5070/HANDOFF.md) / [既有选型](tracks/local-5070/MODEL_SELECTION.md) |
 
 `tracks/laptop-workbuddy` 是保留的历史目录名，当前承担QQ主线和共用网关交接，不表示仍以NapCat或WorkBuddy界面为主路线。所有旧任务的状态/验收差额在TASKS与各任务HANDOFF保留，不重命名整棵目录。
