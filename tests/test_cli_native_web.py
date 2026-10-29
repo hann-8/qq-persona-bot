@@ -159,7 +159,7 @@ class NativeTests(unittest.TestCase):
         for name in ('Read','Agent','ToolSearch','mcp__x__y'):
             with self.assertRaises(GatewayError):p.line(json.dumps(dict(type='assistant',message=dict(content=[dict(type='tool_use',name=name,id=name)]))))
 
-    def host(self,variant='normal',image=True,mode='live'):
+    def host(self,variant='normal',image=True,mode='live',visible_limit=48000):
         with tempfile.TemporaryDirectory() as folder:
             work=Path(folder);blob=None
             if image:
@@ -167,7 +167,7 @@ class NativeTests(unittest.TestCase):
                 import base64
                 wire=dict(type='user',message=dict(role='user',content=[dict(type='text',text='current snapshot'),dict(type='image',source=dict(type='base64',media_type=blob.mime,data=base64.b64encode(blob.data).decode()))]))
             else:wire=dict(type='user',message=dict(role='user',content='current snapshot'))
-            policy=native_contract(validate_web(dict(engine='codebuddy_cli',enabled=True,search_enabled=True)),['987654321'],InputBudget(limit=48000))
+            policy=native_contract(validate_web(dict(engine='codebuddy_cli',enabled=True,search_enabled=True)),['987654321'],InputBudget(limit=visible_limit))
             if variant=='budget':policy['visible_limit']=100
             guard=Guard(work,'current policy','current snapshot',blob,dict(T=30,F=18000,V=1024 if image else 0,O=128000,C=1000000),
                         mode=mode,wire_message=wire,native_web=policy)
@@ -177,6 +177,12 @@ class NativeTests(unittest.TestCase):
             self.assertEqual(result.returncode,0,result.stderr)
             value=json.loads(result.stdout.strip().splitlines()[-1]);proof=guard.read()
             return value,proof
+
+    def test_configurable_native_policy_above_defaults(self):
+        for limit in (524288,786432):
+            value,proof=self.host(image=True,visible_limit=limit)
+            self.assertEqual(value['calls'],1)
+        with self.assertRaises(AssertionError):self.host(image=True,visible_limit=1000000)
 
     def test_image_and_text_two_steps_clipped(self):
         for image in (True,False):
@@ -317,14 +323,15 @@ export function register(on, options) {
         from qqbot_gateway.model_gateway import ModelQueue,application
         from aiohttp.test_utils import TestClient,TestServer
         runner=FakeRunner()
-        runner.vision_settings={'memory':dict(enabled=True,learning_enabled=True)}
+        from qqbot_gateway.group_memory import validate_config
+        runner.vision_settings={'memory':validate_config(dict(enabled=True,learning_enabled=True))}
         runner.web_config=validate_web(dict(engine='codebuddy_cli',enabled=True,search_enabled=True))
         async with TestClient(TestServer(application(ModelQueue(runner),'t'*40))) as client:
             response=await client.get('/health')
             self.assertEqual(response.status,200)
             health=await response.json()
             self.assertEqual(health['native_web_tools'],['WebSearch','WebFetch'])
-            self.assertEqual(health['memory'],dict(enabled=True,learning_enabled=True))
+            self.assertEqual(health['memory'],{k:runner.vision_settings['memory'][k] for k in ('enabled','learning_enabled','max_chars_per_group','max_group_file_bytes','max_total_bytes')})
             self.assertIs(health['thinking_enabled'],False)
             self.assertEqual(runner.attempts,0)
 

@@ -16,7 +16,7 @@ sys.path[:0]=[str(ROOT/'src'),str(ROOT/'tests'),str(ROOT)]
 def check(root):
     import os
     os.environ['QQBOT_TEST_ASTRBOT_SITE']=str(root/'runtime/astrbot-tool/astrbot/Lib/site-packages')
-    modules=('test_lap43','test_cli_native_web')
+    modules=('test_lap43','test_cli_native_web','test_lap44_memory')
     result=unittest.TextTestRunner(verbosity=1).run(unittest.defaultTestLoader.loadTestsFromNames(modules))
     from qqbot_gateway.vision import adapter_signature
     from qqbot_gateway.vision_capabilities import digest,selected_record

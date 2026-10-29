@@ -153,7 +153,7 @@ export function register(on, options) {
   if(web)need(Array.isArray(web.allowed_tools) && web.allowed_tools.every(t=>['WebSearch','WebFetch'].includes(t)) &&
     web.allowed_tools.length===new Set(web.allowed_tools).size && web.max_calls>=1 && web.max_calls<=3 &&
     web.max_turns>=1 && web.max_turns<=4 && web.result_bytes<=8000 && web.total_result_bytes===12000 &&
-    web.visible_limit<=48000 && web.schema_bytes_per_tool===4096,'native_policy');
+    Number.isSafeInteger(web.visible_limit) && web.visible_limit>0 && web.visible_limit+q.F+q.V+q.O<=q.C && web.schema_bytes_per_tool===4096,'native_policy');
   const native={step:0,turn:null,calls:0,resultBytes:0,requests:new Map(),results:new Map(),planned:[],
     descriptions:new Map(),answers:[],prefix:null,urls:[],steps:[],failed:false};
   const publicURL=value=>{

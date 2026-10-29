@@ -229,7 +229,7 @@ def normalize_settings(raw):
         for key, value in defaults['input_budget'].items():budget.setdefault(key, value)
         if not isinstance(profile['model'], str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}', profile['model']):
             raise ValueError('Invalid profile model')
-        for key, lower, upper in (('context_input_limit_tokens',1024,1048576),('context_overhead_reserve_tokens',0,65536),('output_reserve_tokens',0,65536)):
+        for key, lower, upper in (('context_input_limit_tokens',1024,2**53-1),('context_overhead_reserve_tokens',0,65536),('output_reserve_tokens',0,65536)):
             if type(budget[key]) is not int or not lower <= budget[key] <= upper:raise ValueError('Invalid input_budget '+key)
         if type(profile['run_timeout_seconds']) is not int or not 1 <= profile['run_timeout_seconds'] <= 3600:raise ValueError('Invalid run timeout')
     cli, local = profiles['codebuddy_cli'], profiles['ollama_ssh']

@@ -192,7 +192,27 @@ def status_report(*,disk_config=None):
                  gate.get('self_id_verified') is True and gate.get('online') is True and not gate.get('stopping') and
                  (provider=='napcat' or gate.get('channel_ready') is True)),
             'configuration':configuration_status(mode_state,disk_config=disk_config,running=phase!='stopped'),
+            'memory':memory_status(ROOT,settings) if disk_config is not False else {'state':'unavailable'},
             'model':model,'configured_profile':configured,'task_counts':task_counts(),'napcat_login':login_status}
+
+
+def memory_status(root,settings):
+    """Read only counts from local files; never load/migrate or disclose text."""
+    from qqbot_gateway.reply_plan import _pairs
+    result=dict(schema_version=2,groups=0,records=0,chars=0,bytes=0,unavailable=0,
+        limits={k:settings['memory'][k] for k in ('max_chars_per_group','max_group_file_bytes','max_total_bytes')})
+    for path in (root/'state/group-memory').glob('*/memory.json'):
+        try:
+            if path.stat().st_size>settings['memory']['max_group_file_bytes']:raise ValueError()
+            doc=json.loads(path.read_text(encoding='utf-8'),object_pairs_hook=_pairs)
+            if doc['schema_version']!=2 or not isinstance(doc['records'],dict):raise ValueError()
+            result['groups']+=1;result['records']+=len(doc['records']);result['chars']+=sum(map(len,doc['records'].values()));result['bytes']+=path.stat().st_size
+        except (OSError,ValueError,TypeError,KeyError):result['unavailable']+=1
+    try:
+        last=json.loads((root/'state/memory-last-save.json').read_text(encoding='utf-8'))
+        result['last_save']={k:v for k,v in last.items() if k in ('result','reason','added','updated','deleted','saved_revision')}
+    except (OSError,ValueError,TypeError):result['last_save']=None
+    return result
 
 
 def configuration_status(mode_state,*,disk_config=None,running=True):

@@ -41,7 +41,7 @@ def native_contract(web, private_ids, budget, question=''):
 
 from contextvars import ContextVar
 SCOPE=ContextVar('native_web_scope',default=(True,''))
-PROOF_FILES=('scripts/revalidate_lap43_native_web.py','tests/test_cli_native_web.py',
+PROOF_FILES=('tests/test_lap44_memory.py','scripts/revalidate_lap43_native_web.py','tests/test_cli_native_web.py',
              'tests/test_lap43.py','tests/test_vision_mod_guard.py','reports/lap-42-vision-closure-sources.json')
 
 

@@ -1,3 +1,5 @@
+2026-10-29 session LAP-44-full-memory-implementation 唯一实施/部署归属：按 PLAN/MEDIUM_START 完成schema2/全文/更新回执/可扩预算、定向检查、受管迁移部署及commit/push。起点main=b0b4573干净，隔离codex/lap-44-full-memory已接入465e76a规划。拥有PLAN第8节源码/adapter/config模板/manage与配对脚本、定向测试、44报告、AGENTS/使用说明/PROGRESS/工作线HANDOFF/TASKS/44文档；忽略归属生产memory/所选budget/备份与vision/native配对。无代理，不操作旧根，不主动模型/联网服务/QQ；保留其他功能和最新main修复。
+
 2026-10-29 LAP-44 medium交接完成：详细PLAN/MEDIUM_START补齐，6文档归属/UTF-8/围栏、28本地链接、统一配置/单位/扩容合同、diff --check通过；测试要求包含100000字符/786432字节合法扩容与真实容量反例，尚未运行功能测试。既有main/b0b4573经fec402d合入保留；本轮新增修改仅6文档，生产配置/进程/记忆未动。独立分支commit/push并核对后释放归属；下一步用户将MEDIUM_START提交sol/medium，同轮完成实现、必要检查、启用和部署，不再追加规划审批。
 
 2026-10-29 11:13（Asia/Shanghai）：session `LAP-44-medium-handoff-plan`续领44文档。用户已review总体方向，要求补齐详细规划与可直接交sol/medium的prompt，容量/预算可配置、以后可扩大、不要卡死。工作根E:/CodexWS/QQbot_LAP44_plan，分支codex/lap-44-full-memory-plan，起点3642b97，初始干净；生产main已推进到b0b4573，先同步其既有修复历史，保留全部成果。本session仅拥有6文档：PROGRESS.md、工作线HANDOFF/TASKS、tasks/LAP-44/{PLAN.md,HANDOFF.md,新增MEDIUM_START.md}。登记后重读；不实施代码/local/数据迁移、不启停/模型/QQ/联网服务/SSH，不派代理或切模型。仅文档commit/push及远端核对；交付后释放归属。下一轮用户提交prompt即按其中授权同轮实现、启用、配对部署和Git交付，不再逐阶段请求批准。

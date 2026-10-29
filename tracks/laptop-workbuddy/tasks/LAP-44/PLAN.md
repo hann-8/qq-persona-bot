@@ -1,3 +1,5 @@
+实施状态更新（2026-10-29）：用户已提交MEDIUM_START；本轮按本规划实施。下文“仅规划/尚未实施”保留为设计阶段历史，当前进度以HANDOFF为准。未重新规划或扩大功能范围。
+
 # LAP-44：本群记忆全文进入上下文
 
 返回 [PROGRESS](../../../../PROGRESS.md) / [HANDOFF](HANDOFF.md) / [TASKS](../../TASKS.md) / [交给 sol/medium 的实施 prompt](MEDIUM_START.md)。

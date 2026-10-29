@@ -32,6 +32,7 @@ class BackendResult:
     web_expired: bool = False
     response_to_seq: int | None = None
     memory_proposals: tuple = ()
+    memory_aux: dict = field(default_factory=dict)
     web_evidence: tuple = ()
 
 

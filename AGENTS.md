@@ -1,3 +1,5 @@
+2026-10-29 LAP-44当前合同：群长期记忆采用schema2全文快照＋同次回复memory_updates增改删，模型决定内容/整理/遗忘；旧候选、句式、关键词和240字节/3条/8条/1536字节小限制停用，旧配置字段兼容但忽略。每群初始50000 Unicode字符、文件1048576字节、总8388608字节；所选CodeBuddy输入政策524288可见UTF-8字节，均可配置扩大并受真实C/F/V/O限制。保存后在投递台账前生成实际回执，重置只清短期上下文。模型/账号/low、thinking=false、free/owner、识图/表情和两工具3调用/4步骤/90秒/8000/12000保持。部署及验证结果以[LAP-44交接](tracks/laptop-workbuddy/tasks/LAP-44/HANDOFF.md)为准，QQ群效果待用户实测。
+
 # 项目协作准则
 
 2026-10-29当前事实：LAP-43原生WebSearch/WebFetch已实现并部署main，原CodeBuddy的Python关键词/RSS/HTML前置已绕开；仅两工具，MCP及其余工具关闭。3调用/4主步骤/90秒、单结果8000/合计12000字节、每步48000政策不增加。用户明确要求CodeBuddy CLI思考保持关闭，实际子进程alwaysThinkingEnabled=false；low保留为配置参数，不代表启用思考。群长期记忆读取和学习均已加载true；网页材料不写长期记忆。原聊天/识图/表情/owner/free保持。实际质量交用户群测，具体证据及当前状态从PROGRESS/43 HANDOFF读取。以下10-28“仅规划/下一轮”均为历史。

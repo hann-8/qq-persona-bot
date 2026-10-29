@@ -1,3 +1,11 @@
+## 本轮实施检查点（部署前）
+
+隔离codex/lap-44-full-memory已实现schema2、全文manifest/fit/verify、同次更新aux、native/prepared路径与真实回执；旧main/b0b4573修复保留。33项定向组合已通过（含10项44核心/HTTP/实际AstrBot hook，23项当前43/CLI guard），新增保存结果状态/配额展示和停机备份迁移helper。首次→清RAM/重载、50000与100000字符、786432政策、真实容量反例、CAS/重入/写失败/混合部件/最终台账及合成ACK均覆盖；0真实生成/公共工具服务/QQ群消息。测试夹具缺失source_digest已补齐，未发现生产台账缺陷。
+
+下一步：最终重跑受最近状态/ACK改动影响的33组合；正常备份/stop、main快进、只改两份授权local字段、schema1迁移、check/probe/activate、start-desktop/status。生产尚未停止，未宣称新功能已加载。原始文件和key仅在忽略备份区。唯一执行归属仍为本session；无代理。回滚按PLAN第9节，任何新schema2内容保留，不能用旧空备份覆盖。
+
+2026-10-29 session LAP-44-full-memory-implementation 唯一实施/部署归属：按 PLAN/MEDIUM_START 完成schema2/全文/更新回执/可扩预算、定向检查、受管迁移部署及commit/push。起点main=b0b4573干净，隔离codex/lap-44-full-memory已接入465e76a规划。拥有PLAN第8节源码/adapter/config模板/manage与配对脚本、定向测试、44报告、AGENTS/使用说明/PROGRESS/工作线HANDOFF/TASKS/44文档；忽略归属生产memory/所选budget/备份与vision/native配对。无代理，不操作旧根，不主动模型/联网服务/QQ；保留其他功能和最新main修复。
+
 # LAP-44：群记忆全文方案交接
 
 返回 [PROGRESS](../../../../PROGRESS.md) / [工作线 HANDOFF](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [详细规划 PLAN](PLAN.md) / [medium实施prompt](MEDIUM_START.md)。继承根 AGENTS，用户明确要求尽快落地、避免流程拖延。

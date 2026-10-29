@@ -271,7 +271,7 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
                                   'native_web_tools':__import__('qqbot_gateway.cli_web_policy',fromlist=['allowed_tools']).allowed_tools(getattr(queue.runner,'web_config',{})),
                                   'native_web_limits':{k:v for k,v in getattr(queue.runner,'web_config',{}).items() if k.startswith('cli_')},
                                   'thinking_enabled':False,
-                                  'memory':{k:getattr(queue.runner,'vision_settings',{}).get('memory',{}).get(k,False) for k in ('enabled','learning_enabled')},
+                                  'memory':{k:getattr(queue.runner,'vision_settings',{}).get('memory',{}).get(k,False) for k in ('enabled','learning_enabled','max_chars_per_group','max_group_file_bytes','max_total_bytes')},
                                   'vision':vision_status or {'enabled':bool(materials),'quality_state':'unverified'},
                                   'web_search_enabled':getattr(queue.runner,'retriever',None).cfg.get('search_enabled',False) if getattr(queue.runner,'retriever',None) else False,
                                   'web_search_state':'operator_trial_unverified' if getattr(queue.runner,'retriever',None) and queue.runner.retriever.cfg.get('search_enabled') else 'disabled',
@@ -307,7 +307,7 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
                     if isinstance(content,list):
                         if any(not isinstance(p,dict) or set(p)!={'type','text'} or p['type']!='text' or not isinstance(p['text'],str) for p in content):raise ValueError()
                         content=''.join(p['text'] for p in content)
-                    source=validate_source(content,header)
+                    source=validate_source(content,header,(v2 or {}).get('memory_config'))
                 except (KeyError,IndexError,TypeError,ValueError):raise GatewayError('UNSUPPORTED_REQUEST') from None
                 if source['self']['names']!=v2['aliases']:raise GatewayError('UNSUPPORTED_REQUEST')
                 if source['memory'] is not None and not v2.get('memory_enabled',False):raise GatewayError('UNSUPPORTED_REQUEST')
@@ -432,7 +432,7 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
             snapshot=json.loads(json.loads(prompt)[-1]['content'])
             question=next((row['text'] for row in snapshot['messages'] if row['seq']==snapshot.get('target_seq')),snapshot['messages'][-1]['text'])
             response_to=None
-            memory_proposals=list(backend_result.memory_proposals)
+            memory_proposals=dict(backend_result.memory_aux)
             if backend_result.prepared_plan is not None:
                 plan=backend_result.prepared_plan
                 response_to=backend_result.response_to_seq
@@ -454,7 +454,7 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
                 if plan and not (v2 or {}).get('mentions_enabled',False):
                     from dataclasses import replace
                     plan=replace(plan,prepared_parts=tuple(replace(p,mention_ref=None) for p in plan.parts)) if any(p.mention_ref for p in plan.parts) else plan
-                if not (v2 or {}).get('learning_enabled',False) or backend_result.web_evidence:memory_proposals=[]
+                if not (v2 or {}).get('learning_enabled',False):memory_proposals={}
                 metadata['qqbot_group_plan']=v2_metadata(group_request,response_id,decision,plan,snapshot,response_to,member_receipt,memory_proposals,backend_result.web_evidence)
                 LOG.info('ATTENTION trace=%s stage=model_done decision=%s elapsed_ms=%s',request[TRACE],decision,int((time.monotonic()-started)*1000))
             else:metadata['qqbot_group_plan']=group_metadata(group_request,response_id,decision,plan)
@@ -530,7 +530,7 @@ def main():
         from .reply_plan import digest
         persona=compose_persona((root/'config/persona.md').read_text(encoding='utf-8'),settings['output'],settings['web'],settings['participation'],settings['memes'],settings.get('vision'),settings['members'],settings['memory'],settings.get('bilibili'))
         persona_id=session_version(persona+('\n'+memes.fingerprint() if memes.cfg['enabled'] else ''),settings)
-        v2=dict(mode=settings['participation']['mode'],config_version=digest(persona_id),aliases=settings['participation']['attention']['aliases'],mentions_enabled=settings['members']['mentions_enabled'],memory_enabled=settings['memory']['enabled'],learning_enabled=settings['memory']['learning_enabled'])
+        v2=dict(mode=settings['participation']['mode'],config_version=digest(persona_id),aliases=settings['participation']['attention']['aliases'],mentions_enabled=settings['members']['mentions_enabled'],memory_enabled=settings['memory']['enabled'],learning_enabled=settings['memory']['learning_enabled'],memory_config=settings['memory'])
     from .vision import MaterialClient,context_token
     materials=MaterialClient(f"http://127.0.0.1:{settings['onebot']['port']}/context/vision/resolve",context_token(root),settings['vision']['input_reserve_tokens']) if settings['vision']['enabled'] else None
     member_client=MemberClient(f"http://127.0.0.1:{settings['onebot']['port']}/context/members",context_token(root)) if settings['members']['enabled'] else None

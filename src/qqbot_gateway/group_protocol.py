@@ -77,10 +77,10 @@ def metadata(request,response_id,decision,plan):
     return value
 
 
-def verify_metadata(value,request,response_id,text,output,source=None):
+def verify_metadata(value,request,response_id,text,output,source=None,memory_cfg=None):
     if request.get('version')==2:
         from .turn_v2 import verify
-        return verify(value,request,response_id,text,output,source)
+        return verify(value,request,response_id,text,output,source,memory_cfg)
     from .reply_plan import trusted_plan
     if not isinstance(value,dict) or set(value)!={'request','response_id','decision','plan','plan_hash'}:raise ValueError('Missing group metadata')
     body={k:v for k,v in value.items() if k!='plan_hash'}

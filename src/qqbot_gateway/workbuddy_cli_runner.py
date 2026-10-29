@@ -45,7 +45,9 @@ class _ProbeReady(Exception):
 
 
 class ResultParser:
-    def __init__(self, expected_model=None, allowed_tools=(), max_calls=3):
+    def __init__(self, expected_model=None, allowed_tools=(), max_calls=3, visible_limit=16384):
+        self.frame_limit=max(512*1024,visible_limit*8)
+        self.stream_limit=max(2*1024*1024,self.frame_limit*4)
         self.expected_model = expected_model
         self.allowed_tools=set(allowed_tools);self.max_calls=max_calls;self.tool_calls={};self.tool_results=set()
         self.decoder = codecs.getincrementaldecoder('utf-8')('strict')
@@ -58,7 +60,7 @@ class ResultParser:
 
     def feed(self, chunk, final=False):
         self.bytes += len(chunk)
-        if self.bytes > 2 * 1024 * 1024:
+        if self.bytes > self.stream_limit:
             raise GatewayError('PROTOCOL_ERROR')
         try:
             self.buffer += self.decoder.decode(chunk, final=final)
@@ -67,7 +69,7 @@ class ResultParser:
         while '\n' in self.buffer:
             line, self.buffer = self.buffer.split('\n', 1)
             self.line(line.rstrip('\r'))
-        if len(self.buffer) > 512 * 1024:
+        if len(self.buffer.encode('utf-8')) > self.frame_limit:
             raise GatewayError('PROTOCOL_ERROR')
         if final and self.buffer:
             self.line(self.buffer.rstrip('\r'))
@@ -267,7 +269,7 @@ class CLIRunner:
             try:
                 process = await asyncio.create_subprocess_exec(*args,cwd=work,env=env,
                     stdin=asyncio.subprocess.PIPE,stdout=asyncio.subprocess.PIPE,stderr=asyncio.subprocess.PIPE,
-                    limit=512*1024,
+                    limit=max(512*1024,self.budget.limit*8) if self.budget else 512*1024,
                     creationflags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0)
             except BaseException as error:
                 # A cancelled spawn has no provable root identity: retain unknown.
@@ -278,7 +280,7 @@ class CLIRunner:
                 clean = await owner.join()
                 if not clean:raise GatewayError('CLEANUP_FAILED') from None
                 raise GatewayError('BACKEND_UNAVAILABLE') from None
-            parser = ResultParser(self.model,allowed,policy['max_calls'] if policy else 3)
+            parser = ResultParser(self.model,allowed,policy['max_calls'] if policy else 3,self.budget.limit if self.budget else 16384)
             self.last_parameters = {'model':self.model,'effort_requested':self.reasoning_effort,
                                     'effort_effective':None,'thinking_enabled':False,'allowed_tools':allowed,'auto_compact_setting':False,
                                     'forced_compact_exclusion_verified':False,'native_window':'unverified'}

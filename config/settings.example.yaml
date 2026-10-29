@@ -5,15 +5,10 @@ schema_version: 3  # 内部配置版本固定3
 memory:  # 配置节，子字段见下方；保留既有校验约束
   enabled: false  # 读取本群长期记忆的开关，不等于开启学习
   learning_enabled: false  # 记忆学习开关，必须同时开启记忆读取，不新增推理调用
-  max_records: 64  # 每群记忆记录数上限
-  max_fact_bytes: 16384  # 每群记忆事实总字节上限
-  max_group_file_bytes: 65536  # 单群记忆文件字节上限
+  max_chars_per_group: 50000  # Unicode字符，可继续配置扩大
+  max_group_file_bytes: 1048576  # JSON UTF-8字节，可继续配置扩大
   max_groups: 16  # 可持久化群数上限
   max_total_bytes: 8388608  # 记忆总字节上限
-  max_prompt_records: 8  # 单次记忆提示记录数上限
-  max_prompt_bytes: 1536  # 记忆/成员提示UTF-8字节上限
-  max_proposals_per_turn: 3  # 单轮学习提议数上限
-  max_record_bytes: 240  # 单条记忆UTF-8字节上限
 vision:  # 配置节，子字段见下方；保留既有校验约束
   ingress_diagnostics: false  # 仅准入后封闭图片元数据；默认关闭，下次启动生效
   enabled: false  # production_eligible未证明；true会在启动时拒绝，不自动调用验证；原生识图desired开关；生产能力未验证，true仍拒绝启动
@@ -151,7 +146,6 @@ members:  # 配置节，子字段见下方；保留既有校验约束
   count_ttl_seconds: 60  # 人数有效秒数
   roster_ttl_seconds: 300  # 名册有效秒数
   max_prompt_entries: 8  # 成员提示条目上限
-  max_prompt_bytes: 768  # 记忆/成员提示UTF-8字节上限
 
 public_network:  # 项目公共网络，失败不自动切换
   resolver: system  # 仅system/cloudflare_doh，不改全局DNS

@@ -374,7 +374,8 @@ class WebRunner:
         budget.check(system,enriched)
         result=await self.guarded(self.runner.run(system,enriched,request_id))
         result=result if isinstance(result,BackendResult) else BackendResult(result)
-        decision,reply,response=plan(result.text,self.output,question,request,source)
+        aux={}
+        decision,reply,response=plan(result.text,self.output,question,request,source,memory_out=aux)
         from .evidence_selection import manifest
         evidence=tuple(manifest(sources))
         if reply and decision=='speak':
@@ -382,9 +383,9 @@ class WebRunner:
             except WebFailure:return BackendResult(SILENT,web_expired=True,web_evidence=evidence)
             # Public text must not be promoted to facts about group members.
             return BackendResult(reply.canonical_text,result.usage,result.parameters,result.finish_reason,reply,response_to_seq=response,
-                                 memory_proposals=(),web_evidence=evidence)
+                                 memory_aux=aux,web_evidence=evidence)
         from dataclasses import replace
-        return replace(result,web_evidence=evidence,memory_proposals=())
+        return replace(result,web_evidence=evidence,memory_aux=aux)
     async def run_native_v2(self,system,prompt,request_id,request,source,question):
         from dataclasses import replace
         from .turn_v2 import plan
@@ -398,11 +399,11 @@ class WebRunner:
         if not proof.get('calls'):return result
         try:
             raw=json.loads(result.text)
-            raw['memory_proposals']=[]
             if raw.get('decision')=='speak':
-                raw.update(kind='answer',meme_id=None,memory_proposals=[])
+                raw.update(kind='answer',meme_id=None)
                 raw['bubbles']=['\n'.join(raw.get('bubbles',[]))]
-            decision,reply,response=plan(json.dumps(raw,ensure_ascii=False),self.output,question or '',request,source)
+            aux={}
+            decision,reply,response=plan(json.dumps(raw,ensure_ascii=False),self.output,question or '',request,source,memory_out=aux)
             if reply and decision=='speak':
                 allowed=set(proof.get('urls',[]))
                 if any(u not in allowed for u in source_urls(reply.canonical_text)):
@@ -413,8 +414,8 @@ class WebRunner:
                 sources=[dict(url=u,title='本次原生联网来源',status='native',published_at=None) for u in list(proof['urls'])[:2]]
                 reply=source_plan(reply,sources,self.output,question or '')
                 return replace(result,text=reply.canonical_text,prepared_plan=reply,response_to_seq=response,
-                               memory_proposals=(),web_evidence=tuple(dict(url=s['url'],engine='codebuddy_cli',tool_calls=proof['calls'],result_bytes=proof['result_bytes'],sha256=proof['sha256']) for s in sources))
-            return replace(result,text=json.dumps(raw,ensure_ascii=False),memory_proposals=())
+                               memory_aux=aux,web_evidence=tuple(dict(url=s['url'],engine='codebuddy_cli',tool_calls=proof['calls'],result_bytes=proof['result_bytes'],sha256=proof['sha256']) for s in sources))
+            return replace(result,text=json.dumps(raw,ensure_ascii=False),memory_aux=aux)
         except (ValueError,TypeError,KeyError,WebFailure):
             return self.local_failure(request,'本次联网答复未通过格式或来源检查。')
 

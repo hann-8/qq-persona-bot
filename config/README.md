@@ -149,8 +149,38 @@ Snow运行准入另要求online/good、已armed且pipe/login/rx/outbound健康�
 
 新增cli_max_tool_calls默认3且1..3，cli_max_turns默认4且1..4，cli_tool_result_bytes默认8000且1000..8000；本机均取默认。失败计数不退还、重放不重复执行、总工具结果12000字节硬限、90秒总deadline、每步48000可见政策（含真实历史和工具描述/锁定参数schema上界），不自动扩大预算。WebFetch可能内部处理材料，限额不承诺精确HTTP/内部模型数或credits。
 
-子进程alwaysThinkingEnabled=false，DeepSeek/low配置保留；群memory.enabled/learning_enabled均true。正常停机保存后重启，health展示engine/有效工具/限额/思考开关/记忆加载值。当前已部署的识图仍为完整绑定lap43_operator_trial、pending_user_test；使用`scripts/revalidate_lap43_native_web.py`做当前check/probe/activate配对，旧43/42报告保留。联网后最终answer单条、meme_id=null、memory_proposals=[]，实际工具服务与效果由用户群测。
+子进程alwaysThinkingEnabled=false，DeepSeek/low配置保留；群memory.enabled/learning_enabled均true。正常停机保存后重启，health展示engine/有效工具/限额/思考开关/记忆加载值。当前已部署的识图仍为完整绑定lap43_operator_trial、pending_user_test；使用`scripts/revalidate_lap43_native_web.py`做当前check/probe/activate配对，旧43/42报告保留。联网后最终answer单条、meme_id=null，memory_updates仍可仅依据本群人类消息提出，实际工具服务与效果由用户群测。
 
 `access.admin_users`字段保持，但去重后必须恰好1项，不等于bot、不在blocked_users；框架名单与router/记忆管理员同源。群角色、昵称、引用或模型均不授予控制权。
 
 识图当前`lap43_operator_trial`为操作者显式试用许可，质量pending_user_test。它绑定完整源码/配置/实际runtime/所选记录、当前定向检查与真实CLI零生成接线，继续保留预算/工具隔离/unknown限制；不代表新IQ或人工评分通过。固定私有材料位于state/lap43-vision-trial，旧IQ和人工记录不改。详情及配对备份位置见[43交接](../tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)。旧任务段落按其日期解释。
+
+
+## LAP-44 群长期记忆
+
+当前群每次模型调用都会收到本群现有记忆全文；模型自行新增、概括、更新、合并和遗忘。不会跨群，网页不是群友自述，也不应把群记忆上传联网查询。空库存可首次学习。明确要求记住/更新/忘记时，宿主保存后给实际回执；如果模型未提出动作，会显示“本轮长期记忆未变更”，不能把口头答应当作保存证明。普通聊天可静默学习；保存失败保留原文件。重置上下文不删除长期记忆。
+
+用户可在授权群依次测试：“以后叫我小青，请记住”→看到“已保存到本群长期记忆”→由唯一操作者发送“重置本群上下文”→再问“你记得该怎么称呼我吗”。这是用户真实效果测试，离线/加载检查不保证模型每次都合理学习。
+
+初始配置为 `config/local/features.yaml` 的 `memory.max_chars_per_group: 50000`、`max_group_file_bytes: 1048576`、`max_total_bytes: 8388608`；字符按Unicode code point计数，不是字节。所选 `config/local/models.yaml` 的 `llm.profiles.codebuddy_cli.input_budget.context_input_limit_tokens: 524288` 在此CLI路径实际是可见UTF-8字节政策，不代表实际token消耗。默认值均可扩大；例如100000字符、2097152文件字节、33554432总字节和786432输入政策已作合成验证。超模型真实容量或最终输入仍会明确拒绝，不裁半本记忆、不自动压缩调用或切模型。旧max_records/max_fact_bytes/max_prompt_records/max_prompt_bytes/max_proposals_per_turn/max_record_bytes仅兼容，不再生效。
+
+扩大时先用项目 `.venv/Scripts/python.exe scripts/manage.py stop` 正常停机，备份上述两个local及 `state/group-memory`、当前active/技术记录，再只改所需字段。沿当前完整配对流程执行：
+
+```powershell
+.venv/Scripts/python.exe -B scripts/revalidate_lap43_native_web.py check
+# 下两项的实际摘要由scripts/activate_lap42_vision.current和当前active文件SHA取得，不手填旧值
+.venv/Scripts/python.exe -B scripts/revalidate_lap43_native_web.py probe --expected-binding <当前binding>
+.venv/Scripts/python.exe -B scripts/revalidate_lap43_native_web.py activate --authorize-operator-trial --expected-binding <当前binding> --expected-active <当前active文件SHA256>
+.venv/Scripts/python.exe -B scripts/manage.py start-desktop
+.venv/Scripts/python.exe -B scripts/manage.py status --json
+```
+
+取得当前摘要的只读命令（项目根运行）：
+
+```powershell
+.venv/Scripts/python.exe -B -c "import sys;from pathlib import Path;sys.path[:0]=['src','.'];from scripts.activate_lap42_vision import current;from qqbot_gateway.vision_trial import sha;r=Path.cwd();print('binding='+current(r)[2]);print('active='+sha(r/'state/vision-evidence/active.json'))"
+```
+
+health的memory显示实际加载配额，status的memory显示条数/字符/文件字节及最近保存状态，configuration.pending_restart须false。配置保存不等于已加载。当前固定模型容量不足时先降低额度，不改代码或能力登记伪造容量。该配对probe是CLI零生成技术检查，不调用真实模型生成或联网服务。
+
+本机停机管理用 `scripts/configure_bot.py memory-admin`，支持查看计数、只读导出、自由文本新增/纠正/删除、按稳定成员标记删除或清空群；schema2无确认/固定/到期机制。自由文本若未包含某成员稳定标记，不能保证按成员删除能找全所有间接关系；需要明确条目删除。群聊模型没有清namespace/key或改配置的权限。

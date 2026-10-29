@@ -73,8 +73,7 @@ def budget_check(root,settings):
     # Exercise the same final subset fitter with full optional quotas and long
     # old context. Only sizes/counts escape; no persona/body is ever printed.
     for i in range(8):source['member_candidates'].append(dict(member_ref='p_'+f'{i:016x}',name='synthetic-'+str(i)))
-    source['memory']=dict(generation='a'*32,base_revision=0,records=[dict(fact_ref='f_'+f'{i:032x}',record_revision=1,
-        subject_ref=source['messages'][0]['member_ref'],kind='preference',slot='likes',fact='synthetic '+('x'*180)) for i in range(8)])
+    source['memory']=dict(generation='a'*32,base_revision=0,records={f'{i:032x}':'synthetic '+('x'*180) for i in range(8)},actors={})
     body=fit(source,header,system,budget)
     prompt=dialog_text([dict(role='user',content=body)])
     budget.check(system,prompt)

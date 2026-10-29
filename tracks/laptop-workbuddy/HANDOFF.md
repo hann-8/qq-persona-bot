@@ -1,3 +1,5 @@
+2026-10-29 LAP-44当前合同：群长期记忆采用schema2全文快照＋同次回复memory_updates增改删，模型决定内容/整理/遗忘；旧候选、句式、关键词和240字节/3条/8条/1536字节小限制停用，旧配置字段兼容但忽略。每群初始50000 Unicode字符、文件1048576字节、总8388608字节；所选CodeBuddy输入政策524288可见UTF-8字节，均可配置扩大并受真实C/F/V/O限制。保存后在投递台账前生成实际回执，重置只清短期上下文。模型/账号/low、thinking=false、free/owner、识图/表情和两工具3调用/4步骤/90秒/8000/12000保持。部署及验证结果以[LAP-44交接](tasks/LAP-44/HANDOFF.md)为准，QQ群效果待用户实测。
+
 2026-10-29当前交接：[LAP-44详细规划](tasks/LAP-44/PLAN.md)、[medium实施prompt](tasks/LAP-44/MEDIUM_START.md)及[交接](tasks/LAP-44/HANDOFF.md)完成，总体方向已获用户review。每群记忆全文交模型，初始50000 Unicode字符/所选CodeBuddy524288可见字节，容量/磁盘/输入政策可配置扩大；去掉默认值封顶及TS插件48000常量，不换新固定上限。无关键词检索/严格内容门槛/小注入限额；模型增改删，程序可靠保存及真实回执。已同步既有main/b0b4573修复历史，当前未实施或改生产配置/记忆/进程。用户提交prompt后一次落地实现、必要检查、配对部署和Git交付，不再追加规划审批或旧大验收；真实群效果由用户试用。
 
 2026-10-29群测debug修复已部署main：CLI工具参数封套、HTTP(S)盘符误判两处修复已加载。当前43组合21项/真实CLI零生成正反接线通过，running/connected/can_receive/router_ready、current_error=null、pending_restart=false；识图/记忆/模型配置保持，16项保护摘要不变。实际联网质量由用户群测；[43交接](tasks/LAP-43/HANDOFF.md)及[排查报告](../../reports/lap-43-native-web-debug.md)记录当前绑定/回滚。

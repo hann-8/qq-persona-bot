@@ -196,11 +196,28 @@ class QQRouter(Star):
                 if raw.model!='workbuddy-local' or not raw.id.startswith('chatcmpl-') or len(raw.choices)!=1:raise ValueError()
                 text=raw.choices[0].message.content
                 request=event.get_extra('qq_group_request')
-                plan=verify_metadata(getattr(raw,'qqbot_group_plan',None),request,raw.id,text,self.output,event.get_extra('qq_v2_source'))
+                plan=verify_metadata(getattr(raw,'qqbot_group_plan',None),request,raw.id,text,self.output,event.get_extra('qq_v2_source'),self.memory.cfg)
                 event.set_extra('qq_group_response',raw.id)
                 event.set_extra('qq_group_metadata',raw.qqbot_group_plan)
+                if event.get_extra('qq_memory_final_response')==raw.id:
+                    plan=event.get_extra('qq_memory_final_plan')
+                    event.set_extra('qq_group_metadata',event.get_extra('qq_memory_final_metadata'))
+                else:
+                    saved=self.stage_memory(event,raw.qqbot_group_plan)
+                    from copy import deepcopy
+                    from qqbot_gateway.group_memory import receipt_plan
+                    from qqbot_gateway.turn_v2 import sha
+                    aux=raw.qqbot_group_plan.get('memory_aux',{})
+                    plan=receipt_plan(plan,saved or dict(result='failed'),aux.get('receipt',False),self.output)
+                    final=deepcopy(raw.qqbot_group_plan)
+                    final['plan']=plan.metadata(raw.id) if plan else None
+                    final['plan_hash']=sha({k:v for k,v in final.items() if k!='plan_hash'})
+                    event.set_extra('qq_group_metadata',final)
+                    event.set_extra('qq_memory_final_response',raw.id)
+                    event.set_extra('qq_memory_final_plan',plan)
+                    event.set_extra('qq_memory_final_metadata',final)
+                text=plan.canonical_text if plan else text
                 event.set_extra('qq_delivery_plan',plan)
-                self.stage_memory(event,raw.qqbot_group_plan)
                 response.result_chain=MessageChain()
                 response.reasoning_content=None
                 if request['kind']=='member_turn':
@@ -322,7 +339,7 @@ class QQRouter(Star):
         effective=deepcopy(event.get_extra('qq_v2_source'));manifest=metadata['manifest']
         effective['messages']=[r for r in effective['messages'] if r['seq'] in manifest['seqs']]
         close_refs(effective);effective['memory']=manifest.get('memory');effective['member_candidates']=manifest.get('member_candidates',[])
-        self.memory.stage(event.get_extra('qq_memory_context'),metadata.get('memory_proposals',[]),effective)
+        return self.memory.stage(event.get_extra('qq_memory_context'),metadata.get('memory_aux',{}),effective)
 
     def close_memory(self,event):
         context=event.get_extra('qq_memory_context')
@@ -338,7 +355,7 @@ class QQRouter(Star):
             if event.get_extra('qq_delivery_handled'):return
             request=event.get_extra('qq_group_request');plan=event.get_extra('qq_delivery_plan');key=event.get_extra('qq_delivery_key')
             if plan:
-                try:verify_metadata(event.get_extra('qq_group_metadata'),request,event.get_extra('qq_group_response'),plan.canonical_text,self.output,event.get_extra('qq_v2_source'))
+                try:verify_metadata(event.get_extra('qq_group_metadata'),request,event.get_extra('qq_group_response'),plan.canonical_text,self.output,event.get_extra('qq_v2_source'),self.memory.cfg)
                 except Exception:plan=None;event.set_extra('qq_group_invalid',True)
             if plan and self.delivery_allowed(event):
                 if request['version']==2:event.set_extra('qq_v2_delivery_started',time.monotonic())
@@ -686,7 +703,7 @@ class QQRouter(Star):
                         self.group_turns.group_epoch(group)==epoch):
                         # Reverify identity even on abnormal framework exit before ACK attribution.
                         verify_metadata(metadata,event.get_extra('qq_group_request'),event.get_extra('qq_group_response'),
-                            plan.canonical_text,self.output,event.get_extra('qq_v2_source'))
+                            plan.canonical_text,self.output,event.get_extra('qq_v2_source'),self.memory.cfg)
                         confirmed=[(plan.parts[i].payload_ref,mid) for i,state,mid in self.tasks.parts(key)
                             if state=='sent' and mid and plan.parts[i].type=='text']
                         ticket.source=event.get_extra('qq_v2_source')
