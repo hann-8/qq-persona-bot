@@ -1,3 +1,5 @@
+2026-10-29 session LAP-43-step-log：用户要求查明原因、不猜测，必要时录日志，并再次强调不增加限制/过度编码。本轮仅补现有nativeStep诊断中的实际/期望字段，所有判断表达式保持原样；复用既有单次捕获，不主动真实模型/QQ。归属adapters/codebuddy_vision_guard/hooks/register.ts、config/vision-capabilities.json（来源摘要）、当前技术报告、43专属HANDOFF和本隔离台账；忽略归属state/cli-debug-step-deployment及一次性开关/active配对。基线main/4ae466b，生产干净，唯一执行者，无代理。
+
 本轮精确补充归属adapters/codebuddy_vision_guard/hooks/register.ts、config/vision-capabilities.json：只在现有失败回执附计划/请求/结果数量快照，并同步插件来源摘要；不改任何判断表达式。
 
 2026-10-29 session `LAP-43-once-log`续43：用户明确先临时记录一次实测日志，不再猜测修功能。起点生产main/2700200（LAP-44已部署），Git干净。隔离codex/lap43-once-log，唯一执行者，无代理。归属src/qqbot_gateway/workbuddy_cli_runner.py、tests/test_cli_runner.py，必要guard诊断状态快照（只记数不改判断）、当前native技术报告及43专属HANDOFF/报告/本隔离台账；忽略归属state/cli-debug和一次性开关、部署备份与配对active。只加可关闭的一次性采集：匹配下一条影之刃当前请求，保留CLI输出/错误/既有回执和校验状态，消耗后自动停录。不改工具/权限/预算/模型/persona/记忆，不主动真实模型/QQ，不修失败判断。历史请求648a1de253已先在生产本机私有目录归档。

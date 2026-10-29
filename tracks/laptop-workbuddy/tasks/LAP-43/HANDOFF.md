@@ -2,6 +2,10 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线HANDOFF](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [详细规划](PLAN.md) / [medium指令](MEDIUM_START.md)。继承根AGENTS边界；本任务不替代LAP-18/21/27/35/42的历史证据及未验差额。
 
+## 当前：补录步骤校验实际值，尚不修判断
+
+用户要求按日志查原因，不猜测、不扩编码/限制。上一条c42fc84d/e959a60b9b捕获已消费停录，确认模型返回WebFetch/WebSearch但native_step_identity拒绝；旧回执缺实际e值。本轮只在既有diagnostic附actual/expected index、max_turns、actual/expected model/effort、has_agent、within_deadline，历史计数沿用；校验表达式逐字比对未变，不修任何功能。复用影之刃单次开关，录一次自动停，不主动真实模型/QQ。基线4ae466b，source hash/active配对保持44后的配置、记忆和识图。
+
 ## 当前：临时一次性实测日志，不修改功能判断
 
 用户明确先记录实测，不再猜测/过度编码。session LAP-43-once-log，生产main/2700200（含44），本轮只归档已有11:40:37→11:40:47/648a1de253日志，并准备一次性影之刃请求采集：CLI stdout/stderr、现有guard回执和失败计数快照；消费后自动关闭，文件仅state/cli-debug本机忽略，不提交原始内容。不主动真实模型/QQ，不修任何失败判断。源码改变须按当前44后的配对流程保持识图和记忆可用；日志抓到后先读证据，再决定最小修复。归属见本隔离TASKS首段。

@@ -291,7 +291,9 @@ export function register(on, options) {
   async function nativeStep($,e,next){
     let entered=false;
     let releasePlan;
-    let diagnostic={};
+    let diagnostic={actual_index:e.index??null,expected_index:native.step,max_turns:web.max_turns,
+      actual_model:e.model??null,expected_model:q.model,actual_effort:e.effort??null,expected_effort:q.effort,
+      has_agent:!!e.agentId,within_deadline:Date.now()<=q.deadline};
     try{
       const prior=await readState($);
       need(!native.failed && !prior.stages.includes('refused') && prior.stages.includes('composed'),'native_ready');
@@ -320,7 +322,7 @@ export function register(on, options) {
           }else need(false,'native_history_type');
         }
       }
-      diagnostic={planned:native.planned.length,seen_calls:seenCalls.size,requests:native.requests.size,
+      diagnostic={...diagnostic,planned:native.planned.length,seen_calls:seenCalls.size,requests:native.requests.size,
         seen_results:seenResults.size,results:native.results.size};
       need(native.planned.length===0 && seenCalls.size===native.requests.size && seenResults.size===native.results.size &&
         seenCalls.size===seenResults.size,'native_history_complete');
