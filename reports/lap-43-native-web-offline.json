@@ -1,6 +1,6 @@
 {
-  "adapter_signature": "f54238e3a761c68dc914a2c9d1e62b39bd7243a7ccd76dcd508cb55f5ab4a9f9",
-  "binding": "d37637ffbf88d477aa21a60850709cead1af92aee90bfcd63ad1b6dfbf0ce223",
+  "adapter_signature": "695f01b4e8d154525314dae46af5a2ad4efef70df68895b08315b4d3b0540027",
+  "binding": "cf2a6750d6bc7675a95341809e57220357a377bd13e64dbefc054f4a00926f39",
   "budget": {
     "final_visible_policy_bytes": 31334,
     "limit": 524288,
@@ -17,7 +17,7 @@
     "reports/lap-42-vision-closure-sources.json": "7c24fa759b061c28e2dfc07e0a5d4195a10eaecdec18c5c190effa8119e4e640",
     "scripts/revalidate_lap43_native_web.py": "4bc1c461e8c3b70787f52fecfc69d4efacd494e839a4b9dcc199202aea519ac0",
     "tests/test_cli_native_web.py": "337a7eb0f797661e37e3eeb3ebcd9da326d7029a75295ada646158a3686b7a0e",
-    "tests/test_lap43.py": "cf66a2589f9c20ea7aa09fb57205a1344535ec332c3d3386b65f04098aa60d44",
+    "tests/test_lap43.py": "f0cc87c92e081fd167fb48edf4b3fef1300cfdaa8937ecee7233fed362ef4c48",
     "tests/test_lap44_memory.py": "a16bdd12d37552486066470bcce35606e9131e8aa0ca9f33d3faa6432e9acbe6",
     "tests/test_vision_mod_guard.py": "c5afb4053140b939549547669bc0c144315f0f5d0ce6ad25761560097a59051b"
   },
@@ -35,7 +35,7 @@
   "rule_hash": "94e97cd10eb6d03a76960946f7340910e92240ccba4ec48c30c96a0716b4cec4",
   "schema_version": 1,
   "static_missing": [],
-  "tests_run": 33,
+  "tests_run": 34,
   "thinking_enabled": false,
   "tool_policy": {
     "cli_max_tool_calls": 3,

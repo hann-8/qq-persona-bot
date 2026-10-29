@@ -1,3 +1,9 @@
+本session补充PROGRESS.md一条当前使用合同：用户只改config/local访问名单后重启；不新增任何用户配置入口。
+
+本session按用户最新要求改为修复local单入口的程序问题：access授权/屏蔽/管理员策略由原配置验证和gate执行，不应使模型识图技术凭证失效。仅从vision binding排除access配置，保留模型/预算/源码/视觉/其他政策绑定；无新配置文件或开关。补充源码归属src/qqbot_gateway/vision.py、tests/test_lap43.py，先隔离codex/lap43-local-access-start最小修复和定向验证，之后内部配对一次；用户继续只改config/local。
+
+2026-10-29 session LAP-43-access-rebind续43：用户手动关闭后启动报识图绑定/当前offline/probe缺失。只读实证当前源码adapter/runtime/record及proof文件hash均匹配，唯一语义变化access.allowed_groups由2项变3项；上一实例完整配置还原的binding等于旧active。保留用户新名单，仅重做当前配置离线报告/零生成probe/active配对并正常启动；不改代码/模型/local配置/persona/记忆，不主动真实模型/QQ。归属当前native离线报告、43 HANDOFF、本TASKS；忽略归属state/cli-access-rebind/20261029备份与新技术配对。生产main/2544680，Git初始干净，唯一执行者，无代理。
+
 2026-10-29 session LAP-43-sdk-error-result续43：用户授权查明后直接最小修复。最新实测6b78bdc2日志完整：identity值匹配，混合WebFetch成功/跨域跳转错误，native_result_history拒绝。锁定SDK在core抛错时保留原始错误，即使hook返回清理后的结果也不能覆盖；项目错误body固定文本比较不兼容。仅修明确错误回执的兼容/实际字节记账，成功回执严格比较不变，不增重试/权限/次数/模型调用。基线main/13f1621干净；隔离codex/lap43-sdk-error-result唯一执行，无代理。归属adapter register.ts、config/vision-capabilities.json来源摘要、test_cli_native_web.py一个回归场景、当前native报告、43 HANDOFF/排查报告/本隔离台账；忽略归属现有单次实测日志和配对部署备份。原始日志/群消息不提交。
 
 2026-10-29 session LAP-43-step-log：用户要求查明原因、不猜测，必要时录日志，并再次强调不增加限制/过度编码。本轮仅补现有nativeStep诊断中的实际/期望字段，所有判断表达式保持原样；复用既有单次捕获，不主动真实模型/QQ。归属adapters/codebuddy_vision_guard/hooks/register.ts、config/vision-capabilities.json（来源摘要）、当前技术报告、43专属HANDOFF和本隔离台账；忽略归属state/cli-debug-step-deployment及一次性开关/active配对。基线main/4ae466b，生产干净，唯一执行者，无代理。

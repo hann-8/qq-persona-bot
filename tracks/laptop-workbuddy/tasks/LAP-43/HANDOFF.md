@@ -2,6 +2,14 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线HANDOFF](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [详细规划](PLAN.md) / [medium指令](MEDIUM_START.md)。继承根AGENTS边界；本任务不替代LAP-18/21/27/35/42的历史证据及未验差额。
 
+## 当前：local访问名单变更不再阻断启动
+
+用户手动关闭后启动失败，实际源码/运行库/record/proof文件hash均匹配，唯一配置变化access.allowed_groups从2项变3项；上一实例配置复算binding精确等于旧active，因全配置绑定错误牵连识图。用户明确只使用local入口，不处理其它配置文件。
+
+程序最小修复：vision.binding只排除access字典，该字典仍由原配置验证及gate实施；模型/预算/视觉/源码/其它策略仍绑定。没有增加配置字段、开关、用户配置文件，也没改回用户名单。1个回归覆盖名单不影响binding、预算仍影响、输入字典不被修改；生产当前34项/零生成正反probe通过。只读将当前访问名单模拟为2/3/4项，完整load_production均通过（未写用户配置）。
+
+已正常启动：running/connected/can_receive/router_ready、current_error=null、pending_restart=false，加载授权群数3；识图试用和群记忆读写保持。16项local/persona/图库/pending保护与本轮开始时全部一致，用户三群配置未修改。当前binding cf2a6750d6bc7675a95341809e57220357a377bd13e64dbefc054f4a00926f39，备份/回执state/cli-access-rebind/20261029。旧active/probe/offline保留；若回滚不得覆盖用户新增群，旧代码在新名单下原有启动限制会回来。Git交付仅源程序/回归/当前技术报告与文档，原始本机配置不提交。没有真实模型或QQ输出验收；联网质量仍待用户试用。
+
 ## 当前：SDK错误回执兼容已修复部署，待用户正常试用
 
 用户授权查明后直接最小修复。6b78bdc2实测回执：actual_index=expected_index=1、模型相同、effort未提供（原条件允许）、has_agent=false、deadline有效；本次不是identity失配。一个WebFetch成功，另一个跨域跳转被CLI正常拒绝并提示用重定向URL重新抓取。SDK dispatchModsToolCall在core抛错后保留原错误；项目拟替换为151字节固定文本，实际CLI错误content为429字符（error字段422字符），严格正文比对native_result_history中止后续。

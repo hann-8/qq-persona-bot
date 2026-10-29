@@ -1,3 +1,5 @@
+2026-10-29启动修复：用户配置入口仍只有config/local。访问名单由原配置验证/gate执行，不再参与识图模型资格绑定；正常增减授权群、调整访问名单后直接重启，无需用户处理其它文件。本机新增第三群已保留并加载，实际running/connected/can_receive/router_ready；34项检查/零生成接线通过。见[43交接](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)。
+
 2026-10-29 LAP-44当前合同：群长期记忆采用schema2全文快照＋同次回复memory_updates增改删，模型决定内容/整理/遗忘；旧候选、句式、关键词和240字节/3条/8条/1536字节小限制停用，旧配置字段兼容但忽略。每群初始50000 Unicode字符、文件1048576字节、总8388608字节；所选CodeBuddy输入政策524288可见UTF-8字节，均可配置扩大并受真实C/F/V/O限制。保存后在投递台账前生成实际回执，重置只清短期上下文。模型/账号/low、thinking=false、free/owner、识图/表情和两工具3调用/4步骤/90秒/8000/12000保持。部署及验证结果以[LAP-44交接](tracks/laptop-workbuddy/tasks/LAP-44/HANDOFF.md)为准，QQ群效果待用户实测。
 
 # QQ bot项目入口：SnowLuma主线
