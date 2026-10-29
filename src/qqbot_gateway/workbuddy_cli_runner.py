@@ -4,6 +4,7 @@ import hashlib
 import json
 import logging
 import os
+import re
 from pathlib import Path
 import subprocess
 import tempfile
@@ -18,6 +19,21 @@ from .cli_control import ControlExchange, model_metadata
 from .token_budget import InputBudget, known_models, user_message
 
 LOG = logging.getLogger(__name__)
+
+
+def failure_summary(trace, code, parser, guard_state):
+    """Only bounded metadata; never subprocess text, queries, URLs or messages."""
+    from .errors import MESSAGES
+    tags={'unavailable','none','tool_identity_replay_or_limit','tool_validation_or_io','tool_hook_failure',
+        'native_step_validation','native_result_validation','step_validation_or_io','identity_projection_or_step',
+        'tool_envelope','tool_private','fetch_input','search_input','search_domains','search_url',
+        'tool_total_bytes','non_text_resource','result_private','tool_result_bytes','tool_io_or_invalid_json'}
+    safe_tag=lambda value: value if isinstance(value,str) and value in tags else 'suppressed'
+    return dict(schema=1,trace=trace if isinstance(trace,str) and re.fullmatch('[a-f0-9]{10}',trace) else '0000000000',
+        code=code if code in MESSAGES else 'BACKEND_UNAVAILABLE',initialized=parser.initialized,
+        tool_calls=len(parser.tool_calls),tool_results=len(parser.tool_results),
+        reason=safe_tag(guard_state.get('reason','unavailable')),
+        guard_reason=safe_tag(guard_state.get('guard_reason','unavailable')))
 
 
 class _MetadataReady(Exception):
@@ -433,6 +449,15 @@ class CLIRunner:
                 generation = 'BACKEND_UNAVAILABLE'
                 raise GatewayError('BACKEND_UNAVAILABLE') from None
             finally:
+                if generation not in ('pending','success','cancelled'):
+                    try:
+                        from .lifecycle import atomic_json
+                        try:observed=guard.read() if guard else {}
+                        except (OSError,ValueError):observed={}
+                        summary=failure_summary(owner.record.get('trace'),generation,parser,observed)
+                        self.last_parameters['failure_summary']=summary
+                        atomic_json(self.root/'state/cli-last-failure.json',summary)
+                    except OSError:pass
                 if probe and guard:
                     try:self.last_parameters['vision_guard_observed']=guard.read()
                     except (OSError,ValueError) as error:self.last_parameters['vision_guard_read_error']=str(error)

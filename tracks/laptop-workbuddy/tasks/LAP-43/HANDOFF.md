@@ -2,6 +2,17 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线HANDOFF](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [详细规划](PLAN.md) / [medium指令](MEDIUM_START.md)。继承根AGENTS边界；本任务不替代LAP-18/21/27/35/42的历史证据及未验差额。
 
+## 2026-10-29流式时序续修已部署，交用户实测
+
+session LAP-43-native-web-json-debug，用户在c2346cb反馈游戏搜索仍失败。10:41:56请求对应10:42:04/eba52f9466，CLI PID179216两个WebFetch均被项目deny；参数与计划一致、无敏感规则/私密ID命中，具体旧phase未保留。源码与离线复现确认流式工具事件可早于next(e)计划回执，现等待当前步准确计划再执行；兼容JSON字符串封套，拒绝冲突/畸形，白名单/次数/预算不扩。完整CLI替身实际观察e.input为对象，不能把trace字符串序列化冒充本次故障确证。
+
+隔离30项通过（当前43+runner），含21个实际适配器子场景和完整锁定CLI“两工具→最终答复”的零生成/零网络替身往返。对旧c2346cb验证新增3JSON+2时序用例均失败，新版通过。新增state/cli-last-failure.json，仅最后一次固定枚举/随机trace/计数，临时清理前保存且不带私密原文。沿用户已有授权已配对部署：生产check的22项及实际预算/static通过；真实CLI正例1本地user/0 next、反例0/0 user、生成0；受管正常停启后实际running/connected/can_receive/router_ready，current_error=null、pending_restart=false。不改local/persona/模型/额度/记忆，不主动真实生成/公共工具/QQ测试。详见[排查报告](../../../../reports/lap-43-native-web-debug.md)。
+
+当前binding e8a90ceae7a384e393a9431718c94899ed9e62254208be1e63eba363cd9fcbff，active SHA 45c1c391f0a38c634cc8a586669a4b8261cd0aaa6811c8d40ead6505a3ed8648；16项配置/persona/图库/pending保护不变，vision试用及memory读写true、thinking=false保持。备份/回执在state/lap43-web-json-deployment/20261029-1056，含c2346cb基线和active/offline/probe/能力表备份、配对及最终status；该次user_messages_sent=0。
+
+生产发现另一个session已领取LAP-44的PROGRESS/工作线HANDOFF/TASKS及LAP-44文档，均未覆盖/暂存/夹带。故仅从隔离2e0fe73取本次源码/测试及43专属报告/交接到main，独立提交；不是整分支快进。台账领取保存在隔离分支TASKS，本任务当前进度以本专属HANDOFF为准。回滚须正常停止后只配对恢复c2346cb中的本次代码/能力表/技术报告与active/probe备份，保留LAP-44文档、unknown和记忆，不复位main或删状态。Git交付后释放本session启停归属；用户自行群测，真实联网质量未由替身证明。
+
+
 ## 2026-10-29修复已部署main，交用户群测
 
 用户明确授权部署、commit/push，session `LAP-43-native-web-debug-deploy`唯一执行，无代理。正常停止受管实例后从1e607b7快进修复8dd9938及领取记录a8dd386；两处修复已加载。config/vision-capabilities.json仅同步当前插件来源摘要，未改能力、模型或上界；旧“未部署”段是前轮debug检查点，当前以本段为准。

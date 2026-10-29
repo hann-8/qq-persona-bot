@@ -81,7 +81,7 @@ export function register(on, options) {
       try {row=JSON.parse(await $.fs.read(q.receipt_root+'/'+entry.name));} catch {continue;}
       need(row.nonce===q.nonce && phaseNames.includes(row.stage),'phase_identity');
       stages.push(row.stage);
-      for(const key of ['reason','hook_error','diagnostic','registered_tools','catalog_tools','transcript_verified'])
+      for(const key of ['reason','guard_reason','hook_error','diagnostic','registered_tools','catalog_tools','transcript_verified'])
         if(row[key]!==undefined)current[key]=row[key];
       if(row.native_web && row.seq>lastProof){current.native_web=row.native_web;lastProof=row.seq;}
       if(row.stage==='next')calls++;
@@ -178,14 +178,19 @@ export function register(on, options) {
     if(!Object.prototype.hasOwnProperty.call(e,'input'))return flat;
     // The locked SDK's non-flat adapter carries both spread arguments and an
     // input copy. Require agreement before removing that transport envelope.
-    need(e.input && typeof e.input==='object' && !Array.isArray(e.input),'tool_envelope');
-    need(Object.keys(flat).length===0 || canonical(flat)===canonical(e.input),'tool_envelope');
-    return e.input;
+    let input=e.input;
+    if(typeof input==='string'){
+      need(bytes(input).length<=8192,'tool_envelope');
+      input=JSON.parse(input);
+    }
+    need(input && typeof input==='object' && !Array.isArray(input),'tool_envelope');
+    need(Object.keys(flat).length===0 || canonical(flat)===canonical(input),'tool_envelope');
+    return input;
   };
   const denyText='Native web call refused or unavailable; this request has not verified the claim.';
-  async function webDeny($,e,reason){
+  async function webDeny($,e,reason,guard_reason='none'){
     native.failed=true;
-    try{await receipt($,'refused',{reason,native_web:proof()});}catch{}
+    try{await receipt($,'refused',{reason,guard_reason,native_web:proof()});}catch{}
     return {deny:denyText};
   }
   if(web){
@@ -198,6 +203,9 @@ export function register(on, options) {
     }).catch(()=>({description:'Unavailable',isDeferred:false}));
     on('tool.call',async($,e,next)=>{
       try{
+        // Streaming CLI can dispatch a tool before turn.step's next() reply
+        // has crossed the Mod bridge. Wait for that exact plan, never guess it.
+        if(native.pendingStep)await native.pendingStep;
         const id=e.tool_use_id,args=argsOf(e),known=native.planned.find(x=>x.tool===e.tool && canonical(x.input)===canonical(args));
         // Synchronous reservation, before any await, closes parallel and replay gaps.
         if(native.failed || e.agentId || !web.allowed_tools.includes(e.tool) || typeof id!=='string' ||
@@ -238,11 +246,15 @@ export function register(on, options) {
         native.results.set(id,{text,result:clean,visible});
         await receipt($,'admitted',{native_web:proof()});
         return {result:clean};
-      }catch{return await webDeny($,e,'tool_validation_or_io');}
+      }catch(error){
+        const tag=/^Error: VISION_GUARD_([a-z_]{1,80})$/.exec(String(error));
+        return await webDeny($,e,'tool_validation_or_io',tag?tag[1]:'tool_io_or_invalid_json');
+      }
     }).catch(async($,e)=>webDeny($,e,'tool_hook_failure'));
   }
   async function nativeStep($,e,next){
     let entered=false;
+    let releasePlan;
     try{
       const prior=await readState($);
       need(!native.failed && !prior.stages.includes('refused') && prior.stages.includes('composed'),'native_ready');
@@ -285,6 +297,7 @@ export function register(on, options) {
       await receipt($,'context_cleared',{transcript_verified:true,native_web:proof()});
       if(q.mode==='probe'){await receipt($,'probe_short_circuit',{transcript_verified:true,native_web:proof()});return empty(e);}
       await receipt($,'next',{native_web:proof()});native.step++;entered=true;
+      native.pendingStep=new Promise(resolve=>{releasePlan=resolve;});
       const result=await next(e);
       need(!result.serverToolUses?.length,'server_tool');
       need((result.toolUses??[]).length+native.calls<=web.max_calls,'native_planned_limit');
@@ -297,6 +310,7 @@ export function register(on, options) {
       await receipt($,'completed',{native_web:proof()});
       return result;
     }catch(error){native.failed=true;return reject($,e,entered?'native_result_validation':'native_step_validation',{hook_error:String(error).slice(0,160),native_web:proof()});}
+    finally{if(releasePlan){native.pendingStep=null;releasePlan();}}
   }
 
   on('turn.step', async ($, e, next) => {

@@ -6,6 +6,7 @@ import os
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 from PIL import Image
 from qqbot_gateway.cli_web_policy import allowed_tools, native_contract, public_url, PROOF_FILES
@@ -86,17 +87,17 @@ if(variant==='search_drive')inputs[0].query='read C:/private.txt';
 if(variant==='search_backslash')inputs[0].query='read C:\\private.txt';
 if(variant==='search_unc')inputs[0].query='read \\\\server\\share';
 if(variant==='search_private_id')inputs[0].query='look up 123456789';
-let calls=0,steps=0;
-const e=i=>({turnId:'one-task',index:i,model:q.model,messageCount:rows.length});
-const first=await handlers['turn.step'](host,e(0),async event=>{
- steps++;return {...event,answer:'',toolUses:inputs.map(input=>({name:tool,input})),serverToolUses:[]};
-});
 const errors=[],outputs=[],events=[];
-await Promise.all(inputs.map(async(input,i)=>{
+let calls=0,steps=0,early=[];
+const invoke=async(input,i)=>{
  const id='sdk-call-'+i;
  try {
-  const result=await dispatchModsToolCall({name:tool,callId:id,input},async received=>{
-   if(JSON.stringify(received)!==JSON.stringify(input))throw Error('ARGUMENTS_CHANGED');
+  let wireInput=variant.includes('json')?JSON.stringify(input):input;
+  if(variant==='fetch_invalid_json')wireInput='{';
+  if(variant==='fetch_array_json')wireInput='[]';
+  if(variant==='fetch_null_json')wireInput='null';
+  const result=await dispatchModsToolCall({name:tool,callId:id,input:wireInput},async received=>{
+   if(JSON.stringify(received)!==JSON.stringify(wireInput))throw Error('ARGUMENTS_CHANGED');
    calls++;return {content:'public fact https://example.com/news/'+i,title:'Public page'};
   },{dispatch:async(name,event,options)=>{
    events.push(event);
@@ -105,7 +106,14 @@ await Promise.all(inputs.map(async(input,i)=>{
   }},variant.includes('flat'));
   outputs[i]={id,input,result};
  } catch(error){errors.push(String(error));}
-}));
+};
+const e=i=>({turnId:'one-task',index:i,model:q.model,messageCount:rows.length});
+const first=await handlers['turn.step'](host,e(0),async event=>{
+ steps++;
+ if(variant.includes('race'))early=inputs.map(invoke);
+ return {...event,answer:'',toolUses:inputs.map(input=>({name:variant.includes('badplan')?'Read':tool,input})),serverToolUses:[]};
+});
+await Promise.all(variant.includes('race')?early:inputs.map(invoke));
 for(const out of outputs.filter(Boolean))rows.push(
  {role:'assistant',content:[{type:'tool_use',id:out.id,name:tool,input:out.input}]},
  {role:'user',content:[{type:'tool_result',tool_use_id:out.id,content:JSON.stringify(out.result)}]});
@@ -212,8 +220,9 @@ class NativeTests(unittest.TestCase):
         adapter=module[module.index('let eu=["tool"'):]
         self.assertTrue(adapter.endswith('}'))
         adapter='import * as ed from "node:util";\n'+adapter+'\nexport {dispatchModsToolCall};\n'
-        refused=('fetch_conflict','search_drive','search_backslash','search_unc','search_private_id')
-        for variant in ('search','search_flat','search_url','fetch','fetch_parallel','fetch_flat','fetch_http',*refused):
+        refused=('fetch_conflict','search_drive','search_backslash','search_unc','search_private_id',
+            'fetch_invalid_json','fetch_array_json','fetch_null_json','fetch_race_badplan')
+        for variant in ('search','search_flat','search_url','search_json','fetch','fetch_json','fetch_parallel','fetch_parallel_json','fetch_race','fetch_parallel_race_json','fetch_flat','fetch_http',*refused):
             with self.subTest(variant=variant), tempfile.TemporaryDirectory() as folder:
                 work=Path(folder)
                 policy=native_contract(validate_web(dict(engine='codebuddy_cli',enabled=True,search_enabled=True)),(),InputBudget(limit=48000))
@@ -230,7 +239,7 @@ class NativeTests(unittest.TestCase):
                     self.assertTrue(value['errors'])
                     self.assertIn('refused',proof['stages'])
                 else:
-                    self.assertEqual(value['calls'],2 if variant=='fetch_parallel' else 1,(value,proof.get('reason'),proof.get('hook_error')))
+                    self.assertEqual(value['calls'],2 if 'parallel' in variant else 1,(value,proof.get('reason'),proof.get('hook_error')))
                     self.assertEqual(value['errors'],[])
                     self.assertEqual(value['steps'],2)
                     self.assertNotIn('refused',proof['stages'])
@@ -239,6 +248,70 @@ class NativeTests(unittest.TestCase):
 
 
 class NativeOutputTests(unittest.IsolatedAsyncioTestCase):
+    async def test_actual_cli_tool_roundtrip_without_remote_generation(self):
+        from qqbot_gateway.workbuddy_cli_runner import CLIRunner
+        from qqbot_gateway import vision_mod_guard,hosted_cli_budget
+        from test_lap42_vision import settings
+        lock=json.loads((ROOT/'config/versions.lock.json').read_text(encoding='utf-8'))
+        entry=ROOT/lock['cli']['entry']
+        bundle=Path(os.environ.get('QQBOT_TEST_CLI_BUNDLE',str(entry.parent.parent/'dist/codebuddy-headless.js')))
+        if not bundle.is_file():self.skipTest('locked CLI bundle is not installed')
+        self.assertEqual(hashlib.sha256(bundle.read_bytes()).hexdigest(),lock['cli']['headless_sha256'])
+        fixture=r'''
+export function register(on, options) {
+  let calls=0;
+  productionRegister((name,handler)=>{
+    if(name==='turn.step')return on(name,($,e)=>handler($,e,async event=>{
+      // No original next is reachable: this replaces every model request.
+      if(event.index===0)return {...event,answer:'',toolUses:[0,1].map(i=>({name:'WebFetch',
+        input:{url:'https://example.com/news/'+i,prompt:'Read public facts'}})),serverToolUses:[]};
+      return {...event,answer:'Synthetic final answer',toolUses:[],serverToolUses:[]};
+    }));
+    if(name==='tool.call')return on(name,async($,e)=>{
+      await $.fs.write(JSON.parse(options.request).receipt_root+'/fixture-'+(++calls)+'.json',
+        JSON.stringify({input_type:typeof e.input,keys:Object.keys(e)}));
+      // No original next is reachable: this replaces every network tool core.
+      return handler($,e,async()=>({result:{content:'Synthetic public fact https://example.com/news',title:'Synthetic'}}));
+    });
+    return on(name,handler);
+  },options);
+}
+'''
+        receipts=[]
+        class FixtureGuard(Guard):
+            def __init__(self,*args,**kwargs):
+                super().__init__(*args,**kwargs)
+                path=self.root/'hooks/register.ts'
+                source=path.read_text(encoding='utf-8').replace('export function register(on, options)',
+                    'function productionRegister(on, options)',1)+fixture
+                path.write_text(source,encoding='utf-8')
+                self.request['assets']['hooks/register.ts']=hashlib.sha256(path.read_bytes()).hexdigest()
+                self.serialized=json.dumps(self.request,ensure_ascii=False,separators=(',',':'))
+                path=self.root/'.codebuddy-plugin/plugin.json';value=json.loads(path.read_text(encoding='utf-8'))
+                value['userConfig']['request']['default']=self.serialized;value['options']['request']=self.serialized
+                path.write_text(json.dumps(value,ensure_ascii=False),encoding='utf-8')
+                self.manifest_hash=hashlib.sha256(path.read_bytes()).hexdigest()
+            def finish(self):
+                receipts.extend(json.loads(p.read_text(encoding='utf-8')) for p in self.receipt_root.glob('fixture-*.json'))
+                return super().finish()
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder);(root/'config').mkdir()
+            lock['cli']['entry']=str(bundle.parent.parent/'bin/codebuddy')
+            (root/'config/versions.lock.json').write_text(json.dumps(lock),encoding='utf-8')
+            (root/'config/cli-tools-denied.json').write_bytes((ROOT/'config/cli-tools-denied.json').read_bytes())
+            (root/'config/mcp-empty.json').write_bytes((ROOT/'config/mcp-empty.json').read_bytes())
+            runner=CLIRunner(root,'deepseek-v4.1-flash',timeout=40,reasoning_effort='low',budget=InputBudget(limit=48000))
+            runner.native_web=True;runner.web_config=validate_web(dict(engine='codebuddy_cli',enabled=True,search_enabled=True))
+            runner.vision_settings=settings();runner.vision_settings['vision']['enabled']=False
+            upper=json.loads((ROOT/'reports/lap-42-vision-closure-sources.json').read_text(encoding='utf-8'))['framework_upper_bytes']
+            with patch.object(vision_mod_guard,'Guard',FixtureGuard),patch.object(hosted_cli_budget,'framework_upper',return_value=upper):
+                result=await runner.run('Synthetic project policy','Synthetic public question','native-loop-fixture')
+            self.assertEqual(result.text,'Synthetic final answer')
+            self.assertEqual(result.parameters['native_web']['calls'],2)
+            self.assertEqual(len(result.parameters['native_web']['steps']),2)
+            self.assertEqual(len(receipts),2)
+            self.assertTrue(all(r['input_type'] in ('string','object') for r in receipts),receipts)
+
     async def test_health_reports_loaded_native_and_memory_without_generation(self):
         from test_model_gateway import FakeRunner
         from qqbot_gateway.model_gateway import ModelQueue,application
