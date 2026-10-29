@@ -1,8 +1,8 @@
 # LAP-44：本群记忆全文进入上下文
 
-返回 [PROGRESS](../../../../PROGRESS.md) / [HANDOFF](HANDOFF.md) / [TASKS](../../TASKS.md)。
+返回 [PROGRESS](../../../../PROGRESS.md) / [HANDOFF](HANDOFF.md) / [TASKS](../../TASKS.md) / [交给 sol/medium 的实施 prompt](MEDIUM_START.md)。
 
-状态：**设计完成，待用户 review；尚未实施或部署。** 2026-10-29。仅 SnowLuma 主线，不操作原 NapCat 根。
+状态：**用户已 review 总体方向，详细规划及 medium prompt 已补齐；尚未实施或部署。** 2026-10-29。用户提交实施 prompt 后同轮落地，不再追加一轮规划审批。仅 SnowLuma 主线，不操作原 NapCat 根。
 
 ## 先看这几项决定
 
@@ -10,20 +10,20 @@
 | --- | --- |
 | 模型看到什么 | 每次收到授权群新消息并进入模型时，提供本群现有记忆全文；不跨群 |
 | 谁决定记什么 | 当前聊天模型，包括新增、更新、合并、遗忘；不再用 Python 判断内容是否值得记 |
-| 每群容量 | 正文合计 50,000 Unicode 字符；不另设单轮注入字数、单条 240 字节、每轮 3 条等内容限额 |
+| 每群容量 | 正文合计初始 50,000 Unicode 字符，可配置扩大；不把默认值写成校验上限，不另设单轮注入字数、单条 240 字节、每轮 3 条等内容限额 |
 | 如何读 | 完整提供；无关键词检索、相关性排序、向量库、摘要层或按成员筛掉其他记忆 |
 | 如何写 | 模型在同一次回复中附带少量增改删；程序直接应用并原子保存，不要求每次重写全文 |
 | 如何整理 | system prompt 指导模型平时去重、更新、合并；接近容量时自行整理，不按时间强删、不新增压缩任务 |
 | 成本 | 接受全文带来的输入增长；不新增模型调用、后端、账号、付费 API 或记忆工具 |
-| 输入预算 | 所选 CodeBuddy 档位由 48,000 调至 524,288 可见 UTF-8 字节，容纳 5 万字符及实际封套；不是每轮固定消耗这么多 |
+| 输入预算 | 所选 CodeBuddy 档位初始由 48,000 调至 524,288 可见 UTF-8 字节，所有层读取同一配置，以后可继续提高至实际模型容量允许的范围；不是每轮固定消耗这么多 |
 | 保存反馈 | 写入完成后产生实际结果；明确记忆请求显示真实回执，不把模型说“记住了”当写入证据 |
-| 落地节奏 | 用户 review 后，收到实施指令即同轮实现、必要检查、受管部署及 Git 交付；用户自行群测，不再逐阶段等批准 |
+| 落地节奏 | 总体方向已 review；用户提交 MEDIUM_START 即授权同轮实现、必要检查、受管部署及 Git 交付；用户自行群测，不再逐阶段等批准 |
 
 ## 1. 需求、非目标与当前问题
 
 用户希望有趣、自然、可用优先，接受增加输入消耗。记忆是否有意义、如何表达和什么时候更新，由模型决定。所有记忆都可覆盖，不设计永久/固定记忆；不把“节省输入”变成检索系统或严苛内容门槛。
 
-本轮只设计，不改代码、本机配置、人设、实际记忆或进程。设计交付不自动授权部署。沿 AGENTS 的规划→用户 review→后续实施约定，下一次实施应一次完成，不重新索取已给出的同范围授权。规划角色要求 gpt-6.1-sol/max 及以上，实施要求 gpt-6.1-sol/medium；模型/档位由用户设置，工具未自动检测或切换。
+本轮只设计，不改代码、本机配置、人设、实际记忆或进程。用户已 review 总体方向，明确要求详细规划和可交 medium 的 prompt，并要求容量/预算留出扩展接口。设计交付不自动执行部署；用户随后提交 [MEDIUM_START](MEDIUM_START.md) 即按其明示范围同轮落地，不重新索取同范围授权。规划角色要求 gpt-6.1-sol/max 及以上，实施要求 gpt-6.1-sol/medium；模型/档位由用户设置，工具未自动检测或切换。
 
 旧问题：用户现场反馈明确要求记住称呼、bot 确认后重置上下文却无法回忆。前轮只读投递记录与该顺序一致；目前三个记忆文件均为 schema 1、records=0、applied_txns=0。日志缺少候选产生、过滤及提交的逐段计数，**具体首个丢失点尚未定位**。不把句式误判直接当成全部根因，也不从旧聊天日志回填私密内容。
 
@@ -39,6 +39,10 @@
 | `src/qqbot_gateway/web_retrieval.py`、`model_gateway.py` | 当前联网轮次会清空记忆候选，prepared_plan 也可能跳过原解析；新路径完整保留对本群人类发言的记忆更新，不按用了联网工具就清空 |
 | `plugins/qq_router/main.py` | 已有 prepare→元数据校验→stage→投递台账→ACK；复用此链。重置只清短期窗口，长期记忆应继续存在 |
 | `config/local/models.yaml`、`token_budget.py`、`hosted_cli_budget.py` | 当前 48,000 为项目字节政策，非真实 token 计费；本地已登记当前模型 1,000,000 输入/128,000 输出容量，仍须保留实际 CLI 帧校验 |
+| `group_memory.validate_config`、`config.normalize_settings` | 现有 memory 数值被 `integer(v,1,DEFAULTS[k])` 限死在默认值，CLI 输入也有固定数字校验；必须区分“默认值”与“最大允许值”，避免配置看似能改实际被拒绝 |
+| `adapters/codebuddy_vision_guard/hooks/register.ts` native_policy、`cli_web_policy.native_contract` | Python 已用 budget.limit 生成 visible_limit，但 TS 仍硬限 `web.visible_limit<=48000`；必须改成配置/真实容量派生校验，不能换成 `<=524288` 的新常量 |
+
+原设计基于 c2346cb。生产 main 后续 b0b4573 的流式正文/工具计划同步、SDK 参数封套、URL 与安全诊断修复已合入本设计分支作为现有历史，必须保留；本轮没有重新编写这些代码或部署它们。实施前仍需读取最新 main 与 43 HANDOFF。
 
 以上是本轮源码/磁盘核对及前轮现场证据，不等于新方案已经运行通过；不提交原始群消息、账号、群号、密钥或 CLI trace。
 
@@ -99,14 +103,21 @@
 | 配置/政策 | 当前 | 拟实施值及生效方式 |
 | --- | --- | --- |
 | memory.enabled / learning_enabled | 当前均 true | 保持；新安装缺省仍 false，不自动给所有用户启用 |
-| memory.max_chars_per_group | 无 | 新字段默认 50,000；`sum(len(text) for text in records.values())`，按 Unicode code point 计数，空白/标点也计入，emoji 视觉字形可能占多个字符 |
-| memory.max_group_file_bytes | 65,536 | 默认 1,048,576；是 JSON/元数据磁盘保护，不替代正文字符计数 |
-| memory.max_groups / max_total_bytes | 16 / 8,388,608 | 保持现有磁盘资源保护，无后台整理服务 |
+| memory.max_chars_per_group | 无 | 新字段初始默认 50,000，可改 100,000 或更高；`sum(len(text) for text in records.values())`，按 Unicode code point 计数，空白/标点也计入，emoji 视觉字形可能占多个字符 |
+| memory.max_group_file_bytes | 65,536 | 新默认 1,048,576；本机旧 65,536 需随迁移明确提升，不能只改模板。是可继续提高的 JSON/元数据磁盘保护，不替代正文字符计数 |
+| memory.max_groups / max_total_bytes | 16 / 8,388,608 | 初始保留磁盘资源保护，但允许配置超过默认值，无后台整理服务；扩大正文时可同步提高这些配额 |
 | 旧 max_records/max_fact_bytes/max_prompt_records/max_prompt_bytes/max_proposals_per_turn/max_record_bytes | 多重小限额 | 新路径全部停用；旧 local 字段兼容读取并明确忽略，模板不继续宣传生效；不悄悄被旧 1536/240/3 门槛卡住 |
-| 所选 CodeBuddy input_budget.context_input_limit_tokens | 48,000 | 本机所选档位拟调 524,288；历史字段名带 tokens，但此 CLI 路径实际是可见 UTF-8 字节政策；不改家庭本地 profile 或其他模型/账号 |
+| 所选 CodeBuddy input_budget.context_input_limit_tokens | 48,000 | 本机所选档位初始调 524,288，可继续配置提高；历史字段名带 tokens，但此 CLI 路径实际是可见 UTF-8 字节政策；不改家庭本地 profile 或其他模型/账号 |
 | reserve / tools / steps / timeout / thinking | 原有值 | overhead/output=2048、视觉 reserve=4096；两工具、3调用/4步骤/90秒、单结果8000/总12000、thinking=false 保持 |
 
-这些配置需正常重启受管实例并与 vision/native-web 当前完整绑定配对才生效；本轮均不修改。模板提供新能力默认值，现有 48,000 本机档位的提升按用户 review 后的实施指令执行，不全局放宽其他 profile。
+这些配置需正常重启受管实例并与 vision/native-web 当前完整绑定配对才生效；本轮均不修改。模板提供新能力默认值，现有 48,000 本机档位的提升按后续实施 prompt 执行，不全局放宽其他 profile。
+
+**单位和扩展接口：** 50,000 Unicode 字符通常可容纳约 5 万普通汉字，并不是 1 万多汉字；50,000 UTF-8 字节才约为 1.6 万普通汉字。界面/注释分别写“字符数”和“UTF-8字节”，不能混用。50,000、524,288、1MiB 都是初始配置，不是新的产品天花板。
+
+- 字符、文件、群数、总磁盘配额都来自已加载 settings；memory 的整数校验只管正整数/安全数字格式，不再以上述默认值为 upper bound。`valid_memory`、迁移、store、gateway/manifest、schema 校验与 prompt 的容量说明都接收同一运行配置，不在各层复制第二份“5万”常量，不采信模型输出自称的更大额度。
+- CLI 输入政策只设有效数字与实际能力/完整绑定校验；移除无业务依据的默认值上限。TS 原生联网 guard 校验 visible_limit 来自已验证宿主请求且为合法正整数，在当前 C/F/V/O 余量内；实际每步仍校验可见输入与真实上下文总量。不能只是把 48000 换成 524288，也不能去掉最终容量检查。
+- 后续将容量改成 100,000 时，应通过 features.yaml 改 max_chars_per_group，并按需要在同一文件提高 file/total 配额、在所选 models.yaml 档位调整 input_budget。模型不变且实际容量足够时无需改代码。配置应用/正常重启/已有技术配对步骤在使用说明给出实际命令；不能把“文件已保存”冒充“进程已加载”。
+- 不自动把更大额度当成当前已获得授权的模型/账号切换，不另开自动扩预算服务。真实容量不足时给出配置值、实际字节与触发的限制，不删记忆凑进去。降低配额也不自动抹掉已有数据。
 
 50,000 个中文字符正文约 150,000 字节，50,000 个四字节字符约 200,000 字节。转义和嵌套 JSON 也必须计入：本轮纯本地合成示例单条 5 万反斜线封套为 400,300 字节，故不再拿 48,000 当模型天花板，也不只按“中文×3”设过紧预算。524,288 是允许增长的上限，实际只发送已有内容，不填充预算。
 
@@ -130,13 +141,13 @@
 
 1. 先在 `codex/lap-44-full-memory` 隔离分支实现，重新读 PROGRESS/本 HANDOFF/TASKS，登记唯一执行归属并保护生产未提交修改。只领取 LAP-44。
 2. `src/qqbot_gateway/group_memory.py`：简化 schema 2、完整快照、稳定成员映射、增改删事务、结果日志与 schema 1 迁移；保留项目命名空间/key/锁/原子写入基础。
-3. `src/qqbot_gateway/{turn_v2,persona,backends,model_gateway,web_retrieval}.py` 与 `plugins/qq_router/main.py`：新字段、全文 manifest/fit/验证、联网/预制计划贯通、真实回执、重置连续性。`workbuddy_cli_runner.py` 仅在现有缓冲/帧上限确需适配时最小调整；不修改第三方 CLI。
+3. `src/qqbot_gateway/{turn_v2,persona,backends,model_gateway,web_retrieval}.py` 与 `plugins/qq_router/main.py`：新字段、全文 manifest/fit/验证、联网/预制计划贯通、真实回执、重置连续性。`workbuddy_cli_runner.py` 仅在现有缓冲/帧上限确需适配时最小调整，并保留 b0b4573 的流式工具计划同步；不修改第三方 CLI。
 4. `src/qqbot_gateway/{config,config_comments}.py`、features 模板/示例及 `config/README.md`：新字符限额、旧小限额兼容说明。所选本机 models/features 的精确变更保持忽略；其他 profile/秘密/persona 不变。
 5. `scripts/manage.py` 及已有 memory 管理命令接点：schema 2 本机查看/删除/导出兼容，健康仅统计字符/条数/最近保存状态，不公开内容；模型对条目的遗忘是本功能内行为，不获得清 key、删命名空间或配置运维权限。
-6. 必要时对 `src/qqbot_gateway/{vision_trial,vision_mod_guard,hosted_cli_budget}.py`、`config/vision-capabilities.json` 和现有 revalidate/probe 脚本做配对适配，仅处理本次政策/源码完整绑定变化，不伪造新质量分数，不静默关已有识图。
+6. `adapters/codebuddy_vision_guard/hooks/register.ts` 必须去掉 native_policy 中固定 48000 输入门槛，使用同一已验证运行预算/容量，不扩大工具白名单、次数/结果上限或90秒。同步 `src/qqbot_gateway/{cli_web_policy,vision_mod_guard,hosted_cli_budget,vision_trial}.py`、`config/vision-capabilities.json` 及现有 revalidate/probe 接点中的政策与签名；保留 b0b4573 的 SDK/流式同步/诊断修复，不伪造新质量分数，不静默关已有识图。
 7. 定向检查通过后，经正常 stop 备份/快进 main/本机迁移和配置更新/当前技术绑定检查与配对 activate/正常 start，一次部署。保留 thinking=false、当前模型、账号、额度、free、owner、联网、表情、人设。同步 AGENTS/使用说明/PROGRESS/HANDOFF/TASKS 的当前合同，按长期授权 commit/push 并核对远端。
 
-用户 review 通过后再发实施指令；该轮落实同轮部署，不再按 1～7 逐条等待批准。若出现真正无法安全处理的数据或模型能力缺口，交付独立完成部分并说明具体阻断；一般实现细节自行解决。用户 QQ 群试用是效果验收，不给每个旧 LAP 补做大批次测试。
+用户已 review 总体方向；随后提交 MEDIUM_START 即实施指令，该轮落实同轮部署，不再按 1～7 逐条等待批准。若出现真正无法安全处理的数据或模型能力缺口，交付独立完成部分并说明具体阻断；一般实现细节自行解决。用户 QQ 群试用是效果验收，不给每个旧 LAP 补做大批次测试。
 
 ## 9. 迁移、必要检查与回滚
 
@@ -147,6 +158,7 @@
 - 首次空库新增→原子文件含文本→清 RAM→重新读取→正常重启后同样读回；不需要先有一条记忆才能学习。
 - 自由概括、非固定句式、旧宽泛关键词、合并/覆盖/删除可通过；无 240 字节/3条/8条/1536字节/未出场成员筛选残留。
 - 5 万字符中文/emoji/转义样本完整进入模型材料，manifest/fit/native-web 保持一致；50,001 字符不部分写入，超输入不悄悄裁记忆。
+- “可配置扩大”必须用高于默认值的合成配置验证：max_chars_per_group=100000、max_group_file_bytes=2097152、max_total_bytes=33554432，所选 CLI 输入政策=786432。至少装入超过50000字符的记忆验证读写/全文传递，原生联网插件接受该合法政策且不再被48000/524288常量拒绝；仍拒绝超实际C/F/V/O容量的请求，不调用真实模型。当前登记容量下 `786432+8985+1024+128000=924441<1000000`，测试可复用已有锁定 SDK 替身。
 - 模型无动作、aux 格式错误、文件写失败、CAS 冲突、hook 重入各有准确结果；原文件保留，revision/回执/投递 hash 一致。
 - 两个合成群互不混入；稳定成员标记在重置后仍对应同一个人。联网有/无调用、prepared_plan、识图/受控表情和明确保存回执的关键组合通过。
 - 既有 owner 暂停/恢复/重置、模型/额度/工具白名单、thinking=false 不扩大；当前配置与源码的技术绑定有效。复用已有零生成 CLI probe，不主动真实生成或群发验证。
@@ -157,6 +169,57 @@
 
 ## 10. 本轮交付边界
 
-仅五份文档，用户 review 后才能实施。写作期间发现生产目录出现另一会话的 LAP-43 联网修复改动，本设计已搬到普通 Git worktree `E:/CodexWS/QQbot_LAP44_plan`、分支 `codex/lap-44-full-memory-plan` 独立交付，生产目录中本轮添加的文档内容已定向移回，其他修改保留。受管 worktree 接口不接受当前聊天未登记的 Snow 根，故使用普通 Git worktree；不改变聊天实际生产根。下一轮先取最新 main 并核对并行修复，把本设计文档提交接入后实施，不强推或覆盖生产差异。
+初次交付为五份文档，本轮在同一独立分支补齐详细扩展合同和第六份 MEDIUM_START.md。用户已 review 总体方向，提交实施 prompt 后即可实施。初次写作期间生产目录出现另一会话的 LAP-43 联网修复改动，本设计已搬到普通 Git worktree `E:/CodexWS/QQbot_LAP44_plan`、分支 `codex/lap-44-full-memory-plan` 独立交付，生产目录中本轮添加的文档内容已定向移回，其他修改保留。受管 worktree 接口不接受当前聊天未登记的 Snow 根，故使用普通 Git worktree；不改变聊天实际生产根。本轮已将 main/b0b4573 作为既有历史合入设计分支，下一轮仍先核对最新 main，再接入本设计实施，不强推或覆盖生产差异。
 
 当前实际成本/延迟、模型遵循新协议的质量、5 万字符长期使用体验、部署后的真实重置回忆均未验证；不宣称记忆故障已修复。不把已停止的旧路线或旧验收差额转成新前置。
+
+## 11. 给 medium 的实现细节与验收落点
+
+以下补齐前文协议边界，不新增产品功能或审批阶段。实施入口是 [MEDIUM_START](MEDIUM_START.md)。
+
+### 11.1 协议与接口
+
+- source.memory 的 v2 视图形状为 `{generation,base_revision,records,actors}`；records 是全部 `id -> text`，actors 是当轮临时 member_ref 到本群稳定匿名成员标记的映射。宿主提供实际稳定标记，不能要求模型记住每次重置都变化的临时 p_ref。模型给记忆文本自由组织人物/事件；宿主不再解析文本类别。
+- 磁盘 schema 2 使用前文的六个字段加 last_request_key，拒绝重复 JSON 键、非法 UTF-8/无效 Unicode 或非字符串正文等格式错误；空字符串新增视为无效格式，不建空条目。模型不提供路径、时间、权限、generation 或 revision。
+- `memory_updates` 是对象；`new_<正整数>` 的非空字符串表示新增，正式 ID 由宿主生成；既有 ID 的非空字符串表示覆盖，null 表示删除。未知既有 ID/新增 null/错误类型为无效变更，整批保留旧文件。容量看应用全部增改删后的最终状态，允许同批先减后增，不因中间状态暂时超限拒绝。
+- `memory_receipt` 是布尔值，缺失默认 false 并记录 aux_missing；missing memory_updates 记为“未提出动作”，不能记成提交成功。无动作/aux 错误不自动进行第二次模型调用；正常聊天正文可以沿现有恢复路径处理，但错误的更新不捞取、不静默部分提交。明确保存请求应由模型按 prompt 置回执 true。
+- 旧 memory_proposals 不再驱动 schema 2 写入；兼容解析时只记录 legacy_aux_ignored，不继续保留两套语义筛选器。模型正文输出的成功措辞不是保存证据，不给它授予操作权限。
+
+### 11.2 system prompt 的合成例子
+
+只在示例上下文已提供稳定标记 `u_00000000000000000000000000000001` 时使用它。首次请求“以后叫我小青”的完整模型最终对象示例为：
+
+```json
+{"qqbot_turn_reply":2,"decision":"speak","kind":"chat","bubbles":["好，以后叫你小青。"],"meme_id":null,"response_to_seq":1,"mention":null,"memory_updates":{"new_1":"u_00000000000000000000000000000001 希望被称为小青。"},"memory_receipt":true}
+```
+
+成功措辞由宿主在保存之后添加；模型例子故意不说已经写入。清上下文后询问称呼，可凭完整 records 回答，memory_updates={}；不应为了每次使用旧记忆重复新增。
+
+更新偏好时，将已有 ID 覆盖成新认识；合并同一经历时，对保留 ID 写合并文本、对其余既有 ID 写 null。给模型分别演示这两个 aux 片段即可，不添加原句精确匹配或候选状态。所有例子为人工合成，不复制用户原始群消息。
+
+### 11.3 存储/迁移/回执的具体失败分支
+
+- 启停与数据迁移由唯一实施者执行。停机后重查 schema 1 实际内容；空库迁移有效空 records，非空库保留所有事实及归属，旧候选可在文字中标明未确认，不把它当成已确认事实，也不偷偷丢掉。新 generation、revision=0 明确标记协议升级，保留独立原件，不因迁移宣称学习成功。
+- 先获得有效当前快照和访问/连接/epoch许可，再在项目锁内做 CAS 和原子写入；key/schema异常不重建空库。只有正文真实变化才增加 revision；同请求 hook重入返回已有结果或已有去重状态，不再随机生成重复条目。
+- 人类消息记忆在 reply ACK 前已可持久化；当前尚未发送的 bot 承诺只通过 prompt 要求不写成“已送达”。不继续保留旧复杂 ack_parts 提案系统。QQ发送失败和磁盘保存失败是不同结果，日志必须区分。
+- 在 gateway 原始元数据校验之后保存，在最终投递台账之前组装本地回执，重新使用现有合法计划构造器计算最终正文、部件和hash。若明确请求回执但未保存，回执必须准确；不能先签名/登记旧正文后再字符串拼接。mixed文字/表情/@和mentions个人历史路径也要使用同一最终内容，防止台账/历史/ACK不一致。
+
+### 11.4 检查组织和扩容示例
+
+建议以一个 `tests/test_lap44_memory.py` 承担核心数据/配置/失败分支，用已有 v2/AstrBot/CLI guard 接线测试补关键组合；用参数化覆盖边界，避免为每个小字段建立镜像测试。实施者可按现有测试组织合并文件，不重复跑与变更无关的大矩阵。原生 guard 的扩预算正反例可复用 test_cli_native_web 和当前锁定 SDK 适配器替身；现有零生成 probe 留作最终一次接线检查。
+
+扩容配置的文档例子（只在合成验证中使用；生产初始值仍见第6节）：
+
+```yaml
+# config/local/features.yaml，合并到现有 memory 节，不整份覆盖文件
+memory:
+  max_chars_per_group: 100000       # Unicode字符；超过初始50000也应被接受
+  max_group_file_bytes: 2097152     # JSON文件UTF-8字节，可继续配置提高
+  max_total_bytes: 33554432         # 总磁盘配额，可继续配置提高
+
+# config/local/models.yaml，只合并到已选 codebuddy_cli 档位 input_budget
+# input_budget:
+#   context_input_limit_tokens: 786432  # 当前CLI路径实际按可见UTF-8字节政策核对
+```
+
+字符值和预算值同时大于初始默认，才能证明接口可扩大。未来需要更大容量时仍复用同一配置/加载/配对接口；超过当前真实上下文可用余量属于模型能力边界，不制造无限预算承诺。运行状态需展示磁盘与加载值、字符/文件/总配额及实际超限原因，方便用户以后只调配置，不到处改源码常量。

@@ -1,3 +1,7 @@
+2026-10-29 LAP-44 medium交接完成：详细PLAN/MEDIUM_START补齐，6文档归属/UTF-8/围栏、28本地链接、统一配置/单位/扩容合同、diff --check通过；测试要求包含100000字符/786432字节合法扩容与真实容量反例，尚未运行功能测试。既有main/b0b4573经fec402d合入保留；本轮新增修改仅6文档，生产配置/进程/记忆未动。独立分支commit/push并核对后释放归属；下一步用户将MEDIUM_START提交sol/medium，同轮完成实现、必要检查、启用和部署，不再追加规划审批。
+
+2026-10-29 11:13（Asia/Shanghai）：session `LAP-44-medium-handoff-plan`续领44文档。用户已review总体方向，要求补齐详细规划与可直接交sol/medium的prompt，容量/预算可配置、以后可扩大、不要卡死。工作根E:/CodexWS/QQbot_LAP44_plan，分支codex/lap-44-full-memory-plan，起点3642b97，初始干净；生产main已推进到b0b4573，先同步其既有修复历史，保留全部成果。本session仅拥有6文档：PROGRESS.md、工作线HANDOFF/TASKS、tasks/LAP-44/{PLAN.md,HANDOFF.md,新增MEDIUM_START.md}。登记后重读；不实施代码/local/数据迁移、不启停/模型/QQ/联网服务/SSH，不派代理或切模型。仅文档commit/push及远端核对；交付后释放归属。下一轮用户提交prompt即按其中授权同轮实现、启用、配对部署和Git交付，不再逐阶段请求批准。
+
 2026-10-29 LAP-44设计交付：PLAN/HANDOFF完成供review，5文档归属/UTF-8/围栏、11本地链接、关键合同及diff --check通过，0代码/运行修改、0真实模型/QQ/启停。用户要求尽快落地，本设计明确review后下一实施轮同轮完成，不加分阶段审批。写作期间生产根出现并行43修复，五份归属文档已转到E:/CodexWS/QQbot_LAP44_plan、codex/lap-44-full-memory-plan，生产本轮文档改动定向移除，并行9项差异保留不夹带。独立分支commit/push并核对实时SHA，交付后释放归属；不改生产main或代其他会话交付。下一轮先核对最新main及归属，再接入本设计并实施。
 
 2026-10-29 10:54（Asia/Shanghai）：session `LAP-44-full-group-memory-plan` 领取新LAP-44，仅设计供用户review。用户明确接受增加输入消耗，本群记忆全文进入上下文，是否记忆/记什么由模型决定，代码尽量精简；不采用关键词检索、相关性排序、分层摘要或单轮2000/3000字符上限。起点main/c2346cb，工作区干净；43部署归属已释放。本session只拥有5份文档：PROGRESS.md、tracks/laptop-workbuddy/HANDOFF.md、TASKS.md、新tasks/LAP-44/{HANDOFF.md,PLAN.md}。登记后重读，再写设计；不修改代码/AGENTS/local/persona/密钥/记忆/运行文件，不启停、登录、真实模型/联网服务/QQ/SSH，不派代理或切模型。本轮规划和文档检查按既有Git授权commit/push，推送核对后释放归属；用户review之前不实施或部署。现有27/30/42记忆条款只记录拟替代范围，不重启旧验收。

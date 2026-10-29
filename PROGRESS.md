@@ -1,8 +1,8 @@
 # QQ bot项目入口：SnowLuma主线
 
-## 当前设计待 review：LAP-44 群记忆全文注入
+## 当前交接：LAP-44 详细规划完成，待 sol/medium 实施
 
-2026-10-29，[LAP-44设计](tracks/laptop-workbuddy/tasks/LAP-44/PLAN.md)及[交接](tracks/laptop-workbuddy/tasks/LAP-44/HANDOFF.md)已落盘，仅规划。按用户最新决定：接受增加输入消耗，每群5万字符正文全文进入上下文；模型决定记忆内容/整理/遗忘，代码不做关键词检索、语义门槛或单轮2千/3千字符限额。最少增改删、可靠落盘及真实回执；所选CodeBuddy字节政策拟由48000提高至524288，具体接线/迁移/预算证据见设计，当前尚未修改。用户要求尽快落地，review后收到实施指令，同轮实现/必要检查/受管部署，不分多轮审批；真实群体验由用户试用。本轮不改代码/local/persona/记忆/key/运行状态，不调用真实模型或发群消息；43已部署联网保持，记忆故障尚未修复。
+2026-10-29，用户已review总体方向，[LAP-44详细规划](tracks/laptop-workbuddy/tasks/LAP-44/PLAN.md)、[实施prompt](tracks/laptop-workbuddy/tasks/LAP-44/MEDIUM_START.md)及[交接](tracks/laptop-workbuddy/tasks/LAP-44/HANDOFF.md)补齐。本群记忆全文进入上下文、模型决定增改删；初始每群50000 Unicode字符（约5万普通汉字），所选CodeBuddy初始字节政策524288，容量/文件/预算均可配置扩大，去掉memory默认值封顶和TS原生联网48000硬门槛，不换成新固定上限。无关键词检索、语义门槛或单轮2千/3千字限额；只加最少更新和可靠回执。本设计分支已同步既有main/b0b4573联网修复。用户随后提交prompt即同轮实现/必要检查/受管部署/Git交付，不再等新规划审批；效果由用户群测。当前仅文档，未实施/改local/persona/实际记忆/运行状态，记忆故障尚未修复；下方43仍是已部署基础。
 
 2026-10-29群测故障修复已合入并部署main：修复CLI工具参数封套及HTTP(S)被误判成本机路径；当前21项定向检查、真实CLI零生成正反接线通过。实际running/connected/can_receive/router_ready，配置无待重启、当前错误为空；识图与记忆保持。详见[43交接](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)及[排查报告](reports/lap-43-native-web-debug.md)。真实联网及群答复由用户自行实测。
 
@@ -52,7 +52,7 @@ LAP-41工作区整理与使用对照已完成：uv报告清除38,269个缓存文
 ## 从哪里继续
 
 1. 使用bot：[日常操作](SnowLuma使用说明.md) / [与旧NapCat bot的使用对照](docs/BOT_USAGE_COMPARISON.md)。
-2. 项目接续：本文件 → [AGENTS](AGENTS.md) → [QQ主线HANDOFF](tracks/laptop-workbuddy/HANDOFF.md)和[TASKS](tracks/laptop-workbuddy/TASKS.md) → [LAP-43交接](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)、[原生联网合同](tracks/laptop-workbuddy/tasks/LAP-43/CLI_WEB_PLAN.md)、[当前medium指令](tracks/laptop-workbuddy/tasks/LAP-43/MEDIUM_START.md)。下一步由用户群测当前原生联网；收到具体问题按当前合同修复，不重做已交付功能或旧六例/接入/首试。[原43详规](tracks/laptop-workbuddy/tasks/LAP-43/PLAN.md)保留为已部署基础，当前CLI联网以新合同为准；QQ体验由用户实测。
+2. 项目接续：本文件 → [AGENTS](AGENTS.md) → [QQ主线HANDOFF](tracks/laptop-workbuddy/HANDOFF.md)和[TASKS](tracks/laptop-workbuddy/TASKS.md) → [LAP-44交接](tracks/laptop-workbuddy/tasks/LAP-44/HANDOFF.md)、[详细规划](tracks/laptop-workbuddy/tasks/LAP-44/PLAN.md)、[medium实施prompt](tracks/laptop-workbuddy/tasks/LAP-44/MEDIUM_START.md)。用户提交prompt后同轮实现部署44。已有联网/识图等基础及最近修复读[43交接](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)，保留b0b4573成果，不重做旧六例/接入/首试；真实QQ体验由用户实测。
 3. 故障找文件：[目录与日志](项目目录与日志说明.md)。只按实际问题检索，不从历史清单自动展开新任务。
 
 ## 路线和边界
