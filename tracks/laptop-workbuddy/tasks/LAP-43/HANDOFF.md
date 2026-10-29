@@ -8,6 +8,8 @@
 
 一次性开关state/cli-debug.once.json（match=影之刃），只匹配当前问题而非整段历史，probe/元数据检查不消费。首次匹配时原子移入state/cli-debug/<请求目录>/capture-request.json，所以随后自动关闭；stdout.jsonl、stderr.local.log、outcome.json及既有guard manifest/receipts仅在该目录保存。既有native_history_complete判断未改，仅在失败回执附planned/seen_calls/requests/seen_results/results五个计数。日志IO失败不改变原任务结果。9项runner离线检查通过，含不匹配不消费、匹配失败请求留原始输出、消费后不再录。
 
+临时采集已配对部署并开启：当前生产33项检查及零生成正反probe通过，running/connected/can_receive/router_ready，current_error=null、pending_restart=false；16项保护不变，保留44的524288政策、记忆和识图。binding=313416e4f74b853dc391c8c432b9c8c807e2da62967c437a8003908e42066d02，备份/回执state/cli-debug/deployment-20261029。现有失败证据state/cli-debug/historical-20261029-114037已归档。用户下一条当前问题含“影之刃”的正常请求将消费开关并留证，随后自动停录；问题尚未修复，本轮没有改变联网判断或主动真实调用。Git只交付采集代码/测试/当前报告，不提交原始日志。
+
 ## 当前：两处修复已部署，本轮停止扩展
 
 用户要求不要过度debug。本轮停止扩展排查和追加真实调用，只将已确证的接线与公开网址数字ID误拦截修复配对部署。用户再次要求不要过度限制/编码，后续不增加限制、代码或测试，只交付本轮已确证修复。真实任务已用2/2，第三次未获授权、未执行；每任务仍遵守原工具/步骤/90秒上限，不发QQ。
