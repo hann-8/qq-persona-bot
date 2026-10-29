@@ -2,6 +2,10 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线HANDOFF](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [详细规划](PLAN.md) / [medium指令](MEDIUM_START.md)。继承根AGENTS边界；本任务不替代LAP-18/21/27/35/42的历史证据及未验差额。
 
+## 2026-10-29修复部署执行中
+
+用户明确授权本轮将debug修复部署、commit/push后自己群测。session `LAP-43-native-web-debug-deploy`为唯一执行者，起点生产main/1e607b7、修复8dd9938、实时远端一致且生产干净。目标按既有43流程配对更新当前技术报告、CLI零生成正反接线和vision/native active后正常恢复；不改配置/persona/图库/记忆/模型/额度，不主动真实模型/工具服务/QQ测试。精确归属见TASKS首段；备份及运行回执放state/lap43-web-debug-deployment/20261029-1024。原“未部署”段是前轮debug检查点，本轮部署后以本段最终回执为准；失败时保留日志/unknown并按备份配对恢复，不删锁或状态。
+
 ## 2026-10-29群测故障排查（隔离修复完成，未部署）
 
 session `LAP-43-native-web-debug`：用户指定sol/high debug。生产main/1e607b7保持，隔离工作树E:/CodexWS/QQbot_LAP43_debug、codex/lap43-web-debug。已找回对应失败链，用锁定CLI适配器离线复现并修复参数封套及HTTPS被盘符正则误拒绝；仅既有联网合同内维护。当前源码证据：锁定2.168.0的dispatchModsToolCall非flat模式发送spread参数加input封套，项目argsOf未去掉input，无法与turn.step登记的参数相等。09:17:38入站、09:17:47本机CLI结束；trace显示模型返回两个WebFetch，均得到项目固定deny，未取得网页核实结果。原始trace/消息只读不提交。
