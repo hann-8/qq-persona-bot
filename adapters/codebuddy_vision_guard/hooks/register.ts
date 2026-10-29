@@ -169,11 +169,19 @@ export function register(on, options) {
   const urls=text=>Array.from(new Set((text.match(/https?:\/\/[^\s<>"\u3000]+/g)??[])
     .map(x=>x.replace(/[。，；！？、)\]}]+$/g,'')).filter(publicURL)));
   const cut=(text,cap)=>{let out='';for(const ch of text){if(bytes(out+ch).length>cap)break;out+=ch;}return out;};
-  const sensitive=text=> /(?:\d{5,}|QQ号|群号|密码|口令|token|secret|api.?key|[A-Za-z]:[\\/]|\\\\|[\w.+-]+@[\w.-]+)/i.test(
+  const sensitive=text=> /(?:\d{5,}|QQ号|群号|密码|口令|token|secret|api.?key|\b[A-Za-z]:[\\/]|\\\\|[\w.+-]+@[\w.-]+)/i.test(
     text.replace(/\b\d{4}-\d{2}-\d{2}\b/g,'DATE')) || web.private_ids.some(x=>text.includes(x));
   const proof=()=>({calls:native.calls,result_bytes:native.resultBytes,urls:native.urls.slice(0,2),steps:native.steps,
     allowed_tools:web.allowed_tools,thinking_enabled:false,sha256:hash(canonical(Array.from(native.results.values()).map(x=>x.visible??'')))});
-  const argsOf=e=>Object.fromEntries(Object.entries(e).filter(([k])=>!['tool','tool_use_id','agentId'].includes(k)));
+  const argsOf=e=>{
+    const flat=Object.fromEntries(Object.entries(e).filter(([k])=>!['tool','tool_use_id','agentId','consent','input'].includes(k)));
+    if(!Object.prototype.hasOwnProperty.call(e,'input'))return flat;
+    // The locked SDK's non-flat adapter carries both spread arguments and an
+    // input copy. Require agreement before removing that transport envelope.
+    need(e.input && typeof e.input==='object' && !Array.isArray(e.input),'tool_envelope');
+    need(Object.keys(flat).length===0 || canonical(flat)===canonical(e.input),'tool_envelope');
+    return e.input;
+  };
   const denyText='Native web call refused or unavailable; this request has not verified the claim.';
   async function webDeny($,e,reason){
     native.failed=true;

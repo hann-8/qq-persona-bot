@@ -1,3 +1,7 @@
+2026-10-29 09:49本session收尾：两个误拦截已在隔离分支修复；当前43组合21项通过（包含实际锁定SDK适配器12子场景）。报告见reports/lap-43-native-web-debug.md，生产main/运行态未操作；本分支交付后释放执行归属，未授权部署内容不自动执行。
+
+2026-10-29 09:43（Asia/Shanghai）：session `LAP-43-native-web-debug` 续43，用户指定sol/high排查群测BACKEND_UNAVAILABLE。起点main/1e607b7，生产根干净；只读日志/锁定CLI源码，隔离分支codex/lap43-web-debug、工作树E:/CodexWS/QQbot_LAP43_debug准备既有联网合同内的最小修复及离线回归。归属adapters/codebuddy_vision_guard/hooks/register.ts、tests/test_cli_native_web.py、PROGRESS.md、工作线HANDOFF/TASKS、43 HANDOFF、reports/lap-43-native-web-debug.md。仅本session执行，无代理；生产local/persona/记忆/旧证据不变，不启停/部署/真实模型/QQ，不修改第三方CLI。原始私密消息/CLI trace不提交。完成归属检查后commit/push隔离分支并释放归属，真实联网质量仍待用户试用。
+
 2026-10-29 本session补充交付文档归属AGENTS.md、config/README.md、SnowLuma使用说明.md。最终main实施820a77a，当前原生web/vision完整绑定4fe02771…、20项当前检查/真实CLI零生成通过；受管正常启动后connected/can_receive/router_ready均true，memory读取/学习true、thinking=false。用户实际联网效果待群测；本次文档/Git完成后释放唯一执行归属。
 
 2026-10-29 补充归属plugins/qq_router/main.py：原生模式的当前消息anchor须绕开旧intent关键词判断；天气等普通问法由CLI决策，仍保留ambient权限及本轮target绑定。

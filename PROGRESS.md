@@ -1,5 +1,7 @@
 # QQ bot项目入口：SnowLuma主线
 
+2026-10-29调试分支：用户群测原生联网触发BACKEND_UNAVAILABLE，已定位并在codex/lap43-web-debug修复工具参数封套及HTTPS被盘符正则误拒绝，当前43定向21项通过；未部署、生产main未动；见[43交接](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)。
+
 ## 当前任务：LAP-43原生联网已启用并部署，待用户群测
 
 2026-10-29，main已部署CLI原生WebSearch/WebFetch，由模型按需决定联网，router和WebRunner不再用旧关键词/RSS/HTML预筛当前CodeBuddy请求。每任务最多3次工具调用、4个主步骤、90秒，单结果8000/合计12000字节，每步48000可见政策；其他工具/MCP保持关闭，未自动切换模型/账号或回退Python。CodeBuddy CLI思考显式关闭，DeepSeek/low配置及额度来源不变。

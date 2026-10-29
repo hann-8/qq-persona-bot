@@ -1,6 +1,8 @@
 """Actual shipped guard under a synthetic SDK host; zero model/network/QQ calls."""
 import io
+import hashlib
 import json
+import os
 import subprocess
 import tempfile
 import unittest
@@ -68,6 +70,49 @@ if(first.toolUses.length){
  }
 }
 console.log(JSON.stringify({calls,steps,output,second,first}));
+'''
+
+
+SDK_HARNESS=HARNESS.split('let calls=0,steps=0;')[0]+r'''
+// The locked build's actual dispatchModsToolCall, extracted without booting CLI.
+const {dispatchModsToolCall}=await import(pathToFileURL(process.argv[4]).href);
+const fetch=variant.startsWith('fetch'),parallel=variant.includes('parallel');
+const tool=fetch?'WebFetch':'WebSearch';
+const inputs=Array.from({length:parallel?2:1},(_,i)=>fetch?
+ {url:'https://example.com/news/'+i,prompt:'Read public facts'}:{query:'public news '+i});
+if(variant==='fetch_http')inputs[0].url='http://example.com/news';
+if(variant==='search_url')inputs[0].query='public facts https://example.com/news';
+if(variant==='search_drive')inputs[0].query='read C:/private.txt';
+if(variant==='search_backslash')inputs[0].query='read C:\\private.txt';
+if(variant==='search_unc')inputs[0].query='read \\\\server\\share';
+if(variant==='search_private_id')inputs[0].query='look up 123456789';
+let calls=0,steps=0;
+const e=i=>({turnId:'one-task',index:i,model:q.model,messageCount:rows.length});
+const first=await handlers['turn.step'](host,e(0),async event=>{
+ steps++;return {...event,answer:'',toolUses:inputs.map(input=>({name:tool,input})),serverToolUses:[]};
+});
+const errors=[],outputs=[],events=[];
+await Promise.all(inputs.map(async(input,i)=>{
+ const id='sdk-call-'+i;
+ try {
+  const result=await dispatchModsToolCall({name:tool,callId:id,input},async received=>{
+   if(JSON.stringify(received)!==JSON.stringify(input))throw Error('ARGUMENTS_CHANGED');
+   calls++;return {content:'public fact https://example.com/news/'+i,title:'Public page'};
+  },{dispatch:async(name,event,options)=>{
+   events.push(event);
+   if(variant.includes('conflict'))event.input={...input,prompt:'tampered'};
+   return handlers[name](host,event,options.coreResult);
+  }},variant.includes('flat'));
+  outputs[i]={id,input,result};
+ } catch(error){errors.push(String(error));}
+}));
+for(const out of outputs.filter(Boolean))rows.push(
+ {role:'assistant',content:[{type:'tool_use',id:out.id,name:tool,input:out.input}]},
+ {role:'user',content:[{type:'tool_result',tool_use_id:out.id,content:JSON.stringify(out.result)}]});
+const second=await handlers['turn.step'](host,e(1),async event=>{
+ steps++;return {...event,answer:'final',toolUses:[],serverToolUses:[]};
+});
+console.log(JSON.stringify({calls,steps,errors,second,outputs,events,first}));
 '''
 
 
@@ -152,6 +197,44 @@ class NativeTests(unittest.TestCase):
         value,proof=self.host(mode='probe')
         self.assertEqual((value['calls'],value['steps'],proof['next_calls']),(0,0,0))
         self.assertIn('probe_short_circuit',proof['stages'])
+
+    def test_locked_sdk_tool_envelope_and_parallel_fetch(self):
+        lock=json.loads((ROOT/'config/versions.lock.json').read_text(encoding='utf-8'))
+        entry=ROOT/lock['cli']['entry']
+        bundle=Path(os.environ.get('QQBOT_TEST_CLI_BUNDLE',str(entry.parent.parent/'dist/codebuddy-headless.js')))
+        if not bundle.is_file():self.skipTest('locked CLI bundle is not installed')
+        data=bundle.read_bytes()
+        self.assertEqual(hashlib.sha256(data).hexdigest(),lock['cli']['headless_sha256'])
+        source=data.decode('utf-8')
+        # Include the unchanged reserved-key list, result helper, exception and
+        # adapter; no vendor startup, network, credentials or model generation.
+        module=source.split('26728(eA,el,ec){',1)[1].split('},32483(eA,el,ec){',1)[0]
+        adapter=module[module.index('let eu=["tool"'):]
+        self.assertTrue(adapter.endswith('}'))
+        adapter='import * as ed from "node:util";\n'+adapter+'\nexport {dispatchModsToolCall};\n'
+        refused=('fetch_conflict','search_drive','search_backslash','search_unc','search_private_id')
+        for variant in ('search','search_flat','search_url','fetch','fetch_parallel','fetch_flat','fetch_http',*refused):
+            with self.subTest(variant=variant), tempfile.TemporaryDirectory() as folder:
+                work=Path(folder)
+                policy=native_contract(validate_web(dict(engine='codebuddy_cli',enabled=True,search_enabled=True)),(),InputBudget(limit=48000))
+                guard=Guard(work,'current policy','current snapshot',None,dict(T=30,F=18000,V=0,O=128000,C=1000000),
+                    wire_message=dict(type='user',message=dict(role='user',content='current snapshot')),native_web=policy)
+                program=work/'host.mjs';program.write_text(SDK_HARNESS,encoding='utf-8')
+                actual=work/'locked-adapter.mjs';actual.write_text(adapter,encoding='utf-8')
+                result=subprocess.run([lock['node']['path'],str(program),str(guard.root),variant,str(actual)],
+                    capture_output=True,text=True,encoding='utf-8',timeout=15)
+                self.assertEqual(result.returncode,0,result.stderr)
+                value=json.loads(result.stdout.strip().splitlines()[-1]);proof=guard.read()
+                if variant in refused:
+                    self.assertEqual(value['calls'],0)
+                    self.assertTrue(value['errors'])
+                    self.assertIn('refused',proof['stages'])
+                else:
+                    self.assertEqual(value['calls'],2 if variant=='fetch_parallel' else 1,(value,proof.get('reason'),proof.get('hook_error')))
+                    self.assertEqual(value['errors'],[])
+                    self.assertEqual(value['steps'],2)
+                    self.assertNotIn('refused',proof['stages'])
+                    self.assertEqual(value['second']['answer'],'final')
 
 
 

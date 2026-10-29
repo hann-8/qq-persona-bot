@@ -2,6 +2,12 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线HANDOFF](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [详细规划](PLAN.md) / [medium指令](MEDIUM_START.md)。继承根AGENTS边界；本任务不替代LAP-18/21/27/35/42的历史证据及未验差额。
 
+## 2026-10-29群测故障排查（隔离修复完成，未部署）
+
+session `LAP-43-native-web-debug`：用户指定sol/high debug。生产main/1e607b7保持，隔离工作树E:/CodexWS/QQbot_LAP43_debug、codex/lap43-web-debug。已找回对应失败链，用锁定CLI适配器离线复现并修复参数封套及HTTPS被盘符正则误拒绝；仅既有联网合同内维护。当前源码证据：锁定2.168.0的dispatchModsToolCall非flat模式发送spread参数加input封套，项目argsOf未去掉input，无法与turn.step登记的参数相等。09:17:38入站、09:17:47本机CLI结束；trace显示模型返回两个WebFetch，均得到项目固定deny，未取得网页核实结果。原始trace/消息只读不提交。
+
+归属和边界见TASKS首段。实际锁定bundle适配函数（hash核对）回归修前复现、修后12子场景通过；当前43组合21项通过（0真实模型/工具服务/QQ）。仅改项目参数解封套、盘符正则和必要回归，不改第三方CLI/全局设置。生产配置/模型/额度/人设/记忆/旧证据及运行态不动；无主动真实模型、联网工具服务或群发。本分支源码改变尚未重做生产vision/native完整绑定，不能直接称已部署或真实联网通过。最终验证/回执见[排查报告](../../../../reports/lap-43-native-web-debug.md)。
+
 ## 本轮完成：原生联网已启用并部署main
 
 2026-10-29，session LAP-43-native-web-implementation。实现651336f、健康展示修复7aa24fb、路由关键词绕开修复820a77a，从隔离树E:/CodexWS/QQbot_LAP43_native/codex/lap43-native-web快进main。最终部署已实际复核running、OneBot connected、can_receive=true、router_ready=true、current_error=null、pending_restart=false；启动后user_messages_sent=0。本session未主动真实模型生成、WebSearch/WebFetch服务调用或QQ发消息，群测由用户执行。
