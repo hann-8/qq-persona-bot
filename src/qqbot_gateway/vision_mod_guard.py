@@ -73,7 +73,7 @@ class Guard:
         phase_names={'context_cleared','composed','refused','admitted','probe_short_circuit','next','completed'}
         phases=list(self.receipt_root.glob('phase-*.json'))
         if len(phases)>128:raise ValueError('VISION_PLUGIN_RECEIPT_COUNT')
-        stages=['ready'];calls=0;last_proof=-1
+        stages=['ready'];calls=0;last_proof=-1;refusals=[]
         for path in phases:
             if path.is_symlink() or path.stat().st_size>16384:raise ValueError('VISION_PLUGIN_PHASE_INVALID')
             try:row=json.loads(path.read_text(encoding='utf-8'))
@@ -81,12 +81,17 @@ class Guard:
             if row.get('nonce')!=self.request['nonce'] or row.get('stage') not in phase_names:
                 raise ValueError('VISION_PLUGIN_PHASE_IDENTITY')
             stages.append(row['stage'])
+            if row['stage']=='refused' and len(refusals)<8:
+                seq=row.get('seq',0)
+                refusals.append((seq if type(seq) is int else 0,
+                    {k:row.get(k,'unavailable') for k in ('reason','guard_reason')}))
             for key in ('reason','guard_reason','hook_error','diagnostic','registered_tools','catalog_tools','transcript_verified'):
                 if key in row:value[key]=row[key]
             if row['stage']=='next':calls+=1
             if 'native_web' in row and row.get('seq',-1)>last_proof:
                 value['native_web']=row['native_web'];last_proof=row['seq']
         value['stages']=stages;value['next_calls']=calls
+        value['refusals']=[row for _,row in sorted(refusals,key=lambda item:item[0])]
         keys = ('nonce', 'system_sha256', 'system_bytes', 'assets_sha256', 'model', 'effort', 'mode')
         mismatches=[k for k in keys if value.get(k) != self.request[k]]
         canonical=json.dumps(self.request,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()

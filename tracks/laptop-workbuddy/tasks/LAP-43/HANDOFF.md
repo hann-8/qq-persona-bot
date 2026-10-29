@@ -2,6 +2,17 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线HANDOFF](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [详细规划](PLAN.md) / [medium指令](MEDIUM_START.md)。继承根AGENTS边界；本任务不替代LAP-18/21/27/35/42的历史证据及未验差额。
 
+## 当前：两处修复已部署，本轮停止扩展
+
+用户要求不要过度debug。本轮停止扩展排查和追加真实调用，只将已确证的接线与公开网址数字ID误拦截修复配对部署。用户再次要求不要过度限制/编码，后续不增加限制、代码或测试，只交付本轮已确证修复。真实任务已用2/2，第三次未获授权、未执行；每任务仍遵守原工具/步骤/90秒上限，不发QQ。
+
+时间线：11:03:53提问→11:04:05失败；11:05:04日期答复是另一CLI任务，0联网工具。第一独立真实诊断5.844秒确认tool_plan_missing；修为同一CLI公开session.messages内准确tool ID/name/input验证，不能相信工具事件自报参数，无匹配仍拒绝。第二诊断12.578秒已取回PlayStation官方页面4295字节，但Steam公开商品数字ID命中项目自己的过宽号码规则。修为仅对已验证公共URL的数字资源ID豁免通用长号检测；原始URL仍检查本机明确私密ID，query/prompt等字段及凭据/本机地址规则保持。不是Steam隐私规则/403问题。
+
+隔离当前30项通过，含27个SDK子场景；真实最终完整答复未通过，不冒称搜索质量验收。前次计划/回执缺口和公开数字ID误判有实际证据，不再凭替身结果推断网站故障。诊断枚举保留最早拒绝原因，原始私密群消息不入报告。详细证据仍见43排查报告，真实诊断原文仅在隔离树state/lap43-live-web-diagnostic。
+
+当前生产已正常停启并配对部署；check为22项/实际预算/static通过，零生成正反probe通过。最新status为running/connected/can_receive/router_ready，current_error=null、pending_restart=false，识图/群记忆保持、thinking=false，16项保护不变。binding cc218fcd060d8d37d79a8cdc29c33049e4dbf7f1e3468c539989f81d9b1e95fa；备份/回滚材料在state/lap43-web-trace-deployment/20261029-1132（b0b4573代码与active/offline/probe/能力表备份）。仅提交本任务8文件，不碰LAP-44/共享文档。完整真实搜索答复仍待用户试用，本轮不再加测或增码；commit/push并核对后释放执行归属。
+
+
 ## 2026-10-29流式时序续修已部署，交用户实测
 
 session LAP-43-native-web-json-debug，用户在c2346cb反馈游戏搜索仍失败。10:41:56请求对应10:42:04/eba52f9466，CLI PID179216两个WebFetch均被项目deny；参数与计划一致、无敏感规则/私密ID命中，具体旧phase未保留。源码与离线复现确认流式工具事件可早于next(e)计划回执，现等待当前步准确计划再执行；兼容JSON字符串封套，拒绝冲突/畸形，白名单/次数/预算不扩。完整CLI替身实际观察e.input为对象，不能把trace字符串序列化冒充本次故障确证。
