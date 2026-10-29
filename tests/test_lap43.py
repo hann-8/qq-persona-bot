@@ -20,6 +20,22 @@ from test_group_silence import event,Capture,Duplex,frames
 
 
 class Contracts(unittest.TestCase):
+    def test_local_access_edits_keep_vision_binding_but_budget_edits_do_not(self):
+        from copy import deepcopy
+        from unittest.mock import patch
+        from test_lap42_vision import settings
+        from qqbot_gateway.vision import binding
+        original=settings();before=deepcopy(original)
+        with patch('qqbot_gateway.vision.adapter_signature',return_value='a'*64):
+            expected=binding(original,{})
+            changed=deepcopy(original)
+            changed['access']['allowed_groups']=['111','222','333']
+            changed['access']['blocked_users']=['444']
+            self.assertEqual(binding(changed,{}),expected)
+            changed['llm']['profiles']['codebuddy_cli']['input_budget']['context_input_limit_tokens']+=1
+            self.assertNotEqual(binding(changed,{}),expected)
+        self.assertEqual(original,before)
+
     def test_name_boundaries_and_current_material(self):
         names=['鱼鱼','鲸鱼娘','DSH']
         for text in ('鱼鱼查查最新消息','鱼鱼这个怎么看？','我想问鱼鱼一个问题','帮我看看这个，鱼鱼','ＤＳＨ，帮我看看','dsh?', '鱼鱼在吗'):

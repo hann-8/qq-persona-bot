@@ -66,6 +66,8 @@ def binding(settings, runtime):
     profile=resolve_backend(settings)
     from copy import deepcopy
     policy=deepcopy(settings)
+    # Local access rules are enforced by the gate, not image/model capability.
+    policy.pop('access', None)
     # Operator activation and metadata logging do not alter model input. All
     # other prompt/config/network policy, selected parameters and budgets bind.
     policy['vision']=dict(policy.get('vision',DEFAULTS),enabled=False,ingress_diagnostics=False)
