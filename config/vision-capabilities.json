@@ -20,7 +20,7 @@
           "encoding/README.md": "a34a5ca98c65e5b5b2bedd693cc2e18e732fe50192723fb6937ae07219c23739"
         },
         "audit": "reports/lap-42-vision-closure-sources.json",
-        "plugin_assets_sha256": "e34e1192c8848c461d982cecf071004356b1c756c78351d1ced0a3c537598d4d",
+        "plugin_assets_sha256": "4c30eb63f73ded24ced87fc495b72483b476212d8b43dfc5e4241c8520bf427e",
         "native_schema_spans": {
           "WebFetch": [
             9981824,

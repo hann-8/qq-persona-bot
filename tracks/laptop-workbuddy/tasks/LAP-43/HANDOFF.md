@@ -2,9 +2,17 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线HANDOFF](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [详细规划](PLAN.md) / [medium指令](MEDIUM_START.md)。继承根AGENTS边界；本任务不替代LAP-18/21/27/35/42的历史证据及未验差额。
 
-## 2026-10-29修复部署执行中
+## 2026-10-29修复已部署main，交用户群测
 
-用户明确授权本轮将debug修复部署、commit/push后自己群测。session `LAP-43-native-web-debug-deploy`为唯一执行者，起点生产main/1e607b7、修复8dd9938、实时远端一致且生产干净。目标按既有43流程配对更新当前技术报告、CLI零生成正反接线和vision/native active后正常恢复；不改配置/persona/图库/记忆/模型/额度，不主动真实模型/工具服务/QQ测试。精确归属见TASKS首段；备份及运行回执放state/lap43-web-debug-deployment/20261029-1024。原“未部署”段是前轮debug检查点，本轮部署后以本段最终回执为准；失败时保留日志/unknown并按备份配对恢复，不删锁或状态。
+用户明确授权部署、commit/push，session `LAP-43-native-web-debug-deploy`唯一执行，无代理。正常停止受管实例后从1e607b7快进修复8dd9938及领取记录a8dd386；两处修复已加载。config/vision-capabilities.json仅同步当前插件来源摘要，未改能力、模型或上界；旧“未部署”段是前轮debug检查点，当前以本段为准。
+
+当前生产检查：21项定向通过（包含锁定SDK适配器12子场景），实际配置预算通过、static_missing=[]。初次静态检查报旧插件摘要不匹配，配对同步后重新完整check通过。真实CLI正例1条本地user、next=0；两个反例user均0，real_generations=0，未调用真实WebSearch/WebFetch服务或QQ发消息。
+
+当前binding为12d5f947e863327f278c3977837ffb84164acb35b5f49ec1b86398742660023b，active SHA为b36ffe0bcf8ca89361d542cc1f1c41243f430b320f31f0b53bfc3c5bcc33ea90；完整原生/识图试用配对已激活。正常start-desktop后初始Snow连接尚在恢复，随后独立status实际确认running、OneBot connected、can_receive=true、router_ready=true、current_error=null、pending_restart=false。vision=true/lap43_operator_trial/pending_user_test、memory读写true、thinking=false已加载；该次复核本实例user_messages_sent=0。
+
+16项配置/persona/图库/pending保护摘要全部不变；仅更新当前active/技术报告/CLI probe，不改原IQ或质量事实。备份/运行回执在state/lap43-web-debug-deployment/20261029-1024（baseline、active.before、offline.before、probe.before、vision-capabilities.before、status.before/after、deployment-result）。旧native试用路径及unknown全部保留。
+
+回滚先正常停止，确认当前文件仍匹配本事务后，配对恢复1e607b7代码/config能力表、offline/probe和active备份；不改local、不删unknown/记忆/日志。若已有后续用户修改，逐项审阅不得整份覆盖。代码/文档及当前报告按长期授权提交推送main并核对实时远端，SHA见Git/会话回执；交付后释放唯一执行归属。下一步只由用户正常群测，联网服务/回答质量及QQ ACK未由本轮代理验收。
 
 ## 2026-10-29群测故障排查（隔离修复完成，未部署）
 

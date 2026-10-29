@@ -1,4 +1,4 @@
-2026-10-29群测debug：原生联网失败已由本机CLI trace定位到项目插件固定deny；两个误拦截（参数input封套、HTTP(S)误判Windows路径）在codex/lap43-web-debug隔离修复，锁定SDK实际适配器12子场景及当前43组合21项离线通过。生产main/运行配置未动，未部署/真实模型/工具服务/QQ；详见[43交接](tasks/LAP-43/HANDOFF.md)及[排查报告](../../reports/lap-43-native-web-debug.md)。旧验收差额保持。
+2026-10-29群测debug修复已部署main：CLI工具参数封套、HTTP(S)盘符误判两处修复已加载。当前43组合21项/真实CLI零生成正反接线通过，running/connected/can_receive/router_ready、current_error=null、pending_restart=false；识图/记忆/模型配置保持，16项保护摘要不变。实际联网质量由用户群测；[43交接](tasks/LAP-43/HANDOFF.md)及[排查报告](../../reports/lap-43-native-web-debug.md)记录当前绑定/回滚。
 
 2026-10-29最新：LAP-43原生联网已实现、启用并部署main；固定WebSearch/WebFetch，3调用/4步骤/90秒、每步48000、单结果8000/合计12000字节。实际running/connected/can_receive/router_ready，配置无待重启；CLI思考关闭，memory读取/学习true，原识图/表情/owner/free保持。20项当前检查及真实CLI零生成正反接线通过，公共工具服务和群答复效果由用户实测。当前完整绑定/回滚/归属/Git见[43交接](tasks/LAP-43/HANDOFF.md)。下方10-28记录为历史规划/部署，不覆盖此条。
 

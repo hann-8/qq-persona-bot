@@ -1,3 +1,7 @@
+2026-10-29 10:28本session部署收尾：两处debug修复已加载main；当前21检查/真实CLI零生成正反接线通过，生产running/connected/can_receive/router_ready、current_error=null、pending_restart=false，vision/群记忆保持，16项保护不变。当前binding/备份/回滚见43 HANDOFF；本轮main交付并核对远端后释放唯一执行归属，不主动模型/联网服务/QQ测试，用户自行群测。
+
+2026-10-29 10:26补充本session归属config/vision-capabilities.json：生产check的21测试通过，但静态阶段按预期报HOSTED_REVIEW_RECORD_MISMATCH；源审阅记录中plugin_assets_sha256仍为旧插件摘要。仅更新该来源事实字段为当前assets_signature，保持能力/模型/上界/旧报告不变后重新完整check，属于授权部署的配对同步。
+
 2026-10-29 10:24（Asia/Shanghai）：session `LAP-43-native-web-debug-deploy`续领43，用户明确授权修复部署、commit/push，QQ群自行实测。本session唯一启停/配对/交付执行者，无代理。起点生产main/1e607b7、修复分支8dd9938，生产Git干净且实时远端一致。归属既有两处修复及测试、PROGRESS、工作线HANDOFF/TASKS、43 HANDOFF、reports/lap-43-native-web-debug.md及重生成reports/lap-43-native-web-offline.json；忽略归属state/lap43-web-debug-deployment/20261029-1024备份/运行回执、当前native试用probe及完整active绑定。先取保护基线、正常停止、快进main、当前实际配置技术检查/真实CLI零生成正反检查、配对activate、正常start-desktop/health核对，最后main commit/push/远端一致。模型/账号/额度/配置/persona/图库/记忆不变，不主动真实生成/工具服务/QQ测试，旧质量记录不改写。
 
 2026-10-29 09:49本session收尾：两个误拦截已在隔离分支修复；当前43组合21项通过（包含实际锁定SDK适配器12子场景）。报告见reports/lap-43-native-web-debug.md，生产main/运行态未操作；本分支交付后释放执行归属，未授权部署内容不自动执行。

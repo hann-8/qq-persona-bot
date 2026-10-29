@@ -1,6 +1,6 @@
 {
-  "adapter_signature": "d6ad4516d6392ee754fa9f43000eede6b74df01e4f6c9e777a9a9d3737a6907d",
-  "binding": "4fe02771fe0e996855c6a255e6a72190287df362d484d94e5cad6f3ec2f8b092",
+  "adapter_signature": "f270ec4ae5d15c73ec4a5b5788787b1e0b5117ae7a7e3ce23c5f374546ee5d4c",
+  "binding": "12d5f947e863327f278c3977837ffb84164acb35b5f49ec1b86398742660023b",
   "budget": {
     "final_visible_policy_bytes": 29286,
     "limit": 48000,
@@ -16,7 +16,7 @@
   "files": {
     "reports/lap-42-vision-closure-sources.json": "7c24fa759b061c28e2dfc07e0a5d4195a10eaecdec18c5c190effa8119e4e640",
     "scripts/revalidate_lap43_native_web.py": "c4a17bcdc007414d281fa0c76fa919cba5ee90f998ce32c9df5317092b377de8",
-    "tests/test_cli_native_web.py": "57ec4f37aabcd47c667dc4865fe74e020c57c4c24274d5c56f2b214fdcf5ff22",
+    "tests/test_cli_native_web.py": "aa9af655d3e3fab07a16a3cfa9262ef10869bebbdd1fd605d076988333ca3088",
     "tests/test_lap43.py": "cf66a2589f9c20ea7aa09fb57205a1344535ec332c3d3386b65f04098aa60d44",
     "tests/test_vision_mod_guard.py": "c5afb4053140b939549547669bc0c144315f0f5d0ce6ad25761560097a59051b"
   },
@@ -31,10 +31,10 @@
   "quality_state": "pending_user_test",
   "real_model_calls": 0,
   "real_qq_outputs": 0,
-  "rule_hash": "4dfa11543ddbc62e31539c6aa3201bf4e797b9d5e0f867bf443291aa1f04dc65",
+  "rule_hash": "2441f21c6fb14ba6157021ac3d1360f683f66f83f09b8416f321d293f7fc6bcf",
   "schema_version": 1,
   "static_missing": [],
-  "tests_run": 20,
+  "tests_run": 21,
   "thinking_enabled": false,
   "tool_policy": {
     "cli_max_tool_calls": 3,

@@ -6,7 +6,7 @@
 
 本次具体失败已找到本机证据：模型确实返回了两个WebFetch请求，但项目防护插件均返回固定拒绝结果，随后CLI没有最终答复，网关统一映射为BACKEND_UNAVAILABLE。现有证据不能把它归因于搜索服务宕机或模型账号失效。
 
-定位到两个可独立复现的项目接线缺陷，已在隔离分支codex/lap43-web-debug修复；生产main/1e607b7尚未更新。未启停bot、改生产配置、调用真实模型/联网工具服务或发送QQ消息。
+定位到两个可独立复现的项目接线缺陷，先在隔离分支codex/lap43-web-debug修复；随后用户明确授权部署，本轮已合入main并正常停止/配对/重启。未改生产运行配置、调用真实模型/联网工具服务或发送QQ消息。
 
 ## 本机追踪依据（不附原始私密消息）
 
@@ -41,10 +41,14 @@
 4. 命令使用生产项目解释器；PYTHONPATH指向隔离树src/tests，QQBOT_TEST_CLI_BUNDLE仅指向生产锁定bundle，QQBOT_TEST_ASTRBOT_SITE仅指向已安装AstrBot依赖。未修改这些只读依赖。
 5. 额外探索`test_cli_native_web test_vision_mod_guard`整模块时，旧guard检查被隔离树未安装runtime及固定review不匹配阻断（21项/22个error）；该次不是通过结果，未借机改旧质量记录或扩大修复。最终通过的是上面的当前43定向组合。
 
-## 生效、剩余与回滚
+## 已部署、剩余与回滚
 
-修复仅存在本隔离分支，生产工作区保持干净，bot运行态未操作。未改变模型/账号/额度、thinking=false、3工具调用/4步骤/90秒、8000/12000结果预算、48000政策、访问控制、owner/free、人设或记忆。
+2026-10-29用户追加明确授权后，正常停止受管实例、快进main，已加载两处修复。部署检查发现能力表仍登记旧插件来源摘要，config/vision-capabilities.json仅同步plugin_assets_sha256为当前实际assets_signature；未改模型能力或上界。随后重新完整check：21项通过、实际预算通过、static_missing=[]；锁定CLI正例1本地user/0 next、反例0/0 user，真实生成=0。
 
-下一步若部署，沿已有43配对流程：确认生产无新修改及唯一执行归属；正常停止受管实例；合入本分支，使用当前实际配置重做固定技术检查及CLI零生成正反接线，更新完整vision/native试用绑定后再正常启动、复核health/连接。旧binding不能直接冒用，不能为了上线静默关闭识图。真实搜索服务可达性、网页质量、群答复及ACK仍未被本轮离线验证证明，应由用户正常群测。
+vision/native当前完整绑定12d5f947e863327f278c3977837ffb84164acb35b5f49ec1b86398742660023b已配对激活，active SHA b36ffe0bcf8ca89361d542cc1f1c41243f430b320f31f0b53bfc3c5bcc33ea90。正常启动后已独立复核running、OneBot connected、can_receive=true、router_ready=true、current_error=null、pending_restart=false。识图继续lap43_operator_trial/pending_user_test，群记忆读取/学习true，thinking=false；该次实例复核user_messages_sent=0。
 
-回滚本隔离成果不影响生产；后续若部署，必须配对恢复旧代码/active及该次部署备份，保留unknown、记忆及日志，不删除状态/锁。Git提交推送不等于部署或真实验收。
+16项运行配置、人设、图库和pending保护摘要不变。保持原模型/账号/额度、3调用/4步骤/90秒、8000/12000结果预算、48000政策、owner/free和访问控制。初次启动回执的通道尚未就绪是连接恢复中的快照，最终status已实际确认就绪；未安装、登录或接管外部QQ。
+
+备份及运行证据：state/lap43-web-debug-deployment/20261029-1024，含部署前代码/保护摘要、active/offline/probe/能力表备份、前后status与deployment-result。回滚先正常停止、确认无后续改动，配对恢复部署前1e607b7代码与对应能力表/offline/probe/active；保留unknown、记忆和日志，不删锁或状态。提交推送main并核对远端后交付，精确SHA见Git及会话回执。
+
+真实搜索服务可达性、网页质量、群答复及ACK仍未由本轮代理验证，由用户正常群测；旧IQ/质量差额不改写。

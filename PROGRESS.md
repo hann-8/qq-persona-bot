@@ -1,12 +1,12 @@
 # QQ bot项目入口：SnowLuma主线
 
-2026-10-29调试分支：用户群测原生联网触发BACKEND_UNAVAILABLE，已定位并在codex/lap43-web-debug修复工具参数封套及HTTPS被盘符正则误拒绝，当前43定向21项通过；未部署、生产main未动；见[43交接](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)。
+2026-10-29群测故障修复已合入并部署main：修复CLI工具参数封套及HTTP(S)被误判成本机路径；当前21项定向检查、真实CLI零生成正反接线通过。实际running/connected/can_receive/router_ready，配置无待重启、当前错误为空；识图与记忆保持。详见[43交接](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)及[排查报告](reports/lap-43-native-web-debug.md)。真实联网及群答复由用户自行实测。
 
-## 当前任务：LAP-43原生联网已启用并部署，待用户群测
+## 当前任务：LAP-43联网故障修复已部署，待用户群测
 
 2026-10-29，main已部署CLI原生WebSearch/WebFetch，由模型按需决定联网，router和WebRunner不再用旧关键词/RSS/HTML预筛当前CodeBuddy请求。每任务最多3次工具调用、4个主步骤、90秒，单结果8000/合计12000字节，每步48000可见政策；其他工具/MCP保持关闭，未自动切换模型/账号或回退Python。CodeBuddy CLI思考显式关闭，DeepSeek/low配置及额度来源不变。
 
-当前实际复核：组件running、OneBot connected、can_receive=true、router_ready=true，磁盘与加载快照一致；原聊天、识图、7表情、唯一操作者、free保持；群长期记忆和学习均true。20项当前定向检查及最终真实CLI零生成正反接线通过，未代用户调用实际WebSearch/WebFetch服务或群发验收，实际联网质量待群测。识图继续完整配对的lap43_operator_trial，未改写旧IQ/质量结论。实现提交651336f/7aa24fb/820a77a，完整运行/Git/回滚见[43交接](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)；使用见[日常说明](SnowLuma使用说明.md)。
+当前实际复核：组件running、OneBot connected、can_receive=true、router_ready=true，磁盘与加载快照一致；原聊天、识图、7表情、唯一操作者、free保持；群长期记忆和学习均true。21项当前定向检查及最终真实CLI零生成正反接线通过，未代用户调用实际WebSearch/WebFetch服务或群发验收，实际联网质量待群测。识图继续完整配对的lap43_operator_trial，未改写旧IQ/质量结论。实现提交651336f/7aa24fb/820a77a，完整运行/Git/回滚见[43交接](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)；使用见[日常说明](SnowLuma使用说明.md)。
 
 ## 已部署基础：LAP-43四项与原Python联网
 
