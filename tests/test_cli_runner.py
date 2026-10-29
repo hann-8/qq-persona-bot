@@ -41,6 +41,8 @@ else:
  user=sys.stdin.read();(base/'user.json').write_text(user)
 send({'type':'system','subtype':'init','model':'deepseek-v4.1-flash','tools':[],'mcp_servers':[]})
 if mode=='missing-final':sys.exit(0)
+if mode=='backend-error':
+ send({'type':'result','is_error':True,'errors':['PRIVATE_SENTINEL https://example.com/private']});sys.exit(0)
 result={'type':'result','subtype':'success','is_error':False,'result':'answer'}
 send(result)
 if mode=='duplicate-final':send(result)
@@ -53,6 +55,28 @@ class RunnerTests(unittest.IsolatedAsyncioTestCase):
         self.script=self.root/'fake.py';self.script.write_text(FAKE,encoding='utf-8')
 
     def tearDown(self):self.temp.cleanup()
+
+    async def test_backend_failure_keeps_only_safe_metadata_after_cleanup(self):
+        runner=self.runner('backend-error')
+        with self.assertRaises(GatewayError) as raised:
+            await runner.run('SYS','Synthetic question','trace')
+        self.assertEqual(raised.exception.code,'BACKEND_UNAVAILABLE')
+        raw=(self.root/'state/cli-last-failure.json').read_text(encoding='utf-8')
+        summary=json.loads(raw)
+        self.assertEqual(summary['code'],'BACKEND_UNAVAILABLE')
+        self.assertTrue(summary['initialized'])
+        self.assertEqual(summary['tool_calls'],0)
+        self.assertNotIn('PRIVATE_SENTINEL',raw)
+        self.assertNotIn('https://',raw)
+        self.assertEqual(list((self.root/'runtime/requests').iterdir()),[])
+
+    def test_failure_summary_never_copies_raw_guard_errors(self):
+        from qqbot_gateway.workbuddy_cli_runner import failure_summary,ResultParser
+        summary=failure_summary('raw private trace','unknown',ResultParser(),
+            dict(reason='https://example.com/private',guard_reason='PRIVATE_SENTINEL',hook_error='secret'))
+        self.assertEqual(summary['reason'],'suppressed')
+        self.assertEqual(summary['guard_reason'],'suppressed')
+        self.assertNotIn('PRIVATE_SENTINEL',json.dumps(summary))
 
     def runner(self,mode='success',effort='high',budget=None):
         (self.root/'mode').write_text(mode)

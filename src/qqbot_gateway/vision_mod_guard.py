@@ -81,7 +81,7 @@ class Guard:
             if row.get('nonce')!=self.request['nonce'] or row.get('stage') not in phase_names:
                 raise ValueError('VISION_PLUGIN_PHASE_IDENTITY')
             stages.append(row['stage'])
-            for key in ('reason','hook_error','diagnostic','registered_tools','catalog_tools','transcript_verified'):
+            for key in ('reason','guard_reason','hook_error','diagnostic','registered_tools','catalog_tools','transcript_verified'):
                 if key in row:value[key]=row[key]
             if row['stage']=='next':calls+=1
             if 'native_web' in row and row.get('seq',-1)>last_proof:

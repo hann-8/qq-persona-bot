@@ -1,3 +1,7 @@
+2026-10-29本session补充src/qqbot_gateway/vision_mod_guard.py归属：传递固定guard_reason枚举供最后一次安全失败摘要使用，不存原始错误/消息。
+
+2026-10-29 10:45（Asia/Shanghai）：session `LAP-43-native-web-json-debug`续43，用户反馈已部署版游戏搜索仍BACKEND_UNAVAILABLE，沿本会话修复/部署/Git授权继续。起点生产main/c2346cb，隔离codex/lap43-web-debug已快进同提交、两树干净。本session唯一实现/受管启停执行者，不派代理。归属adapters/codebuddy_vision_guard/hooks/register.ts、src/qqbot_gateway/workbuddy_cli_runner.py、tests/test_cli_native_web.py、tests/test_cli_runner.py、config/vision-capabilities.json、当前native离线报告及PROGRESS/工作线HANDOFF/TASKS/43 HANDOFF/排查报告；忽略归属state/lap43-web-json-deployment及当前probe/active配对。目标补全字符串参数传递、完整CLI零生成工具往返与安全故障类别留存，再配对部署；不改模型/额度/local/persona/图库/记忆，不主动真实生成/公共工具服务/QQ测试。
+
 2026-10-29 10:28本session部署收尾：两处debug修复已加载main；当前21检查/真实CLI零生成正反接线通过，生产running/connected/can_receive/router_ready、current_error=null、pending_restart=false，vision/群记忆保持，16项保护不变。当前binding/备份/回滚见43 HANDOFF；本轮main交付并核对远端后释放唯一执行归属，不主动模型/联网服务/QQ测试，用户自行群测。
 
 2026-10-29 10:26补充本session归属config/vision-capabilities.json：生产check的21测试通过，但静态阶段按预期报HOSTED_REVIEW_RECORD_MISMATCH；源审阅记录中plugin_assets_sha256仍为旧插件摘要。仅更新该来源事实字段为当前assets_signature，保持能力/模型/上界/旧报告不变后重新完整check，属于授权部署的配对同步。
