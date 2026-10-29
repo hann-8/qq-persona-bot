@@ -27,13 +27,20 @@ def failure_summary(trace, code, parser, guard_state):
     tags={'unavailable','none','tool_identity_replay_or_limit','tool_validation_or_io','tool_hook_failure',
         'native_step_validation','native_result_validation','step_validation_or_io','identity_projection_or_step',
         'tool_envelope','tool_private','fetch_input','search_input','search_domains','search_url',
-        'tool_total_bytes','non_text_resource','result_private','tool_result_bytes','tool_io_or_invalid_json'}
+        'tool_total_bytes','non_text_resource','result_private','tool_result_bytes','tool_io_or_invalid_json',
+        'previous_failure','tool_subagent','tool_wrong_name','tool_id','tool_plan_missing','tool_plan_mismatch',
+        'tool_replayed','tool_limit','tool_deadline','native_ready','native_step_identity','native_turn',
+        'native_rows','native_first','native_blocks','native_answer_history','native_call_history',
+        'native_result_history','native_history_type','native_history_complete','native_prefix','native_mcp',
+        'native_tool_definitions','native_step_budget','server_tool','native_planned_limit','native_returned_tool','native_io'}
     safe_tag=lambda value: value if isinstance(value,str) and value in tags else 'suppressed'
     return dict(schema=1,trace=trace if isinstance(trace,str) and re.fullmatch('[a-f0-9]{10}',trace) else '0000000000',
         code=code if code in MESSAGES else 'BACKEND_UNAVAILABLE',initialized=parser.initialized,
         tool_calls=len(parser.tool_calls),tool_results=len(parser.tool_results),
         reason=safe_tag(guard_state.get('reason','unavailable')),
-        guard_reason=safe_tag(guard_state.get('guard_reason','unavailable')))
+        guard_reason=safe_tag(guard_state.get('guard_reason','unavailable')),
+        refusals=[{k:safe_tag(row.get(k,'unavailable')) for k in ('reason','guard_reason')}
+            for row in guard_state.get('refusals',[])[:8] if isinstance(row,dict)])
 
 
 class _MetadataReady(Exception):

@@ -1,3 +1,7 @@
+2026-10-29用户要求收住debug：只完成已确证的同会话工具凭证接线及公共数字URL误拦截修复、必要部署/Git；真实诊断2/2已用（5.844秒失败、12.578秒取到PS页后被Steam商品ID误判），不追加第3次、不发QQ。当前30项/27SDK场景通过。
+
+2026-10-29本session `LAP-43-web-latency-trace`续43：用户反馈错误后约一分半又回答，已只读确认11:03:53→11:04:05失败，11:05:04答复属于另一请求且0联网工具。生产main/b0b4573保持，隔离codex/lap43-web-trace精确拥有adapters/codebuddy_vision_guard/hooks/register.ts、src/qqbot_gateway/{vision_mod_guard,workbuddy_cli_runner}.py、tests/test_cli_{native_web,runner}.py、config/vision-capabilities.json、43专属HANDOFF/排查报告及本隔离台账。先补固定枚举的细分拒绝诊断、离线验证；已询问最多2次真实模型诊断额度，未获回复前不执行真实模型/工具服务/QQ。保留他会话LAP-44的共享文档，当前不改生产配置/persona/记忆、不启停。
+
 2026-10-29 10:28本session部署收尾：两处debug修复已加载main；当前21检查/真实CLI零生成正反接线通过，生产running/connected/can_receive/router_ready、current_error=null、pending_restart=false，vision/群记忆保持，16项保护不变。当前binding/备份/回滚见43 HANDOFF；本轮main交付并核对远端后释放唯一执行归属，不主动模型/联网服务/QQ测试，用户自行群测。
 
 2026-10-29 10:26补充本session归属config/vision-capabilities.json：生产check的21测试通过，但静态阶段按预期报HOSTED_REVIEW_RECORD_MISMATCH；源审阅记录中plugin_assets_sha256仍为旧插件摘要。仅更新该来源事实字段为当前assets_signature，保持能力/模型/上界/旧报告不变后重新完整check，属于授权部署的配对同步。
