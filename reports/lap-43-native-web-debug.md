@@ -2,6 +2,24 @@
 
 日期：2026-10-29（Asia/Shanghai）。任务/session：LAP-43 / LAP-43-native-web-debug。
 
+## 2026-10-29 10:42反馈续修（已部署，待用户实测）
+
+c2346cb部署后，用户正常游戏搜索仍失败。10:41:56入站对应10:42:04/eba52f9466，CLI PID179216两次WebFetch仍返回本插件固定deny，没有取得网页结果。本轮检查真实工具参数与首轮模型计划完全相等，公开URL/文本没有命中既有敏感规则或本机私密ID。旧运行没有保留具体拒绝phase，不能追认这条请求命中了哪一个分支。
+
+定位并复现流式时序缺口：锁定CLI getStreamedResponse在response_done时通知turn.step结果，同时继续向主循环交付输出，并未等待Mod后处理完成。工具事件可先于插件从next(e)取得/登记计划到达，旧工具处理立即找不到planned而拒绝。修复以当前步的Promise等待准确计划登记，之后仍执行原白名单/参数/计数/预算，不猜测计划、不重试/加次数。
+
+另外补齐<=8192字节的JSON字符串input封套；解析后必须是参数对象，外层副本存在时完全一致，畸形/数组/null拒绝。trace.toolInput为字符串本身只是日志序列化，完整CLI本地替身观察实际e.input为对象，因此字符串支持是兼容补全，不据此断言它就是用户本次失败原因。
+
+验证：对c2346cb源码运行新增回归，3个JSON参数及2个提前工具事件子场景失败；新源码全部通过，合计21个实际适配器子场景。新增完整锁定CLI工具往返测试：仅在临时插件中固定替换模型next和工具core（均不调用原next），真实CLI控制/事件/消息历史/最终parser经历两次WebFetch后生成固定最终答复，远端生成/公共工具服务/QQ均0，不把替身结果称为真实搜索成功。
+
+隔离30项通过：test_lap43 + test_cli_native_web + test_cli_runner。包含上述CLI往返、21适配器子场景、坏计划/重放/畸形JSON/私密参数拒绝及安全诊断落盘。安全诊断仅覆盖最后一次CLI失败，state/cli-last-failure.json只保存固定枚举、随机trace及计数，不保存原始错误、消息、查询、URL或凭据；失败摘要无法写入不覆盖原有生成/清理结果。
+
+本轮已部署：生产当前check为22项（含完整CLI零生成工具往返）/实际预算/static通过，额外8个runner检查在隔离树通过，合计30项。生产正式零生成probe正例1本地user/0 next，反例0/0 user；完整active绑定已激活，受管正常重启后running/connected/can_receive/router_ready、current_error=null、pending_restart=false。识图试用和群记忆读写true，thinking=false，16项保护不变。
+
+当前binding e8a90ceae7a384e393a9431718c94899ed9e62254208be1e63eba363cd9fcbff；备份/回执state/lap43-web-json-deployment/20261029-1056。最后一次安全失败摘要路径state/cli-last-failure.json（也可能由本地负例probe更新，以trace/类别区分）。
+
+另一个session正修改LAP-44的5份共享/规划文档，本轮均保留，不夹带提交；只从隔离2e0fe73取本次源码/测试/43专属报告到main。当前精确归属/回滚见43 HANDOFF，隔离TASKS保留本轮领取。本段覆盖前轮“两个缺陷即已解决”的推断；真实服务/群回复仍需用户实测。
+
 ## 结论
 
 本次具体失败已找到本机证据：模型确实返回了两个WebFetch请求，但项目防护插件均返回固定拒绝结果，随后CLI没有最终答复，网关统一映射为BACKEND_UNAVAILABLE。现有证据不能把它归因于搜索服务宕机或模型账号失效。
