@@ -42,6 +42,7 @@ else:
 send({'type':'system','subtype':'init','model':'deepseek-v4.1-flash','tools':[],'mcp_servers':[]})
 if mode=='missing-final':sys.exit(0)
 if mode=='backend-error':
+ print('synthetic stderr details',file=sys.stderr,flush=True)
  send({'type':'result','is_error':True,'errors':['PRIVATE_SENTINEL https://example.com/private']});sys.exit(0)
 result={'type':'result','subtype':'success','is_error':False,'result':'answer'}
 send(result)
@@ -55,6 +56,23 @@ class RunnerTests(unittest.IsolatedAsyncioTestCase):
         self.script=self.root/'fake.py';self.script.write_text(FAKE,encoding='utf-8')
 
     def tearDown(self):self.temp.cleanup()
+
+    async def test_temporary_capture_matches_once_then_turns_off(self):
+        state=self.root/'state';state.mkdir()
+        flag=state/'cli-debug.once.json';flag.write_text(json.dumps({'match':'影之刃'}),encoding='utf-8')
+        runner=self.runner('success')
+        await runner.run('SYS',json.dumps([{'role':'user','content':'other question'}]),'unrelated')
+        self.assertTrue(flag.exists())
+        runner=self.runner('backend-error')
+        with self.assertRaises(GatewayError):
+            await runner.run('SYS',json.dumps([{'role':'user','content':'影之刃什么时候能玩'}],ensure_ascii=False),'capture')
+        self.assertFalse(flag.exists())
+        captures=list((state/'cli-debug').iterdir());self.assertEqual(len(captures),1)
+        self.assertIn('PRIVATE_SENTINEL',(captures[0]/'stdout.jsonl').read_text(encoding='utf-8'))
+        self.assertIn('synthetic stderr details',(captures[0]/'stderr.local.log').read_text(encoding='utf-8'))
+        self.assertEqual(json.loads((captures[0]/'outcome.json').read_text(encoding='utf-8'))['generation'],'BACKEND_UNAVAILABLE')
+        await self.runner('success').run('SYS','question','after')
+        self.assertEqual(len(list((state/'cli-debug').iterdir())),1)
 
     async def test_backend_failure_keeps_only_safe_metadata_after_cleanup(self):
         runner=self.runner('backend-error')

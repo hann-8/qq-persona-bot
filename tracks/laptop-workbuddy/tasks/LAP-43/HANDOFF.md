@@ -2,6 +2,12 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线HANDOFF](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [详细规划](PLAN.md) / [medium指令](MEDIUM_START.md)。继承根AGENTS边界；本任务不替代LAP-18/21/27/35/42的历史证据及未验差额。
 
+## 当前：临时一次性实测日志，不修改功能判断
+
+用户明确先记录实测，不再猜测/过度编码。session LAP-43-once-log，生产main/2700200（含44），本轮只归档已有11:40:37→11:40:47/648a1de253日志，并准备一次性影之刃请求采集：CLI stdout/stderr、现有guard回执和失败计数快照；消费后自动关闭，文件仅state/cli-debug本机忽略，不提交原始内容。不主动真实模型/QQ，不修任何失败判断。源码改变须按当前44后的配对流程保持识图和记忆可用；日志抓到后先读证据，再决定最小修复。归属见本隔离TASKS首段。
+
+一次性开关state/cli-debug.once.json（match=影之刃），只匹配当前问题而非整段历史，probe/元数据检查不消费。首次匹配时原子移入state/cli-debug/<请求目录>/capture-request.json，所以随后自动关闭；stdout.jsonl、stderr.local.log、outcome.json及既有guard manifest/receipts仅在该目录保存。既有native_history_complete判断未改，仅在失败回执附planned/seen_calls/requests/seen_results/results五个计数。日志IO失败不改变原任务结果。9项runner离线检查通过，含不匹配不消费、匹配失败请求留原始输出、消费后不再录。
+
 ## 当前：两处修复已部署，本轮停止扩展
 
 用户要求不要过度debug。本轮停止扩展排查和追加真实调用，只将已确证的接线与公开网址数字ID误拦截修复配对部署。用户再次要求不要过度限制/编码，后续不增加限制、代码或测试，只交付本轮已确证修复。真实任务已用2/2，第三次未获授权、未执行；每任务仍遵守原工具/步骤/90秒上限，不发QQ。

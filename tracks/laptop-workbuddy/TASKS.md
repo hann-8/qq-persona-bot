@@ -1,3 +1,7 @@
+本轮精确补充归属adapters/codebuddy_vision_guard/hooks/register.ts、config/vision-capabilities.json：只在现有失败回执附计划/请求/结果数量快照，并同步插件来源摘要；不改任何判断表达式。
+
+2026-10-29 session `LAP-43-once-log`续43：用户明确先临时记录一次实测日志，不再猜测修功能。起点生产main/2700200（LAP-44已部署），Git干净。隔离codex/lap43-once-log，唯一执行者，无代理。归属src/qqbot_gateway/workbuddy_cli_runner.py、tests/test_cli_runner.py，必要guard诊断状态快照（只记数不改判断）、当前native技术报告及43专属HANDOFF/报告/本隔离台账；忽略归属state/cli-debug和一次性开关、部署备份与配对active。只加可关闭的一次性采集：匹配下一条影之刃当前请求，保留CLI输出/错误/既有回执和校验状态，消耗后自动停录。不改工具/权限/预算/模型/persona/记忆，不主动真实模型/QQ，不修失败判断。历史请求648a1de253已先在生产本机私有目录归档。
+
 2026-10-29 LAP-44-full-memory-implementation 收尾：实现2b7bab7，0d82882合入并保留期间新增的main/df46056，生产正常stop后快进；备份20261029-1140、schema1三空库迁移schema2、两份local精确调值、33检查/static与零生成probe/activate、start/status全部完成。当前running/connected/can_receive/router_ready、memory读写true、0条0字符、524288政策、无待重启/当前错误。最终报告/交接及AGENTS/使用说明/PLAN已同步，其他任务与旧验收差额保留；main和实施分支commit/push核对后释放本session唯一归属，不主动追加模型/工具服务/QQ测试。
 
 2026-10-29 session LAP-44-full-memory-implementation 唯一实施/部署归属：按 PLAN/MEDIUM_START 完成schema2/全文/更新回执/可扩预算、定向检查、受管迁移部署及commit/push。起点main=b0b4573干净，隔离codex/lap-44-full-memory已接入465e76a规划。拥有PLAN第8节源码/adapter/config模板/manage与配对脚本、定向测试、44报告、AGENTS/使用说明/PROGRESS/工作线HANDOFF/TASKS/44文档；忽略归属生产memory/所选budget/备份与vision/native配对。无代理，不操作旧根，不主动模型/联网服务/QQ；保留其他功能和最新main修复。

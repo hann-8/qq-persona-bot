@@ -294,6 +294,24 @@ class CLIRunner:
             self.last_parameters['effort_evidence']='auto_default' if self.reasoning_effort=='auto' else 'awaiting_current_capabilities'
             exchange = ControlExchange('get_available_models') if control_only or self.reasoning_effort != 'auto' else None
             acknowledged = asyncio.Event()
+            debug = None
+            flag = self.root/'state/cli-debug.once.json'
+            if not probe and not control_only and flag.is_file():
+                try:
+                    match=json.loads(flag.read_text(encoding='utf-8'))['match']
+                    if isinstance(match,str) and match and match in (scope[1] or current_question(prompt)):
+                        target=self.root/'state/cli-debug'/work.name
+                        target.mkdir(parents=True,exist_ok=False)
+                        flag.rename(target/'capture-request.json')
+                        debug=target
+                except (OSError,ValueError,KeyError,TypeError):pass
+
+            def record(name, data):
+                if debug is not None:
+                    try:
+                        with (debug/name).open('ab') as stream:stream.write(data)
+                    except OSError:self.last_parameters['debug_log_io_failed']=True
+
             owned_root = None
             try:
                 owned_root = psutil.Process(process.pid)
@@ -314,6 +332,7 @@ class CLIRunner:
             async def read_stdout():
                 if exchange is not None:
                     while line := await process.stdout.readline():
+                        record('stdout.jsonl',line)
                         try:event = json.loads(line)
                         except (ValueError,UnicodeError):
                             if probe:
@@ -366,12 +385,14 @@ class CLIRunner:
                         parser.line(line.decode('utf-8'))
                 else:
                     while chunk := await process.stdout.read(8192):
+                        record('stdout.jsonl',chunk)
                         parser.feed(chunk)
 
             async def read_stderr():
                 count = 0
                 if probe:self.last_probe_stderr=bytearray()
                 while chunk := await process.stderr.read(8192):
+                    record('stderr.local.log',chunk)
                     count += len(chunk)
                     if count > 65536:
                         raise GatewayError('PROTOCOL_ERROR')
@@ -455,6 +476,9 @@ class CLIRunner:
                 generation = 'PROTOCOL_ERROR'
                 raise GatewayError('PROTOCOL_ERROR') from None
             except Exception:
+                if debug is not None:
+                    import traceback
+                    record('exception.local.log',traceback.format_exc().encode('utf-8'))
                 generation = 'BACKEND_UNAVAILABLE'
                 raise GatewayError('BACKEND_UNAVAILABLE') from None
             finally:
@@ -477,6 +501,12 @@ class CLIRunner:
                 self.last_protocol = parser.events
                 owner.begin(process, io, watcher, owned_root, generation, self.cleanup_seconds)
                 clean = await owner.join()
+                if debug is not None:
+                    if guard:
+                        try:guard.preserve_probe(debug/'guard')
+                        except (OSError,ValueError):self.last_parameters['debug_guard_copy_failed']=True
+                    record('outcome.json',json.dumps(dict(generation=generation,cleanup_ok=clean,
+                        parameters=self.last_parameters,protocol=parser.events),ensure_ascii=False).encode('utf-8'))
                 if not clean:
                     # Keep original generation metadata; withhold any late answer.
                     raise GatewayError('CLEANUP_FAILED')

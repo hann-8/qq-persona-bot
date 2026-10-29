@@ -291,6 +291,7 @@ export function register(on, options) {
   async function nativeStep($,e,next){
     let entered=false;
     let releasePlan;
+    let diagnostic={};
     try{
       const prior=await readState($);
       need(!native.failed && !prior.stages.includes('refused') && prior.stages.includes('composed'),'native_ready');
@@ -319,6 +320,8 @@ export function register(on, options) {
           }else need(false,'native_history_type');
         }
       }
+      diagnostic={planned:native.planned.length,seen_calls:seenCalls.size,requests:native.requests.size,
+        seen_results:seenResults.size,results:native.results.size};
       need(native.planned.length===0 && seenCalls.size===native.requests.size && seenResults.size===native.results.size &&
         seenCalls.size===seenResults.size,'native_history_complete');
       if(native.prefix)need(canonical(rows.slice(0,native.prefix.length))===canonical(native.prefix),'native_prefix');
@@ -349,7 +352,7 @@ export function register(on, options) {
       native.failed=true;
       const tag=/^Error: VISION_GUARD_([a-z_]{1,80})$/.exec(String(error));
       return reject($,e,entered?'native_result_validation':'native_step_validation',{
-        guard_reason:tag?tag[1]:'native_io',hook_error:String(error).slice(0,160),native_web:proof()});
+        guard_reason:tag?tag[1]:'native_io',hook_error:String(error).slice(0,160),diagnostic,native_web:proof()});
     }
     finally{if(releasePlan){native.pendingStep=null;releasePlan();}}
   }
