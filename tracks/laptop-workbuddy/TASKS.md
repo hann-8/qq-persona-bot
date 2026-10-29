@@ -1,3 +1,5 @@
+2026-10-29 session LAP-43-sdk-error-result续43：用户授权查明后直接最小修复。最新实测6b78bdc2日志完整：identity值匹配，混合WebFetch成功/跨域跳转错误，native_result_history拒绝。锁定SDK在core抛错时保留原始错误，即使hook返回清理后的结果也不能覆盖；项目错误body固定文本比较不兼容。仅修明确错误回执的兼容/实际字节记账，成功回执严格比较不变，不增重试/权限/次数/模型调用。基线main/13f1621干净；隔离codex/lap43-sdk-error-result唯一执行，无代理。归属adapter register.ts、config/vision-capabilities.json来源摘要、test_cli_native_web.py一个回归场景、当前native报告、43 HANDOFF/排查报告/本隔离台账；忽略归属现有单次实测日志和配对部署备份。原始日志/群消息不提交。
+
 2026-10-29 session LAP-43-step-log：用户要求查明原因、不猜测，必要时录日志，并再次强调不增加限制/过度编码。本轮仅补现有nativeStep诊断中的实际/期望字段，所有判断表达式保持原样；复用既有单次捕获，不主动真实模型/QQ。归属adapters/codebuddy_vision_guard/hooks/register.ts、config/vision-capabilities.json（来源摘要）、当前技术报告、43专属HANDOFF和本隔离台账；忽略归属state/cli-debug-step-deployment及一次性开关/active配对。基线main/4ae466b，生产干净，唯一执行者，无代理。
 
 本轮精确补充归属adapters/codebuddy_vision_guard/hooks/register.ts、config/vision-capabilities.json：只在现有失败回执附计划/请求/结果数量快照，并同步插件来源摘要；不改任何判断表达式。

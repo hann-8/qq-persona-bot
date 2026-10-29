@@ -173,6 +173,18 @@ export function register(on, options) {
     text.replace(/\b\d{4}-\d{2}-\d{2}\b/g,'DATE')) || web.private_ids.some(x=>text.includes(x));
   const proof=()=>({calls:native.calls,result_bytes:native.resultBytes,urls:native.urls.slice(0,2),steps:native.steps,
     allowed_tools:web.allowed_tools,thinking_enabled:false,sha256:hash(canonical(Array.from(native.results.values()).map(x=>x.visible??'')))});
+  const verifyResult=(b,out)=>{
+    need(out && !out.pending,'native_result_history');
+    if(!out.failed){need([out.text,out.visible].includes(b.content),'native_result_history');return;}
+    // SDK core errors remain in its transcript even when a hook replaces the
+    // result. Account that actual error view rather than our proposed text.
+    need(b.is_error===true && typeof b.content==='string','native_result_history');
+    if(!out.api_error){
+      const size=bytes(b.content).length,total=native.resultBytes-bytes(out.visible).length+size;
+      need(size<=web.result_bytes && total<=web.total_result_bytes,'tool_result_bytes');
+      native.resultBytes=total;out.visible=b.content;out.api_error=true;
+    }else need(out.visible===b.content,'native_result_history');
+  };
   const argsOf=e=>{
     const flat=Object.fromEntries(Object.entries(e).filter(([k])=>!['tool','tool_use_id','agentId','consent','input'].includes(k)));
     if(!Object.prototype.hasOwnProperty.call(e,'input'))return flat;
@@ -224,7 +236,7 @@ export function register(on, options) {
                 if(!native.answers.includes(b.text))native.answers.push(b.text);
               }else if(row.role==='user' && b.type==='tool_result'){
                 const out=native.results.get(b.tool_use_id);
-                need(out && !out.pending && [out.text,out.visible].includes(b.content),'native_result_history');
+                verifyResult(b,out);
               }else need(row.role==='assistant' && b.type==='tool_use' && native.requests.has(b.id),'native_history_type');
             }
           }
@@ -279,7 +291,7 @@ export function register(on, options) {
         const visible=JSON.stringify(clean);
         native.resultBytes+=bytes(visible).length;
         const actual=urls(text);native.urls=Array.from(new Set([...native.urls,...actual])).slice(0,2);
-        native.results.set(id,{text,result:clean,visible});
+        native.results.set(id,{text,result:clean,visible,failed:!!(result.deny || result.isError)});
         await receipt($,'admitted',{native_web:proof()});
         return {result:clean};
       }catch(error){
@@ -316,8 +328,8 @@ export function register(on, options) {
             seenCalls.add(b.id);
           }else if(row.role==='user' && b.type==='tool_result'){
             const out=native.results.get(b.tool_use_id);
-            need(out && !out.pending && seenCalls.has(b.tool_use_id) && !seenResults.has(b.tool_use_id) &&
-              [out.text,out.visible].includes(b.content),'native_result_history');
+            need(seenCalls.has(b.tool_use_id) && !seenResults.has(b.tool_use_id),'native_result_history');
+            verifyResult(b,out);
             seenResults.add(b.tool_use_id);
           }else need(false,'native_history_type');
         }

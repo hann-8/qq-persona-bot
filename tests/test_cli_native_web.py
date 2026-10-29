@@ -101,14 +101,20 @@ const invoke=async(input,i)=>{
   if(variant==='fetch_null_json')wireInput='null';
   const result=await dispatchModsToolCall({name:tool,callId:id,input:wireInput},async received=>{
    if(JSON.stringify(received)!==JSON.stringify(wireInput))throw Error('ARGUMENTS_CHANGED');
-   calls++;return {content:'public fact https://example.com/news/'+i,title:'Public page'};
+   calls++;
+   if(variant==='fetch_sdk_error')throw Error('URL redirected to different host; use the redirect URL');
+   return {content:'public fact https://example.com/news/'+i,title:'Public page'};
   },{dispatch:async(name,event,options)=>{
    events.push(event);
    if(variant.includes('conflict'))event.input={...input,prompt:'tampered'};
    return handlers[name](host,event,options.coreResult);
   }},variant.includes('flat'));
   outputs[i]={id,input,result};
- } catch(error){errors.push(String(error));}
+ } catch(error){
+  errors.push(String(error));
+  if(variant==='fetch_sdk_error')outputs[i]={id,input,is_error:true,
+    result:{content:'Error: '+String(error),error:String(error)}};
+ }
 };
 const e=i=>({turnId:'one-task',index:i,model:q.model,messageCount:rows.length});
 const first=await handlers['turn.step'](host,e(0),async event=>{
@@ -121,7 +127,7 @@ const first=await handlers['turn.step'](host,e(0),async event=>{
 await Promise.all(variant.includes('race')?early:inputs.map(invoke));
 for(const out of outputs.filter(Boolean)){
  if(!variant.includes('session_plan'))rows.push({role:'assistant',content:[{type:'tool_use',id:out.id,name:tool,input:out.input}]});
- rows.push({role:'user',content:[{type:'tool_result',tool_use_id:out.id,content:JSON.stringify(out.result)}]});
+ rows.push({role:'user',content:[{type:'tool_result',tool_use_id:out.id,content:JSON.stringify(out.result),is_error:!!out.is_error}]});
 }
 const second=await handlers['turn.step'](host,e(1),async event=>{
  steps++;return {...event,answer:'final',toolUses:[],serverToolUses:[]};
@@ -235,7 +241,7 @@ class NativeTests(unittest.TestCase):
         refused=('fetch_conflict','search_drive','search_backslash','search_unc','search_private_id',
             'fetch_invalid_json','fetch_array_json','fetch_null_json','fetch_race_badplan','fetch_session_plan_wrong_id',
             'fetch_private_numeric_url','fetch_numeric_prompt')
-        for variant in ('search','search_flat','search_url','search_json','fetch','fetch_json','fetch_parallel','fetch_parallel_json','fetch_race','fetch_parallel_race_json','fetch_flat','fetch_http','fetch_numeric_url','fetch_session_plan','fetch_parallel_session_plan',*refused):
+        for variant in ('search','search_flat','search_url','search_json','fetch','fetch_json','fetch_parallel','fetch_parallel_json','fetch_race','fetch_parallel_race_json','fetch_flat','fetch_http','fetch_numeric_url','fetch_session_plan','fetch_parallel_session_plan','fetch_sdk_error',*refused):
             with self.subTest(variant=variant), tempfile.TemporaryDirectory() as folder:
                 work=Path(folder)
                 policy=native_contract(validate_web(dict(engine='codebuddy_cli',enabled=True,search_enabled=True)),('987654321',),InputBudget(limit=48000))
@@ -253,7 +259,7 @@ class NativeTests(unittest.TestCase):
                     self.assertIn('refused',proof['stages'])
                 else:
                     self.assertEqual(value['calls'],2 if 'parallel' in variant else 1,(value,proof.get('reason'),proof.get('hook_error')))
-                    self.assertEqual(value['errors'],[])
+                    self.assertEqual(len(value['errors']),1 if variant=='fetch_sdk_error' else 0)
                     self.assertEqual(value['steps'],2)
                     self.assertNotIn('refused',proof['stages'])
                     self.assertEqual(value['second']['answer'],'final')

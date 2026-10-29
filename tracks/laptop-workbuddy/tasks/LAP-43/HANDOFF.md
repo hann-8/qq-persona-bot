@@ -2,6 +2,12 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线HANDOFF](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [详细规划](PLAN.md) / [medium指令](MEDIUM_START.md)。继承根AGENTS边界；本任务不替代LAP-18/21/27/35/42的历史证据及未验差额。
 
+## 当前：按实测修复SDK错误回执兼容（部署中）
+
+用户授权查明后直接最小修复。6b78bdc2实测回执：actual_index=expected_index=1、模型相同、effort未提供（原条件允许）、has_agent=false、deadline有效；本次不是identity失配。一个WebFetch成功，另一个跨域跳转被CLI正常拒绝并提示用重定向URL重新抓取。SDK dispatchModsToolCall在core抛错后保留原错误；项目拟替换为151字节固定文本，实际CLI错误content为429字符（error字段422字符），严格正文比对native_result_history中止后续。
+
+只对已标记SDK错误且API is_error=true的回执，使用CLI实际body并按原8000/12000限额重新记账；以后仍比较该实际快照。成功回执严格比较、工具ID/参数/次数、权限/预算均保持，不加自动重定向或顶层重试。新增一个锁定SDK真实适配函数错误回归：旧源码仅此场景失败，新源码通过；其余既有27子场景保持通过，无真实模型/网络/QQ调用。原始日志保留本机state/cli-debug/6b78bdc282034270be8dd8c9b7742e14-mtb4uv5e，不提交。后续只作正常配对部署和一次用户实测记录。
+
 ## 当前：补录步骤校验实际值，尚不修判断
 
 用户要求按日志查原因，不猜测、不扩编码/限制。上一条c42fc84d/e959a60b9b捕获已消费停录，确认模型返回WebFetch/WebSearch但native_step_identity拒绝；旧回执缺实际e值。本轮只在既有diagnostic附actual/expected index、max_turns、actual/expected model/effort、has_agent、within_deadline，历史计数沿用；校验表达式逐字比对未变，不修任何功能。复用影之刃单次开关，录一次自动停，不主动真实模型/QQ。基线4ae466b，source hash/active配对保持44后的配置、记忆和识图。
