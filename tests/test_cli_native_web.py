@@ -82,6 +82,9 @@ const tool=fetch?'WebFetch':'WebSearch';
 const inputs=Array.from({length:parallel?2:1},(_,i)=>fetch?
  {url:'https://example.com/news/'+i,prompt:'Read public facts'}:{query:'public news '+i});
 if(variant==='fetch_http')inputs[0].url='http://example.com/news';
+if(variant==='fetch_numeric_url')inputs[0].url='https://example.com/app/2358720';
+if(variant==='fetch_private_numeric_url')inputs[0].url='https://example.com/profile/987654321';
+if(variant==='fetch_numeric_prompt')inputs[0].prompt='Read profile 123456789';
 if(variant==='search_url')inputs[0].query='public facts https://example.com/news';
 if(variant==='search_drive')inputs[0].query='read C:/private.txt';
 if(variant==='search_backslash')inputs[0].query='read C:\\private.txt';
@@ -90,7 +93,7 @@ if(variant==='search_private_id')inputs[0].query='look up 123456789';
 const errors=[],outputs=[],events=[];
 let calls=0,steps=0,early=[];
 const invoke=async(input,i)=>{
- const id='sdk-call-'+i;
+ const id=(variant.includes('wrong_id')?'intruder-':'sdk-call-')+i;
  try {
   let wireInput=variant.includes('json')?JSON.stringify(input):input;
   if(variant==='fetch_invalid_json')wireInput='{';
@@ -111,12 +114,15 @@ const e=i=>({turnId:'one-task',index:i,model:q.model,messageCount:rows.length});
 const first=await handlers['turn.step'](host,e(0),async event=>{
  steps++;
  if(variant.includes('race'))early=inputs.map(invoke);
- return {...event,answer:'',toolUses:inputs.map(input=>({name:variant.includes('badplan')?'Read':tool,input})),serverToolUses:[]};
+ if(variant.includes('session_plan'))rows=rows.concat([{role:'assistant',content:[{type:'text',text:'model preamble'},
+   ...inputs.map((input,i)=>({type:'tool_use',id:'sdk-call-'+i,name:tool,input}))]}]);
+ return {...event,answer:'',toolUses:variant.includes('session_plan')?[]:inputs.map(input=>({name:variant.includes('badplan')?'Read':tool,input})),serverToolUses:[]};
 });
 await Promise.all(variant.includes('race')?early:inputs.map(invoke));
-for(const out of outputs.filter(Boolean))rows.push(
- {role:'assistant',content:[{type:'tool_use',id:out.id,name:tool,input:out.input}]},
- {role:'user',content:[{type:'tool_result',tool_use_id:out.id,content:JSON.stringify(out.result)}]});
+for(const out of outputs.filter(Boolean)){
+ if(!variant.includes('session_plan'))rows.push({role:'assistant',content:[{type:'tool_use',id:out.id,name:tool,input:out.input}]});
+ rows.push({role:'user',content:[{type:'tool_result',tool_use_id:out.id,content:JSON.stringify(out.result)}]});
+}
 const second=await handlers['turn.step'](host,e(1),async event=>{
  steps++;return {...event,answer:'final',toolUses:[],serverToolUses:[]};
 });
@@ -227,11 +233,12 @@ class NativeTests(unittest.TestCase):
         self.assertTrue(adapter.endswith('}'))
         adapter='import * as ed from "node:util";\n'+adapter+'\nexport {dispatchModsToolCall};\n'
         refused=('fetch_conflict','search_drive','search_backslash','search_unc','search_private_id',
-            'fetch_invalid_json','fetch_array_json','fetch_null_json','fetch_race_badplan')
-        for variant in ('search','search_flat','search_url','search_json','fetch','fetch_json','fetch_parallel','fetch_parallel_json','fetch_race','fetch_parallel_race_json','fetch_flat','fetch_http',*refused):
+            'fetch_invalid_json','fetch_array_json','fetch_null_json','fetch_race_badplan','fetch_session_plan_wrong_id',
+            'fetch_private_numeric_url','fetch_numeric_prompt')
+        for variant in ('search','search_flat','search_url','search_json','fetch','fetch_json','fetch_parallel','fetch_parallel_json','fetch_race','fetch_parallel_race_json','fetch_flat','fetch_http','fetch_numeric_url','fetch_session_plan','fetch_parallel_session_plan',*refused):
             with self.subTest(variant=variant), tempfile.TemporaryDirectory() as folder:
                 work=Path(folder)
-                policy=native_contract(validate_web(dict(engine='codebuddy_cli',enabled=True,search_enabled=True)),(),InputBudget(limit=48000))
+                policy=native_contract(validate_web(dict(engine='codebuddy_cli',enabled=True,search_enabled=True)),('987654321',),InputBudget(limit=48000))
                 guard=Guard(work,'current policy','current snapshot',None,dict(T=30,F=18000,V=0,O=128000,C=1000000),
                     wire_message=dict(type='user',message=dict(role='user',content='current snapshot')),native_web=policy)
                 program=work/'host.mjs';program.write_text(SDK_HARNESS,encoding='utf-8')

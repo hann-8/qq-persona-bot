@@ -206,14 +206,50 @@ export function register(on, options) {
         // Streaming CLI can dispatch a tool before turn.step's next() reply
         // has crossed the Mod bridge. Wait for that exact plan, never guess it.
         if(native.pendingStep)await native.pendingStep;
-        const id=e.tool_use_id,args=argsOf(e),known=native.planned.find(x=>x.tool===e.tool && canonical(x.input)===canonical(args));
+        const id=e.tool_use_id,args=argsOf(e);
+        let known=native.planned.find(x=>x.tool===e.tool && canonical(x.input)===canonical(args));
+        if(!known && !native.failed && typeof id==='string' && !native.results.has(id)){
+          // Live streaming next() can omit toolUses even though the SDK has
+          // committed them. Authorize only the exact id from that same bounded
+          // session transcript, never a tool event's self-reported arguments.
+          const rows=await $.session.messages({as:'api'});
+          need(native.prefix && canonical(rows.slice(0,native.prefix.length))===canonical(native.prefix),'native_prefix');
+          const pending=[];
+          for(const row of rows.slice(native.prefix.length)){
+            need(Array.isArray(row.content),'native_blocks');
+            for(const b of row.content){
+              if(row.role==='assistant' && b.type==='tool_use' && !native.requests.has(b.id)){
+                need(web.allowed_tools.includes(b.name),'native_returned_tool');pending.push(b);
+              }else if(row.role==='assistant' && b.type==='text'){
+                if(!native.answers.includes(b.text))native.answers.push(b.text);
+              }else if(row.role==='user' && b.type==='tool_result'){
+                const out=native.results.get(b.tool_use_id);
+                need(out && !out.pending && [out.text,out.visible].includes(b.content),'native_result_history');
+              }else need(row.role==='assistant' && b.type==='tool_use' && native.requests.has(b.id),'native_history_type');
+            }
+          }
+          need(pending.length+native.calls<=web.max_calls,'native_planned_limit');
+          const matches=pending.filter(b=>b.id===id && b.name===e.tool && canonical(b.input)===canonical(args));
+          need(matches.length===1,'tool_plan_missing');
+          known={tool:matches[0].name,input:matches[0].input};
+        }
         // Synchronous reservation, before any await, closes parallel and replay gaps.
-        if(native.failed || e.agentId || !web.allowed_tools.includes(e.tool) || typeof id!=='string' ||
-          !known || known.tool!==e.tool || canonical(known.input)!==canonical(args) ||
-          native.results.has(id) || native.calls>=web.max_calls || Date.now()>q.deadline)
-          return await webDeny($,e,'tool_identity_replay_or_limit');
-        native.calls++;native.planned.splice(native.planned.indexOf(known),1);native.requests.set(id,known);native.results.set(id,{pending:true});
-        need(!sensitive(JSON.stringify(args)),'tool_private');
+        const problem=native.failed?'previous_failure':e.agentId?'tool_subagent':
+          !web.allowed_tools.includes(e.tool)?'tool_wrong_name':typeof id!=='string'?'tool_id':
+          !known?'tool_plan_missing':known.tool!==e.tool || canonical(known.input)!==canonical(args)?'tool_plan_mismatch':
+          native.results.has(id)?'tool_replayed':native.calls>=web.max_calls?'tool_limit':Date.now()>q.deadline?'tool_deadline':null;
+        if(problem)return await webDeny($,e,'tool_identity_replay_or_limit',problem);
+        native.calls++;
+        if(native.planned.includes(known))native.planned.splice(native.planned.indexOf(known),1);
+        native.requests.set(id,known);native.results.set(id,{pending:true});
+        const rawArgs=JSON.stringify(args);
+        // A public product/article URL may contain long numeric resource IDs.
+        // Keep exact private-ID checks on the original URL, and the generic
+        // number check on all other fields; only public URL numbers are masked.
+        need(!web.private_ids.some(x=>rawArgs.includes(x)),'tool_private');
+        const privacyArgs=e.tool==='WebFetch' && publicURL(args.url)?
+          {...args,url:args.url.replace(/\d{5,}/g,'PUBLIC_NUMBER')}:args;
+        need(!sensitive(JSON.stringify(privacyArgs)),'tool_private');
         if(e.tool==='WebFetch'){
           need(Object.keys(args).every(k=>['url','prompt'].includes(k)) && publicURL(args.url) &&
             typeof args.prompt==='string' && args.prompt.length<=1000,'fetch_input');
@@ -309,7 +345,12 @@ export function register(on, options) {
       native.prefix=JSON.parse(JSON.stringify(rows));
       await receipt($,'completed',{native_web:proof()});
       return result;
-    }catch(error){native.failed=true;return reject($,e,entered?'native_result_validation':'native_step_validation',{hook_error:String(error).slice(0,160),native_web:proof()});}
+    }catch(error){
+      native.failed=true;
+      const tag=/^Error: VISION_GUARD_([a-z_]{1,80})$/.exec(String(error));
+      return reject($,e,entered?'native_result_validation':'native_step_validation',{
+        guard_reason:tag?tag[1]:'native_io',hook_error:String(error).slice(0,160),native_web:proof()});
+    }
     finally{if(releasePlan){native.pendingStep=null;releasePlan();}}
   }
 
