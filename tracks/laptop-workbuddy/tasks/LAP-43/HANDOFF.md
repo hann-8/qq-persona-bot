@@ -6,6 +6,8 @@
 
 用户要求按日志查原因，不猜测、不扩编码/限制。上一条c42fc84d/e959a60b9b捕获已消费停录，确认模型返回WebFetch/WebSearch但native_step_identity拒绝；旧回执缺实际e值。本轮只在既有diagnostic附actual/expected index、max_turns、actual/expected model/effort、has_agent、within_deadline，历史计数沿用；校验表达式逐字比对未变，不修任何功能。复用影之刃单次开关，录一次自动停，不主动真实模型/QQ。基线4ae466b，source hash/active配对保持44后的配置、记忆和识图。
 
+字段日志已部署并重新一次性开启：33项当前检查/零生成正反probe通过，running/connected/can_receive/router_ready、current_error=null、pending_restart=false，16项保护不变。binding=42f79e34da82e68e336450ebe8b1e12ee6ce32f0acf4721d270b96863f125250，备份/回执state/cli-debug-step-deployment/20261029。用户明确“如果查到了就修一下”：拿到实际失配后直接最小修复/部署，不再重复索权；目前尚待下一条实测数据，不改原校验。
+
 ## 当前：临时一次性实测日志，不修改功能判断
 
 用户明确先记录实测，不再猜测/过度编码。session LAP-43-once-log，生产main/2700200（含44），本轮只归档已有11:40:37→11:40:47/648a1de253日志，并准备一次性影之刃请求采集：CLI stdout/stderr、现有guard回执和失败计数快照；消费后自动关闭，文件仅state/cli-debug本机忽略，不提交原始内容。不主动真实模型/QQ，不修任何失败判断。源码改变须按当前44后的配对流程保持识图和记忆可用；日志抓到后先读证据，再决定最小修复。归属见本隔离TASKS首段。

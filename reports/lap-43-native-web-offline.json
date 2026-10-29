@@ -1,6 +1,6 @@
 {
-  "adapter_signature": "0f96698d2dc5513b496e6440c4f99701b92dad294649087f25ba512071102ef1",
-  "binding": "313416e4f74b853dc391c8c432b9c8c807e2da62967c437a8003908e42066d02",
+  "adapter_signature": "4fbd4c395399510cc9123d3a284793c883804d2d1f2dbe7ed990097d5efd942f",
+  "binding": "42f79e34da82e68e336450ebe8b1e12ee6ce32f0acf4721d270b96863f125250",
   "budget": {
     "final_visible_policy_bytes": 31334,
     "limit": 524288,
@@ -32,7 +32,7 @@
   "quality_state": "pending_user_test",
   "real_model_calls": 0,
   "real_qq_outputs": 0,
-  "rule_hash": "3f31cedb09497b1460bf8217dd68afcaa5d3a11bc0554a5c21f4799ce52b39cb",
+  "rule_hash": "1408bcb82d4cba02de69a30e739386fdad33303acbf47896241214d73b3bf214",
   "schema_version": 1,
   "static_missing": [],
   "tests_run": 33,
