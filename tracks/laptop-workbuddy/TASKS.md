@@ -1,3 +1,7 @@
+2026-10-29 LAP-44设计交付：PLAN/HANDOFF完成供review，5文档归属/UTF-8/围栏、11本地链接、关键合同及diff --check通过，0代码/运行修改、0真实模型/QQ/启停。用户要求尽快落地，本设计明确review后下一实施轮同轮完成，不加分阶段审批。写作期间生产根出现并行43修复，五份归属文档已转到E:/CodexWS/QQbot_LAP44_plan、codex/lap-44-full-memory-plan，生产本轮文档改动定向移除，并行9项差异保留不夹带。独立分支commit/push并核对实时SHA，交付后释放归属；不改生产main或代其他会话交付。下一轮先核对最新main及归属，再接入本设计并实施。
+
+2026-10-29 10:54（Asia/Shanghai）：session `LAP-44-full-group-memory-plan` 领取新LAP-44，仅设计供用户review。用户明确接受增加输入消耗，本群记忆全文进入上下文，是否记忆/记什么由模型决定，代码尽量精简；不采用关键词检索、相关性排序、分层摘要或单轮2000/3000字符上限。起点main/c2346cb，工作区干净；43部署归属已释放。本session只拥有5份文档：PROGRESS.md、tracks/laptop-workbuddy/HANDOFF.md、TASKS.md、新tasks/LAP-44/{HANDOFF.md,PLAN.md}。登记后重读，再写设计；不修改代码/AGENTS/local/persona/密钥/记忆/运行文件，不启停、登录、真实模型/联网服务/QQ/SSH，不派代理或切模型。本轮规划和文档检查按既有Git授权commit/push，推送核对后释放归属；用户review之前不实施或部署。现有27/30/42记忆条款只记录拟替代范围，不重启旧验收。
+
 2026-10-29 10:28本session部署收尾：两处debug修复已加载main；当前21检查/真实CLI零生成正反接线通过，生产running/connected/can_receive/router_ready、current_error=null、pending_restart=false，vision/群记忆保持，16项保护不变。当前binding/备份/回滚见43 HANDOFF；本轮main交付并核对远端后释放唯一执行归属，不主动模型/联网服务/QQ测试，用户自行群测。
 
 2026-10-29 10:26补充本session归属config/vision-capabilities.json：生产check的21测试通过，但静态阶段按预期报HOSTED_REVIEW_RECORD_MISMATCH；源审阅记录中plugin_assets_sha256仍为旧插件摘要。仅更新该来源事实字段为当前assets_signature，保持能力/模型/上界/旧报告不变后重新完整check，属于授权部署的配对同步。

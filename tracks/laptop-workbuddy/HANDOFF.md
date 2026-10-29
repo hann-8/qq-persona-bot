@@ -1,3 +1,5 @@
+2026-10-29当前设计：新[LAP-44全文群记忆](tasks/LAP-44/PLAN.md)及[交接](tasks/LAP-44/HANDOFF.md)已落盘，待用户review，尚未实施。用户接受增加输入消耗；每群5万字符全文交模型，去掉关键词检索/严格内容门槛/小注入限额，模型增改删、程序可靠保存及真实回执；所选CodeBuddy政策拟524288字节。当前不改代码/local/persona/实际记忆/进程。review后按后续实施指令同轮实现、必要检查、配对部署和Git交付，不再多轮审批或补做旧大验收；真实群效果由用户试用。
+
 2026-10-29群测debug修复已部署main：CLI工具参数封套、HTTP(S)盘符误判两处修复已加载。当前43组合21项/真实CLI零生成正反接线通过，running/connected/can_receive/router_ready、current_error=null、pending_restart=false；识图/记忆/模型配置保持，16项保护摘要不变。实际联网质量由用户群测；[43交接](tasks/LAP-43/HANDOFF.md)及[排查报告](../../reports/lap-43-native-web-debug.md)记录当前绑定/回滚。
 
 2026-10-29最新：LAP-43原生联网已实现、启用并部署main；固定WebSearch/WebFetch，3调用/4步骤/90秒、每步48000、单结果8000/合计12000字节。实际running/connected/can_receive/router_ready，配置无待重启；CLI思考关闭，memory读取/学习true，原识图/表情/owner/free保持。20项当前检查及真实CLI零生成正反接线通过，公共工具服务和群答复效果由用户实测。当前完整绑定/回滚/归属/Git见[43交接](tasks/LAP-43/HANDOFF.md)。下方10-28记录为历史规划/部署，不覆盖此条。

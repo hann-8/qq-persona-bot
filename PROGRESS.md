@@ -1,5 +1,9 @@
 # QQ bot项目入口：SnowLuma主线
 
+## 当前设计待 review：LAP-44 群记忆全文注入
+
+2026-10-29，[LAP-44设计](tracks/laptop-workbuddy/tasks/LAP-44/PLAN.md)及[交接](tracks/laptop-workbuddy/tasks/LAP-44/HANDOFF.md)已落盘，仅规划。按用户最新决定：接受增加输入消耗，每群5万字符正文全文进入上下文；模型决定记忆内容/整理/遗忘，代码不做关键词检索、语义门槛或单轮2千/3千字符限额。最少增改删、可靠落盘及真实回执；所选CodeBuddy字节政策拟由48000提高至524288，具体接线/迁移/预算证据见设计，当前尚未修改。用户要求尽快落地，review后收到实施指令，同轮实现/必要检查/受管部署，不分多轮审批；真实群体验由用户试用。本轮不改代码/local/persona/记忆/key/运行状态，不调用真实模型或发群消息；43已部署联网保持，记忆故障尚未修复。
+
 2026-10-29群测故障修复已合入并部署main：修复CLI工具参数封套及HTTP(S)被误判成本机路径；当前21项定向检查、真实CLI零生成正反接线通过。实际running/connected/can_receive/router_ready，配置无待重启、当前错误为空；识图与记忆保持。详见[43交接](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)及[排查报告](reports/lap-43-native-web-debug.md)。真实联网及群答复由用户自行实测。
 
 ## 当前任务：LAP-43联网故障修复已部署，待用户群测
