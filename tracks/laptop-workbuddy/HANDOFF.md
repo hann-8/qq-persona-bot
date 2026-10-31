@@ -1,3 +1,5 @@
+2026-10-31 WX-AKASHA-ALL：QQ/AstrBot独立微信平台已接线并受管部署，原QQ已恢复connected/ready，账号向导/真实配对待用户；见[本项交接](tasks/WX-AKASHA-ALL/HANDOFF.md)。
+
 2026-10-29 LAP-44已实现、启用并部署main：schema2群记忆全文/模型增改删/实际保存回执已加载，33项定向组合及真实锁定CLI零生成正反配对通过。当前running/connected/can_receive/router_ready，current_error=null、pending_restart=false；memory读写true，3文件0条0字符。初始50000 Unicode字符/1048576文件字节/8388608总字节，所选CLI524288字节政策。容量预算可扩大，100000字符/786432政策合成检查通过，真实C/F/V/O边界仍保留。最新main/df46056联网修复完整合入；其他模型/账号/low、thinking=false、free/owner、识图/表情和工具限额保持。QQ群效果由用户实测，未由离线或加载晋升真实验收。 [44交接](tasks/LAP-44/HANDOFF.md)。
 
 下列早期规划/48000预算为历史，当前以本条及44交接为准。

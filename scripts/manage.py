@@ -637,30 +637,8 @@ def _start_channel(full=False, paused=False, *, lease=None):
     backup.mkdir(parents=True,exist_ok=True)
     config_before=ROOT/'runtime/astrbot/data/cmd_config.json'
     if config_before.exists():(backup/'astrbot-cmd-config.json').write_bytes(config_before.read_bytes())
-    if full:
-        result=subprocess.run([str(ROOT/'runtime/astrbot-tool/astrbot/Scripts/python.exe'),str(ROOT/'scripts/configure_astrbot.py')],
-                              cwd=ROOT/'runtime/astrbot',capture_output=True,env=env)
-        if result.returncode:
-            (ROOT/'runtime/astrbot/configure-error.log').write_bytes(result.stdout+result.stderr)
-            raise RuntimeError('CONFIG_PREPARE_FAILED; local runtime/astrbot/configure-error.log')
     load_consumer(ROOT,snapshot,environ=env)
-    config_path=ROOT/'runtime/astrbot/data/cmd_config.json'
-    config=json.loads(config_path.read_text(encoding='utf-8-sig'))
-    config['platform']=[{'id':'qqbot','type':'aiocqhttp','enable':True,'ws_reverse_host':'127.0.0.1',
-                         'ws_reverse_port':6199,'ws_reverse_token':gate.upstream_token}]
-    config['platform_settings'].update({'unique_session':True,'enable_id_white_list':True,
-                                       'id_whitelist':sorted(gate.allowed_groups),
-                                       'wl_ignore_admin_on_group':False,'wl_ignore_admin_on_friend':False,
-                                       'ignore_bot_self_message':True,'ignore_at_all':True,
-                                       'empty_mention_waiting':False,'empty_mention_waiting_need_reply':False})
-    config['wake_prefix']=[]
-    config['admins_id']=sorted(gate.admin_users)
-    config['log_level']='ERROR'
-    config['provider_settings']['enable']=full
-    config['provider_settings']['streaming_response']=False
-    config['provider_settings']['proactive_capability']['add_cron_tools']=False
-    config['provider_settings']['computer_use_runtime']='none'
-    config_path.write_text(json.dumps(config,ensure_ascii=False,indent=2),encoding='utf-8-sig')
+    _configure_snow_framework(gate,full,env)
     napcat_config=NAPCAT/'versions/9.9.33-52230/resources/app/napcat/config'
     # WebUI owns core settings. Back up existing files without rewriting them;
     # NapCat initializes missing files using its own defaults.

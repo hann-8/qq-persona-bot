@@ -11,7 +11,7 @@
 
 目标：WeFlow公开API/SSE→固定Akasha薄补丁→现有AstrBot独立平台→既有provider/业务/MemoryStore→回源UIA。用户指定全部增强、必要组合检查和部署同轮完成；上游内核不改，不主动造真实生成/群发样本。
 
-检查点：完成入口/当前HEAD核对与登记，尚未实现、启动或真实收发。下一步读取接点源码，启动现成WeFlow向导供用户配合，独立实施其余接线。
+当前：QQ侧实现与受管部署完成，6199/11229监听；QQ connected/online/channel_ready、router_ready=true，current_error=null。微信账号/真实映射待操作者向导，同任务继续；见reports/wx-akasha-all.md。
 
 ## Implementation checkpoint
 
@@ -22,3 +22,7 @@ Protocol overlay and transport-bound existing router methods implemented. Real A
 Current native/QQ/schema2 suite: 34 passed; new WeChat material/shared-context suite: 3 passed; WeChat real-adapter/provider + synthetic model/UIA suite: 3 passed. Additional legacy test_transport_router: 17 run, 10 failures/2 errors, exactly reproduced at clean baseline 42911af in QQbot_Akasha_baseline; no legacy contract rewrite. Managed live gateway idle/ready/router_ready, current_error=null before stop. Baseline config/persona/local hashes and exact plugin/config backups: state/akasha-deployment. Operator account setup still pending, so platform listener can deploy independently; no real WeChat-ready claim.
 
 Actual source ownership includes plugins/qq_router/wechat.py; src/qqbot_gateway/{wechat_materials,cli_web_policy,workbuddy_cli_runner,reply_delivery,backends,model_gateway,group_memory}.py; scripts/{configure_akasha,manage}.py; tests/test_wechat_materials.py; reports/lap-43-native-web-offline.json and task report/entries. No QQ local/persona/credentials/memory content changes.
+
+## Runtime checkpoint
+
+Current CLI zero-generation probe passed and active paired to c74ccff25c769e27dd55af1e84d74dc59cd9e1ff45c986b3c00845523eba72da. Actual source daily startup initially replaced the new platform; corrected the active _start_channel path to reuse incremental configure helper (not the retired path alone), then normal managed restart. Both 6199/11229 listen; QQ connected/online/channel_ready and router_ready true. Source QQ platform/provider/preferences and local/persona protection checks unchanged. Details: [QQ report](../../../../reports/wx-akasha-all.md). Operator account setup remains pending; no real WeChat reply asserted.
