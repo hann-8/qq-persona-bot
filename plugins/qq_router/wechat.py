@@ -196,6 +196,7 @@ async def start_management(router):
         value=await request.json();route=getattr(router,'wechat',None)
         if route is None:raise web.HTTPServiceUnavailable()
         sid=value.get('session');action=value.get('action','inspect')
+        if action!='inspect' and not sid:raise web.HTTPBadRequest(text='Select one memory session')
         selected=[sid] if sid else list(route.sessions)
         result=[]
         for session in selected:

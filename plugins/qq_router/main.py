@@ -78,7 +78,9 @@ class QQRouter(Star):
         self.connection_watcher=None
         self.silence_mirror=None
         from .wechat import create_route
-        self.wechat=create_route(self)
+        try:self.wechat=create_route(self)
+        except (OSError,ValueError,KeyError,TypeError):
+            self.wechat=None;LOG.error('AKASHA_CONFIG_UNAVAILABLE')
 
     def route(self,event):
         if getattr(event,'get_platform_id',lambda:None)()=='akasha-wechat':

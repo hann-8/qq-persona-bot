@@ -82,7 +82,7 @@ def adapter_signature():
         'src/qqbot_gateway/ollama_ssh_runner.py','src/qqbot_gateway/model_gateway.py','src/qqbot_gateway/onebot_gate.py',
         'src/qqbot_gateway/turn_v2.py','src/qqbot_gateway/web_retrieval.py','src/qqbot_gateway/contracts.py',
         'src/qqbot_gateway/token_budget.py','src/qqbot_gateway/persona.py','src/qqbot_gateway/config.py',
-        'src/qqbot_gateway/backends.py','plugins/qq_router/provider.py','plugins/qq_router/main.py')
+        'src/qqbot_gateway/backends.py','plugins/qq_router/provider.py','plugins/qq_router/main.py','plugins/qq_router/wechat.py')
     h=hashlib.sha256()
     from PIL import __version__ as pillow_version
     h.update(pillow_version.encode());h.update(aiohttp.__version__.encode())
