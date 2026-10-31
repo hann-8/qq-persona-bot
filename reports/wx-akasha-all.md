@@ -8,7 +8,7 @@
 
 当前检查：原生/QQ/schema2定向34通过；新微信当前图/共享上下文3通过；微信根实际AstrBot适配/provider＋替身端到端3通过。额外旧test_transport_router的17项有10失败/2错误，原始42911af隔离副本完全复现，保留记录，不称通过。
 
-按当前binding `c74ccff25c769e27dd55af1e84d74dc59cd9e1ff45c986b3c00845523eba72da` 完成现有check/probe/activate；真实锁定CLI零生成握手 passed，real_generations=0、positive_next_calls=0、negative_users=[0,0]，operator_trial质量待用户实测。没有主动生成/联网服务/群发样本。
+按当前binding `1c8d1f3724243023ef4f3ba11e39861c4f19df8061308480f9dfe45aef94a8cc` 完成现有check/probe/activate；真实锁定CLI零生成握手 passed，real_generations=0、positive_next_calls=0、negative_users=[0,0]，operator_trial质量待用户实测。没有主动生成/联网服务/群发样本。
 
 受管重启已完成，6199与11229监听，gateway/router_ready=true，current_error=null，QQ connected/online/channel_ready=true。原QQ平台、provider/provider_sources/provider_settings/agent_runner/admins_id逐字段与备份相同；所有config/local与persona摘要未变，原memory和vision仍启用。修复日常实际启动路径会重建单QQ平台的问题：沿共享配置接点保留其他平台，存在Akasha时不重跑旧全量AstrBot生成器。
 

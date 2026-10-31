@@ -1,3 +1,5 @@
+当前唯一跨平台实施 WX-AKASHA-ALL active：负责人本会话Codex，2026-10-31T10:25:51+08:00起。QQ侧已部署/恢复connected，原local/平台/provider保持；微信账号/真实映射待操作者，同任务继续。见[本项交接](tasks/WX-AKASHA-ALL/HANDOFF.md)。下方既有任务记录保留。
+
 本session补充PROGRESS.md一条当前使用合同：用户只改config/local访问名单后重启；不新增任何用户配置入口。
 
 本session按用户最新要求改为修复local单入口的程序问题：access授权/屏蔽/管理员策略由原配置验证和gate执行，不应使模型识图技术凭证失效。仅从vision binding排除access配置，保留模型/预算/源码/视觉/其他政策绑定；无新配置文件或开关。补充源码归属src/qqbot_gateway/vision.py、tests/test_lap43.py，先隔离codex/lap43-local-access-start最小修复和定向验证，之后内部配对一次；用户继续只改config/local。
