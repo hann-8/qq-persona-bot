@@ -1,4 +1,4 @@
-当前唯一跨平台实施 WX-AKASHA-ALL active：负责人本会话Codex，2026-10-31T10:25:51+08:00起。QQ侧已部署/恢复connected，原local/平台/provider保持；微信账号/真实映射待操作者，同任务继续。见[本项交接](tasks/WX-AKASHA-ALL/HANDOFF.md)。下方既有任务记录保留。
+当前唯一跨平台实施 WX-AKASHA-ALL ready_for_user_test：负责人本会话Codex，2026-10-31T10:25:51+08:00起。QQ侧已部署/恢复connected，原local/平台/provider保持；微信账号/真实映射已保存，SSE/WS正常，交用户自然实测，故障续同任务。见[本项交接](tasks/WX-AKASHA-ALL/HANDOFF.md)。下方既有任务记录保留。
 
 本session补充PROGRESS.md一条当前使用合同：用户只改config/local访问名单后重启；不新增任何用户配置入口。
 

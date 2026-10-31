@@ -12,6 +12,6 @@
 
 受管重启已完成，6199与11229监听，gateway/router_ready=true，current_error=null，QQ connected/online/channel_ready=true。原QQ平台、provider/provider_sources/provider_settings/agent_runner/admins_id逐字段与备份相同；所有config/local与persona摘要未变，原memory和vision仍启用。修复日常实际启动路径会重建单QQ平台的问题：沿共享配置接点保留其他平台，存在Akasha时不重跑旧全量AstrBot生成器。
 
-备份和保护摘要仅在忽略的state/akasha-deployment。尚待操作者完成微信账号向导及实际会话/actor配对；目前仅部署独立平台监听，不等于微信SSE/WS/真实模型回复已通过。之后仍在本任务继续，不另开规划。
+备份和保护摘要仅在忽略的state/akasha-deployment。操作者已完成微信账号/密钥及facts_only＋1 actor_link，原选定群实际WeFlow/SSE/11229 WS均正常；当前微信配置摘要已加载，共享MemoryStore检查200，QQ仍connected/online/ready。没有主动真实生成/群发样本，交用户自然实测，具体故障继续本任务。
 
 Git推送结果在交接/最终回执更新，Git交付与运行状态分别记录。

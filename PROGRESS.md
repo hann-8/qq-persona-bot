@@ -1,4 +1,4 @@
-当前实施：**WX-AKASHA-ALL active；QQ侧已受管部署/恢复connected，6199与11229监听，微信账号/配对待操作者**，见[本次交接](tracks/laptop-workbuddy/tasks/WX-AKASHA-ALL/HANDOFF.md)；用户已提交完整实施指令，下方只规划描述为历史。
+当前实施：**WX-AKASHA-ALL ready_for_user_test；QQ侧已受管部署/恢复connected，6199与11229监听，微信账号/配对已保存，SSE/WS正常，交用户实测**，见[本次交接](tracks/laptop-workbuddy/tasks/WX-AKASHA-ALL/HANDOFF.md)；用户已提交完整实施指令，下方只规划描述为历史。
 
 2026-10-29启动修复：用户配置入口仍只有config/local。访问名单由原配置验证/gate执行，不再参与识图模型资格绑定；正常增减授权群、调整访问名单后直接重启，无需用户处理其它文件。本机新增第三群已保留并加载，实际running/connected/can_receive/router_ready；34项检查/零生成接线通过。见[43交接](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)。
 

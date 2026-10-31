@@ -2,7 +2,7 @@
 
 返回[PROGRESS](../../../../PROGRESS.md)；继承根AGENTS。
 
-状态：active，2026-10-31T10:25:51.763167+08:00，负责人本会话Codex，session WX-AKASHA-ALL-20261031。
+状态：ready_for_user_test，2026-10-31T10:25:51.763167+08:00，负责人本会话Codex，session WX-AKASHA-ALL-20261031。
 
 
 2026-10-31T10:25:51.763167+08:00：唯一任务 **WX-AKASHA-ALL**，负责人本会话Codex，session WX-AKASHA-ALL-20261031。起点QQbot_Snowluma main=42911af。归属：plugins/qq_router/{main,provider,wechat}.py、必要src/qqbot_gateway/{model_gateway,turn_v2,group_memory,persona}接点、scripts/configure_akasha.py、定向测试与报告、PROGRESS/工作线HANDOFF/TASKS/本项HANDOFF；运行配置仅增量平台/插件，原QQ local保留。完整执行微信计划；已有微信9份规划差异保留，QQ开工干净。不操作旧NapCat根。只管理有创建身份的项目进程；授权受管部署/检查/提交普通push，真实聊天交用户。
@@ -11,7 +11,7 @@
 
 目标：WeFlow公开API/SSE→固定Akasha薄补丁→现有AstrBot独立平台→既有provider/业务/MemoryStore→回源UIA。用户指定全部增强、必要组合检查和部署同轮完成；上游内核不改，不主动造真实生成/群发样本。
 
-当前：QQ侧实现与受管部署完成，6199/11229监听；QQ connected/online/channel_ready、router_ready=true，current_error=null。微信账号/真实映射待操作者向导，同任务继续；见reports/wx-akasha-all.md。
+当前：QQ侧实现与受管部署完成，6199/11229监听；QQ connected/online/channel_ready、router_ready=true，current_error=null。微信账号与facts_only＋1 actor_link已由用户保存，实际微信SSE/WS正常，交用户实测，具体故障续同任务；见reports/wx-akasha-all.md。
 
 ## Implementation checkpoint
 
@@ -28,3 +28,7 @@ Actual source ownership includes plugins/qq_router/wechat.py; src/qqbot_gateway/
 Current CLI zero-generation probe passed and active paired to c74ccff25c769e27dd55af1e84d74dc59cd9e1ff45c986b3c00845523eba72da. Actual source daily startup initially replaced the new platform; corrected the active _start_channel path to reuse incremental configure helper (not the retired path alone), then normal managed restart. Both 6199/11229 listen; QQ connected/online/channel_ready and router_ready true. Source QQ platform/provider/preferences and local/persona protection checks unchanged. Details: [QQ report](../../../../reports/wx-akasha-all.md). Operator account setup remains pending; no real WeChat reply asserted.
 
 Final source-bound activation: 1c8d1f3724243023ef4f3ba11e39861c4f19df8061308480f9dfe45aef94a8cc; check34 passed, real CLI zero-generation probe passed, authorize-operator-trial activated. New WeChat plugin helper is now included in the existing source dependency binding. Managed restart restored QQ connected/online/ready and independent 11229 listener. Runtime model state remains not_probed after restart (not a real reply); saved zero-generation proof is current. Operator still completing WeFlow setup.
+
+2026-10-31T11:05:04.308079+08:00 最终运行：操作者已保存所选微信账号/密钥和一次真实配对（facts_only＋1 actor_link）；当前AstrBot已加载对应配置摘要，WX SSE/11229 WS正常，UIA初始化正常，MemoryStore检查200；QQ connected/online/channel_ready、router_ready=true，current_error=null，原平台/provider/local/persona保持。free/adaptive/vision/memes/memory均true。未主动真实生成/群发，交用户自然实测。
+
+最终净归属（相对42911af）：PROGRESS.md、plugins/qq_router/main.py、plugins/qq_router/provider.py、plugins/qq_router/wechat.py、reports/lap-43-native-web-offline.json、reports/wx-akasha-all.md、scripts/configure_akasha.py、scripts/manage.py、src/qqbot_gateway/cli_web_policy.py、src/qqbot_gateway/group_memory.py、src/qqbot_gateway/model_gateway.py、src/qqbot_gateway/reply_delivery.py、src/qqbot_gateway/vision.py、src/qqbot_gateway/wechat_materials.py、src/qqbot_gateway/workbuddy_cli_runner.py、tests/test_wechat_materials.py、tracks/laptop-workbuddy/HANDOFF.md、tracks/laptop-workbuddy/TASKS.md、tracks/laptop-workbuddy/tasks/WX-AKASHA-ALL/HANDOFF.md。所有运行配置/密钥/配对/数据仍忽略；只提交这些已审阅任务文件。
