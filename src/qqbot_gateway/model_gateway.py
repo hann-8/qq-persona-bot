@@ -41,6 +41,7 @@ class Job:
     group_request: dict | None = None
     vision: object = None
     prepare_deadline: float | None = None
+    private_ids: tuple = ()
     requested_at: float = field(default_factory=time.time)
     started: asyncio.Event = field(default_factory=asyncio.Event)
     cancelled: asyncio.Event = field(default_factory=asyncio.Event)
@@ -100,7 +101,7 @@ class ModelQueue:
             self.release_image(job)
             if not job.future.done():job.future.set_exception(GatewayError('BACKEND_UNAVAILABLE'))
 
-    async def submit(self,system,prompt,request_id,group_request=None,vision=None,prepare_deadline=None):
+    async def submit(self,system,prompt,request_id,group_request=None,vision=None,prepare_deadline=None,private_ids=()):
         if self.close_task is not None:raise GatewayError('SHUTTING_DOWN')
         await self.cleanup_admission()
         if self.state in ('AUTH_REQUIRED','QUOTA_EXHAUSTED','CLEANUP_FAILED','REMOTE_RESULT_UNKNOWN'):
@@ -108,6 +109,7 @@ class ModelQueue:
         if self.queue.qsize()>=self.limit+(0 if self.active else 1):raise GatewayError('QUEUE_FULL')
         job=Job(system,prompt,request_id,time.monotonic()+self.wait,asyncio.get_running_loop().create_future())
         job.group_request=group_request
+        job.private_ids=tuple(private_ids)
         job.vision=vision
         job.prepare_deadline=prepare_deadline
         if group_request and group_request.get('version')==2:
@@ -153,9 +155,11 @@ class ModelQueue:
             from .web_retrieval import REQUESTED_AT
             from datetime import datetime,timezone
             web_token=REQUESTED_AT.set(datetime.fromtimestamp(job.requested_at,timezone.utc))
+            from .cli_web_policy import PRIVATE_IDS
+            private_token=PRIVATE_IDS.set(job.private_ids)
             try:task=asyncio.create_task(call)
             finally:
-                CURRENT.reset(image_token);PREPARE_DEADLINE.reset(prep_token);REQUESTED_AT.reset(web_token)
+                CURRENT.reset(image_token);PREPARE_DEADLINE.reset(prep_token);REQUESTED_AT.reset(web_token);PRIVATE_IDS.reset(private_token)
             cancel=asyncio.create_task(job.cancelled.wait())
             try:
                 done,_=await asyncio.wait((task,cancel),return_when=asyncio.FIRST_COMPLETED)
@@ -332,15 +336,19 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
             if group_request['version']==2 and len(group_request['resource_caps'])>len(snapshot['images']):
                 prepare_deadline=time.monotonic()+15
                 try:
-                    if members is None:raise ValueError('Member service unavailable')
-                    resolved=await members.resolve(group_request,request[V2_SOURCE],prepare_deadline)
+                    if members is None and request.headers.get('X-QQBot-Transport')!='wechat_akasha':raise ValueError('Member service unavailable')
+                    selected_members=members
+                    if request.headers.get('X-QQBot-Transport')=='wechat_akasha':
+                        from .wechat_materials import WeChatMembers
+                        selected_members=WeChatMembers()
+                    resolved=await selected_members.resolve(group_request,request[V2_SOURCE],prepare_deadline)
                     snapshot['member_candidates']=resolved['candidates']
                     member_receipt=resolved['receipt']
                 except (ValueError,TypeError,TimeoutError,OSError,aiohttp.ClientError):
                     snapshot['member_candidates']=[]
                 from .members import POLICY as MEMBER_POLICY
                 system=system.replace('mention必须null；','')+MEMBER_POLICY
-                if not (v2 or {}).get('mentions_enabled',False):system+='本轮受控@关闭，mention必须null。\n'
+                if not (v2 or {}).get('mentions_enabled',False) or request.headers.get('X-QQBot-Transport')=='wechat_akasha':system+='本轮受控@关闭，mention必须null。\n'
                 from .turn_v2 import fit
                 dialog=json.loads(prompt);dialog[-1]['content']=fit(snapshot,group_request,system,budget,suffix,dialog[:-1])
                 prompt=json.dumps(dialog,ensure_ascii=False,separators=(',',':'))
@@ -353,7 +361,11 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
                 prepare_deadline=deadline
                 try:
                     if materials is None:raise ValueError('MATERIAL_UNAVAILABLE')
-                    native_image,descriptor=await asyncio.wait_for(materials.resolve(group_request,snapshot,deadline),max(.001,deadline-time.monotonic()))
+                    selected_materials=materials
+                    if request.headers.get('X-QQBot-Transport')=='wechat_akasha':
+                        from .wechat_materials import WeChatMaterials
+                        selected_materials=WeChatMaterials(materials.reserve)
+                    native_image,descriptor=await asyncio.wait_for(selected_materials.resolve(group_request,snapshot,deadline),max(.001,deadline-time.monotonic()))
                 except (ValueError,TypeError,TimeoutError,OSError,aiohttp.ClientError):
                     # No second image or model attempt. Direct produces one
                     # truthful local notice; ambient is silent.
@@ -422,7 +434,13 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
                 candidates.pop()
             system+=instruction
         started=time.monotonic()
-        result=await queue.submit(system,prompt,request[TRACE],group_request,vision=native_image,prepare_deadline=prepare_deadline)
+        transport_private=()
+        if request.headers.get('X-QQBot-Transport')=='wechat_akasha':
+            from .wechat_materials import private_ids
+            transport_private=private_ids()+[r['name'] for r in request.get(V2_SOURCE,{}).get('messages',[]) if r['name']]
+        job_options=dict(vision=native_image,prepare_deadline=prepare_deadline)
+        if transport_private:job_options['private_ids']=transport_private
+        result=await queue.submit(system,prompt,request[TRACE],group_request,**job_options)
         backend_result=result if isinstance(result,BackendResult) else BackendResult(result)
         result=backend_result.text
         response_id='chatcmpl-'+request[TRACE]
@@ -451,7 +469,7 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
             limited=plan.limited if plan else False
             if group_request['version']==2:
                 from .turn_v2 import metadata as v2_metadata
-                if plan and not (v2 or {}).get('mentions_enabled',False):
+                if plan and (not (v2 or {}).get('mentions_enabled',False) or request.headers.get('X-QQBot-Transport')=='wechat_akasha'):
                     from dataclasses import replace
                     plan=replace(plan,prepared_parts=tuple(replace(p,mention_ref=None) for p in plan.parts)) if any(p.mention_ref for p in plan.parts) else plan
                 if not (v2 or {}).get('learning_enabled',False):memory_proposals={}

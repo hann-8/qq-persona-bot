@@ -95,6 +95,7 @@ def locked(root):
 
 class MemoryStore:
     def __init__(self,root,bot,groups,blocked=(),admins=(),cfg=None,clock=time.time):
+        self.actor_links={}
         self.root=Path(root);self.bot=str(bot);self.groups=set(map(str,groups));self.blocked=set(map(str,blocked));self.admins=set(map(str,admins))
         self.cfg=validate_config(cfg or {});self.clock=clock;self.disabled=set();self.live={}
         if set(cfg or {})&LEGACY:LOG.info('MEMORY_CONFIG reason=legacy_limits_ignored')
@@ -125,7 +126,7 @@ class MemoryStore:
             self.disabled.update(self.groups);LOG.warning('MEMORY_UNAVAILABLE category=key_or_storage')
     def hmac(self,*parts):return hmac.new(self.key,canonical(list(parts)).encode(),hashlib.sha256).hexdigest()
     def namespace(self,group):return self._namespace_overrides.get(group) or self.hmac('bot',self.bot)[:32]+self.hmac('namespace',self.bot,str(group))[:32]
-    def actor(self,group,user):return self.hmac('actor',self.namespace(group),str(user))
+    def actor(self,group,user):return self.actor_links.get((str(group),str(user))) or self.hmac('actor',self.namespace(group),str(user))
     def path(self,group):return self.directory/self.namespace(group)/'memory.json'
     def _blank(self,group):return dict(schema_version=2,namespace_hmac=self.namespace(group),generation=uuid.uuid4().hex,revision=0,records={},last_request_key=None)
     def _available(self,group):

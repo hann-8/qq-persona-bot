@@ -459,13 +459,19 @@ def _snow_framework_specs(snapshot,full,settings):
 
 def _configure_snow_framework(gate,full,env):
     """Same restricted AstrBot platform contract as the existing NapCat path."""
-    if full:
+    path=ROOT/'runtime/astrbot/data/cmd_config.json'
+    existing=json.loads(path.read_text(encoding='utf-8-sig')) if path.exists() else {}
+    keep_existing=any(p.get('id')=='akasha-wechat' for p in existing.get('platform',[])) and bool(existing.get('provider'))
+    if full and not keep_existing:
         result=subprocess.run([str(ROOT/'runtime/astrbot-tool/astrbot/Scripts/python.exe'),str(ROOT/'scripts/configure_astrbot.py')],
             cwd=ROOT/'runtime/astrbot',capture_output=True,env=env)
         if result.returncode:raise RuntimeError('CONFIG_PREPARE_FAILED')
-    path=ROOT/'runtime/astrbot/data/cmd_config.json'
+    elif full:
+        from scripts.configure_akasha import configure
+        configure()
     config=json.loads(path.read_text(encoding='utf-8-sig'))
-    config['platform']=[dict(id='qqbot',type='aiocqhttp',enable=True,ws_reverse_host='127.0.0.1',ws_reverse_port=6199,ws_reverse_token=gate.upstream_token)]
+    other=[p for p in config.get('platform',[]) if p.get('id')!='qqbot']
+    config['platform']=[dict(id='qqbot',type='aiocqhttp',enable=True,ws_reverse_host='127.0.0.1',ws_reverse_port=6199,ws_reverse_token=gate.upstream_token)]+other
     config['platform_settings'].update(dict(unique_session=True,enable_id_white_list=True,id_whitelist=sorted(gate.allowed_groups),
         wl_ignore_admin_on_group=False,wl_ignore_admin_on_friend=False,ignore_bot_self_message=True,ignore_at_all=True,
         empty_mention_waiting=False,empty_mention_waiting_need_reply=False))
@@ -473,6 +479,8 @@ def _configure_snow_framework(gate,full,env):
     config['provider_settings']['enable']=full;config['provider_settings']['streaming_response']=False
     config['provider_settings']['proactive_capability']['add_cron_tools']=False
     config['provider_settings']['computer_use_runtime']='none'
+    from scripts.configure_akasha import augment
+    augment(config)
     path.write_text(json.dumps(config,ensure_ascii=False,indent=2),encoding='utf-8-sig')
 
 

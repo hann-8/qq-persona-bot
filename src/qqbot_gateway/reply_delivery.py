@@ -64,6 +64,20 @@ class EventReceiptProxy:
     def __getattr__(self,name):
         return getattr(self.original,name)
 
+    async def send_private_msg(self,**kwargs):
+        # Only Akasha's explicitly configured private route installs this proxy.
+        # Normal QQ private messages never reach ReplyDelivery.
+        original=self.original
+        class PrivateAPI:
+            async def send_group_msg(self,**value):
+                user=value.pop('group_id')
+                return await original.send_private_msg(user_id=user,**value)
+        self.original=PrivateAPI()
+        try:
+            value=dict(kwargs);user=value.pop('user_id',None)
+            return await self.send_group_msg(group_id=user,**value)
+        finally:self.original=original
+
     async def send_group_msg(self,**kwargs):
         self.calls+=1
         if self.calls!=1 or str(kwargs.get('group_id'))!=self.group:

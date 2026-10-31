@@ -77,6 +77,13 @@ class QQRouter(Star):
         self.connection_id=None
         self.connection_watcher=None
         self.silence_mirror=None
+        from .wechat import create_route
+        self.wechat=create_route(self)
+
+    def route(self,event):
+        if getattr(event,'get_platform_id',lambda:None)()=='akasha-wechat':
+            return event.get_extra('akasha_route') or getattr(self,'wechat',None)
+        return self
 
     def gate_metadata(self):
         try:
@@ -153,6 +160,13 @@ class QQRouter(Star):
 
     @filter.on_llm_request()
     async def before_provider(self,event,request):
+        route=self.route(event)
+        if route is not self:
+            QQBotProvider._transport.set('wechat_akasha')
+            if route is None or not route.silence_allowed(event):event.should_call_llm(False);event.stop_event();return
+            QQBotProvider._output_gate.set(dict(valid=lambda:route.silence_allowed(event),submitted=False))
+            return
+        QQBotProvider._transport.set('qq')
         QQBotProvider._output_gate.set(dict(valid=lambda:self.silence_allowed(event),submitted=False))
         if not self.silence_allowed(event):event.should_call_llm(False);event.stop_event()
 
@@ -166,6 +180,9 @@ class QQRouter(Star):
         except Exception:pass
 
     async def initialize(self):
+        if getattr(self,'wechat',None):
+            from .wechat import start_management
+            await start_management(self)
         await self.tasks.recover_deliveries(self.context.conversation_manager)
         if self.participation['mode']=='free' or self.silence_enabled() or self.transport_provider=='snowluma':self.connection_watcher=asyncio.create_task(self.watch_connection())
         manager=self.context.persona_manager
@@ -174,7 +191,10 @@ class QQRouter(Star):
             await manager.create_persona(self.persona_id,self.persona,tools=[],skills=[])
         else:
             await manager.update_persona(self.persona_id,system_prompt=self.persona,tools=[],skills=[])
-        (self.root/'state/router-ready.json').write_text(json.dumps({'pid':os.getpid(),'created':psutil.Process().create_time(),'time':time.time(),'persona_id':self.persona_id,'instance_id':os.environ.get('QQBOT_INSTANCE_ID'),'config_digest':os.environ.get('QQBOT_CONFIG_DIGEST')}),encoding='utf-8')
+        from .wechat import CONFIG as WX_CONFIG
+        import hashlib
+        wx_digest=hashlib.sha256(WX_CONFIG.read_bytes()).hexdigest() if WX_CONFIG.exists() else None
+        (self.root/'state/router-ready.json').write_text(json.dumps({'pid':os.getpid(),'created':psutil.Process().create_time(),'time':time.time(),'persona_id':self.persona_id,'instance_id':os.environ.get('QQBOT_INSTANCE_ID'),'config_digest':os.environ.get('QQBOT_CONFIG_DIGEST'),'wechat_config_sha256':wx_digest}),encoding='utf-8')
         LOG.warning('QQ_ROUTER_READY persona_version=%s',self.persona_id)
 
     @filter.on_llm_response()
@@ -184,6 +204,10 @@ class QQRouter(Star):
 
     @filter.on_agent_done()
     async def preserve_gateway_text(self,event:AstrMessageEvent,run_context,response):
+        route=self.route(event)
+        if route is not self:
+            if route is not None:await QQRouter.preserve_gateway_text(route,event,run_context,response)
+            return
         # The OpenAI adapter strips whitespace, <think> tags and JSON wrappers.
         # Our gateway has already returned final plain text; restore that exact
         # value in both the outgoing chain and runner history, without parsing.
@@ -349,6 +373,11 @@ class QQRouter(Star):
 
     @filter.on_decorating_result()
     async def deliver_reply(self,event:AstrMessageEvent):
+        route=self.route(event)
+        if route is not self:
+            if route is not None:await QQRouter.deliver_reply(route,event)
+            else:event.clear_result();event.stop_event()
+            return
         guard=event.get_extra('qq_send_guard')
         if event.get_extra('qq_group_request'):
             event.clear_result()
@@ -407,6 +436,12 @@ class QQRouter(Star):
 
     @filter.event_message_type(filter.EventMessageType.GROUP_MESSAGE)
     async def on_group(self,event:AstrMessageEvent):
+        route=self.route(event)
+        if route is not self:
+            if route is not None:
+                async for item in route.accept(event):yield item
+            else:event.should_call_llm(False);event.stop_event()
+            return
         if (stopping(self.root) or event.is_private_chat() or str(event.get_self_id())!=self.bot or str(event.get_group_id()) not in self.groups or
             str(event.get_sender_id()) in self.blocked or str(event.get_sender_id())==self.bot):
             event.should_call_llm(False);event.stop_event();return
@@ -432,6 +467,15 @@ class QQRouter(Star):
             async for item in self.on_free_group(event):yield item
         else:
             async for item in self.on_mentions(event):yield item
+
+    @filter.event_message_type(filter.EventMessageType.PRIVATE_MESSAGE)
+    async def on_wechat_private(self,event:AstrMessageEvent):
+        if getattr(event,'get_platform_id',lambda:None)()!='akasha-wechat':return
+        route=self.route(event)
+        if route is None:event.should_call_llm(False);event.stop_event();return
+        # Local group business scope for an explicitly selected private session.
+        event.get_group_id=lambda:str(event.get_sender_id())
+        async for item in route.accept(event):yield item
 
     async def on_mentions(self,event):
         if stopping(self.root) or not self.transport_allowed(event):
@@ -832,6 +876,7 @@ class QQRouter(Star):
             if lease:lease.release()
 
     async def terminate(self):
+        if getattr(self,'wechat_management',None):await self.wechat_management.cleanup()
         if self.connection_watcher:
             self.connection_watcher.cancel();await asyncio.gather(self.connection_watcher,return_exceptions=True)
         self.group_turns.invalidate()

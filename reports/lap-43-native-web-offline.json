@@ -1,6 +1,6 @@
 {
-  "adapter_signature": "695f01b4e8d154525314dae46af5a2ad4efef70df68895b08315b4d3b0540027",
-  "binding": "cf2a6750d6bc7675a95341809e57220357a377bd13e64dbefc054f4a00926f39",
+  "adapter_signature": "7b1b2fb3c983649fea9cb7a9f6c63e0204f5a7143296998b82b013560b680c89",
+  "binding": "c74ccff25c769e27dd55af1e84d74dc59cd9e1ff45c986b3c00845523eba72da",
   "budget": {
     "final_visible_policy_bytes": 31334,
     "limit": 524288,

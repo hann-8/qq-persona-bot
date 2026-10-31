@@ -201,11 +201,11 @@ class CLIRunner:
 
     async def _execute(self, system, prompt, request_id, *, control_only=False,probe=False,probe_fault=None):
         from .vision import CURRENT,text_budget,cli_message,wire_check,production_budget
-        from .cli_web_policy import native_contract, SCOPE, current_question
+        from .cli_web_policy import native_contract, SCOPE, PRIVATE_IDS, current_question
         web=getattr(self,'web_config',{})
         native=bool(getattr(self,'native_web',False) and not control_only)
         scope=SCOPE.get()
-        policy=native_contract(web,getattr(self,'web_private_ids',()),text_budget(self.budget),scope[1] or current_question(prompt)) if native else None
+        policy=native_contract(web,list(getattr(self,'web_private_ids',()))+list(PRIVATE_IDS.get()),text_budget(self.budget),scope[1] or current_question(prompt)) if native else None
         if policy and not scope[0]:policy['allowed_tools']=[]
         allowed=policy['allowed_tools'] if policy else []
         denied=[t for t in self.denied if t not in allowed]
