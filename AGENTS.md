@@ -1,3 +1,5 @@
+2026-10-31 本地维护事实：用户明确只保留 SnowLuma main 工作区，旧本地 worktree 不再保留、历史留 GitHub。LAP-45 已清除 8 个旧工作区文件和 15 个本地历史分支，公共 .git 已迁至 `E:/CodexWS/QQbot_Snowluma/.git`；旧 QQbot 因 Codex cwd 仅留空目录，不能再作为旧运行根使用。下方旧根/worktree“保留、不修改”为历史约定，由本次用户新指令覆盖；主线运行环境/配置/秘密/会话/记忆/图库及本根 A4 材料保留。Snow 原生日志已配置七天，项目追加日志补齐方案已规划未实施，见[LAP-45交接](tracks/laptop-workbuddy/tasks/LAP-45/HANDOFF.md)。
+
 2026-10-29 LAP-44当前合同：群长期记忆采用schema2全文快照＋同次回复memory_updates增改删，模型决定内容/整理/遗忘；旧候选、句式、关键词和240字节/3条/8条/1536字节小限制停用，旧配置字段兼容但忽略。每群初始50000 Unicode字符、文件1048576字节、总8388608字节；所选CodeBuddy输入政策524288可见UTF-8字节，均可配置扩大并受真实C/F/V/O限制。保存后在投递台账前生成实际回执，重置只清短期上下文。模型/账号/low、thinking=false、free/owner、识图/表情和两工具3调用/4步骤/90秒/8000/12000保持。部署及验证结果以[LAP-44交接](tracks/laptop-workbuddy/tasks/LAP-44/HANDOFF.md)为准，QQ群效果待用户实测。
 
 # 项目协作准则
@@ -17,7 +19,7 @@
 
 ## QQ主线当前约定（2026-10-25）
 
-- 用户已决定以后QQ以SnowLuma为主线。活动工作根为`E:/CodexWS/QQbot_Snowluma`；新工作默认在此接续，先读PROGRESS、QQ工作线HANDOFF/TASKS，再读当前任务。原`E:/CodexWS/QQbot`保留为NapCat旧根，不修改或启停；历史目录名`tracks/laptop-workbuddy`不改名。
+- 用户已决定以后QQ以SnowLuma为主线。活动工作根为`E:/CodexWS/QQbot_Snowluma`；新工作默认在此接续，先读PROGRESS、QQ工作线HANDOFF/TASKS，再读当前任务。原`E:/CodexWS/QQbot`及其他旧worktree文件已按2026-10-31新指令清理，源码历史在GitHub；不重建旧运行环境。历史目录名`tracks/laptop-workbuddy`不改名。
 - LAP-40官方接入与日常启动入口已实现/离线通过，最小文字首试获用户现场确认成功；不重复安装、领取旧接入实施或把已成功首试列为待办。其他能力/停止/免扫码/长稳不因此晋升为完整验收。
 - NapCat兼容模块、测试和旧任务记录暂留；整理不等于改代码中的provider默认值或现有local。模型/人设/额度/触发按当前配置保留，不随主线标签自动切换。
 - 当前操作见README、SnowLuma使用说明及docs/BOT_USAGE_COMPARISON.md；旧说明集中在docs/archive，仅按历史查阅。工作区清理须先登记精确清单、核对依赖和路径；保留配置/秘密/登录/状态/会话/图库、安装环境和A4。不得把state、uv.lock、正在使用的runtime当缓存清空。

@@ -1,3 +1,5 @@
+当前维护已交付：**LAP-45 清除 8 个旧 worktree 的文件，只保留 SnowLuma main 工作根和本地 main；历史已保全 GitHub**，见[实际交接](tracks/laptop-workbuddy/tasks/LAP-45/HANDOFF.md)。Git 公共目录已迁入本根，旧 QQbot 仅因 Codex cwd 占用留下空目录；移除旧文件约 3.087 GiB（逻辑大小）。22 个保护摘要不变，生产仍在线，未启停。Snow 原生日志配置已为七天；项目追加日志的[七天方案](tracks/laptop-workbuddy/tasks/LAP-45/PLAN.md)已规划、尚未实现，后续按[medium 指令](tracks/laptop-workbuddy/tasks/LAP-45/MEDIUM_START.md)接续。
+
 当前实施：**WX-AKASHA-ALL ready_for_user_test；QQ侧已受管部署/恢复connected，6199与11229监听，微信账号/配对已保存，SSE/WS正常，交用户实测**，见[本次交接](tracks/laptop-workbuddy/tasks/WX-AKASHA-ALL/HANDOFF.md)；用户已提交完整实施指令，下方只规划描述为历史。
 
 2026-10-29启动修复：用户配置入口仍只有config/local。访问名单由原配置验证/gate执行，不再参与识图模型资格绑定；正常增减授权群、调整访问名单后直接重启，无需用户处理其它文件。本机新增第三群已保留并加载，实际running/connected/can_receive/router_ready；34项检查/零生成接线通过。见[43交接](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)。
@@ -64,7 +66,7 @@ LAP-41工作区整理与使用对照已完成：uv报告清除38,269个缓存文
 ## 路线和边界
 
 - 当前链路：官方原版SnowLuma → OneBot gate → AstrBot/router → gateway/CodeBuddy CLI。聊天大脑和共用业务模块继续复用；不维护Snow私有分支。
-- NapCat旧根 `E:/CodexWS/QQbot` 保留，本轮不修改或启停；本根的NapCat兼容代码/测试暂留，不能删除仍被导入的模块。主线调整不等于改变代码中的兼容默认值或切换现有local。
+- NapCat 旧根及其他旧 worktree 的本地文件已按 2026-10-31 用户新指令清理，源码历史留 GitHub；旧 QQbot 仅为空 cwd 目录。本根的 NapCat 兼容代码/测试暂留，不能删除仍被导入的模块。清理不改变代码默认值或现有 local。
 - local/persona、秘密、图库、登录资料、会话/任务/清理台账和日志保留；不通过删state、lock或uv.lock解决运行问题。
 - 私聊关闭、授权群、当前触发/额度/模型/人设、单次尝试、工具隔离不变。账号屏蔽按用户决定由QQ客户端拉黑；不新增内部零日志/存储证明系统。
 - 只停止有创建身份依据的本项目进程；禁止按QQ/Node/Python进程名批量结束。QQ/Snow外部手工实例不接管。

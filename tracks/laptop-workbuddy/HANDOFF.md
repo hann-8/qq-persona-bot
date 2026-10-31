@@ -1,3 +1,5 @@
+2026-10-31 LAP-45 已完成本地清理：8 个旧工作区文件/15 个本地历史分支已移除，历史头保全 GitHub；公共 .git 迁入 SnowLuma，本地仅 main/一个 worktree，旧 QQbot 留空 cwd 目录。22 个保护摘要一致、零生成健康在线，未启停生产。Snow 原生日志已配置七天，项目固定追加日志的[补齐方案](tasks/LAP-45/PLAN.md)已规划未实施；[实际交接](tasks/LAP-45/HANDOFF.md) / [后续 medium](tasks/LAP-45/MEDIUM_START.md)。本会话交付后释放维护归属，WX-AKASHA-ALL 仍待用户实测。
+
 2026-10-31 WX-AKASHA-ALL：QQ/AstrBot独立微信平台已接线并受管部署，原QQ已恢复connected/ready，账号/真实配对已保存，微信SSE/WS正常，交用户实测；见[本项交接](tasks/WX-AKASHA-ALL/HANDOFF.md)。
 
 2026-10-29 LAP-44已实现、启用并部署main：schema2群记忆全文/模型增改删/实际保存回执已加载，33项定向组合及真实锁定CLI零生成正反配对通过。当前running/connected/can_receive/router_ready，current_error=null、pending_restart=false；memory读写true，3文件0条0字符。初始50000 Unicode字符/1048576文件字节/8388608总字节，所选CLI524288字节政策。容量预算可扩大，100000字符/786432政策合成检查通过，真实C/F/V/O边界仍保留。最新main/df46056联网修复完整合入；其他模型/账号/low、thinking=false、free/owner、识图/表情和工具限额保持。QQ群效果由用户实测，未由离线或加载晋升真实验收。 [44交接](tasks/LAP-44/HANDOFF.md)。
