@@ -1,6 +1,6 @@
 # LAP-45 七天运行日志保留方案
 
-返回[交接](HANDOFF.md) / [PROGRESS](../../../../PROGRESS.md)。2026-10-31；本方案尚未实施，旧 worktree 清理已完成。
+返回[交接](HANDOFF.md) / [PROGRESS](../../../../PROGRESS.md)。2026-10-31原方案；2026-11-01已实现/启用，实际结果以[RESULT](RESULT.md)为准。此前AGENTS分轮指令已撤销，原文medium仅为历史。
 
 ## 需求与非目标
 

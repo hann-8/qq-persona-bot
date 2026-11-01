@@ -2,6 +2,10 @@ LAP-24可选管理token独立于五文件配置和QQ密码，仅用`scripts/conf
 
 # 配置文件索引
 
+运行日志策略在 `config/local/runtime.yaml` 的 `logging`：`enabled: true`、`retention_days: 7`、`sweep_interval_minutes: 60`。保留当天和前六个自然日，常驻进程每分钟检查轮转；停机日志由当前用户计划任务每小时及登录时清理。变更后正常重启 bot，并运行 `.venv\Scripts\python.exe scripts/log_retention.py install` 更新维护任务；`status` 查看任务，`purge` 手动执行一次，`remove` 仅移除本项目任务。配置为 false 后运行 install 会移除维护任务，下一次正常重启停止轮转/删除。
+
+范围只含指定运行日志；配置、秘密、群记忆、会话、state 台账和测试证据不删除。正在使用或锁定的文件跳过重试；首次管理密码仍仅写本机控制台日志，不会输出到维护报告。
+
 模板和本机文件均在每个参数旁写中文注释，列表参数在列表名旁说明。注释中的“新装默认”只供参考，不会覆盖右侧当前值；既有用户备注保留。`participation.mode`控制mentions/free，`output.mode`固定plain_chat，分条方式另由`output.delivery_mode`控制。
 
 日常流程：关闭机器人 → 编辑对应文件 → 保存 → 使用根目录“启动机器人.cmd”正常启动。没有apply步骤，不热更新。可选先运行 `.venv/Scripts/python.exe scripts/config_files.py check`。当前实例继续用启动时快照；状态页将已加载快照与磁盘候选分开显示。

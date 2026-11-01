@@ -68,6 +68,10 @@ def remember(entries, process, component):
 
 def capture(entries, root_process, component, started):
     try:
+        collector=getattr(root_process,'__dict__',{}).get('_qqbot_log_collector')
+        if collector is not None:
+            remember(entries,collector,'log_collector')
+            for child in collector.children(recursive=True):remember(entries,child,'log_collector')
         remember(entries, root_process, component)
         for child in root_process.children(recursive=True):
             remember(entries, child, component)
@@ -257,7 +261,7 @@ def show_status(report=None):
     print('QQ通道：'+channels.get(report['channel_state'],'登录状态未确认'))
     if report.get('provider')=='snowluma':
         state=report.get('desktop') or {}
-        print('Snow管理页：'+('本机端口可达（不代表QQ已连接）' if state.get('webui_listening') else '尚未监听')+'；'+desktop.URL)
+        print('Snow管理页：'+('本机端口可达（不代表QQ已连接）' if state.get('webui_listening') else '尚未监听')+'；'+desktop.webui_url(ROOT))
         print('官方Snow/专用QQ：'+str(state.get('snow','未确认'))+' / '+str(state.get('qq','未确认')))
         print('OneBot：'+('已连接且就绪' if report.get('channel',{}).get('channel_ready') is True else '未就绪'))
     print('登录层：'+report.get('qq_login_state','unknown'))
@@ -346,6 +350,17 @@ def stop_project(grace=5,*,expected_instance=None):
 
 
 def stop_in_order(entries):
+    desktop.close_log_pipe(ROOT)
+    collectors=[e for e in entries if e['component']=='log_collector']
+    if not collectors:return _stop_regular_in_order(entries)
+    try:_stop_regular_in_order([e for e in entries if e['component']!='log_collector'])
+    finally:save(read_state()+collectors)
+    deadline=time.monotonic()+5
+    while time.monotonic()<deadline and any(alive(e) is not None for e in collectors):time.sleep(.05)
+    stop(collectors)
+
+
+def _stop_regular_in_order(entries):
     official=[e for e in entries if e['component'] in desktop.COMPONENTS]
     if not official:return stop(entries)
     framework=[e for e in entries if e['component'] not in desktop.COMPONENTS]
@@ -376,7 +391,7 @@ def desktop_status(settings, entries):
     def label(component):
         if any(e['component']==component and alive(e) is not None for e in entries):return '脚本创建，运行中'
         return '外部实例，保留' if found[component] else '未发现'
-    return dict(webui_listening=port_open(5099),snow=label('official_snow'),qq=label('official_qq'))
+    return dict(webui_listening=port_open(desktop.webui_port(ROOT)),snow=label('official_snow'),qq=label('official_qq'))
 
 
 def start_desktop(channel_only=False):
@@ -404,12 +419,13 @@ def start_desktop(channel_only=False):
                     if process is not None and all(p.pid!=process.pid for p in found[component]):found[component].append(process)
         if found['official_snow'] and plan[3]:
             raise RuntimeError('Snow已运行，目标OneBot连接需同步。请先在Snow窗口/管理页正常退出Snow（QQ可保留），再双击启动机器人.cmd；脚本会自动备份并同步，无需手填JSON/token。现有项目组件保持运行。')
-        if port_open(5099):
+        webui_port=desktop.webui_port(ROOT)
+        if port_open(webui_port):
             permitted=set()
             for process in found['official_snow']:
                 permitted.add(process.pid)
                 permitted.update(p.pid for p in process.children(recursive=True))
-            listeners=[c for c in psutil.net_connections('tcp') if c.laddr and c.laddr.port==5099 and c.status=='LISTEN']
+            listeners=[c for c in psutil.net_connections('tcp') if c.laddr and c.laddr.port==webui_port and c.status=='LISTEN']
             if not listeners or any(c.pid not in permitted or c.laddr.ip not in ('127.0.0.1','::1') for c in listeners):
                 raise RuntimeError('5099端口被未确认或非回环实例占用；请正常退出冲突程序后重试，脚本不会终止它。')
         try:
@@ -424,8 +440,8 @@ def start_desktop(channel_only=False):
                 remember(entries,process,component)
                 capture(entries,process,component,time.time())
                 if component=='official_snow':
-                    desktop.wait_ready(process,lambda:port_open(5099),
-                        lambda:capture(entries,process,component,time.time()))
+                    desktop.wait_ready(process,lambda:port_open(webui_port),
+                        lambda:capture(entries,process,component,time.time()),root=ROOT)
             show_status()
         except BaseException:
             new=[e for e in read_state() if e not in existing]
@@ -434,7 +450,8 @@ def start_desktop(channel_only=False):
                 survivors=[e for e in read_state() if e not in existing]
                 save(existing+survivors)
             raise
-    desktop.open_page()
+        finally:desktop.close_log_pipe(ROOT)
+    desktop.open_page(ROOT)
     print('首次请在官方页面阅读/确认条款、登录管理页、选择本根专用QQ进程并扫码。')
     print('管理账号/初始密码请双击“查看Snow本机日志.cmd”在本机查看；统一状态不显示密码。')
     print('关闭此窗口不会停止机器人；请使用“关闭机器人.cmd”。')
@@ -511,9 +528,8 @@ def _launch_snow_framework(specs,env,entries,snapshot,full):
     logs=ROOT/'logs';logs.mkdir(exist_ok=True)
     for component,args,cwd,ports,timeout in specs:
         load_consumer(ROOT,snapshot,environ=env)
-        with (logs/(component+'.log')).open('ab') as output:
-            process=psutil.Popen([str(ROOT/'.venv/Scripts/python.exe'),str(ROOT/'scripts/process_host.py'),component,'--',*args],
-                cwd=cwd,env=env,stdout=output,stderr=subprocess.STDOUT,creationflags=subprocess.CREATE_NO_WINDOW)
+        process=psutil.Popen([str(ROOT/'.venv/Scripts/python.exe'),str(ROOT/'scripts/process_host.py'),component,'--',*args],
+            cwd=cwd,env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,creationflags=subprocess.CREATE_NO_WINDOW)
         started=time.time();deadline=time.monotonic()+timeout
         while time.monotonic()<deadline:
             capture(entries,process,component,started)
@@ -663,10 +679,9 @@ def _start_channel(full=False, paused=False, *, lease=None):
         for component,args,cwd,ports,timeout in specs:
             load_consumer(ROOT,snapshot,environ=env)
             started=time.time()
-            with (logs/(component+'.log')).open('ab') as output:
-                hosted=[str(ROOT/'.venv/Scripts/python.exe'),str(ROOT/'scripts/process_host.py'),component,'--',*args]
-                process=psutil.Popen(hosted,cwd=cwd,env=env,stdout=output,stderr=subprocess.STDOUT,
-                                     creationflags=subprocess.CREATE_NO_WINDOW)
+            hosted=[str(ROOT/'.venv/Scripts/python.exe'),str(ROOT/'scripts/process_host.py'),component,'--',*args]
+            process=psutil.Popen(hosted,cwd=cwd,env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,
+                                 creationflags=subprocess.CREATE_NO_WINDOW)
             ready=False
             while time.time()-started<timeout:
                 capture(entries,process,component,started)
@@ -781,9 +796,9 @@ def intake_only(*, authorize, group, sender, max_events=1, timeout_seconds=120):
                 started=time.time()
                 if component=='official_snow':process=desktop.launch(component,package,qq,ROOT)
                 else:
-                    with (logs/('intake-'+component+'.log')).open('ab') as output:
-                        process=psutil.Popen([str(ROOT/'.venv/Scripts/python.exe'),str(ROOT/'scripts/process_host.py'),component,'--',*args],
-                            cwd=cwd,env=env,stdout=output,stderr=subprocess.STDOUT,creationflags=subprocess.CREATE_NO_WINDOW)
+                    log_env=dict(env,QQBOT_LOG_NAME='intake-'+component+'.log')
+                    process=psutil.Popen([str(ROOT/'.venv/Scripts/python.exe'),str(ROOT/'scripts/process_host.py'),component,'--',*args],
+                        cwd=cwd,env=log_env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,creationflags=subprocess.CREATE_NO_WINDOW)
                 owners.append((process,component,started))
                 capture(entries,process,component,started)
                 if not entries:raise RuntimeError('INTAKE_IDENTITY_UNVERIFIED')
@@ -847,7 +862,7 @@ def main():
         parser.error('login observation requires a start command')
     try:
         if args.command=='start-desktop':start_desktop(channel_only=args.channel_only)
-        elif args.command=='open-snow':return 0 if desktop.open_page() else 1
+        elif args.command=='open-snow':return 0 if desktop.open_page(ROOT) else 1
         elif args.command=='snow-log':return 0 if desktop.open_log(ROOT) else 1
         elif args.command in ('start-channel','start-text'):
             start_channel(full=args.command=='start-text',paused=args.login_check_only,

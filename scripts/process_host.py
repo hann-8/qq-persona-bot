@@ -1,5 +1,7 @@
 """Discard upstream output; retain only explicit local transport/model metadata."""
 import argparse
+import os
+from pathlib import Path
 import re
 import subprocess
 import time
@@ -72,20 +74,28 @@ def safe_line(component,line):
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('component');parser.add_argument('command',nargs=argparse.REMAINDER);args=parser.parse_args()
     command=args.command[1:] if args.command[:1]==['--'] else args.command
-    print('HOST_START component='+args.component,flush=True)
-    process=subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,stdin=subprocess.DEVNULL,
-                             creationflags=subprocess.CREATE_NO_WINDOW)
-    lines=BoundedLines();last_error=0;events=set()
-    while chunk:=process.stdout.read1(4096):
-        for line in lines.feed(chunk):
-            safe=safe_line(args.component,line)
-            if safe and args.component=='napcat':
-                if safe in events or len(events)>=32:continue
-                events.add(safe)
-            if safe:print(time.strftime('%Y-%m-%d %H:%M:%S')+' '+safe,flush=True)
-            elif args.component not in ('napcat','snowluma','qq_client','transport_watch') and ('ERROR' in line or '[ERRO]' in line) and time.monotonic()-last_error>30:
-                print('COMPONENT_ERROR component='+args.component+' details_suppressed',flush=True);last_error=time.monotonic()
-    code=process.wait();print('HOST_EXIT component='+args.component+' code='+str(code),flush=True)
+    root=Path(os.environ.get('QQBOT_ROOT',Path(__file__).resolve().parents[1]))
+    from qqbot_gateway.config_files import load_consumer
+    from log_retention import LogSink
+    settings=load_consumer(root).get('logging',{})
+    sink=LogSink(root,os.environ.get('QQBOT_LOG_NAME',args.component+'.log'),settings)
+    def emit(text):sink.write(text+'\n')
+    try:
+        emit('HOST_START component='+args.component)
+        process=subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,stdin=subprocess.DEVNULL,
+                                 creationflags=subprocess.CREATE_NO_WINDOW)
+        lines=BoundedLines();last_error=0;events=set()
+        while chunk:=process.stdout.read1(4096):
+            for line in lines.feed(chunk):
+                safe=safe_line(args.component,line)
+                if safe and args.component=='napcat':
+                    if safe in events or len(events)>=32:continue
+                    events.add(safe)
+                if safe:emit(time.strftime('%Y-%m-%d %H:%M:%S')+' '+safe)
+                elif args.component not in ('napcat','snowluma','qq_client','transport_watch') and ('ERROR' in line or '[ERRO]' in line) and time.monotonic()-last_error>30:
+                    emit('COMPONENT_ERROR component='+args.component+' details_suppressed');last_error=time.monotonic()
+        code=process.wait();emit('HOST_EXIT component='+args.component+' code='+str(code))
+    finally:sink.close()
     raise SystemExit(code)
 
 

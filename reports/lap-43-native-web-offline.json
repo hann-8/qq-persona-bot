@@ -1,6 +1,6 @@
 {
-  "adapter_signature": "a4ee4d763097642128f34c3ecfdb365efdbe81287b38fe0aaa6d21f4d259e6b2",
-  "binding": "1c8d1f3724243023ef4f3ba11e39861c4f19df8061308480f9dfe45aef94a8cc",
+  "adapter_signature": "6d3548126cea9d0714ded5ccda0840c83c7e709f03c5cdfb3fa29549af12c36f",
+  "binding": "6ef680f01f60431e57cff154a9cfc2b345024e081f951601d9aed6307bd2713c",
   "budget": {
     "final_visible_policy_bytes": 31334,
     "limit": 524288,
@@ -25,7 +25,7 @@
     "C": 1000000,
     "F": 8985,
     "O": 128000,
-    "T": 33330,
+    "T": 33366,
     "V": 1024
   },
   "passed": true,

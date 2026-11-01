@@ -1,4 +1,4 @@
-当前维护已交付：**LAP-45 清除 8 个旧 worktree 的文件，只保留 SnowLuma main 工作根和本地 main；历史已保全 GitHub**，见[实际交接](tracks/laptop-workbuddy/tasks/LAP-45/HANDOFF.md)。Git 公共目录已迁入本根，旧 QQbot 仅因 Codex cwd 占用留下空目录；移除旧文件约 3.087 GiB（逻辑大小）。22 个保护摘要不变，生产仍在线，未启停。Snow 原生日志配置已为七天；项目追加日志的[七天方案](tracks/laptop-workbuddy/tasks/LAP-45/PLAN.md)已规划、尚未实现，后续按[medium 指令](tracks/laptop-workbuddy/tasks/LAP-45/MEDIUM_START.md)接续。
+2026-11-01 LAP-45已实现/启用七天运行日志保留：日轮转、常驻每分钟维护、当前用户每小时及登录清理任务，实际LastTaskResult=0。QQ恢复connected/ready，微信监听正常；管理页按钮跟随官方实际5101。原工作区清理已完成，本地只保留SnowLuma main，历史在GitHub。[实际结果](tracks/laptop-workbuddy/tasks/LAP-45/RESULT.md) / [交接](tracks/laptop-workbuddy/tasks/LAP-45/HANDOFF.md)。
 
 当前实施：**WX-AKASHA-ALL ready_for_user_test；QQ侧已受管部署/恢复connected，6199与11229监听，微信账号/配对已保存，SSE/WS正常，交用户实测**，见[本次交接](tracks/laptop-workbuddy/tasks/WX-AKASHA-ALL/HANDOFF.md)；用户已提交完整实施指令，下方只规划描述为历史。
 

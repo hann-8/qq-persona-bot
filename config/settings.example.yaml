@@ -61,6 +61,10 @@ web:
   max_page_text_bytes: 4000  # 单页正文1000..8000字节
   max_evidence_bytes: 6000  # 兼容保存1000..12000；公共材料实际最多6000且受最终预算约束
   max_sources: 2  # 来源1..2项
+logging:
+  enabled: true  # 项目日志按日轮转并自动过期；false停止轮转/删除
+  retention_days: 7  # 保留当天和前六日；正整数1..36500
+  sweep_interval_minutes: 60  # 停机清理计划任务间隔1..1440分钟
 bot:  # 配置节，子字段见下方；保留既有校验约束
   qq: REQUIRED_PERSONAL_BOT_QQ  # 机器人个人QQ，必填正整数字符串，占位不能启动
 access:  # 配置节，子字段见下方；保留既有校验约束

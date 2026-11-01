@@ -20,7 +20,7 @@ LAYOUT = {
     'models.yaml': ('llm',),
     'chat.yaml': ('chat', 'participation', 'output'),
     'features.yaml': ('public_network', 'web', 'bilibili', 'memes', 'memory', 'vision', 'members'),
-    'runtime.yaml': ('layout_version', 'schema_version', 'onebot', 'secrets_file', 'qq_transport', 'legacy_extensions'),
+    'runtime.yaml': ('layout_version', 'schema_version', 'onebot', 'secrets_file', 'qq_transport', 'logging', 'legacy_extensions'),
 }
 KNOWN = frozenset(k for keys in LAYOUT.values() for k in keys)
 FILE_LIMIT = 128 * 1024

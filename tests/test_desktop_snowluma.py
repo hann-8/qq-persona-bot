@@ -187,6 +187,7 @@ class DesktopTests(unittest.TestCase):
     def test_launch_uses_bundled_node_cwd_hidden_and_sanitized_environment(self):
         with patch.dict(os.environ,{'SNOWLUMA_ACCEPT_EULA':'1','SNOWLUMA_ACCEPT_PRIVACY':'1',
                 'SNOWLUMA_HOOK_AUTOLOAD_ALL':'1','SNOWLUMA_WEBUI_BOOTSTRAP_PASSWORD':'hidden'}), \
+             patch.object(desktop,'log_pipe',return_value=SimpleNamespace(write_fd=subprocess.DEVNULL,process=None)), \
              patch.object(desktop.subprocess,'run',return_value=SimpleNamespace(returncode=0)) as check, \
              patch.object(desktop.psutil,'Popen') as popen:
             desktop.launch('official_snow',self.package,self.qq,self.root)
@@ -233,8 +234,20 @@ class DesktopTests(unittest.TestCase):
             self.assertIsNone(manage.alive(row));manage.stop([row])
         p.terminate.assert_not_called();p.kill.assert_not_called()
 
+    def test_official_fallback_port_uses_owned_loopback_listener_and_expires_with_identity(self):
+        process=self.process(77);process.children.return_value=[self.process(78)]
+        def connection(pid,port,ip='127.0.0.1'):
+            return SimpleNamespace(pid=pid,laddr=SimpleNamespace(port=port,ip=ip),status='LISTEN')
+        with patch.object(desktop.psutil,'net_connections',return_value=[connection(999,5099),connection(78,5101)]):
+            self.assertEqual(desktop.actual_webui_port(process),5101)
+            desktop.wait_ready(process,lambda:False,lambda:None,root=self.root)
+        with patch.object(desktop.psutil,'Process',return_value=process):
+            self.assertEqual(desktop.webui_url(self.root),'http://127.0.0.1:5101')
+            process.create_time.return_value=999.
+            self.assertEqual(desktop.webui_port(self.root),5099)
+
     def test_page_log_fallback_never_print_log_contents(self):
-        with patch.object(desktop.webbrowser,'open',return_value=False):self.assertFalse(desktop.open_page())
+        with patch.object(desktop.webbrowser,'open',return_value=False):self.assertFalse(desktop.open_page(self.root))
         self.assertIn(desktop.URL,self.output.getvalue())
         self.assertFalse(desktop.open_log(self.root))
         path=self.root/'logs/snowluma-startup.local.log';path.parent.mkdir();path.write_text('password-do-not-print')

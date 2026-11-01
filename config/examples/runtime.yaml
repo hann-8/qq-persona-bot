@@ -2,6 +2,10 @@
 # 同目录五文件共同组成配置；其他文件见config/README.md。
 # 本机config/local不提交；保存后下次正常启动生效，不热更新。
 schema_version: 3  # 内部配置版本固定3；新装默认 3
+logging:
+  enabled: true  # 项目日志按日轮转并自动过期；false停止轮转/删除
+  retention_days: 7  # 保留当天和前六日；正整数1..36500
+  sweep_interval_minutes: 60  # 停机清理计划任务间隔1..1440分钟；修改后运行日志维护install更新
 onebot:  # 配置节，子字段见下方；保留既有校验约束
   host: 127.0.0.1  # 高级监听地址固定127.0.0.1；新装默认 "127.0.0.1"
   port: 6200  # 高级回环端口1..65535；新装默认 6200

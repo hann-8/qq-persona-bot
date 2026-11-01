@@ -2,7 +2,13 @@
 
 返回[PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md)。继承根 AGENTS。
 
-状态：本地清理已完成；日志补齐方案已规划，待用户后续 medium 实施。负责人：当前会话 Codex；session `LAP-45-local-worktrees-20261031`；开始时间：2026-10-31 12:57（Asia/Shanghai）。[七天日志方案](PLAN.md) / [后续实施指令](MEDIUM_START.md)。
+状态：本地清理与七天日志均已完成，日志已启用/受管加载，当前用户计划任务实际执行成功。2026-11-01用户同意续作并另行授权关闭两个旧Snow实例；此前AGENTS分轮指令已撤销。负责人当前会话Codex，session LAP-45-logs-20261101；[实际结果](RESULT.md)。
+
+本次归属：scripts/{log_retention,log_collector,process_host,manage}.py、src/qqbot_gateway/{official_snowluma,config,config_files}.py、配置模板/说明、定向测试和本项/进度交接。已发现用户新建未跟踪的 `启动机器人_workbuddyDeepseek.bat`，保留、不执行、不提交。起点 main=1d843fa，与现有工作区唯一 main 一致；零生成健康在线。范围为实现、必要检查、启用自动清理、受管加载和 Git 交付；不重做工作区删除，不调用真实模型/造群消息。
+
+上线前检查点（历史）：日志专项 10 项中 9 通过、文件 symlink 权限不足 1 跳过（实际 Windows 目录 junction 拒绝已通过）；23 项桌面回归通过。配置 suite 29 通过，既有 CF05 fixture 缺 platform_settings 的 KeyError 在原 HEAD 管理模块复现，未改写无关测试。匿名管道同时接收两个真实合成子进程、EOF退出通过；兼容 Windows venv launcher/解释器的创建身份。新 logger 不改现有脱敏规则；旧不可变快照省略 logging 时不新增语义字段，保持摘要兼容。当前无实际启停；20 个本机保护文件及源代码原件已备份到忽略的 state/lap45-logs-20261101/before，准备空闲点受管加载和当前零生成技术配对。
+
+部署过程检查点（历史）：空闲时已受管停止并保存 logging=true/7/60，旧组件日志已归档。原控制台日志由两个未登记 Snow Node 占用，用户异步明确授权关闭并改为受管启动；已按精确 PID/创建时间/程序路径关闭两项并成功归档原日志。首次恢复时官方选择 5101（5099/5100 被 WeGame 进程绑定但未监听），旧检查仅认 5099，触发本次新增组件回收；未操作 WeGame/未登记 QQ。已最小修复为只识别本次创建树的回环监听端口，并把 PID/创建时间绑定的端口用于状态和管理页按钮。新检查：日志 11 项中 10 通过/1 文件 symlink 权限跳过，桌面 24 通过，当前联网/记忆/视觉兼容 34 通过；第一次当前真实 CLI 零生成通过，现按最终源码再做技术配对/恢复。原模型/额度/人设/访问控制不变。
 
 ## 目标与授权
 
@@ -46,4 +52,4 @@
 
 ## 下一步与交付
 
-日志项目机制尚未实现或启用；按 [PLAN](PLAN.md) 和 [MEDIUM_START](MEDIUM_START.md) 由用户后续选择 medium 实施。工作区清理不需要再做。真实七天运行/模型/QQ/微信消息效果均不是本轮验收。Git 文档交付：审阅、链接/diff 检查及 push 后远端 main 核对，最终提交号见会话回执。本会话交付后释放维护归属，WX-AKASHA-ALL 仍待用户实测。
+日志已实现并启用：11项日志专项10通过/1权限跳过、24桌面和34兼容通过，最终真实CLI零生成配对通过；任务每小时和登录时执行，实际LastTaskResult=0。当前QQ connected/ready、router_ready=true，微信11229监听正常，管理页跟随官方5101。详情见[RESULT](RESULT.md)。本机表情说明变化按用户内容保留，未跟踪启动bat不执行/不提交；群记忆及其余保护摘要一致。Git交付完成后释放归属，真实七天长跑与消息质量仍待自然观察。

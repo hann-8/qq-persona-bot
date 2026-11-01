@@ -1,6 +1,6 @@
 # LAP-45 后续 medium 实施指令
 
-返回[交接](HANDOFF.md) / [方案](PLAN.md)。由用户在会话设置选择 gpt-6.1-sol/medium 后提交以下指令；本文件本身不自动启用或授权运行操作。
+历史实施指令：2026-11-01本任务已完成，无需再次提交或重复部署。实际状态见[RESULT](RESULT.md)和[交接](HANDOFF.md)。
 
 ```text
 在 E:\CodexWS\QQbot_Snowluma 的 main 继续 LAP-45。先读 PROGRESS、AGENTS、QQ 工作线 HANDOFF/TASKS 和 LAP-45 HANDOFF/PLAN；只领取本任务，不新建其他 worktree。

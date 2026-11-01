@@ -16,6 +16,43 @@ from .qq_transport import checked_path, resolve_transport
 
 URL = 'http://127.0.0.1:5099'
 COMPONENTS = ('official_snow', 'official_qq')
+_LOG_PIPES = {}
+
+
+def webui_port(root=None):
+    root=Path(root or Path(__file__).resolve().parents[2])
+    try:
+        value=json.loads((root/'state/snowluma-webui.local.json').read_text(encoding='utf-8'))
+        process=psutil.Process(value['pid'])
+        if type(value['port']) is int and 1<=value['port']<=65535 and abs(process.create_time()-value['created'])<.01:
+            return value['port']
+    except (OSError,ValueError,KeyError,TypeError,psutil.Error):pass
+    return 5099
+
+
+def webui_url(root=None):return 'http://127.0.0.1:'+str(webui_port(root))
+
+
+def actual_webui_port(process):
+    """Follow official automatic port fallback, using only this created tree."""
+    owned={process.pid,*(child.pid for child in process.children(recursive=True))}
+    ports={c.laddr.port for c in psutil.net_connections('tcp') if c.pid in owned and c.status=='LISTEN'
+           and c.laddr and c.laddr.ip in ('127.0.0.1','::1')}
+    return next(iter(ports)) if len(ports)==1 else None
+
+
+def log_pipe(root):
+    root=Path(root).resolve()
+    if root not in _LOG_PIPES:
+        from scripts.log_collector import CollectorPipe
+        from .config_files import read_project
+        _LOG_PIPES[root]=CollectorPipe(root,read_project(root).settings.get('logging',{}))
+    return _LOG_PIPES[root]
+
+
+def close_log_pipe(root):
+    pipe=_LOG_PIPES.pop(Path(root).resolve(),None)
+    if pipe is not None:pipe.close()
 
 
 def paths(root, settings):
@@ -105,9 +142,9 @@ def environment():
 def launch(component, package, qq, root):
     flags = getattr(subprocess, 'CREATE_NO_WINDOW', 0) if component == 'official_snow' else 0
     env = environment()
-    log = Path(root)/'logs/snowluma-startup.local.log'
-    log.parent.mkdir(parents=True, exist_ok=True)
-    with log.open('ab') as output:
+    pipe = log_pipe(root)
+    output = pipe.write_fd
+    try:
         if component == 'official_snow':
             try:
                 result = subprocess.run([str(package/'node.exe'), str(package/'check-node-version.cjs')],
@@ -117,15 +154,21 @@ def launch(component, package, qq, root):
                 raise RuntimeError('官方Node版本检查超时，请查看Snow本机日志。') from None
             if result.returncode:raise RuntimeError('官方Node版本检查失败，请查看Snow本机日志；未启动Snow。')
         args = [str(package/'node.exe'), str(package/'index.mjs')] if component == 'official_snow' else [str(qq)]
-        return psutil.Popen(args, cwd=package if component == 'official_snow' else qq.parent,
+        process = psutil.Popen(args, cwd=package if component == 'official_snow' else qq.parent,
                             env=env, stdout=output, stderr=subprocess.STDOUT, creationflags=flags)
+        process._qqbot_log_collector = pipe.process
+        return process
+    except BaseException:
+        close_log_pipe(root)
+        raise
 
 
-def open_page():
+def open_page(root=None):
+    url=webui_url(root)
     try:
-        if webbrowser.open(URL):return True
+        if webbrowser.open(url):return True
     except (OSError, webbrowser.Error):pass
-    print('浏览器未打开，请手动打开：'+URL)
+    print('浏览器未打开，请手动打开：'+url)
     return False
 
 
@@ -138,11 +181,18 @@ def open_log(root):
         print('无法打开本机日志，请手动查看：'+str(path));return False
 
 
-def wait_ready(process, ready, capture, timeout=20):
+def wait_ready(process, ready, capture, timeout=20, *, root=None):
     deadline = time.monotonic()+timeout
     while time.monotonic() < deadline:
         capture()
-        if ready():return
+        if root is None:
+            if ready():return
+        else:
+            try:port=actual_webui_port(process)
+            except (psutil.Error,OSError):port=None
+            if port is not None:
+                atomic_json(Path(root)/'state/snowluma-webui.local.json',dict(port=port,pid=process.pid,created=process.create_time()))
+                return
         if not process.is_running():break
         time.sleep(.2)
     raise RuntimeError('Snow管理页未就绪，请查看Snow本机日志；仅回收本次新增进程。')

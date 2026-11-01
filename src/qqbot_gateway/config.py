@@ -143,6 +143,16 @@ class GateConfig:
             raise ValueError('Missing local transport token')
 
 
+def normalize_logging(raw):
+    if not isinstance(raw,dict) or set(raw)-{'enabled','retention_days','sweep_interval_minutes'}:
+        raise ValueError('Invalid logging configuration')
+    value={'enabled':True,'retention_days':7,'sweep_interval_minutes':60,**raw}
+    if type(value['enabled']) is not bool:raise ValueError('Invalid logging.enabled')
+    for key,upper in [('retention_days',36500),('sweep_interval_minutes',1440)]:
+        if type(value[key]) is not int or not 1<=value[key]<=upper:raise ValueError('Invalid logging.'+key)
+    return value
+
+
 def normalize_settings(raw):
     """Validate a complete snapshot without rewriting the source or losing extensions."""
     if not isinstance(raw, dict):
@@ -152,6 +162,9 @@ def normalize_settings(raw):
     if type(version) is not int or version not in (1, 2, 3):
         raise ValueError('Unsupported schema_version')
     data['schema_version'] = 3
+    # Existing immutable snapshots keep their semantic digest; consumers supply
+    # the default when this optional operations section is absent.
+    if 'logging' in data:data['logging'] = normalize_logging(data['logging'])
     from .group_memory import validate_config as validate_memory
     data['memory']=validate_memory(data.get('memory',{}))
     from .members import validate_config as validate_members
