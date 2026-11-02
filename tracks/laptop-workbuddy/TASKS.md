@@ -1,4 +1,6 @@
-2026-11-02 20:59（Asia/Shanghai）LAP-46 规划领取：session `LAP-46-web-quality-plan`，负责人当前会话 Codex，无代理。用户要求先诊断/规划、review 后再落地，保持简单。本轮仅拥有 PROGRESS.md、工作线 HANDOFF/TASKS、tasks/LAP-46/{PLAN.md,HANDOFF.md}；只读核对今日两例日志、投递台账、原生联网源码及公开搜索对照，不改代码/local/persona/状态，不启停、不调用真实 CodeBuddy 模型/工具、不发群消息。基线 main/2fd1073 与实时 origin/main 一致；用户未跟踪启动 bat 保留且不提交。规划按既有授权 commit/push，随后等待 review；实际质量根因仍需后续受控工具追踪。[计划](tasks/LAP-46/PLAN.md) / [交接](tasks/LAP-46/HANDOFF.md)。
+2026-11-02 23:05（Asia/Shanghai）LAP-46 规划修订续领：session `LAP-46-web-quality-plan`，负责人当前会话 Codex，无代理。用户明确修整体搜索/回答方式而非特例，检查并扩大搜索/识图限制，并已选择开启思考、low。仍先 review 后实施。本轮只拥有 AGENTS.md、PROGRESS.md、工作线 HANDOFF/TASKS、tasks/LAP-46/{PLAN.md,HANDOFF.md} 六份文档。起点 main/5b8c601 与实时 origin/main 一致，用户未跟踪 bat 保留。只读日志/源码/公开官方资料及内存内合成图片检查；不改代码/local/角色材料/采集开关，不启停/真实模型/QQ。规划 commit/push 后等待 review。[计划](tasks/LAP-46/PLAN.md) / [交接](tasks/LAP-46/HANDOFF.md)。
+
+2026-11-02 20:59（Asia/Shanghai）LAP-46 首版规划记录（由上方修订覆盖）：session `LAP-46-web-quality-plan`，负责人当前会话 Codex，无代理。起点 main/2fd1073；仅五份规划文档，交付5b8c601，无代码/配置/运行变更。原“专名/游戏、保持旧预算和思考关闭”方案不再作为执行合同。[计划](tasks/LAP-46/PLAN.md) / [交接](tasks/LAP-46/HANDOFF.md)。
 
 LAP-45 已实现/启用/部署：session LAP-45-logs-20261101，本会话2026-11-01 17:03续领；归属日志/启动/配置接点、模板、定向测试、脱敏技术报告及进度交接。七天策略true/7/60已加载，计划任务实际返回0；原工作区清理不重复，用户bat/本机表情说明改动保留。[实际结果](tasks/LAP-45/RESULT.md) / [交接](tasks/LAP-45/HANDOFF.md)。Git交付后释放归属，WX-AKASHA-ALL真实消息效果仍待用户试用。
 

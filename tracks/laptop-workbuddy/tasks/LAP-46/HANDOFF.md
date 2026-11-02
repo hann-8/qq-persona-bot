@@ -1,15 +1,17 @@
-# LAP-46 联网质量修正规划交接
+# LAP-46 整体CLI搜索表达与图片预算交接
 
-返回 [PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [计划](PLAN.md)。继承根 AGENTS；用户本轮明确先 review 再实施，并希望全程由当前会话处理、保持简单。
+返回 [PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [计划](PLAN.md)。继承根AGENTS，最新用户修订优先。
 
-状态：**planned / awaiting_user_review**。2026-11-02，session `LAP-46-web-quality-plan`，无代理。基线 main/2fd1073 与实时 origin/main 相同。尚未实施、配置变更、捕获开关、模型调用、启停或群发。
+状态：planned / awaiting_user_review。session LAP-46-web-quality-plan，当前会话负责人，无代理。首版5b8c601已交付；本次起点main/5b8c601与实时origin/main一致。用户明确不修专名/游戏特例，要求整体搜索/表达和预算合理化；已选择思考开启、low，覆盖旧关闭偏好。整体仍先review再实施。
 
-已完成：读取 AGENTS、项目/工作线交接及台账；定位当日 18:24/18:34 两例收发与 completed/sent 台账；确认来源尾巴为 web_retrieval.source_plan 强制追加；核对 native 提示、工具参数传递、结果裁剪和实际配置。独立公开搜索能找到相关资料，不代表 bot 工具效果。今日完整 query/返回轨迹未保留，检索差的具体根因未证实。
+实证：bot是锁定CLI的WebSearch/WebFetch，用户对照为REPL→Search；bot替换system、关闭思考、要求群JSON、截工具材料为8000/12000、只留前两URL、部分校验失败终结任务、来源尾巴代码追加。当前图片8MiB原始/16MP解码、1024边/1MP处理、PNG512KiB/帧2MiB；文字524288字节/视觉预留4096。不能把问题缩成专名消歧或一概归咎文字预算。
 
-方案只改原生正文和简短搜索指导，复用一次性捕获做两例真实本机前后对照，最多四项业务任务、零主动 QQ 输出；不换后端、不加预算、不建搜索框架。真实调用和部署须等本计划获用户确认。需要换服务/模型/CLI或增加限额时，带证据回到 review。
+11:38:53固定失败句对应CLI generation=success，不能确认图片预算失败；中午bot自述预算只是聊天。纯文字图后追问不重带原像素。离线高细节1600×1200 JPEG（1721958字节）normalize拒绝IMAGE_BLOB_INVALID，同尺寸纯色图成功：小字节门槛真实存在，但不证明今日特定图根因。今日两次搜索完整工具/模型原文未保留。
 
-本轮归属：PROGRESS.md、工作线 HANDOFF/TASKS、本目录 PLAN/HANDOFF 五份文档。用户未跟踪 `启动机器人_workbuddyDeepseek.bat` 保留、不执行、不提交；原始群消息、号码、数据库和捕获材料不进入 Git。旧 LAP-43、44、45、微信任务状态不改写。
+计划精简过窄适配/表达约束、允许普通工具错误纠正、思考true/low；试用8调用/10步/120秒、单64KiB/总256KiB、图原32MiB/处理8MiB/2048边与4MP、正文4000。同步实际校验/期限/来源和配置，避免仅改local；这些是可调默认而非新封顶。账号/准入/两工具边界保持，不开放REPL/本机执行。最多8项本机业务测试，含非原例查询和两类图，无主动群发。细节见PLAN。
 
-验证：五份归属文档检查通过、244 个本地 Markdown 链接无缺失、git diff --check 通过；未改代码或配置。实现与搜索检查尚未执行。Git 交付为规划文档，不是部署；最终提交号以 Git/本次回复为准。
+本次只拥有AGENTS、PROGRESS、工作线HANDOFF/TASKS、本目录PLAN/HANDOFF六文档。用户未跟踪启动bat保留、不执行、不提交。未改代码/local/角色材料/采集开关，无启停/真实模型/原生联网工具/QQ输出。读取公开官方资料并核对锁定编码源hash，API支持不冒充CodeBuddy能力。
 
-下一步：等待用户 review；同意后按 PLAN 第5节在当前会话一次完成最小实现、必要验证、配对恢复、Git 交付。实施前重新取当前配置/运行/Git基线，不沿用本次现场快照。此次规划 Git 核对后释放文档归属。
+验证与Git：六文档/256个本地链接无缺失，git diff --check及归属检查通过，未改代码或配置；最终提交号见Git和本次回复。本次不是实施，核对后释放文档归属。
+
+下一步：用户review修订方案后，当前会话依PLAN完成最小实现、必要验证、配对部署和Git。不要按首版旧预算/思考false保持执行；实施前重新取Git/配置/运行基线。

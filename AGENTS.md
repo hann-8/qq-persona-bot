@@ -1,3 +1,5 @@
+2026-11-02 LAP-46用户最新修订：要改善整体CLI搜索/回答方式和消息适配，不针对专名/游戏写特例；搜索/识图不能继续维持不合理小限额。用户已明确选择“试试思考，强度low”，覆盖下方旧强制thinking=false偏好；当前运行仍false，开启和预算扩大尚待整体方案review后实施。复用原两工具与现有链路，精简过窄适配、不新建检索框架。[修订计划](tracks/laptop-workbuddy/tasks/LAP-46/PLAN.md) / [交接](tracks/laptop-workbuddy/tasks/LAP-46/HANDOFF.md)。旧3调用/4步/90秒/8000/12000是现状，不再作为新方案必须保留的上限；不得把本条规划写成已部署。
+
 2026-10-31 本地维护事实：用户明确只保留 SnowLuma main 工作区，旧本地 worktree 不再保留、历史留 GitHub。LAP-45 已清除 8 个旧工作区文件和 15 个本地历史分支，公共 .git 已迁至 `E:/CodexWS/QQbot_Snowluma/.git`；旧 QQbot 因 Codex cwd 仅留空目录，不能再作为旧运行根使用。下方旧根/worktree“保留、不修改”为历史约定，由本次用户新指令覆盖；主线运行环境/配置/秘密/会话/记忆/图库及本根 A4 材料保留。Snow 原生日志已配置七天，项目追加日志补齐方案已规划未实施，见[LAP-45交接](tracks/laptop-workbuddy/tasks/LAP-45/HANDOFF.md)。
 
 2026-10-29 LAP-44当前合同：群长期记忆采用schema2全文快照＋同次回复memory_updates增改删，模型决定内容/整理/遗忘；旧候选、句式、关键词和240字节/3条/8条/1536字节小限制停用，旧配置字段兼容但忽略。每群初始50000 Unicode字符、文件1048576字节、总8388608字节；所选CodeBuddy输入政策524288可见UTF-8字节，均可配置扩大并受真实C/F/V/O限制。保存后在投递台账前生成实际回执，重置只清短期上下文。模型/账号/low、thinking=false、free/owner、识图/表情和两工具3调用/4步骤/90秒/8000/12000保持。部署及验证结果以[LAP-44交接](tracks/laptop-workbuddy/tasks/LAP-44/HANDOFF.md)为准，QQ群效果待用户实测。

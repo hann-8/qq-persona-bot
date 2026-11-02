@@ -1,4 +1,4 @@
-2026-11-02 当前规划：**LAP-46 联网回复质量，等待用户 review**。已定位今日两例及程序强制来源尾巴；完整工具轨迹未保留，不猜搜索差的具体根因。拟最小去尾巴、补搜索消歧指导，并在批准后复用现有捕获做两例少量本机前后对照；原后端/限额保持。本轮仅只读与文档，未实施或操作运行。[计划](tracks/laptop-workbuddy/tasks/LAP-46/PLAN.md) / [交接](tracks/laptop-workbuddy/tasks/LAP-46/HANDOFF.md)。
+2026-11-02 当前规划：**LAP-46 整体CLI搜索表达/图片预算修订，等待review**。用户明确不针对特例；已选择思考开启/low，拟精简结果裁剪/普通错误终结/来源尾巴等适配，扩大搜索和图片实际限额。今日固定失败句对应CLI生成成功，不能认定图片预算超限；合成JPEG已复现PNG512KiB拒绝。具体今日搜索根因仍缺完整轨迹。本轮仅只读/合成检查/文档，未改运行。[计划](tracks/laptop-workbuddy/tasks/LAP-46/PLAN.md) / [交接](tracks/laptop-workbuddy/tasks/LAP-46/HANDOFF.md)。
 
 2026-11-01 LAP-45已实现/启用七天运行日志保留：日轮转、常驻每分钟维护、当前用户每小时及登录清理任务，实际LastTaskResult=0。QQ恢复connected/ready，微信监听正常；管理页按钮跟随官方实际5101。原工作区清理已完成，本地只保留SnowLuma main，历史在GitHub。[实际结果](tracks/laptop-workbuddy/tasks/LAP-45/RESULT.md) / [交接](tracks/laptop-workbuddy/tasks/LAP-45/HANDOFF.md)。
 
