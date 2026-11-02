@@ -130,8 +130,8 @@ class BatchTests(unittest.TestCase):
         for size in ((1024,1),(1,1024),(1023,977),(1001,1000),(2000,501)):
             raw=io.BytesIO();Image.new('RGBA',size,(255,0,0,0)).save(raw,format='PNG')
             blob=normalize(raw.getvalue())
-            self.assertLessEqual(blob.width*blob.height,1000000)
-            self.assertLessEqual(max(blob.width,blob.height),1024)
+            self.assertLessEqual(blob.width*blob.height,4194304)
+            self.assertLessEqual(max(blob.width,blob.height),2048)
             with Image.open(io.BytesIO(blob.data)) as image:self.assertEqual(image.getpixel((0,0)),(255,255,255))
         with tempfile.TemporaryDirectory() as temp:
             folder=Path(temp)/'fixtures';spec=fixtures(folder);s=settings()

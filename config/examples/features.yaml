@@ -6,9 +6,10 @@ public_network:  # 项目公共网络策略；默认无额外CA
   ca_bundle_file: null  # 仅显式secrets/public-network-ca.local.pem，禁止任意路径/私钥/链接
 web:
   engine: gateway  # codebuddy_cli原生联网；gateway旧兼容链
-  cli_max_tool_calls: 3  # 原生单任务1..3次，失败计数
-  cli_max_turns: 4  # 原生主步骤1..4，90秒总时限
-  cli_tool_result_bytes: 8000  # 单结果1000..8000，合计12000字节
+  cli_max_tool_calls: 8  # 单任务工具调用上限，可调，失败计数
+  cli_max_turns: 10  # 主步骤上限，可调；期限跟随模型运行配置
+  cli_tool_result_bytes: 65536  # 单结果UTF-8字节预算
+  cli_total_result_bytes: 262144  # 总结果UTF-8字节预算
   search_enabled: false  # 显式启用bing_rss个人试用；逐请求校验正文与日期，质量待用户实测
   freshness_days: 7  # 默认最近7天；1..30，当前请求的明确时间窗优先
   enabled: false  # 共用网页读取总开关；搜索还须显式search_enabled；新装默认 false
@@ -50,6 +51,9 @@ vision:  # 配置节，子字段见下方；保留既有校验约束
   ingress_diagnostics: false  # 仅准入后封闭图片元数据日志，无下载/模型/图片正文；默认关闭，下次启动生效
   enabled: false  # 原生识图desired开关；生产能力未验证，true仍拒绝启动；新装默认 false
   input_reserve_tokens: 4096  # 视觉预留4096仅假设，容量/上界未证，true仍拒启动；新装默认 4096
+  max_image_bytes: 33554432  # 原图32MiB
+  max_normalized_bytes: 8388608  # 处理后8MiB
+  max_normalized_pixels: 4194304  # 4MP、最长边2048
 members:  # 配置节，子字段见下方；保留既有校验约束
   enabled: false  # 小群成员desired开关；人数新鲜度未证，生产仍暂停；新装默认 false
   mentions_enabled: false  # 受控成员@开关，仍受成员生产暂停门槛限制；新装默认 false

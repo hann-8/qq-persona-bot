@@ -2,7 +2,11 @@
 
 返回 [PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [计划](PLAN.md)。继承根AGENTS，最新用户修订优先。
 
-状态：planned / awaiting_user_review。session LAP-46-web-quality-plan，当前会话负责人，无代理。首版5b8c601已交付；本次起点main/5b8c601与实时origin/main一致。用户明确不修专名/游戏特例，要求整体搜索/表达和预算合理化；已选择思考开启、low，覆盖旧关闭偏好。整体仍先review再实施。
+状态：implementation_in_progress。2026-11-02 23:22，session LAP-46-implementation，当前会话唯一实施/启停/真实测试负责人，无代理。用户已明确“先实施”，按已review修订PLAN实现、必要检查、配对部署和Git交付；不再等待重复批准。起点main/811e70d，用户未跟踪启动bat保留。当前先保存生产保护材料和状态，再受管停止、旧路径本机基线；尚未改源码/配置或发起真实任务。最多8项本机业务任务、无主动QQ发消息，仅用既有一次性捕获，不新增常驻详细原文日志。
+
+实施检查点：17项保护文件已保存于state/lap46-deployment/before，受管stop完成，现有根分支codex/lap46-cli-quality。旧路径3项本机业务基线完成（3/8）：11.16/11.67/8.39秒。游戏例实际两次WebFetch模型自拼的Bing搜索URL、返回“菜”字百科/菜谱，未调用WebSearch；这条复现不是数字过滤拒绝。其他两例WebFetch内容页成功，但来源因先两URL规则偏向页面内链。原始轨迹只在忽略目录；尚不能把本次复现完全等同白天两条。下一步修改现有薄适配、预算和思考，3次修改后查询+2图片仍余5项。
+
+部署前检查点：实现与计划字段已完成，72项视觉/原生组合通过；最终36项当前技术检查通过，33项runner/桌面通过；真实锁定CLI正反零生成probe通过（0生成、正例0 next、反例0 user）。8项业务任务已用完：3基线+3修改后查询+2图片；其中游戏任务暴露并行WebFetch内部处理触发过严格完整性检查，已兼容并用锁定SDK嵌套/并行离线回归验证；一张大JPEG图像理解成功但最终JSON少]被丢弃，已补仅正文恢复、辅助动作不恢复并实际捕获离线重放。另查明WebSearch别名read被原Read deny误关，锁定SDK实际启用检查证明修前false/修后true、Read仍false。移除该CLI否定项后init目录会列Read，父解析器仅兼容此注册项，真实执行仍由--tools与guard限制为两web工具。尚未有别名修复后真实WebSearch服务成功证据，不夸大质量。原始材料在忽略目录，未新增常驻详细日志。下一步提交分支并快进main、activate当前配对、受管恢复和状态核对。
 
 23:19补充review：用户明确娱乐bot无需按数字/token/secret等普通内容做泄密审查。按PLAN第3节删除项目自建query/返回内容黑名单，不换数字/标识/敏感词继续审查；程序不主动注入本机凭据/内部配置。起点34271c6，仅AGENTS/TASKS/本PLAN/HANDOFF四文档补充，仍无代码/配置/模型/启停操作。白天的具体失败仍未知，不能把已知规则当成当时触发实证。
 

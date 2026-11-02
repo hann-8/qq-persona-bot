@@ -218,13 +218,13 @@ def verify(value,request,response_id,text,output,source,memory_cfg=None):
             validate_updates(aux['updates'],(effective['memory'] or {}).get('records',{}))
     if 'member_receipt' in value and not hexa(value['member_receipt'],64):raise ValueError('Member receipt')
     if m['images']:
-        from .vision import NORMALIZER,MAX_BLOB
+        from .vision import NORMALIZER,MAX_BLOB,MAX_EDGE,MAX_PIXELS
         if not isinstance(m['images'],list) or len(m['images'])!=1 or len(source['images'])!=1:raise ValueError('images')
         image=m['images'][0]
         if (not isinstance(image,dict) or set(image)!={'image_ref','sha256','mime','width','height','byte_length','normalizer_version'} or
-            image['image_ref']!=source['images'][0]['image_ref'] or not hexa(image['sha256'],64) or image['mime']!='image/png' or
-            image['normalizer_version']!=NORMALIZER or not integer(image['width'],1,1024) or not integer(image['height'],1,1024) or
-            image['width']*image['height']>1000000 or not integer(image['byte_length'],1,MAX_BLOB)):
+            image['image_ref']!=source['images'][0]['image_ref'] or not hexa(image['sha256'],64) or image['mime'] not in ('image/png','image/jpeg') or
+            image['normalizer_version']!=NORMALIZER or not integer(image['width'],1,MAX_EDGE) or not integer(image['height'],1,MAX_EDGE) or
+            image['width']*image['height']>MAX_PIXELS or not integer(image['byte_length'],1,MAX_BLOB)):
             raise ValueError('image descriptor')
         effective['images']=copy.deepcopy(m['images'])
     elif source['images']:

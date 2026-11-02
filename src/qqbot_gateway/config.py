@@ -101,6 +101,7 @@ class GateConfig:
     attention_enabled: bool = False
     media_catalog: object = None
     vision_enabled: bool = False
+    vision_limits: object = None
     ingress_diagnostics: bool = False
     members_enabled: bool = False
     members_config: object = None
@@ -366,7 +367,7 @@ def load_gate_config(path=None, *, root=None, settings=None):
         silence_aliases=tuple(data['participation']['attention']['aliases']),
         session_queue_timeout_seconds=data['chat']['session_queue_timeout_seconds'],
         message_max_chars=data['participation']['message_max_chars'],
-        vision_enabled=data['vision']['enabled'],
+        vision_enabled=data['vision']['enabled'],vision_limits=data['vision'],
         ingress_diagnostics=data['vision']['ingress_diagnostics'],
         members_enabled=effective_members['enabled'],
         members_config=effective_members,

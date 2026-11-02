@@ -51,8 +51,8 @@ def source_request(image,mode='free'):
 class NormalizeTests(unittest.TestCase):
     def test_VIS01_dimensions_hash_and_no_metadata(self):
         raw=png((1600,1000));blob=normalize(raw)
-        self.assertLessEqual(max(blob.width,blob.height),1024)
-        self.assertLessEqual(blob.width*blob.height,1000000)
+        self.assertLessEqual(max(blob.width,blob.height),2048)
+        self.assertLessEqual(blob.width*blob.height,4194304)
         self.assertLessEqual(len(blob.data),MAX_BLOB)
         self.assertEqual(blob.original_sha256,hashlib.sha256(raw).hexdigest())
         self.assertEqual(blob.sha256,hashlib.sha256(blob.data).hexdigest())
@@ -71,13 +71,24 @@ class NormalizeTests(unittest.TestCase):
         for raw in (b'<svg/>',b'bad',b'0'*(MAX_RAW+1),png(fmt='BMP')):
             with self.subTest(length=len(raw)),self.assertRaises(ValueError):normalize(raw)
         with patch('qqbot_gateway.vision.Image.open') as opened:
-            opened.return_value.__enter__.return_value=SimpleNamespace(format='PNG',width=16000001,height=1)
+            opened.return_value.__enter__.return_value=SimpleNamespace(format='PNG',width=64000001,height=1)
             with self.assertRaises(ValueError):normalize(png())
-        # Excess entropy is rejected rather than cropping or repeatedly lowering
-        # dimensions/quality until content happens to fit.
+        # A valid detailed image must not be rejected by the former 512KiB PNG cap.
         im=Image.frombytes('RGB',(1000,1000),__import__('random').Random(4).randbytes(3000000))
         out=io.BytesIO();im.save(out,format='PNG')
-        with self.assertRaises(ValueError):normalize(out.getvalue())
+        blob=normalize(out.getvalue())
+        self.assertEqual((blob.width,blob.height),(1000,1000))
+        self.assertGreater(len(blob.data),512*1024)
+
+    def test_detailed_jpeg_and_larger_configurable_image(self):
+        image=Image.frombytes('RGB',(1600,1200),__import__('random').Random(46).randbytes(1600*1200*3))
+        out=io.BytesIO();image.save(out,'JPEG',quality=90)
+        blob=normalize(out.getvalue())
+        self.assertEqual((blob.width,blob.height),(1600,1200))
+        self.assertEqual(blob.mime,'image/jpeg')
+        self.assertGreater(len(blob.data),512*1024)
+        large=normalize(png((3000,2000)),limits={'max_normalized_pixels':9437184})
+        self.assertEqual((large.width,large.height),(3000,2000))
 
     def test_VIS01_exact_https_source_allowlist(self):
         for value in ('file:///x','https://127.0.0.1/x','https://gchat.qpic.cn.evil/x','http://gchat.qpic.cn/x',
@@ -119,7 +130,7 @@ class NormalizeTests(unittest.TestCase):
             self.assertEqual(b.limit,7904)
             with self.assertRaises(GatewayError):text_budget(InputBudget(limit=4096))
             with self.assertRaises(GatewayError):text_budget(InputBudget(limit=15000,window=16384,output=2048))
-            with self.assertRaises(GatewayError):wire_check({'x':'x'*(2*1024*1024)})
+            with self.assertRaises(GatewayError):wire_check({'x':'x'*(16*1024*1024)})
             c=cli_message('literal text');self.assertEqual(c['message']['content'][0]['text'],'literal text')
             self.assertEqual(c['message']['content'][1]['source']['media_type'],'image/png')
             self.assertNotIn('cap',json.dumps(c))
@@ -281,6 +292,7 @@ class GateTests(unittest.IsolatedAsyncioTestCase):
         image=dict(image_ref='i_'+'a'*32,cap='d'*64);source,request=source_request(image)
         release=asyncio.Event();refs=[];rejected=[]
         class Client:
+            limits={'max_normalized_bytes':1024*1024}
             async def resolve(self,header,source,deadline):
                 value=NativeImage(blob,4096,time.monotonic()+60,deadline);refs.append(weakref.ref(value))
                 return value,blob.descriptor(image['image_ref'])

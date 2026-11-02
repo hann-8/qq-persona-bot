@@ -66,7 +66,7 @@ def validate_record(row):
     if any(type(v) is not bool for v in row['first_image_field_flags'].values()):raise ValueError('INVALID_INGRESS_METADATA')
     if any(not isinstance(v,str) or v not in REPRESENTATIONS for v in row['representation_enum'].values()):raise ValueError('INVALID_INGRESS_METADATA')
     if not number(row['attempt_counts']['download'],1) or not number(row['attempt_counts']['redirect'],2):raise ValueError('INVALID_INGRESS_METADATA')
-    for key,limit in (('original_dimensions',16000000),('normalized_dimensions',1024)):
+    for key,limit in (('original_dimensions',64000000),('normalized_dimensions',8192)):
         if not isinstance(row[key],list) or len(row[key])!=2 or any(not number(v,limit) for v in row[key]):raise ValueError('INVALID_INGRESS_METADATA')
     return row
 

@@ -156,7 +156,7 @@ class OneBotGate:
                                   config.session_queue_timeout_seconds+210)
         from .vision import Materials,context_token,fetch_image
         from functools import partial
-        self.materials=Materials(fetch=partial(fetch_image,network=config.public_network,root=root))
+        self.materials=Materials(fetch=partial(fetch_image,network=config.public_network,root=root),limits=config.vision_limits)
         from .members import Members
         self.members=Members(config.members_config or {'enabled':config.members_enabled})
         self.mention_pending={}

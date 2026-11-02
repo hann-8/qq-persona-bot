@@ -274,7 +274,7 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
                                   'web_engine':getattr(queue.runner,'web_config',{}).get('engine','gateway'),
                                   'native_web_tools':__import__('qqbot_gateway.cli_web_policy',fromlist=['allowed_tools']).allowed_tools(getattr(queue.runner,'web_config',{})),
                                   'native_web_limits':{k:v for k,v in getattr(queue.runner,'web_config',{}).items() if k.startswith('cli_')},
-                                  'thinking_enabled':False,
+                                  'thinking_enabled':getattr(queue.runner,'thinking_enabled',False),
                                   'memory':{k:getattr(queue.runner,'vision_settings',{}).get('memory',{}).get(k,False) for k in ('enabled','learning_enabled','max_chars_per_group','max_group_file_bytes','max_total_bytes')},
                                   'vision':vision_status or {'enabled':bool(materials),'quality_state':'unverified'},
                                   'web_search_enabled':getattr(queue.runner,'retriever',None).cfg.get('search_enabled',False) if getattr(queue.runner,'retriever',None) else False,
@@ -382,7 +382,7 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
                     return web.json_response(dict(id=response_id,object='chat.completion',created=int(time.time()),model='workbuddy-local',
                         choices=[dict(index=0,message=dict(role='assistant',content=text),finish_reason='stop')],qqbot_group_plan=meta))
                 size=len(native_image.blob.data)
-                if vision_bytes+size>8*1024*1024:
+                if vision_bytes+size>4*getattr(materials,'limits',{}).get('max_normalized_bytes',8*1024*1024):
                     snapshot['images']=[]
                     for row in snapshot['messages']:row['images']=[]
                     request[V2_EFFECTIVE]=snapshot
@@ -550,7 +550,7 @@ def main():
         persona_id=session_version(persona+('\n'+memes.fingerprint() if memes.cfg['enabled'] else ''),settings)
         v2=dict(mode=settings['participation']['mode'],config_version=digest(persona_id),aliases=settings['participation']['attention']['aliases'],mentions_enabled=settings['members']['mentions_enabled'],memory_enabled=settings['memory']['enabled'],learning_enabled=settings['memory']['learning_enabled'],memory_config=settings['memory'])
     from .vision import MaterialClient,context_token
-    materials=MaterialClient(f"http://127.0.0.1:{settings['onebot']['port']}/context/vision/resolve",context_token(root),settings['vision']['input_reserve_tokens']) if settings['vision']['enabled'] else None
+    materials=MaterialClient(f"http://127.0.0.1:{settings['onebot']['port']}/context/vision/resolve",context_token(root),settings['vision']['input_reserve_tokens'],settings['vision']) if settings['vision']['enabled'] else None
     member_client=MemberClient(f"http://127.0.0.1:{settings['onebot']['port']}/context/members",context_token(root)) if settings['members']['enabled'] else None
     vision_status={'enabled':settings['vision']['enabled']}
     if settings['vision']['enabled']:

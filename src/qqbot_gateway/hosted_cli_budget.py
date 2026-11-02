@@ -48,8 +48,8 @@ def review_record():
                      audit='reports/lap-42-vision-closure-sources.json',
                      plugin_assets_sha256=assets_signature(),native_schema_spans={k:list(v) for k,v in NATIVE_SCHEMAS.items()}),
         bounds=dict(text_tokens_per_byte=1, visual_max_tokens=1024,
-                    native_window=1000000, max_width=1024, max_height=1024,
-                    max_pixels=1000000, max_images=1),
+                    native_window=1000000, max_width=8192, max_height=8192,
+                    max_pixels=67108864, max_images=1),
         template_contract='post_render_current_task_bounded_native_web_v3')
 
 
@@ -177,7 +177,7 @@ def final_budget(record, budget, system, prompt, width, height, model):
     reviewed(record)
     if budget.vision_kind != KIND: raise ValueError('HOSTED_BUDGET_KIND_MISMATCH')
     if not (type(width) is int and type(height) is int and
-            0 < width <= 1024 and 0 < height <= 1024 and width*height <= 1000000):
+            0 < width <= record['bounds']['max_width'] and 0 < height <= record['bounds']['max_height'] and width*height <= record['bounds']['max_pixels']):
         raise ValueError('IMAGE_OUTSIDE_REVIEW')
     budget.check(system, prompt)
     capacity, output = model_terms(model, budget.output)

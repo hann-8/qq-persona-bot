@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 BUDGET_DEFAULTS = dict(context_input_limit_tokens=16384,
                        context_overhead_reserve_tokens=2048, output_reserve_tokens=2048)
 CLI_DEFAULTS = dict(model='deepseek-v4.1-flash', reasoning_effort='auto',
-                    context_window_tokens=None, run_timeout_seconds=90,
+                    context_window_tokens=None, run_timeout_seconds=120,
                     input_budget=BUDGET_DEFAULTS)
 OLLAMA_DEFAULTS = dict(model='qwen3.5:9b-q4_K_M', expected_digest=None,
     access_file='secrets/home-5070-runtime.local.json', num_ctx=16384, think=False,

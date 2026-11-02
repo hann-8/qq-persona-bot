@@ -40,7 +40,7 @@ participation:  # 配置节，子字段见下方；保留既有校验约束
 output:  # 配置节，子字段见下方；保留既有校验约束
   quote_reply: false  # 固定false，直接群发；新装默认 false
   mode: plain_chat  # QQ正文固定plain_chat自然纯文本；新装默认 "plain_chat"
-  max_reply_chars: 1200  # 正文字符上限200..8000；新装默认 1200
+  max_reply_chars: 4000  # 正文字符上限200..8000；新装默认 4000
   delivery_mode: single  # single/adaptive，adaptive自然分条，不强制凑条；新装默认 "single"
   max_bubbles: 3  # 最多气泡1..3，认真问题仍单条；新装默认 3
   casual_max_chars: 80  # 闲聊总字符20..120；新装默认 80

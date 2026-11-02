@@ -103,7 +103,7 @@ class EvidenceTests(unittest.IsolatedAsyncioTestCase):
         row=evidence.inspect_event(event())
         for change in ({'url':'private'},{'bytes':999999999999},{'mime':'private'}, {'backend_calls':1},
                        {'random_trace':'1'*25},{'stage':'native_observed'}, {'attempt_counts':{'download':2,'redirect':0}},
-                       {'first_image_field_flags':{'url':'PRIVATE'}},{'normalized_dimensions':[1025,1]}):
+                       {'first_image_field_flags':{'url':'PRIVATE'}},{'normalized_dimensions':[8193,1]}):
             bad=row|change
             with self.assertRaises(ValueError):evidence.validate_record(bad)
         self.assertIsNone(evidence.safe_log(evidence.encode(row)[:-1]+',"bytes":0}'))

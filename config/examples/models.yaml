@@ -8,7 +8,7 @@ llm:  # 配置节，子字段见下方；保留既有校验约束
       model: deepseek-v4.1-flash  # CLI模型ID或已安装本地精确tag，不自动下载，不保证免费；新装默认 "deepseek-v4.1-flash"
       reasoning_effort: auto  # auto/minimal/low/medium/high/xhigh/max，受已有模型能力元数据约束；新装默认 "auto"
       context_window_tokens: null  # CLI原生窗口仅null/auto口径，实际窗口未证；新装默认 null
-      run_timeout_seconds: 90  # 单次运行期限秒；排队+所选运行期限+25秒不得超过180秒；新装默认 90
+      run_timeout_seconds: 120  # 单次运行期限秒；排队+所选运行期限+25秒不得超过180秒；新装默认 120
       input_budget:  # 配置节，子字段见下方；保留既有校验约束
         context_input_limit_tokens: 16384  # 可见UTF-8字节保守输入预算，非精确token/积分；新装默认 16384
         context_overhead_reserve_tokens: 2048  # 输入开销预留，保守计数，非精确token；新装默认 2048

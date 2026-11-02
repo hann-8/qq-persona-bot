@@ -15,6 +15,27 @@ def decode_envelope(raw, *, group, must_reply):
     internal=bool(re.search(r'qqbot_(?:group|media|reply)|QQBOT_INTERNAL_',body,re.I))
     try:obj=json.loads(body,object_pairs_hook=_pairs)
     except ValueError:
+        # Recover only complete JSON string bubbles from a damaged v2 envelope.
+        # No auxiliary field (memory, mention, tool or control) is recovered.
+        marker_v2=re.search(r'"qqbot_turn_reply"\s*:\s*2\b',body)
+        spoken=re.search(r'"decision"\s*:\s*"speak"',body)
+        start=re.search(r'"bubbles"\s*:\s*\[',body)
+        if must_reply and marker_v2 and spoken and start:
+            bubbles=[];cursor=start.end();decoder=json.JSONDecoder()
+            while cursor<len(body):
+                while cursor<len(body) and body[cursor].isspace():cursor+=1
+                if cursor>=len(body) or body[cursor]!='"':break
+                try:value,end=decoder.raw_decode(body,cursor)
+                except ValueError:break
+                if not isinstance(value,str) or not value.strip():break
+                bubbles.append(value);cursor=end
+                while cursor<len(body) and body[cursor].isspace():cursor+=1
+                if cursor>=len(body) or body[cursor]!=',':break
+                # A comma followed by another field is the missing-] case.
+                following=body[cursor+1:]
+                if re.match(r'\s*"[^"\n]+"\s*:',following):break
+                cursor+=1
+            if bubbles:return {marker:1,'decision':'speak','kind':'answer','bubbles':bubbles,'meme_id':None}
         # Never render broken envelopes or internal JSON as ordinary chat.
         if not must_reply or body.startswith(('{','[','```')) or internal:
             raise ValueError('invalid_json') from None

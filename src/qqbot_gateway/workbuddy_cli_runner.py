@@ -92,16 +92,19 @@ class ResultParser:
         if not isinstance(event, dict):
             raise GatewayError('PROTOCOL_ERROR')
         kind = event.get('type')
-        if len(self.events) >= 128:
-            raise GatewayError('PROTOCOL_ERROR')
         self.events.append({'type': kind, 'subtype': event.get('subtype'), 'keys': sorted(event)})
+        self.events=self.events[-128:]
         if kind in ('control_response','control_request'):
             raise GatewayError('PROTOCOL_ERROR')
         if kind == 'error' or event.get('is_error') or event.get('errors'):
             raise GatewayError(classify_error({k:event.get(k) for k in ('error','errors','message','result')}))
         if kind == 'system' and event.get('subtype') == 'init':
             tools=event.get('tools')
-            if not isinstance(tools,list) or len(tools)!=len(self.allowed_tools) or set(tools)!=self.allowed_tools or event.get('mcp_servers') != []:
+            # init is a registration catalog, not the SDK's enabled-tool view.
+            # WebSearch's Read alias must be un-denied in the CLI catalog, while
+            # --tools and the execution guard still forbid file Read.
+            catalog=self.allowed_tools | ({'Read'} if 'WebSearch' in self.allowed_tools else set())
+            if (not isinstance(tools,list) or len(tools)!=len(set(tools)) or not self.allowed_tools<=set(tools)<=catalog or event.get('mcp_servers') != []):
                 raise GatewayError('TOOL_ISOLATION_FAILED')
             if self.expected_model is not None and event.get('model') != self.expected_model:
                 raise GatewayError('PROTOCOL_ERROR')
@@ -145,6 +148,7 @@ class ResultParser:
 
 class CLIRunner:
     backend = 'codebuddy_cli'
+    thinking_enabled = True
     def __init__(self, root, model, timeout=90, cleanup_seconds=5, reasoning_effort='auto', budget=None):
         self.root = Path(root)
         lock = json.loads((self.root/'config/versions.lock.json').read_text(encoding='utf-8'))
@@ -201,14 +205,14 @@ class CLIRunner:
 
     async def _execute(self, system, prompt, request_id, *, control_only=False,probe=False,probe_fault=None):
         from .vision import CURRENT,text_budget,cli_message,wire_check,production_budget
-        from .cli_web_policy import native_contract, SCOPE, PRIVATE_IDS, current_question
+        from .cli_web_policy import native_contract, SCOPE, PRIVATE_IDS, current_question, denied_tools
         web=getattr(self,'web_config',{})
         native=bool(getattr(self,'native_web',False) and not control_only)
         scope=SCOPE.get()
         policy=native_contract(web,list(getattr(self,'web_private_ids',()))+list(PRIVATE_IDS.get()),text_budget(self.budget),scope[1] or current_question(prompt)) if native else None
         if policy and not scope[0]:policy['allowed_tools']=[]
         allowed=policy['allowed_tools'] if policy else []
-        denied=[t for t in self.denied if t not in allowed]
+        denied=denied_tools(self.denied,allowed)
         if control_only and CURRENT.get():raise GatewayError('PROTOCOL_ERROR')
         if not control_only:production_budget(self.root,getattr(self,'vision_settings',{}),self.budget,system,prompt)
         text_budget(self.budget).check(system, prompt)
@@ -228,7 +232,7 @@ class CLIRunner:
                     '--model',self.model,'--system-prompt-file',str(system_file),
                     '--setting-sources','none','--disallowedTools',*denied]
             if allowed:args+=['--allowedTools',*allowed]
-            local_settings={'autoCompactEnabled':False,'alwaysThinkingEnabled':False}
+            local_settings={'autoCompactEnabled':False,'alwaysThinkingEnabled':self.thinking_enabled}
             args += ['--settings',json.dumps(local_settings)]
             guard=None
             from .hosted_cli_budget import KIND, final_budget, framework_upper, model_terms
@@ -240,7 +244,7 @@ class CLIRunner:
                     terms=final_budget(selected_record(self.vision_settings),self.budget,system,prompt,
                         image.width,image.height,known_models().get(self.model,{})) if image else dict(T=len((system+prompt).encode()),F=framework_upper(),V=0,
                             O=model_terms(known_models().get(self.model,{}),self.budget.output)[1],C=1000000)
-                    guard=Guard(work,system,prompt,image,terms,mode='probe' if probe else 'live',denied_tools=denied,wire_message=image_message,native_web=policy)
+                    guard=Guard(work,system,prompt,image,terms,mode='probe' if probe else 'live',denied_tools=[t for t in self.denied if t not in allowed],wire_message=image_message,native_web=policy,timeout=self.timeout)
                 except (OSError,ValueError,KeyError,TypeError):
                     raise GatewayError('MODEL_CONFIG_UNSUPPORTED') from None
                 if probe_fault!='missing_plugin':args += ['--plugin-dir',str(guard.root)]
@@ -289,7 +293,7 @@ class CLIRunner:
                 raise GatewayError('BACKEND_UNAVAILABLE') from None
             parser = ResultParser(self.model,allowed,policy['max_calls'] if policy else 3,self.budget.limit if self.budget else 16384)
             self.last_parameters = {'model':self.model,'effort_requested':self.reasoning_effort,
-                                    'effort_effective':None,'thinking_enabled':False,'allowed_tools':allowed,'auto_compact_setting':False,
+                                    'effort_effective':None,'thinking_enabled':self.thinking_enabled,'allowed_tools':allowed,'auto_compact_setting':False,
                                     'forced_compact_exclusion_verified':False,'native_window':'unverified'}
             self.last_parameters['effort_evidence']='auto_default' if self.reasoning_effort=='auto' else 'awaiting_current_capabilities'
             exchange = ControlExchange('get_available_models') if control_only or self.reasoning_effort != 'auto' else None

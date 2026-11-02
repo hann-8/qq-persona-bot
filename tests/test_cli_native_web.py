@@ -9,7 +9,7 @@ import unittest
 from unittest.mock import patch
 from pathlib import Path
 from PIL import Image
-from qqbot_gateway.cli_web_policy import allowed_tools, native_contract, public_url, PROOF_FILES
+from qqbot_gateway.cli_web_policy import allowed_tools, native_contract, public_url, PROOF_FILES, denied_tools
 from qqbot_gateway.web_policy import validate_web
 from qqbot_gateway.workbuddy_cli_runner import ResultParser
 from qqbot_gateway.vision_mod_guard import Guard
@@ -90,6 +90,7 @@ if(variant==='search_drive')inputs[0].query='read C:/private.txt';
 if(variant==='search_backslash')inputs[0].query='read C:\\private.txt';
 if(variant==='search_unc')inputs[0].query='read \\\\server\\share';
 if(variant==='search_private_id')inputs[0].query='look up 123456789';
+if(variant==='search_content_words')inputs[0].query='12345 token secret API key tokenization';
 const errors=[],outputs=[],events=[];
 let calls=0,steps=0,early=[];
 const invoke=async(input,i)=>{
@@ -102,6 +103,7 @@ const invoke=async(input,i)=>{
   const result=await dispatchModsToolCall({name:tool,callId:id,input:wireInput},async received=>{
    if(JSON.stringify(received)!==JSON.stringify(wireInput))throw Error('ARGUMENTS_CHANGED');
    calls++;
+   if(variant.includes('nested'))await handlers['turn.step'](host,e(1),async event=>{steps++;return {...event,answer:'Native tool summary',toolUses:[],serverToolUses:[]}});
    if(variant==='fetch_sdk_error')throw Error('URL redirected to different host; use the redirect URL');
    return {content:'public fact https://example.com/news/'+i,title:'Public page'};
   },{dispatch:async(name,event,options)=>{
@@ -143,9 +145,32 @@ class NativeTests(unittest.TestCase):
         self.assertEqual(allowed_tools(cfg|dict(search_enabled=False)),('WebFetch',))
         self.assertEqual(allowed_tools(cfg|dict(enabled=False)),())
         self.assertEqual(validate_web({})['engine'],'gateway')
-        for key,value in [('cli_max_tool_calls',4),('cli_max_turns',5),('cli_tool_result_bytes',8001),('engine','other')]:
+        for key,value in [('cli_max_tool_calls',0),('cli_max_turns',False),('cli_tool_result_bytes',0),('cli_total_result_bytes',0),('engine','other')]:
             with self.assertRaises(ValueError):validate_web({key:value})
         self.assertEqual(native_contract(cfg,(),InputBudget(),'不要联网')['allowed_tools'],[])
+
+    def test_locked_sdk_read_alias_does_not_disable_websearch(self):
+        lock=json.loads((ROOT/'config/versions.lock.json').read_text(encoding='utf-8'))
+        source=(ROOT/lock['cli']['entry']).parent.parent/'dist/codebuddy-headless.js'
+        source=source.read_text(encoding='utf-8')
+        from qqbot_gateway.hosted_cli_budget import FRAMEWORK_SPANS
+        a,b,_=FRAMEWORK_SPANS['tool_enable_checker'];checker=source[a:b]
+        a=source.index('static isWholeToolDenied');b=source.index('static getDebugService',a);whole=source[a:b]
+        a=source.index('static matchPermissionRules');b=source.index('static matchMcpPermissionRules',a);matcher=source[a:b]
+        a=source.index('isToolDisallowed(eA,el,ec){');b=source.index('buildSessionAwareMcpServers',a);disallowed=source[a:b]
+        denied=json.loads((ROOT/'config/cli-tools-denied.json').read_text(encoding='utf-8'))
+        allowed=['WebSearch','WebFetch']
+        # Execute the locked SDK's actual alias/enable logic; only unrelated
+        # deferral and rule-source services are stubbed, no CLI/network startup.
+        program="const PermissionUtils=class{"+whole+matcher+"static getDebugService(){} static collectSessionDenyRules(ctx){return ctx.deny}};"
+        program+="const rk={PermissionUtils},rd={rl:()=>null,q0:()=>true},n_={pr:{merge:()=>({})}},nw={kC:()=>false},Ak={ZC:{Delegate:'delegate'},L3:{}},nP=new Set(),nD={};"
+        program+="const manager={"+checker+","+disallowed+",deferToolConfigService:{isGlobalDeferLoadingEnabled:async()=>false,isBuiltinToolDeferLoading:()=>false},agentToolDeferOverlayCache:new Map()};"
+        program+="const enabled=async(name,aliases,deny)=>(await manager.createIsEnabledChecker({name,aliases}))({runContext:{context:{options:{tools:'WebSearch,WebFetch'},deny}}});"
+        old=[x for x in denied if x not in allowed];new=denied_tools(denied,allowed)
+        program+="console.log(JSON.stringify([await enabled('WebSearch',['read'],"+json.dumps(old)+"),await enabled('WebSearch',['read'],"+json.dumps(new)+"),await enabled('Read',[],"+json.dumps(new)+"),await enabled('WebFetch',[],"+json.dumps(new)+")]));"
+        result=subprocess.run([lock['node']['path'],'--input-type=module','-e',program],capture_output=True,text=True,encoding='utf-8',timeout=10)
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertEqual(json.loads(result.stdout),[False,True,False,True])
 
     def test_native_weather_anchor_does_not_call_python_intent(self):
         from unittest.mock import patch
@@ -201,13 +226,14 @@ class NativeTests(unittest.TestCase):
             value,proof=self.host(image=image)
             self.assertEqual((value['calls'],value['steps']),(1,2))
             self.assertEqual(proof['next_calls'],2)
-            self.assertLessEqual(proof['native_web']['result_bytes'],8000)
+            self.assertLessEqual(proof['native_web']['result_bytes'],65536)
+            self.assertGreater(proof['native_web']['result_bytes'],12000)
             self.assertEqual(proof['native_web']['urls'],['https://example.com/news'])
             self.assertNotIn('ref',value['output'])
             self.assertEqual(len(proof['native_web']['steps']),2)
 
     def test_replay_parallel_third_private_and_history_refused(self):
-        for variant in ('third','private','fetch_private','replay','parallel','injection','tamper_result','step_replay','budget'):
+        for variant in ('third','private','fetch_private','replay','parallel','injection','tamper_result','budget'):
             value,proof=self.host(variant)
             self.assertIn('refused',proof['stages'],variant)
             self.assertLessEqual(value['calls'],1,variant)
@@ -238,10 +264,8 @@ class NativeTests(unittest.TestCase):
         adapter=module[module.index('let eu=["tool"'):]
         self.assertTrue(adapter.endswith('}'))
         adapter='import * as ed from "node:util";\n'+adapter+'\nexport {dispatchModsToolCall};\n'
-        refused=('fetch_conflict','search_drive','search_backslash','search_unc','search_private_id',
-            'fetch_invalid_json','fetch_array_json','fetch_null_json','fetch_race_badplan','fetch_session_plan_wrong_id',
-            'fetch_private_numeric_url','fetch_numeric_prompt')
-        for variant in ('search','search_flat','search_url','search_json','fetch','fetch_json','fetch_parallel','fetch_parallel_json','fetch_race','fetch_parallel_race_json','fetch_flat','fetch_http','fetch_numeric_url','fetch_session_plan','fetch_parallel_session_plan','fetch_sdk_error',*refused):
+        refused=('fetch_conflict','fetch_invalid_json','fetch_array_json','fetch_null_json','fetch_race_badplan','fetch_session_plan_wrong_id')
+        for variant in ('search','search_flat','search_url','search_json','fetch','fetch_json','fetch_parallel','fetch_parallel_json','fetch_race','fetch_parallel_race_json','fetch_flat','fetch_http','fetch_numeric_url','fetch_session_plan','fetch_parallel_session_plan','fetch_sdk_error','fetch_nested_session_plan','fetch_parallel_nested_session_plan','search_drive','search_backslash','search_unc','search_private_id','fetch_private_numeric_url','fetch_numeric_prompt','search_content_words',*refused):
             with self.subTest(variant=variant), tempfile.TemporaryDirectory() as folder:
                 work=Path(folder)
                 policy=native_contract(validate_web(dict(engine='codebuddy_cli',enabled=True,search_enabled=True)),('987654321',),InputBudget(limit=48000))
@@ -260,7 +284,7 @@ class NativeTests(unittest.TestCase):
                 else:
                     self.assertEqual(value['calls'],2 if 'parallel' in variant else 1,(value,proof.get('reason'),proof.get('hook_error')))
                     self.assertEqual(len(value['errors']),1 if variant=='fetch_sdk_error' else 0)
-                    self.assertEqual(value['steps'],2)
+                    self.assertEqual(value['steps'],2+(2 if 'parallel' in variant else 1) if 'nested' in variant else 2)
                     self.assertNotIn('refused',proof['stages'])
                     self.assertEqual(value['second']['answer'],'final')
 
@@ -345,7 +369,7 @@ export function register(on, options) {
             health=await response.json()
             self.assertEqual(health['native_web_tools'],['WebSearch','WebFetch'])
             self.assertEqual(health['memory'],{k:runner.vision_settings['memory'][k] for k in ('enabled','learning_enabled','max_chars_per_group','max_group_file_bytes','max_total_bytes')})
-            self.assertIs(health['thinking_enabled'],False)
+            self.assertIs(health['thinking_enabled'],False)  # FakeRunner has no thinking setting
             self.assertEqual(runner.attempts,0)
 
     async def test_web_final_only_no_meme_or_memory(self):
@@ -369,9 +393,26 @@ export function register(on, options) {
         self.assertNotIn('should-never-send',reply.text)
         self.assertIn('https://example.com/news',reply.text)
         self.assertNotIn('主体全文',reply.text)
+        self.assertNotIn('来源：',reply.text)
+        self.assertNotIn('日期未知',reply.text)
         from qqbot_gateway.evidence_selection import validate_manifest
         validate_manifest(list(reply.web_evidence),source)
-        with self.assertRaises(ValueError):validate_manifest([dict(reply.web_evidence[0],tool_calls=4)],source)
+        with self.assertRaises(ValueError):validate_manifest([dict(reply.web_evidence[0],tool_calls=0)],source)
+
+    async def test_damaged_native_bubbles_keep_text_without_auxiliary_actions(self):
+        from types import SimpleNamespace
+        from qqbot_gateway.backends import BackendResult
+        from qqbot_gateway.web_retrieval import WebRunner
+        from qqbot_gateway.vision import member_source
+        from qqbot_gateway.reply_plan import DEFAULTS
+        raw='{"qqbot_turn_reply":2,"decision":"speak","kind":"answer","bubbles":["Useful recovered answer.","meme_id":null,"memory_updates":{"add":"must not save"}}'
+        class Runner:
+            async def run(self,*args):return BackendResult(raw,parameters={'native_web':dict(calls=1,result_bytes=100,sha256='a'*64,urls=['https://example.com/news'])})
+        source=member_source('Search public facts',['bot']);source['web_anchor']='Search public facts'
+        result=await WebRunner(Runner(),SimpleNamespace(),InputBudget(),DEFAULTS).run_native_v2('system','prompt','trace',dict(must_reply=True,target_seq=1),source,'Search public facts')
+        self.assertEqual(result.text,'Useful recovered answer.')
+        self.assertEqual(result.memory_aux,{})
+        self.assertEqual(result.prepared_plan.fallback_reason,'v2_core_recovery')
 
     async def test_native_bypasses_legacy_and_no_web_chat_unchanged(self):
         from types import SimpleNamespace

@@ -99,8 +99,8 @@ class HostedBudgetTests(unittest.TestCase):
         try:
             result=budget_check(ROOT,s)
             self.assertEqual(result['persona_bytes'],19256)
-            self.assertEqual(result['limit'],30000)
-            self.assertLessEqual(result['final_visible_policy_bytes'],30000)
+            self.assertEqual(result['limit'],s['llm']['profiles']['codebuddy_cli']['input_budget']['context_input_limit_tokens'])
+            self.assertLessEqual(result['final_visible_policy_bytes'],result['limit'])
             self.assertTrue(result['passed'])
         finally:CURRENT.reset(token)
 
@@ -309,6 +309,6 @@ class ImageMemberCapTests(unittest.IsolatedAsyncioTestCase):
                     await client.resolve(header,source,time.monotonic()+10)
         finally:await runner.cleanup()
 
-    async def test_native_observation_contract_unchanged_by_material_cap_fix(self):
+    async def test_legacy_native_observation_does_not_bind_changed_runtime(self):
         from qqbot_gateway.vision_operator_review import native_contract_signature,NATIVE_CONTRACT
-        self.assertEqual(native_contract_signature(ROOT),NATIVE_CONTRACT)
+        self.assertNotEqual(native_contract_signature(ROOT),NATIVE_CONTRACT)

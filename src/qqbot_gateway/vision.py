@@ -23,12 +23,15 @@ from PIL import Image, ImageOps
 
 from .errors import GatewayError
 
-NORMALIZER = 'lap28-rgb-png-v1'
+NORMALIZER = 'lap46-rgb-image-v2'
 STATES = ('unverified','offline_passed','native_observed','production_eligible')
-DEFAULTS = dict(enabled=False, input_reserve_tokens=4096, ingress_diagnostics=False)
-MAX_RAW = 8*1024*1024
-MAX_BLOB = 512*1024
-MAX_WIRE = 2*1024*1024
+DEFAULTS = dict(enabled=False, input_reserve_tokens=4096, ingress_diagnostics=False,
+                max_image_bytes=32*1024*1024,max_normalized_bytes=8*1024*1024,max_normalized_pixels=4194304)
+MAX_RAW = 32*1024*1024
+MAX_BLOB = 32*1024*1024  # service ceiling; configured normalization default is 8 MiB
+MAX_WIRE = 48*1024*1024
+MAX_EDGE = 8192
+MAX_PIXELS = 64*1024*1024
 TTL = 60
 HOSTS = {'gchat.qpic.cn', 'multimedia.nt.qq.com.cn'}
 NOTICE = '这张图片暂时无法读取，请稍后发送一张新图片再试。'
@@ -57,7 +60,13 @@ def validate_config(raw):
     if type(cfg['ingress_diagnostics']) is not bool:raise ValueError('Invalid vision.ingress_diagnostics')
     if type(cfg['input_reserve_tokens']) is not int or not 1<=cfg['input_reserve_tokens']<=65536:
         raise ValueError('Invalid vision reserve')
+    for key,maximum in [('max_image_bytes',MAX_RAW),('max_normalized_bytes',MAX_BLOB),('max_normalized_pixels',MAX_PIXELS)]:
+        if type(cfg[key]) is not int or not 1<=cfg[key]<=maximum:raise ValueError('Invalid vision.'+key)
     return cfg
+
+
+def wire_limit(limits=None):
+    return min(MAX_WIRE,max(16*1024*1024,2*(limits or DEFAULTS)['max_normalized_bytes']))
 
 
 def binding(settings, runtime):
@@ -201,34 +210,45 @@ class Blob:
         if (not isinstance(self.data,bytes) or not 0<len(self.data)<=MAX_BLOB or hashlib.sha256(self.data).hexdigest()!=self.sha256 or
             not isinstance(self.original_sha256,str) or not re.fullmatch('[a-f0-9]{64}',self.original_sha256) or
             type(self.width) is not int or type(self.height) is not int or
-            not 0<self.width<=1024 or not 0<self.height<=1024 or self.width*self.height>1000000 or
-            self.mime!='image/png' or self.normalizer_version!=NORMALIZER):raise ValueError('IMAGE_BLOB_INVALID')
+            not 0<self.width<=MAX_EDGE or not 0<self.height<=MAX_EDGE or self.width*self.height>MAX_PIXELS or
+            self.mime not in ('image/png','image/jpeg') or self.normalizer_version!=NORMALIZER):raise ValueError('IMAGE_BLOB_INVALID')
         return self
 
 
-def normalize(data, *, diagnostic=None):
-    if not isinstance(data,bytes) or not 0<len(data)<=MAX_RAW:raise ValueError('IMAGE_TOO_LARGE')
+def normalize(data, *, diagnostic=None,limits=None):
+    limits=validate_config(limits or {})
+    if not isinstance(data,bytes) or not 0<len(data)<=limits['max_image_bytes']:raise ValueError('IMAGE_TOO_LARGE')
     try:
         with warnings.catch_warnings():
             warnings.simplefilter('error',Image.DecompressionBombWarning)
             with Image.open(io.BytesIO(data)) as source:
-                if source.format not in ('PNG','JPEG','WEBP','GIF') or source.width*source.height>16000000:
+                if source.format not in ('PNG','JPEG','WEBP','GIF') or source.width*source.height>64000000:
                     raise ValueError('IMAGE_DECODE_LIMIT')
                 if diagnostic is not None:diagnostic.update(original_dimensions=list(source.size),format=source.format)
                 source.seek(0);source.load()
                 image=ImageOps.exif_transpose(source).convert('RGBA')
                 # Composite transparency; no metadata or hidden RGB channels survive.
                 canvas=Image.new('RGB',image.size,'white');canvas.paste(image,mask=image.getchannel('A'))
-                scale=min(1,1024/max(canvas.size),(1000000/(canvas.width*canvas.height))**.5)
+                edge=min(MAX_EDGE,int(limits['max_normalized_pixels']**.5))
+                scale=min(1,edge/max(canvas.size),(limits['max_normalized_pixels']/(canvas.width*canvas.height))**.5)
                 if scale<1:canvas=canvas.resize((max(1,int(canvas.width*scale)),max(1,int(canvas.height*scale))),Image.Resampling.LANCZOS)
-                out=io.BytesIO();canvas.save(out,format='PNG',optimize=True);blob=out.getvalue()
-                return Blob(blob,hashlib.sha256(blob).hexdigest(),hashlib.sha256(data).hexdigest(),*canvas.size).checked()
+                mime='image/jpeg' if source.format=='JPEG' else 'image/png'
+                while True:
+                    out=io.BytesIO()
+                    canvas.save(out,format='JPEG' if mime=='image/jpeg' else 'PNG',**({'quality':92} if mime=='image/jpeg' else {'optimize':True}))
+                    blob=out.getvalue()
+                    if len(blob)<=limits['max_normalized_bytes']:break
+                    if mime=='image/png':mime='image/jpeg';continue
+                    if min(canvas.size)<=1:raise ValueError('IMAGE_TOO_LARGE')
+                    canvas=canvas.resize((max(1,int(canvas.width*.8)),max(1,int(canvas.height*.8))),Image.Resampling.LANCZOS)
+                return Blob(blob,hashlib.sha256(blob).hexdigest(),hashlib.sha256(data).hexdigest(),*canvas.size,mime=mime).checked()
     except (OSError,Image.DecompressionBombError,Image.DecompressionBombWarning):raise ValueError('IMAGE_DECODE_FAILED') from None
 
 
 class Materials:
     """Gate-owned cap ledger and RAM cache. Consumption precedes all await/I/O."""
-    def __init__(self,fetch=fetch_image,clock=time.monotonic):
+    def __init__(self,fetch=fetch_image,clock=time.monotonic,limits=None):
+        self.limits=validate_config(limits or {})
         self.fetch=fetch;self.clock=clock;self.entries=OrderedDict();self.blobs=OrderedDict();self.timers={};self.busy=False
         self.instance=secrets.token_hex(32);self.generation=0
 
@@ -292,11 +312,11 @@ class Materials:
         self.busy=True;generation=self.generation;deadline=self.clock()+15
         try:
             async with asyncio.timeout(15):
-                blob=normalize(await self.fetch(row['url']),diagnostic=diagnostic)
+                blob=normalize(await self.fetch(row['url']),diagnostic=diagnostic,limits=self.limits)
             if generation!=self.generation or self.clock()>=min(row['expires'],deadline) or not allowed(row['identity']):raise ValueError('MATERIAL_EXPIRED')
             self.blobs[cap]=blob
             row['original_sha256']=blob.original_sha256;row['normalized_sha256']=blob.sha256
-            while sum(len(b.data) for b in self.blobs.values())>MAX_RAW:self.blobs.popitem(last=False)
+            while sum(len(b.data) for b in self.blobs.values())>4*self.limits['max_normalized_bytes']:self.blobs.popitem(last=False)
             return dict(descriptor=blob.descriptor(row['ref']),original_sha256=blob.original_sha256,ttl_seconds=max(0,row['expires']-self.clock()),
                         data=base64.b64encode(blob.data).decode('ascii'))
         finally:
@@ -310,6 +330,7 @@ class NativeImage:
     expires: float
     prepare_deadline: float
     lease: object = field(default=None,repr=False,compare=False)
+    max_wire: int = 16*1024*1024
 
 
 class BlobLease:
@@ -367,7 +388,7 @@ def native_payload_images(payload):
 def wire_check(payload):
     # Default separators match SSHTransport; this also conservatively bounds the
     # compact CLI message plus its newline and separate system input.
-    if CURRENT.get() and len(json.dumps(payload,ensure_ascii=False,allow_nan=False).encode('utf-8'))+1>MAX_WIRE:
+    if CURRENT.get() and len(json.dumps(payload,ensure_ascii=False,allow_nan=False).encode('utf-8'))+1>CURRENT.get().max_wire:
         raise GatewayError('INPUT_TOO_LONG')
     audit=AUDIT.get()
     if CURRENT.get() and audit is not None:
@@ -387,12 +408,13 @@ def wire_check(payload):
 
 
 class MaterialClient:
-    def __init__(self,url,token,reserve):
+    def __init__(self,url,token,reserve,limits=None):
         u=urlsplit(url)
         if u.scheme!='http' or u.hostname!='127.0.0.1' or not u.port or u.path!='/context/vision/resolve' or u.query or u.fragment or u.username is not None:
             raise ValueError('Fixed loopback endpoint required')
         if not isinstance(token,str) or len(token)<64:raise ValueError('Context token required')
         self.url,self.token,self.reserve=url,token,reserve
+        self.limits=validate_config(limits or {})
 
     async def resolve(self,header,source,deadline):
         started=time.monotonic()
@@ -411,19 +433,20 @@ class MaterialClient:
                 raw=bytearray()
                 async for chunk in response.content.iter_chunked(16384):
                     raw.extend(chunk)
-                    if len(raw)>MAX_WIRE:raise ValueError('IMAGE_RESPONSE_LIMIT')
+                    if len(raw)>wire_limit(self.limits):raise ValueError('IMAGE_RESPONSE_LIMIT')
         from .reply_plan import _pairs
         obj=json.loads(raw,object_pairs_hook=_pairs)
         if not isinstance(obj,dict) or set(obj)!={'descriptor','original_sha256','ttl_seconds','data'}:raise ValueError('IMAGE_RESPONSE_INVALID')
         d=obj['descriptor']
         if not isinstance(d,dict) or set(d)!={'image_ref','sha256','mime','width','height','byte_length','normalizer_version'} or d['image_ref']!=ref:
             raise ValueError('IMAGE_DESCRIPTOR_INVALID')
-        if not isinstance(obj['data'],str) or len(obj['data'])>4*((MAX_BLOB+2)//3):raise ValueError('IMAGE_RESPONSE_LIMIT')
+        if not isinstance(obj['data'],str) or len(obj['data'])>4*((self.limits['max_normalized_bytes']+2)//3):raise ValueError('IMAGE_RESPONSE_LIMIT')
         data=base64.b64decode(obj['data'],validate=True)
         blob=Blob(data,d['sha256'],obj['original_sha256'],d['width'],d['height'],d['mime'],d['normalizer_version']).checked()
+        if blob.width*blob.height>self.limits['max_normalized_pixels'] or max(blob.width,blob.height)>min(MAX_EDGE,int(self.limits['max_normalized_pixels']**.5)):raise ValueError('IMAGE_DESCRIPTOR_INVALID')
         if len(data)!=d['byte_length']:raise ValueError('IMAGE_DESCRIPTOR_INVALID')
         ttl=obj['ttl_seconds']
         if type(ttl) not in (int,float) or not 0<ttl<=TTL:raise ValueError('IMAGE_EXPIRED')
         # Count response TTL from before the exchange, never refresh it by
         # adding HTTP/decoding time after the gate's remaining lifetime.
-        return NativeImage(blob,self.reserve,started+ttl,deadline),d
+        return NativeImage(blob,self.reserve,started+ttl,deadline,max_wire=wire_limit(self.limits)),d

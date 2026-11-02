@@ -20,7 +20,7 @@
           "encoding/README.md": "a34a5ca98c65e5b5b2bedd693cc2e18e732fe50192723fb6937ae07219c23739"
         },
         "audit": "reports/lap-42-vision-closure-sources.json",
-        "plugin_assets_sha256": "5c54211d2e367714fd4d31e763769535e415a5d17deaf193ddcfd82b6f0fb68c",
+        "plugin_assets_sha256": "5cb703fa8304f57cd1f10a1ac39c7cabcef374e6d90ae57ed0d287e52827ddc9",
         "native_schema_spans": {
           "WebFetch": [
             9981824,
@@ -38,9 +38,9 @@
         "text_tokens_per_byte": 1,
         "visual_max_tokens": 1024,
         "native_window": 1000000,
-        "max_width": 1024,
-        "max_height": 1024,
-        "max_pixels": 1000000,
+        "max_width": 8192,
+        "max_height": 8192,
+        "max_pixels": 67108864,
         "max_images": 1
       },
       "template_contract": "post_render_current_task_bounded_native_web_v3"

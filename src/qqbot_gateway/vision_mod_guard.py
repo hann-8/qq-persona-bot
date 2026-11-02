@@ -24,7 +24,7 @@ def assets_signature():
 
 
 class Guard:
-    def __init__(self, work, system, prompt, image, terms, *, mode='live',denied_tools=None,wire_message=None,native_web=None):
+    def __init__(self, work, system, prompt, image, terms, *, mode='live',denied_tools=None,wire_message=None,native_web=None,timeout=120):
         import base64
         if wire_message is None:
             wire_message=dict(type='user',message=dict(role='user',content=[dict(type='text',text=prompt),
@@ -50,7 +50,7 @@ class Guard:
             wire_path=str(wire_path.resolve()),wire_sha256=sha(wire),
             assets={k:v for k,v in source.items() if k != FILES[0]}, assets_sha256=assets_signature(), model='deepseek-v4.1-flash',
             denied_tools=denied_tools if denied_tools is not None else json.loads((ROOT/'config/cli-tools-denied.json').read_text(encoding='utf-8')),
-            effort='low', mode=mode, deadline=int((time.time()+90)*1000), **terms)
+            effort='low', mode=mode, deadline=int((time.time()+timeout)*1000), **terms)
         self.serialized = json.dumps(self.request, ensure_ascii=False, separators=(',', ':'))
         manifest_path = self.root / FILES[0]
         manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
@@ -72,10 +72,11 @@ class Guard:
         value = json.loads(self.receipt.read_text(encoding='utf-8'))
         phase_names={'context_cleared','composed','refused','admitted','probe_short_circuit','next','completed'}
         phases=list(self.receipt_root.glob('phase-*.json'))
-        if len(phases)>128:raise ValueError('VISION_PLUGIN_RECEIPT_COUNT')
+        web=self.request.get('native_web') or {}
+        if len(phases)>max(128,8*(web.get('max_turns',0)+web.get('max_calls',0))+16):raise ValueError('VISION_PLUGIN_RECEIPT_COUNT')
         stages=['ready'];calls=0;last_proof=-1;refusals=[]
         for path in phases:
-            if path.is_symlink() or path.stat().st_size>16384:raise ValueError('VISION_PLUGIN_PHASE_INVALID')
+            if path.is_symlink() or path.stat().st_size>max(16384,2*(web.get('visible_limit',0)+web.get('total_result_bytes',0))):raise ValueError('VISION_PLUGIN_PHASE_INVALID')
             try:row=json.loads(path.read_text(encoding='utf-8'))
             except json.JSONDecodeError:continue
             if row.get('nonce')!=self.request['nonce'] or row.get('stage') not in phase_names:

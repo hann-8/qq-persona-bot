@@ -41,9 +41,10 @@ participation:  # 配置节，子字段见下方；保留既有校验约束
   allow_ambient_web: true  # 普通候选可用联网，还必须开启web；不上传历史
 web:
   engine: gateway  # codebuddy_cli原生联网；gateway旧兼容链
-  cli_max_tool_calls: 3  # 原生单任务1..3次，失败计数
-  cli_max_turns: 4  # 原生主步骤1..4，90秒总时限
-  cli_tool_result_bytes: 8000  # 单结果1000..8000，合计12000字节
+  cli_max_tool_calls: 8  # 单任务工具调用上限，可调，失败计数
+  cli_max_turns: 10  # 主步骤上限，可调；期限跟随模型运行配置
+  cli_tool_result_bytes: 65536  # 单结果字节预算
+  cli_total_result_bytes: 262144  # 总结果字节预算
   search_enabled: false  # 显式启用bing_rss个人试用；逐请求校验正文与日期
   freshness_days: 7  # 默认最近7天；1..30，当前请求明确时间窗优先
   extractor: readability  # 本地受管正文提取，可显式legacy回滚
@@ -92,7 +93,7 @@ llm:  # 配置节，子字段见下方；保留既有校验约束
       model: deepseek-v4.1-flash  # CLI模型ID或已安装本地精确tag，不自动下载，不保证免费
       reasoning_effort: auto  # auto/minimal/low/medium/high/xhigh/max，受已有模型能力元数据约束
       context_window_tokens: null  # CLI原生窗口仅null/auto口径，实际窗口未证
-      run_timeout_seconds: 90  # 单次运行期限秒；排队+所选运行期限+25秒不得超过180秒
+      run_timeout_seconds: 120  # 单次运行期限秒；排队+所选运行期限+25秒不得超过180秒
       input_budget:  # 配置节，子字段见下方；保留既有校验约束
         context_input_limit_tokens: 16384  # 可见UTF-8字节保守输入预算，非精确token/积分
         context_overhead_reserve_tokens: 2048  # 输入开销预留，保守计数，非精确token
@@ -118,7 +119,7 @@ chat:  # 配置节，子字段见下方；保留既有校验约束
 output:  # 配置节，子字段见下方；保留既有校验约束
   quote_reply: false  # 固定false，直接群发
   mode: plain_chat  # QQ正文固定plain_chat自然纯文本
-  max_reply_chars: 1200  # 正文字符上限200..8000
+  max_reply_chars: 4000  # 正文字符上限200..8000
   delivery_mode: single  # single/adaptive，adaptive自然分条，不强制凑条
   max_bubbles: 3  # 最多气泡1..3，认真问题仍单条
   casual_max_chars: 80  # 闲聊总字符20..120

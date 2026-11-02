@@ -398,21 +398,19 @@ class WebRunner:
         proof=result.parameters.get('native_web',{})
         if not proof.get('calls'):return result
         try:
-            raw=json.loads(result.text)
-            if raw.get('decision')=='speak':
+            try:raw=json.loads(result.text)
+            except ValueError:raw=None
+            if isinstance(raw,dict) and raw.get('decision')=='speak':
                 raw.update(kind='answer',meme_id=None)
                 raw['bubbles']=['\n'.join(raw.get('bubbles',[]))]
             aux={}
-            decision,reply,response=plan(json.dumps(raw,ensure_ascii=False),self.output,question or '',request,source,memory_out=aux)
+            decision,reply,response=plan(json.dumps(raw,ensure_ascii=False) if isinstance(raw,dict) else result.text,self.output,question or '',request,source,memory_out=aux)
             if reply and decision=='speak':
                 allowed=set(proof.get('urls',[]))
                 if any(u not in allowed for u in source_urls(reply.canonical_text)):
                     return self.local_failure(request,'本次联网来源无法核对，没有采用这次答复。')
-                if not allowed:
-                    return self.local_failure(request,'本次联网未取得可核实的公开来源。')
-                # source_plan checks every URL, plain text, reply limits, and caps sources.
-                sources=[dict(url=u,title='本次原生联网来源',status='native',published_at=None) for u in list(proof['urls'])[:2]]
-                reply=source_plan(reply,sources,self.output,question or '')
+                # URLs stay internal; the user's answer does not need a source footer.
+                sources=[dict(url=u) for u in proof.get('urls',[])]
                 return replace(result,text=reply.canonical_text,prepared_plan=reply,response_to_seq=response,
                                memory_aux=aux,web_evidence=tuple(dict(url=s['url'],engine='codebuddy_cli',tool_calls=proof['calls'],result_bytes=proof['result_bytes'],sha256=proof['sha256']) for s in sources))
             return replace(result,text=json.dumps(raw,ensure_ascii=False),memory_aux=aux)

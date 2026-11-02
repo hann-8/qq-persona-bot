@@ -4,7 +4,14 @@ from urllib.parse import urlsplit
 import ipaddress
 
 TOOLS = ('WebSearch', 'WebFetch')
-TOTAL_RESULT_BYTES = 12000
+TOTAL_RESULT_BYTES = 262144
+
+
+def denied_tools(denied, allowed):
+    # Locked CLI WebSearch.aliases=['read']; denying Read also disables search.
+    # The exact --tools allowlist and tool.call guard still exclude file Read.
+    aliases={'read'} if 'WebSearch' in allowed else set()
+    return [name for name in denied if name not in allowed and name.casefold() not in aliases]
 
 
 def allowed_tools(web):
@@ -32,8 +39,8 @@ def native_contract(web, private_ids, budget, question=''):
     tools=allowed_tools(web)
     if re.search(r'不要联网|别联网|不联网|禁止联网|只根据这段文字|只凭记忆',question):tools=()
     return dict(allowed_tools=list(tools),max_calls=web['cli_max_tool_calls'],max_turns=web['cli_max_turns'],
-                result_bytes=web['cli_tool_result_bytes'],total_result_bytes=TOTAL_RESULT_BYTES,
-                private_ids=[str(x) for x in private_ids if str(x)],visible_limit=budget.limit,overhead=budget.overhead,
+                result_bytes=web['cli_tool_result_bytes'],total_result_bytes=web.get('cli_total_result_bytes',TOTAL_RESULT_BYTES),
+                thinking_enabled=True,visible_limit=budget.limit,overhead=budget.overhead,
                 # Locked Zod parameter source + JSON schema field/escaping overhead.
                 # Dynamic descriptions are separately measured by tool.describe.
                 schema_bytes_per_tool=4096)

@@ -2,6 +2,8 @@ LAP-24可选管理token独立于五文件配置和QQ密码，仅用`scripts/conf
 
 # 配置文件索引
 
+LAP-46：CodeBuddy CLI思考开启，生产强度low。原生web默认8调用/10步骤，单结果65536/总262144 UTF-8字节；总额由新增`web.cli_total_result_bytes`配置，期限跟随所选`run_timeout_seconds`（本机120秒）。图片新增`vision.max_image_bytes`（33554432）、`max_normalized_bytes`（8388608）、`max_normalized_pixels`（4194304，最长边由平方根派生）；帧/RAM额度随图片配置计算。均通过原五文件local编辑后正常重启生效，无新配置入口。数字及token/secret普通字样不触发项目自建内容过滤。
+
 运行日志策略在 `config/local/runtime.yaml` 的 `logging`：`enabled: true`、`retention_days: 7`、`sweep_interval_minutes: 60`。保留当天和前六个自然日，常驻进程每分钟检查轮转；停机日志由当前用户计划任务每小时及登录时清理。变更后正常重启 bot，并运行 `.venv\Scripts\python.exe scripts/log_retention.py install` 更新维护任务；`status` 查看任务，`purge` 手动执行一次，`remove` 仅移除本项目任务。配置为 false 后运行 install 会移除维护任务，下一次正常重启停止轮转/删除。
 
 范围只含指定运行日志；配置、秘密、群记忆、会话、state 台账和测试证据不删除。正在使用或锁定的文件跳过重试；首次管理密码仍仅写本机控制台日志，不会输出到维护报告。

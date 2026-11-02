@@ -75,7 +75,7 @@ export function register(on, options) {
     need(current.nonce===q.nonce,'receipt_identity');
     const stages=['ready'];let calls=0,lastProof=-1;
     const entries=(await $.fs.list(q.receipt_root)).filter(x=>x.name.startsWith('phase-') && x.name.endsWith('.json'));
-    need(entries.length<=128,'receipt_count');
+    need(entries.length<=Math.max(128,8*((q.native_web?.max_turns??0)+(q.native_web?.max_calls??0))+16),'receipt_count');
     for(const entry of entries){
       let row;
       try {row=JSON.parse(await $.fs.read(q.receipt_root+'/'+entry.name));} catch {continue;}
@@ -127,7 +127,7 @@ export function register(on, options) {
     else {
     need(wire.message.content[0].type==='text' && wire.message.content[0].text===q.prompt,'wire_text');
     const image=wire.message.content[1];
-    need(image.type==='image' && image.source.type==='base64' && image.source.media_type==='image/png','wire_image');
+    need(image.type==='image' && image.source.type==='base64' && ['image/png','image/jpeg'].includes(image.source.media_type),'wire_image');
     need(hash(decode(image.source.data))===q.image_sha256,'wire_pixels');
     }
     await receipt(engine, 'ready', {request_sha256: await hash(canonical(q)),wire_verified:true});
@@ -151,10 +151,11 @@ export function register(on, options) {
 
   const web=q.native_web;
   if(web)need(Array.isArray(web.allowed_tools) && web.allowed_tools.every(t=>['WebSearch','WebFetch'].includes(t)) &&
-    web.allowed_tools.length===new Set(web.allowed_tools).size && web.max_calls>=1 && web.max_calls<=3 &&
-    web.max_turns>=1 && web.max_turns<=4 && web.result_bytes<=8000 && web.total_result_bytes===12000 &&
+    web.allowed_tools.length===new Set(web.allowed_tools).size && Number.isSafeInteger(web.max_calls) && web.max_calls>=1 &&
+    Number.isSafeInteger(web.max_turns) && web.max_turns>=1 && Number.isSafeInteger(web.result_bytes) && web.result_bytes>0 &&
+    Number.isSafeInteger(web.total_result_bytes) && web.total_result_bytes>=web.result_bytes &&
     Number.isSafeInteger(web.visible_limit) && web.visible_limit>0 && web.visible_limit+q.F+q.V+q.O<=q.C && web.schema_bytes_per_tool===4096,'native_policy');
-  const native={step:0,turn:null,calls:0,resultBytes:0,requests:new Map(),results:new Map(),planned:[],
+  const native={step:0,turn:null,calls:0,resultBytes:0,resultWireBytes:0,requests:new Map(),results:new Map(),planned:[],
     descriptions:new Map(),answers:[],prefix:null,urls:[],steps:[],failed:false};
   const publicURL=value=>{
     if(typeof value!=='string' || /[\\\s\x00-\x1f]/.test(value))return false;
@@ -168,11 +169,9 @@ export function register(on, options) {
   };
   const urls=text=>Array.from(new Set((text.match(/https?:\/\/[^\s<>"\u3000]+/g)??[])
     .map(x=>x.replace(/[。，；！？、)\]}]+$/g,'')).filter(publicURL)));
-  const cut=(text,cap)=>{let out='';for(const ch of text){if(bytes(out+ch).length>cap)break;out+=ch;}return out;};
-  const sensitive=text=> /(?:\d{5,}|QQ号|群号|密码|口令|token|secret|api.?key|\b[A-Za-z]:[\\/]|\\\\|[\w.+-]+@[\w.-]+)/i.test(
-    text.replace(/\b\d{4}-\d{2}-\d{2}\b/g,'DATE')) || web.private_ids.some(x=>text.includes(x));
-  const proof=()=>({calls:native.calls,result_bytes:native.resultBytes,urls:native.urls.slice(0,2),steps:native.steps,
-    allowed_tools:web.allowed_tools,thinking_enabled:false,sha256:hash(canonical(Array.from(native.results.values()).map(x=>x.visible??'')))});
+  const cut=(text,cap)=>{let out='',used=0;for(const ch of text){const n=bytes(ch).length;if(used+n>cap)break;out+=ch;used+=n;}return out;};
+  const proof=()=>({calls:native.calls,result_bytes:native.resultBytes,urls:native.urls,steps:native.steps,
+    allowed_tools:web.allowed_tools,thinking_enabled:web.thinking_enabled===true,sha256:hash(canonical(Array.from(native.results.values()).map(x=>x.visible??'')))});
   const verifyResult=(b,out)=>{
     need(out && !out.pending,'native_result_history');
     if(!out.failed){need([out.text,out.visible].includes(b.content),'native_result_history');return;}
@@ -182,7 +181,7 @@ export function register(on, options) {
     if(!out.api_error){
       const size=bytes(b.content).length,total=native.resultBytes-bytes(out.visible).length+size;
       need(size<=web.result_bytes && total<=web.total_result_bytes,'tool_result_bytes');
-      native.resultBytes=total;out.visible=b.content;out.api_error=true;
+      native.resultBytes=total;native.resultWireBytes+=bytes(JSON.stringify(b.content)).length-bytes(JSON.stringify(out.visible)).length;out.visible=b.content;out.api_error=true;
     }else need(out.visible===b.content,'native_result_history');
   };
   const argsOf=e=>{
@@ -254,44 +253,34 @@ export function register(on, options) {
         native.calls++;
         if(native.planned.includes(known))native.planned.splice(native.planned.indexOf(known),1);
         native.requests.set(id,known);native.results.set(id,{pending:true});
-        const rawArgs=JSON.stringify(args);
-        // A public product/article URL may contain long numeric resource IDs.
-        // Keep exact private-ID checks on the original URL, and the generic
-        // number check on all other fields; only public URL numbers are masked.
-        need(!web.private_ids.some(x=>rawArgs.includes(x)),'tool_private');
-        const privacyArgs=e.tool==='WebFetch' && publicURL(args.url)?
-          {...args,url:args.url.replace(/\d{5,}/g,'PUBLIC_NUMBER')}:args;
-        need(!sensitive(JSON.stringify(privacyArgs)),'tool_private');
-        if(e.tool==='WebFetch'){
-          need(Object.keys(args).every(k=>['url','prompt'].includes(k)) && publicURL(args.url) &&
-            typeof args.prompt==='string' && args.prompt.length<=1000,'fetch_input');
-        }else{
-          need(Object.keys(args).every(k=>['query','allowed_domains','blocked_domains','freshness'].includes(k)) &&
-            typeof args.query==='string' && args.query.length>=2 && args.query.length<=240,'search_input');
-          for(const k of ['allowed_domains','blocked_domains'])if(args[k]!==undefined)
-            need(Array.isArray(args[k]) && args[k].length<=5 && args[k].every(x=>typeof x==='string' && publicURL('https://'+x)),'search_domains');
-          for(const u of (args.query.match(/https?:\/\/[^\s<>"]+/g)??[]))need(publicURL(u),'search_url');
-        }
-        const result=await next(e);
+        if(e.tool==='WebFetch')need(publicURL(args.url),'fetch_input');
+        // Schema errors and ordinary tool failures belong to the model's task.
+        // Do not turn content words, public numbers or SDK errors into refusals.
+        let result;
+        try{result=await next(e);}
+        catch(error){result={isError:true,result:{content:String(error),title:'Tool error'}};}
+        const step=native.steps[native.steps.length-1];
+        const remaining=web.visible_limit-step.visible_bytes-(native.resultWireBytes-native.stepResultWireBytes)-bytes(JSON.stringify(Array.from(native.requests.values()))).length-1024;
         const cap=Math.min(web.result_bytes,web.total_result_bytes-native.resultBytes);
         need(cap>=256,'tool_total_bytes');
-        let text='',found=[];
-        if(!result.deny && !result.isError && result.result && typeof result.result.content==='string'){
-          const body=result.result;
-          need(!body.content.includes('Do NOT retry WebFetch') && !body.content.includes('cb-fetch-XXXXXX'),'non_text_resource');
-          need(!web.private_ids.some(x=>JSON.stringify(body).includes(x)) && !/(?:api.?key|access.?token|密码)\s*[:=]/i.test(body.content),'result_private');
-          found=urls(JSON.stringify(body));
-          text=cut(found.slice(0,2).join('\n')+'\n'+String(body.title??'').replace(/\x1b\[[0-9;]*m/g,'')+'\n'+body.content,cap-64);
-        }else text=cut(denyText,cap-64);
-        // Return a fresh generic tool result. Keeping core's ref would bypass clipping.
-        const clean={content:text,title:'Native web material',renderer:{type:'text'}};
-        while(bytes(JSON.stringify(clean)).length>cap && clean.content.length)clean.content=cut(clean.content,bytes(clean.content).length-64);
+        const body=result.result;
+        let text=body && typeof body.content==='string'?body.content:String(result.deny??'Tool unavailable');
+        const failed=!!(result.deny || result.isError);
+        const clean={content:cut(text,cap),title:cut(String(body?.title??''),Math.max(0,Math.min(cap,remaining)/4)),renderer:{type:'text'}};
+        const fits=()=>bytes(JSON.stringify(clean)).length<=cap && bytes(JSON.stringify(JSON.stringify(clean))).length<=remaining;
+        if(!fits()){
+          const chars=Array.from(clean.content);let low=0,high=chars.length;
+          while(low<high){const mid=Math.ceil((low+high)/2);clean.content=chars.slice(0,mid).join('');
+            if(fits())low=mid;else high=mid-1;}
+          clean.content=chars.slice(0,low).join('');
+        }
         text=clean.content;
-        need(bytes(JSON.stringify(clean)).length<=cap,'tool_result_bytes');
+        need(fits(),'tool_result_bytes');
         const visible=JSON.stringify(clean);
-        native.resultBytes+=bytes(visible).length;
-        const actual=urls(text);native.urls=Array.from(new Set([...native.urls,...actual])).slice(0,2);
-        native.results.set(id,{text,result:clean,visible,failed:!!(result.deny || result.isError)});
+        native.resultBytes+=bytes(visible).length;native.resultWireBytes+=bytes(JSON.stringify(visible)).length;
+        const actual=failed?[]:[...(e.tool==='WebFetch'?[args.url]:[]),...urls(visible)];
+        native.urls=Array.from(new Set([...native.urls,...actual]));
+        native.results.set(id,{text,result:clean,visible,failed});
         await receipt($,'admitted',{native_web:proof()});
         return {result:clean};
       }catch(error){
@@ -309,7 +298,7 @@ export function register(on, options) {
     try{
       const prior=await readState($);
       need(!native.failed && !prior.stages.includes('refused') && prior.stages.includes('composed'),'native_ready');
-      need(!e.agentId && e.index===native.step && e.index<web.max_turns && Date.now()<=q.deadline &&
+      need(!e.agentId && native.step<web.max_turns && Number.isSafeInteger(e.index) && e.index>=0 && Date.now()<=q.deadline &&
         e.model===q.model && (e.effort===undefined || e.effort===q.effort),'native_step_identity');
       if(native.turn===null)native.turn=e.turnId;
       need(e.turnId===native.turn,'native_turn');
@@ -336,8 +325,11 @@ export function register(on, options) {
       }
       diagnostic={...diagnostic,planned:native.planned.length,seen_calls:seenCalls.size,requests:native.requests.size,
         seen_results:seenResults.size,results:native.results.size};
-      need(native.planned.length===0 && seenCalls.size===native.requests.size && seenResults.size===native.results.size &&
-        seenCalls.size===seenResults.size,'native_history_complete');
+      // WebFetch's native content analyzer may request a model step while
+      // concurrent tools are still running. Their results are not missing.
+      const pending=Array.from(native.results.values()).some(out=>out.pending);
+      if(!pending)need(native.planned.length===0 && seenCalls.size===native.requests.size &&
+        seenResults.size===native.results.size && seenCalls.size===seenResults.size,'native_history_complete');
       if(native.prefix)need(canonical(rows.slice(0,native.prefix.length))===canonical(native.prefix),'native_prefix');
       const tools=await $.tool.list();need(tools.every(t=>!t.mcp),'native_mcp');
       // Definitions are the current dynamic descriptions plus the locked parameter-schema upper bound.
@@ -346,6 +338,7 @@ export function register(on, options) {
       const D=bytes(JSON.stringify(definitions)).length+definitions.length*web.schema_bytes_per_tool;
       const T=q.system_bytes+bytes(JSON.stringify(rows)).length;
       need(T+D+web.overhead<=web.visible_limit && T+D+q.F+q.V+q.O<=q.C,'native_step_budget');
+      native.stepResultWireBytes=native.resultWireBytes;
       native.steps.push({index:e.index,text_bytes:T,tool_definition_bytes:D,visible_bytes:T+D+web.overhead});
       await receipt($,'context_cleared',{transcript_verified:true,native_web:proof()});
       if(q.mode==='probe'){await receipt($,'probe_short_circuit',{transcript_verified:true,native_web:proof()});return empty(e);}

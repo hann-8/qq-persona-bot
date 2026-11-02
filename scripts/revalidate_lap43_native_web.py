@@ -41,7 +41,7 @@ def check(root):
     value=dict(schema_version=1,passed=result.wasSuccessful() and not static and budget['passed'],adapter_signature=adapter_signature(),
         binding=binding(settings,runtime_identity(root,settings)),
         rule_hash=digest(selected_record(settings)),files={p:sha(root/p) for p in files},
-        tests_run=result.testsRun,budget=budget,native=native,tool_policy={k:v for k,v in settings['web'].items() if k.startswith('cli_') or k in ('engine','enabled','search_enabled')},thinking_enabled=False,static_missing=static,real_model_calls=0,real_qq_outputs=0,quality_state='pending_user_test')
+        tests_run=result.testsRun,budget=budget,native=native,tool_policy={k:v for k,v in settings['web'].items() if k.startswith('cli_') or k in ('engine','enabled','search_enabled')},thinking_enabled=True,static_missing=static,real_model_calls=0,real_qq_outputs=0,quality_state='pending_user_test')
     atomic(root/OFFLINE,json.dumps(value,sort_keys=True,indent=2).encode())
     return dict(passed=value['passed'],tests_run=result.testsRun)
 
