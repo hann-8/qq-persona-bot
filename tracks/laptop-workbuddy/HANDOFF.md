@@ -1,3 +1,5 @@
+2026-11-02 当前规划 LAP-46：联网回复默认去掉来源尾巴，改善跑题后的搜词与自然交付；已定位今日两例，缺完整工具轨迹，具体检索根因未证实。用户要求 review 后再落地，本轮仅五份文档与只读检查，无模型/启停/群发；[计划](tasks/LAP-46/PLAN.md) / [交接](tasks/LAP-46/HANDOFF.md)。后续仍保留原后端/预算，用两例少量本机追踪定位，不扩建系统。
+
 2026-11-01 LAP-45七天日志已实现、启用和受管加载，当前用户每小时/登录任务实际执行成功。11项日志专项10通过/1权限跳过，24桌面和34兼容通过，CLI零生成配对通过；QQ connected/ready、微信11229正常，管理页跟随官方5101。本地仍仅SnowLuma main；[结果](tasks/LAP-45/RESULT.md) / [交接](tasks/LAP-45/HANDOFF.md)。
 
 2026-10-31 WX-AKASHA-ALL：QQ/AstrBot独立微信平台已接线并受管部署，原QQ已恢复connected/ready，账号/真实配对已保存，微信SSE/WS正常，交用户实测；见[本项交接](tasks/WX-AKASHA-ALL/HANDOFF.md)。
