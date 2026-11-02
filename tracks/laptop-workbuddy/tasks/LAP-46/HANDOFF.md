@@ -1,23 +1,19 @@
 # LAP-46 整体CLI搜索表达与图片预算交接
 
-返回 [PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [计划](PLAN.md)。继承根AGENTS，最新用户修订优先。
+返回 [PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md) / [合同](PLAN.md) / [结果](RESULT.md)。继承根AGENTS，最新用户指令优先。
 
-状态：implementation_in_progress。2026-11-02 23:22，session LAP-46-implementation，当前会话唯一实施/启停/真实测试负责人，无代理。用户已明确“先实施”，按已review修订PLAN实现、必要检查、配对部署和Git交付；不再等待重复批准。起点main/811e70d，用户未跟踪启动bat保留。当前先保存生产保护材料和状态，再受管停止、旧路径本机基线；尚未改源码/配置或发起真实任务。最多8项本机业务任务、无主动QQ发消息，仅用既有一次性捕获，不新增常驻详细原文日志。
+状态：implemented_and_deployed / ready_for_user_test。2026-11-03，session LAP-46-implementation，当前会话唯一实施/启停/真实测试负责人，无代理。用户已明确实施；源码bbe728d已快进main，正常受管恢复成功。
 
-实施检查点：17项保护文件已保存于state/lap46-deployment/before，受管stop完成，现有根分支codex/lap46-cli-quality。旧路径3项本机业务基线完成（3/8）：11.16/11.67/8.39秒。游戏例实际两次WebFetch模型自拼的Bing搜索URL、返回“菜”字百科/菜谱，未调用WebSearch；这条复现不是数字过滤拒绝。其他两例WebFetch内容页成功，但来源因先两URL规则偏向页面内链。原始轨迹只在忽略目录；尚不能把本次复现完全等同白天两条。下一步修改现有薄适配、预算和思考，3次修改后查询+2图片仍余5项。
+当前独立status确认running、connected、可收群消息、router_ready=true、current_error=null、pending_restart=false、source_changed=false。thinking_enabled=true，强度low；WebSearch/WebFetch及8调用/10步骤/单65536/总262144字节加载。模型期限120秒，原图32MiB/处理后8MiB/4MP（默认边2048）、正文4000。识图试用与长期记忆/学习保持。
 
-部署前检查点：实现与计划字段已完成，72项视觉/原生组合通过；最终36项当前技术检查通过，33项runner/桌面通过；真实锁定CLI正反零生成probe通过（0生成、正例0 next、反例0 user）。8项业务任务已用完：3基线+3修改后查询+2图片；其中游戏任务暴露并行WebFetch内部处理触发过严格完整性检查，已兼容并用锁定SDK嵌套/并行离线回归验证；一张大JPEG图像理解成功但最终JSON少]被丢弃，已补仅正文恢复、辅助动作不恢复并实际捕获离线重放。另查明WebSearch别名read被原Read deny误关，锁定SDK实际启用检查证明修前false/修后true、Read仍false。移除该CLI否定项后init目录会列Read，父解析器仅兼容此注册项，真实执行仍由--tools与guard限制为两web工具。尚未有别名修复后真实WebSearch服务成功证据，不夸大质量。原始材料在忽略目录，未新增常驻详细日志。下一步提交分支并快进main、activate当前配对、受管恢复和状态核对。
+主要原因与修复：锁定CLI WebSearch.aliases含read，原Read deny大小写无关误关搜索；按精确--tools和guard保留两工具执行，去掉CLI别名冲突。另修并行WebFetch内部处理的过严格完整性拒绝、完整字符串正文格式恢复；删除数字/token/secret/标识内容拦截、来源尾巴及无谓材料损耗。不做角色/游戏关键词特例，不开放REPL，不换模型或账号。
 
-23:19补充review：用户明确娱乐bot无需按数字/token/secret等普通内容做泄密审查。按PLAN第3节删除项目自建query/返回内容黑名单，不换数字/标识/敏感词继续审查；程序不主动注入本机凭据/内部配置。起点34271c6，仅AGENTS/TASKS/本PLAN/HANDOFF四文档补充，仍无代码/配置/模型/启停操作。白天的具体失败仍未知，不能把已知规则当成当时触发实证。
+必要检查：72项原生/视觉组合通过；最终当前技术检查36项、runner/桌面33项、模板/ingress28项通过（组合重叠）；最终真实锁定CLI正反零生成probe通过，active配对成功。6个无关旧配置/注释测试差额在811e70d隔离副本重现，未扩修。
 
-实证：bot是锁定CLI的WebSearch/WebFetch，用户对照为REPL→Search；bot替换system、关闭思考、要求群JSON、截工具材料为8000/12000、只留前两URL、部分校验失败终结任务、来源尾巴代码追加。当前图片8MiB原始/16MP解码、1024边/1MP处理、PNG512KiB/帧2MiB；文字524288字节/视觉预留4096。不能把问题缩成专名消歧或一概归咎文字预算。
+8项业务任务全部留账、无额外真实搜索：旧路径3查询+修改后3查询+2图片。JPEG和大截图的原生理解成功；实际损坏JSON捕获已离线重放恢复正文且辅助动作为空。一个查询捕获定位了内部步骤误拒绝，后续离线回归通过。别名修正后WebSearch服务质量未新增真实样本，不把SDK启用检查/零生成/运行加载当真实搜索验收。详细边界见RESULT。
 
-11:38:53固定失败句对应CLI generation=success，不能确认图片预算失败；中午bot自述预算只是聊天。纯文字图后追问不重带原像素。离线高细节1600×1200 JPEG（1721958字节）normalize拒绝IMAGE_BLOB_INVALID，同尺寸纯色图成功：小字节门槛真实存在，但不证明今日特定图根因。今日两次搜索完整工具/模型原文未保留。
+保护：17项文件基线已保存，只有3份local的9个计划字段和技术配对材料改变，角色材料、bot/access/runtime配置、图库/群记忆不改。用户未跟踪启动机器人_workbuddyDeepseek.bat保留、不执行、不提交。原始材料只在忽略state/lap46-deployment，未新增常驻详细原文日志、未主动QQ发消息。
 
-计划精简过窄适配/表达约束、允许普通工具错误纠正、思考true/low；试用8调用/10步/120秒、单64KiB/总256KiB、图原32MiB/处理8MiB/2048边与4MP、正文4000。同步实际校验/期限/来源和配置，避免仅改local；这些是可调默认而非新封顶。账号/准入/两工具边界保持，不开放REPL/本机执行。最多8项本机业务测试，含非原例查询和两类图，无主动群发。细节见PLAN。
+恢复：state/lap46-deployment/before与pairing/status/保护摘要齐备；回滚先受管停止，按RESULT配对恢复811e70d代码和精确配置字段，不能覆盖后续配置或回滚群记忆。分支合入后删除临时本地分支，仍只保留main。Git最终回执见会话/日志，Git核对后释放执行归属。
 
-本次只拥有AGENTS、PROGRESS、工作线HANDOFF/TASKS、本目录PLAN/HANDOFF六文档。用户未跟踪启动bat保留、不执行、不提交。未改代码/local/角色材料/采集开关，无启停/真实模型/原生联网工具/QQ输出。读取公开官方资料并核对锁定编码源hash，API支持不冒充CodeBuddy能力。
-
-验证与Git：六文档/256个本地链接无缺失，git diff --check及归属检查通过，未改代码或配置；最终提交号见Git和本次回复。本次不是实施，核对后释放文档归属。
-
-下一步：用户review修订方案后，当前会话依PLAN完成最小实现、必要验证、配对部署和Git。不要按首版旧预算/思考false保持执行；实施前重新取Git/配置/运行基线。
+下一步：用户自然群测；若继续频繁失败，沿此任务针对实际问题补日志细节，不预先扩建日志/搜索系统。不要重新领取已完成的部署或宣称白天两条已被完整追踪还原。
