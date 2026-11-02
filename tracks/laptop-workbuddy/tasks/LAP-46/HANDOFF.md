@@ -4,6 +4,8 @@
 
 状态：planned / awaiting_user_review。session LAP-46-web-quality-plan，当前会话负责人，无代理。首版5b8c601已交付；本次起点main/5b8c601与实时origin/main一致。用户明确不修专名/游戏特例，要求整体搜索/表达和预算合理化；已选择思考开启、low，覆盖旧关闭偏好。整体仍先review再实施。
 
+23:19补充review：用户明确娱乐bot无需按数字/token/secret等普通内容做泄密审查。按PLAN第3节删除项目自建query/返回内容黑名单，不换数字/标识/敏感词继续审查；程序不主动注入本机凭据/内部配置。起点34271c6，仅AGENTS/TASKS/本PLAN/HANDOFF四文档补充，仍无代码/配置/模型/启停操作。白天的具体失败仍未知，不能把已知规则当成当时触发实证。
+
 实证：bot是锁定CLI的WebSearch/WebFetch，用户对照为REPL→Search；bot替换system、关闭思考、要求群JSON、截工具材料为8000/12000、只留前两URL、部分校验失败终结任务、来源尾巴代码追加。当前图片8MiB原始/16MP解码、1024边/1MP处理、PNG512KiB/帧2MiB；文字524288字节/视觉预留4096。不能把问题缩成专名消歧或一概归咎文字预算。
 
 11:38:53固定失败句对应CLI generation=success，不能确认图片预算失败；中午bot自述预算只是聊天。纯文字图后追问不重带原像素。离线高细节1600×1200 JPEG（1721958字节）normalize拒绝IMAGE_BLOB_INVALID，同尺寸纯色图成功：小字节门槛真实存在，但不证明今日特定图根因。今日两次搜索完整工具/模型原文未保留。

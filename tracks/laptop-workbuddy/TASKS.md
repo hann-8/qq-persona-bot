@@ -1,3 +1,5 @@
+2026-11-02 23:19 LAP-46补充review归属：同一session，起点main/34271c6。用户再次明确娱乐bot不应做数字/token/secret等宽泛泄密审查；本轮仅将“删除自建内容拦截、不换词表继续拦、具体白天根因未知”写清到AGENTS、TASKS、46 PLAN/HANDOFF四文档。保留未跟踪bat，不改代码/配置/运行或调用模型，仍待整体方案确认后实施。
+
 2026-11-02 23:05（Asia/Shanghai）LAP-46 规划修订续领：session `LAP-46-web-quality-plan`，负责人当前会话 Codex，无代理。用户明确修整体搜索/回答方式而非特例，检查并扩大搜索/识图限制，并已选择开启思考、low。仍先 review 后实施。本轮只拥有 AGENTS.md、PROGRESS.md、工作线 HANDOFF/TASKS、tasks/LAP-46/{PLAN.md,HANDOFF.md} 六份文档。起点 main/5b8c601 与实时 origin/main 一致，用户未跟踪 bat 保留。只读日志/源码/公开官方资料及内存内合成图片检查；不改代码/local/角色材料/采集开关，不启停/真实模型/QQ。规划 commit/push 后等待 review。[计划](tasks/LAP-46/PLAN.md) / [交接](tasks/LAP-46/HANDOFF.md)。
 
 2026-11-02 20:59（Asia/Shanghai）LAP-46 首版规划记录（由上方修订覆盖）：session `LAP-46-web-quality-plan`，负责人当前会话 Codex，无代理。起点 main/2fd1073；仅五份规划文档，交付5b8c601，无代码/配置/运行变更。原“专名/游戏、保持旧预算和思考关闭”方案不再作为执行合同。[计划](tasks/LAP-46/PLAN.md) / [交接](tasks/LAP-46/HANDOFF.md)。
