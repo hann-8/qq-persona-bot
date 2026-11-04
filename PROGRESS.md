@@ -1,3 +1,5 @@
+当前活动任务：**LAP-48 implemented_and_deployed / ready_for_user_test**（2026-11-04）。QQ号schema3整块记忆、静默成功保存、官方联网薄适配/180秒共享/实际provider235及指定完整人设已启用；39条有效旧记忆保留、1条待关联，原0字节退役文件不动。36＋11＋1项定向检查与当前CLI零生成配对通过；最终running/connected/可收消息/router_ready、无错误或待重启。真实搜索/角色/群聊质量交用户自然群测。[结果](tracks/laptop-workbuddy/tasks/LAP-48/RESULT.md) / [交接](tracks/laptop-workbuddy/tasks/LAP-48/HANDOFF.md)。
+
 2026-11-03 当前交付：**LAP-46整体CLI搜索/表达与图片预算已实现部署，待用户群测**。修复WebSearch别名read被Read deny误关、工具并行步骤误拒绝及正文格式恢复；去掉内容黑名单/来源尾巴，开启思考low，放宽搜索和图片预算。实际running/connected/可收消息、router_ready，current_error=null、pending_restart=false；原能力/配置保护保持，无新增常驻详细日志。[结果](tracks/laptop-workbuddy/tasks/LAP-46/RESULT.md) / [交接](tracks/laptop-workbuddy/tasks/LAP-46/HANDOFF.md)。
 
 2026-11-01 LAP-45已实现/启用七天运行日志保留：日轮转、常驻每分钟维护、当前用户每小时及登录清理任务，实际LastTaskResult=0。QQ恢复connected/ready，微信监听正常；管理页按钮跟随官方实际5101。原工作区清理已完成，本地只保留SnowLuma main，历史在GitHub。[实际结果](tracks/laptop-workbuddy/tasks/LAP-45/RESULT.md) / [交接](tracks/laptop-workbuddy/tasks/LAP-45/HANDOFF.md)。
@@ -7,8 +9,6 @@
 2026-10-29启动修复：用户配置入口仍只有config/local。访问名单由原配置验证/gate执行，不再参与识图模型资格绑定；正常增减授权群、调整访问名单后直接重启，无需用户处理其它文件。本机新增第三群已保留并加载，实际running/connected/can_receive/router_ready；34项检查/零生成接线通过。见[43交接](tracks/laptop-workbuddy/tasks/LAP-43/HANDOFF.md)。
 
 2026-10-29 LAP-44当前合同：群长期记忆采用schema2全文快照＋同次回复memory_updates增改删，模型决定内容/整理/遗忘；旧候选、句式、关键词和240字节/3条/8条/1536字节小限制停用，旧配置字段兼容但忽略。每群初始50000 Unicode字符、文件1048576字节、总8388608字节；所选CodeBuddy输入政策524288可见UTF-8字节，均可配置扩大并受真实C/F/V/O限制。保存后在投递台账前生成实际回执，重置只清短期上下文。模型/账号/low、thinking=false、free/owner、识图/表情和两工具3调用/4步骤/90秒/8000/12000保持。部署及验证结果以[LAP-44交接](tracks/laptop-workbuddy/tasks/LAP-44/HANDOFF.md)为准，QQ群效果待用户实测。
-
-当前活动任务：**LAP-48 planned / ready_for_medium**（2026-11-04）。用户最终选择QQ号唯一键、无逐条ID的整块记忆，成功保存静默；联网删除重复计划/完整历史/固定10步门槛，180秒共享/235秒provider；人设采用ff2e348删第十三节。已按要求直接准备[medium指令](tracks/laptop-workbuddy/tasks/LAP-48/MEDIUM_START.md)，由用户手动交接，不再追加review。[评审](tracks/laptop-workbuddy/tasks/LAP-48/REVIEW.md) / [设计](tracks/laptop-workbuddy/tasks/LAP-48/PLAN.md) / [交接](tracks/laptop-workbuddy/tasks/LAP-48/HANDOFF.md)。本轮仅八文档，运行基础仍LAP-47，未实施。
 
 # QQ bot项目入口：SnowLuma主线
 

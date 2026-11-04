@@ -18,11 +18,11 @@ from qqbot_gateway.web_retrieval import WebRunner
 def planned(**kw):
     return dict(qqbot_dialogue_plan=1,decision='speak',kind='chat',response_to_seq=1,
                 reply_reference='接住上一句的玩笑，不追加建议。',meme_id=None,mention=None,
-                memory_updates={'new_1':'这是一条由Planner决定的记忆'},memory_receipt=True)|kw
+                memory_updates={'group':['这是一条由Planner决定的记忆']},memory_receipt=True)|kw
 
 
 class Runner:
-    timeout=120
+    timeout=180
     thinking_enabled=True
     native_web=True
     async def run(self,system,prompt,request_id,**options):
@@ -70,7 +70,7 @@ class DialogueTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(wire['memory_updates'],planned()['memory_updates'])
         self.assertEqual(result.usage,{'input_tokens':13,'output_tokens':10})
         self.assertEqual(result.parameters['generation_stages'],2)
-        self.assertEqual(self.runner.timeout,120);self.assertTrue(self.runner.thinking_enabled)
+        self.assertEqual(self.runner.timeout,180);self.assertTrue(self.runner.thinking_enabled)
     async def test_silent_one_stage_and_direct_cannot_silence(self):
         for must in (False,True):
             with self.subTest(must=must):
@@ -122,7 +122,7 @@ class DialogueTests(unittest.IsolatedAsyncioTestCase):
         self.setup_turn(BackendResult(json.dumps(planned())))
         from types import SimpleNamespace
         from unittest.mock import Mock
-        with patch('qqbot_gateway.dialogue.time',SimpleNamespace(monotonic=Mock(side_effect=[0,0,121,121]))):
+        with patch('qqbot_gateway.dialogue.time',SimpleNamespace(monotonic=Mock(side_effect=[0,0,181,181]))):
             with self.assertRaises(GatewayError) as error:await self.execute()
         self.assertEqual(error.exception.code,'MODEL_TIMEOUT');self.assertEqual(len(self.runner.calls),1)
     def test_configuration_defaults_and_reserve(self):
@@ -130,7 +130,7 @@ class DialogueTests(unittest.IsolatedAsyncioTestCase):
         from qqbot_gateway.config import normalize_settings
         data=normalize_settings(fixture())
         self.assertEqual(data['chat']['dialogue_mode'],'single');self.assertEqual(data['chat']['replyer_reserve_seconds'],30)
-        for reserve in (0,True,120):
+        for reserve in (0,True,180):
             candidate=deepcopy(data);candidate['chat'].update(dialogue_mode='planner_replyer',replyer_reserve_seconds=reserve)
             with self.subTest(reserve=reserve),self.assertRaises(ValueError):normalize_settings(candidate)
 

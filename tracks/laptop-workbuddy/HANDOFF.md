@@ -1,4 +1,4 @@
-当前活动任务：**LAP-48 planned / ready_for_medium**（2026-11-04）。QQ号整块记忆/无逐条ID、静默成功保存、联网薄适配/180秒共享和ff2e348删第十三节人设已按用户反馈定稿。[评审](tasks/LAP-48/REVIEW.md) / [设计](tasks/LAP-48/PLAN.md) / [交接](tasks/LAP-48/HANDOFF.md) / [medium指令](tasks/LAP-48/MEDIUM_START.md)。用户要求直接交接，不再追加review；本轮八文档，无业务/运行改动，仍基于LAP-47。
+当前活动任务：**LAP-48 implemented_and_deployed / ready_for_user_test**（2026-11-04）。QQ号schema3整块记忆、静默成功保存、官方联网薄适配/180秒共享/实际provider235及指定完整人设已启用；39条有效旧记忆保留、1条待关联，原0字节退役文件不动。36＋11＋1项定向检查与当前CLI零生成配对通过；最终running/connected/可收消息/router_ready、无错误或待重启。真实搜索/角色/群聊质量交用户自然群测。[结果](tasks/LAP-48/RESULT.md) / [交接](tasks/LAP-48/HANDOFF.md)。
 
 2026-11-03 LAP-46已实现并受管部署main：WebSearch/read别名冲突、内部并行步骤和正文恢复已修；内容审查/来源尾巴移除，思考low开启，搜索/图片预算已扩大加载。QQ running/connected/ready、无当前错误或待重启，记忆/识图保持。实际质量待用户自然群测，无新增常驻原文日志。[结果](tasks/LAP-46/RESULT.md) / [交接](tasks/LAP-46/HANDOFF.md)。
 

@@ -167,12 +167,13 @@ def create_route(router):
         gid=stable_id(account,'group' if sid.endswith('@chatroom') else 'user',sid);pair=next((p for p in cfg['pairings'] if p['wechat_session']==sid),None)
         qq=str(pair['qq_session']) if pair else None
         if qq and qq not in router.groups:raise ValueError('Pairing QQ room is not authorized')
-        router.memory.groups.add(gid)
+        router.memory.groups.add(gid);router.memory.wechat_groups.add(gid)
         router.memory._namespace_overrides[gid]=router.memory.namespace(qq) if qq else router.memory.hmac('wechat',account,sid)
         if pair:
             for wxid,qqid in pair.get('actor_links',{}).items():
                 uid=stable_id(account,'user',wxid)
-                router.memory.actor_links[(gid,uid)]=router.memory.actor(qq,str(qqid));actors[(gid,uid)]=str(qqid)
+                router.memory.actor_links[(gid,uid)]=router.memory.actor(qq,str(qqid))
+                router.memory.identity_links[(gid,uid)]=str(qqid);actors[(gid,uid)]=str(qqid)
             if pair.get('scope')=='shared_context':rooms[gid]=qq
     if rooms:
         # Share only selected scopes. Non-paired rooms retain their own RAM.
@@ -203,7 +204,7 @@ async def start_management(router):
             if session not in route.sessions:raise web.HTTPForbidden()
             gid=stable_id(route.cfg['bridge']['bot_wxid'],'group' if session.endswith('@chatroom') else 'user',session)
             if action not in ('inspect','export','delete','clear'):raise web.HTTPBadRequest()
-            try:result.append(router.memory.manage(gid,action,record_id=value.get('record_id'),expected=value.get('expected')))
+            try:result.append(router.memory.manage(gid,action,user=value.get('user'),fact=value.get('memory'),expected=value.get('expected')))
             except ValueError:raise web.HTTPConflict(text='Memory changed or unavailable') from None
         return web.json_response(dict(results=result))
     app=web.Application();app.router.add_post('/memory',memory)

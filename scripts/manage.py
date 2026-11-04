@@ -203,14 +203,15 @@ def status_report(*,disk_config=None):
 def memory_status(root,settings):
     """Read only counts from local files; never load/migrate or disclose text."""
     from qqbot_gateway.reply_plan import _pairs
-    result=dict(schema_version=2,groups=0,records=0,chars=0,bytes=0,unavailable=0,
+    result=dict(schema_version=3,groups=0,records=0,chars=0,bytes=0,unavailable=0,
         limits={k:settings['memory'][k] for k in ('max_chars_per_group','max_group_file_bytes','max_total_bytes')})
     for path in (root/'state/group-memory').glob('*/memory.json'):
         try:
             if path.stat().st_size>settings['memory']['max_group_file_bytes']:raise ValueError()
             doc=json.loads(path.read_text(encoding='utf-8'),object_pairs_hook=_pairs)
-            if doc['schema_version']!=2 or not isinstance(doc['records'],dict):raise ValueError()
-            result['groups']+=1;result['records']+=len(doc['records']);result['chars']+=sum(map(len,doc['records'].values()));result['bytes']+=path.stat().st_size
+            if doc['schema_version']!=3:raise ValueError()
+            from qqbot_gateway.group_memory import texts
+            result['groups']+=1;result['records']+=len(texts(doc));result['chars']+=sum(map(len,texts(doc)));result['bytes']+=path.stat().st_size
         except (OSError,ValueError,TypeError,KeyError):result['unavailable']+=1
     try:
         last=json.loads((root/'state/memory-last-save.json').read_text(encoding='utf-8'))
@@ -488,6 +489,13 @@ def _configure_snow_framework(gate,full,env):
         from scripts.configure_akasha import configure
         configure()
     config=json.loads(path.read_text(encoding='utf-8-sig'))
+    if full:
+        from qqbot_gateway.backends import provider_timeout
+        timeout=provider_timeout(load_consumer(ROOT,environ=env))
+        provider=next(p for p in config['provider'] if p['id']=='workbuddy-local')
+        source_id=provider.get('provider_source_id')
+        target=next(p for p in config['provider_sources'] if p['id']==source_id) if source_id else provider
+        target['timeout']=timeout
     other=[p for p in config.get('platform',[]) if p.get('id')!='qqbot']
     config['platform']=[dict(id='qqbot',type='aiocqhttp',enable=True,ws_reverse_host='127.0.0.1',ws_reverse_port=6199,ws_reverse_token=gate.upstream_token)]+other
     config['platform_settings'].update(dict(unique_session=True,enable_id_white_list=True,id_whitelist=sorted(gate.allowed_groups),

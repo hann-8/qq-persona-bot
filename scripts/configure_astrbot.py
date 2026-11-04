@@ -9,7 +9,7 @@ import sys
 ROOT=Path(os.environ.get('QQBOT_ROOT',Path(__file__).resolve().parents[1])).resolve()
 sys.path.insert(0,str(ROOT/'src'))
 from qqbot_gateway.config_files import load_consumer
-from qqbot_gateway.backends import resolve_backend
+from qqbot_gateway.backends import resolve_backend, provider_timeout
 from qqbot_gateway.persona import compose_persona, session_version
 
 
@@ -21,11 +21,11 @@ async def configure():
     path=ROOT/'runtime/astrbot/data/cmd_config.json'
     config=json.loads(path.read_text(encoding='utf-8-sig'))
     tokens=json.loads((ROOT/settings['secrets_file']).read_text(encoding='utf-8'))
-    config['provider_sources']=[]
-    config['provider']=[{'id':'workbuddy-local','type':'qqbot_openai','provider':'openai',
-        'provider_type':'chat_completion','enable':True,'key':[tokens['model_gateway']],
-        'api_base':'http://127.0.0.1:8765/v1','model':'workbuddy-local','modalities':['text'],
-        'custom_extra_body':{},'timeout':180,'proxy':''}]
+    config['provider_sources']=[{'id':'workbuddy-local_source','type':'qqbot_openai','provider':'openai',
+        'provider_type':'chat_completion','key':[tokens['model_gateway']],
+        'api_base':'http://127.0.0.1:8765/v1','timeout':provider_timeout(settings),'proxy':''}]
+    config['provider']=[{'id':'workbuddy-local','enable':True,'model':'workbuddy-local',
+        'modalities':['text'],'custom_extra_body':{},'provider_source_id':'workbuddy-local_source'}]
     config['provider_settings'].update({'enable':True,'streaming_response':False,'web_search':False,
         'web_search_link':False,'display_reasoning_text':False,'show_tool_use_status':False,
         'computer_use_runtime':'none','prompt_prefix':'{{prompt}}',

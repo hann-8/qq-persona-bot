@@ -48,7 +48,7 @@ def replyer_system(character,output,kind):
         f'只输出{{"bubbles":["正文"]}}，最多{limit}条，不输出其他控制字段。'
         f'闲聊合计最多{output["casual_max_chars"]}字、每条{output["bubble_max_chars"]}字；认真回答完整单条，最多{output["max_reply_chars"]}字。'
         '没有工具、图片像素或记忆写入能力；所需事实已由Planner提供，保留事实、代码、链接和不确定性。'
-        '普通聊天顺着上下文说，不默认总结、建议、万能安慰或追问；认真问题完整回答。不强制昵称、颜文字或固定收尾。\n'+character)
+        '按以下完整人设表达，认真问题保持事实与必要条件完整。\n'+character)
 
 
 def combined(planner,replyer=None):

@@ -300,9 +300,10 @@ def normalize_settings(raw):
             raise ValueError(f'Invalid {key}; expected integer {lower}..{upper}')
     from .token_budget import validate_model_settings
     validate_model_settings(data, backend='codebuddy_cli')
-    # 180s provider: reserve 15s retrieval (LAP-18) and 10s delivery margin.
+    # Provider wait derives from the selected queue/run budget plus 25s margin.
     active = profiles[llm['backend']]
-    if llm['queue_wait_seconds'] + active['run_timeout_seconds'] + 25 > 180:raise ValueError('Provider timeout 180 exceeded')
+    from .backends import provider_timeout
+    if provider_timeout(data)<=active['run_timeout_seconds']:raise ValueError('Invalid provider timeout')
     secret = data.get('secrets_file')
     if not isinstance(secret, str) or not secret:
         raise ValueError('Missing secrets_file')

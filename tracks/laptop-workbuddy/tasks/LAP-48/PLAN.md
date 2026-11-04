@@ -2,7 +2,7 @@
 
 返回 [PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md)，继承 [AGENTS](../../../../AGENTS.md)。[REVIEW](REVIEW.md) 为简练评审，[MEDIUM_START](MEDIUM_START.md) 为手动实施入口，状态见 [HANDOFF](HANDOFF.md)。
 
-状态：planned / ready_for_medium，2026-11-04（Asia/Shanghai）。用户要求本次修订完成直接提供指令，由其手动交medium；本轮仅文档和非运行人设备稿，不自动实施。首稿mN/rN、逐条编辑、439字候选及严格历史/步骤限制由本稿替代。
+实施状态：implemented_and_deployed / ready_for_user_test，2026-11-04（Asia/Shanghai）。用户已手动提交最终指令，已按本稿完成实现/迁移/配对/受管部署；实际结果与未验项见[RESULT](RESULT.md)。下文保留批准设计，首稿mN/rN、逐条编辑、439字候选及严格历史/步骤限制已被本稿替代。
 
 ## 1. 范围与完成标准
 

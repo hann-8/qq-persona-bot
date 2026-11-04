@@ -2,7 +2,7 @@ LAP-24可选管理token独立于五文件配置和QQ密码，仅用`scripts/conf
 
 # 配置文件索引
 
-LAP-46：CodeBuddy CLI思考开启，生产强度low。原生web默认8调用/10步骤，单结果65536/总262144 UTF-8字节；总额由新增`web.cli_total_result_bytes`配置，期限跟随所选`run_timeout_seconds`（本机120秒）。图片新增`vision.max_image_bytes`（33554432）、`max_normalized_bytes`（8388608）、`max_normalized_pixels`（4194304，最长边由平方根派生）；帧/RAM额度随图片配置计算。均通过原五文件local编辑后正常重启生效，无新配置入口。数字及token/secret普通字样不触发项目自建内容过滤。
+LAP-48：CodeBuddy CLI思考开启，生产强度low。原生web默认8次真实工具执行，cli_max_turns兼容但不限制步骤；单结果65536/总262144 UTF-8字节。两阶段共享run_timeout_seconds（本机180秒），表达预留30秒、清理在期限内；provider_sources实际等待=queue_wait_seconds＋运行期限＋25（本机235秒）。网站/工具预算错误交模型用已有材料收尾，不再要求第二计划、完整历史重演或固定步骤，不自动整项重跑/换模型账号。图片新增`vision.max_image_bytes`（33554432）、`max_normalized_bytes`（8388608）、`max_normalized_pixels`（4194304，最长边由平方根派生）；帧/RAM额度随图片配置计算。均通过原五文件local编辑后正常重启生效，无新配置入口。数字及token/secret普通字样不触发项目自建内容过滤。
 
 运行日志策略在 `config/local/runtime.yaml` 的 `logging`：`enabled: true`、`retention_days: 7`、`sweep_interval_minutes: 60`。保留当天和前六个自然日，常驻进程每分钟检查轮转；停机日志由当前用户计划任务每小时及登录时清理。变更后正常重启 bot，并运行 `.venv\Scripts\python.exe scripts/log_retention.py install` 更新维护任务；`status` 查看任务，`purge` 手动执行一次，`remove` 仅移除本项目任务。配置为 false 后运行 install 会移除维护任务，下一次正常重启停止轮转/删除。
 
@@ -153,7 +153,7 @@ Snow运行准入另要求online/good、已armed且pipe/login/rx/outbound健康�
 
 `web.engine`缺省gateway兼容旧配置，本机已保存codebuddy_cli并加载。只有CodeBuddy后端支持原生engine；web.enabled=true/search_enabled=true恰开放WebSearch/WebFetch，search_enabled=false仅WebFetch，enabled=false不开放工具。其余工具/MCP禁用，dontAsk配合固定显式许可及NoDefer直接暴露；原gateway的trigger/provider/freshness/提取字段保留但不作用于原生模式，原搜索质量false不控制原生工具。
 
-新增cli_max_tool_calls默认3且1..3，cli_max_turns默认4且1..4，cli_tool_result_bytes默认8000且1000..8000；本机均取默认。失败计数不退还、重放不重复执行、总工具结果12000字节硬限、90秒总deadline、每步48000可见政策（含真实历史和工具描述/锁定参数schema上界），不自动扩大预算。WebFetch可能内部处理材料，限额不承诺精确HTTP/内部模型数或credits。
+当前cli_max_tool_calls默认8、cli_tool_result_bytes默认65536、cli_total_result_bytes默认262144；本机同值。cli_max_turns兼容但不执行固定步骤门槛。失败执行消耗调用预算，预算耗尽以普通工具结果提示模型收尾；总运行期限180秒、可见输入政策524288字节，实际模型容量校验保留。WebFetch可能内部处理材料，限额不承诺精确HTTP/内部模型数或credits。
 
 子进程alwaysThinkingEnabled=false，DeepSeek/low配置保留；群memory.enabled/learning_enabled均true。正常停机保存后重启，health展示engine/有效工具/限额/思考开关/记忆加载值。当前已部署的识图仍为完整绑定lap43_operator_trial、pending_user_test；使用`scripts/revalidate_lap43_native_web.py`做当前check/probe/activate配对，旧43/42报告保留。联网后最终answer单条、meme_id=null，memory_updates仍可仅依据本群人类消息提出，实际工具服务与效果由用户群测。
 
@@ -164,9 +164,9 @@ Snow运行准入另要求online/good、已armed且pipe/login/rx/outbound健康�
 
 ## LAP-44 群长期记忆
 
-当前群每次模型调用都会收到本群现有记忆全文；模型自行新增、概括、更新、合并和遗忘。不会跨群，网页不是群友自述，也不应把群记忆上传联网查询。空库存可首次学习。明确要求记住/更新/忘记时，宿主保存后给实际回执；如果模型未提出动作，会显示“本轮长期记忆未变更”，不能把口头答应当作保存证明。普通聊天可静默学习；保存失败保留原文件。重置上下文不删除长期记忆。
+Planner收到本群schema3记忆全文，Replyer仅收必要事实。QQ号字符串是成员唯一键，name仅展示，memory为无编号文本数组；group及unassigned同为文本数组。模型只回写变化成员或块的完整数组：省略不改、[]清空，不能用逐条ID/null/下标编辑。_meta只留宿主。模型自主增改删、合并、整理和遗忘；同块完全相同文字轻量去重，语义相近由原Planner合并并保留时间与不确定性，无额外调用。旧HMAC由本机已有身份精确关联，未关联内容保留待关联区；显式微信配对保持，未配对身份使用wechat:前缀。不会跨群或主动上传群记忆，网页不自动入库。保存成功/无变化不追加提示、不改正文、气泡或表情；内部保留实际结果，明确要求记住/改正/忘记但失败才说明，后台失败不刷群。重置短期上下文不删除长期记忆。
 
-用户可在授权群依次测试：“以后叫我小青，请记住”→看到“已保存到本群长期记忆”→由唯一操作者发送“重置本群上下文”→再问“你记得该怎么称呼我吗”。这是用户真实效果测试，离线/加载检查不保证模型每次都合理学习。
+用户可在授权群依次测试：“以后叫我小青，请记住”→自然应声（不附保存播报）→由唯一操作者发送“重置本群上下文”→再问“你记得该怎么称呼我吗”。这是用户真实效果测试，离线/加载检查不保证模型每次都合理学习。
 
 初始配置为 `config/local/features.yaml` 的 `memory.max_chars_per_group: 50000`、`max_group_file_bytes: 1048576`、`max_total_bytes: 8388608`；字符按Unicode code point计数，不是字节。所选 `config/local/models.yaml` 的 `llm.profiles.codebuddy_cli.input_budget.context_input_limit_tokens: 524288` 在此CLI路径实际是可见UTF-8字节政策，不代表实际token消耗。默认值均可扩大；例如100000字符、2097152文件字节、33554432总字节和786432输入政策已作合成验证。超模型真实容量或最终输入仍会明确拒绝，不裁半本记忆、不自动压缩调用或切模型。旧max_records/max_fact_bytes/max_prompt_records/max_prompt_bytes/max_proposals_per_turn/max_record_bytes仅兼容，不再生效。
 
@@ -189,7 +189,7 @@ Snow运行准入另要求online/good、已armed且pipe/login/rx/outbound健康�
 
 health的memory显示实际加载配额，status的memory显示条数/字符/文件字节及最近保存状态，configuration.pending_restart须false。配置保存不等于已加载。当前固定模型容量不足时先降低额度，不改代码或能力登记伪造容量。该配对probe是CLI零生成技术检查，不调用真实模型生成或联网服务。
 
-本机停机管理用 `scripts/configure_bot.py memory-admin`，支持查看计数、只读导出、自由文本新增/纠正/删除、按稳定成员标记删除或清空群；schema2无确认/固定/到期机制。自由文本若未包含某成员稳定标记，不能保证按成员删除能找全所有间接关系；需要明确条目删除。群聊模型没有清namespace/key或改配置的权限。
+本机停机管理用 `scripts/configure_bot.py memory-admin`，支持查看计数、整块只读导出、替换群或成员完整文本数组、清空成员或全群；不再提供记录ID操作。成员清空删除该QQ块，群背景中的多人关系由模型整块整理。群聊模型没有清namespace/key或改配置的权限。
 ## LAP-47 对话配置
 
-在原 `config/local/chat.yaml` 的 chat 节设置 `dialogue_mode: planner_replyer`、`replyer_reserve_seconds: 30`，正常受管启动生效。缺省为 single/30；表达预留须为正整数且小于所选 CodeBuddy 整项运行期限。仅 CodeBuddy v2 使用双阶段，Ollama/旧接口保留 single；health 如实区分请求模式与实际模式。人设仍只有 `config/persona.md`。精简角色保留认真问题的完整表达，真实自然感和延迟由用户实测。
+在原 `config/local/chat.yaml` 的 chat 节设置 `dialogue_mode: planner_replyer`、`replyer_reserve_seconds: 30`，正常受管启动生效。缺省为 single/30；表达预留须为正整数且小于所选 CodeBuddy 整项运行期限。仅 CodeBuddy v2 使用双阶段，Ollama/旧接口保留 single；health 如实区分请求模式与实际模式。人设仍只有 `config/persona.md`。角色采用ff2e348第1～12节，删除第十三节及开头失效说明；两阶段同一完整人设，不再以通用风格限制覆盖它。单份角色输入由1502增至17575 UTF-8字节，工具往返及缓存影响实际token/费用，不能保证省掉编号抵消增长。真实角色自然感、搜索质量和延迟由用户实测。

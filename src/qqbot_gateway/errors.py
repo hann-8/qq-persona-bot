@@ -5,6 +5,7 @@ class GatewayError(Exception):
 
 
 MESSAGES = {
+    'WEB_ADAPTER_ERROR':'这次联网过程出错，没能完成查询。',
     'REMOTE_RESULT_UNKNOWN':'远端生成是否结束尚未确认，已暂停本地后端；请操作者核对后显式解除。',
     'SSH_ACCESS_INVALID':'家庭连接资料缺失或无效，请在本机初始化或检查。',
     'SSH_HOST_KEY_MISMATCH':'家庭SSH主机指纹不匹配，已拒绝认证，请核对既有指纹。',

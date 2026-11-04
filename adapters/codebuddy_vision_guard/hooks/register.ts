@@ -75,7 +75,7 @@ export function register(on, options) {
     need(current.nonce===q.nonce,'receipt_identity');
     const stages=['ready'];let calls=0,lastProof=-1;
     const entries=(await $.fs.list(q.receipt_root)).filter(x=>x.name.startsWith('phase-') && x.name.endsWith('.json'));
-    need(entries.length<=Math.max(128,8*((q.native_web?.max_turns??0)+(q.native_web?.max_calls??0))+16),'receipt_count');
+    
     for(const entry of entries){
       let row;
       try {row=JSON.parse(await $.fs.read(q.receipt_root+'/'+entry.name));} catch {continue;}
@@ -155,8 +155,8 @@ export function register(on, options) {
     Number.isSafeInteger(web.max_turns) && web.max_turns>=1 && Number.isSafeInteger(web.result_bytes) && web.result_bytes>0 &&
     Number.isSafeInteger(web.total_result_bytes) && web.total_result_bytes>=web.result_bytes &&
     Number.isSafeInteger(web.visible_limit) && web.visible_limit>0 && web.visible_limit+q.F+q.V+q.O<=q.C && web.schema_bytes_per_tool===4096,'native_policy');
-  const native={step:0,turn:null,calls:0,resultBytes:0,resultWireBytes:0,requests:new Map(),results:new Map(),planned:[],
-    descriptions:new Map(),answers:[],prefix:null,urls:[],steps:[],failed:false};
+  const native={step:0,calls:0,resultBytes:0,resultWireBytes:0,stepResultWireBytes:0,requests:new Map(),results:new Map(),
+    descriptions:new Map(),urls:[],steps:[]};
   const publicURL=value=>{
     if(typeof value!=='string' || /[\\\s\x00-\x1f]/.test(value))return false;
     const m=/^https?:\/\/([^/?#]+)(?:[/?#]|$)/i.exec(value);
@@ -172,18 +172,6 @@ export function register(on, options) {
   const cut=(text,cap)=>{let out='',used=0;for(const ch of text){const n=bytes(ch).length;if(used+n>cap)break;out+=ch;used+=n;}return out;};
   const proof=()=>({calls:native.calls,result_bytes:native.resultBytes,urls:native.urls,steps:native.steps,
     allowed_tools:web.allowed_tools,thinking_enabled:web.thinking_enabled===true,sha256:hash(canonical(Array.from(native.results.values()).map(x=>x.visible??'')))});
-  const verifyResult=(b,out)=>{
-    need(out && !out.pending,'native_result_history');
-    if(!out.failed){need([out.text,out.visible].includes(b.content),'native_result_history');return;}
-    // SDK core errors remain in its transcript even when a hook replaces the
-    // result. Account that actual error view rather than our proposed text.
-    need(b.is_error===true && typeof b.content==='string','native_result_history');
-    if(!out.api_error){
-      const size=bytes(b.content).length,total=native.resultBytes-bytes(out.visible).length+size;
-      need(size<=web.result_bytes && total<=web.total_result_bytes,'tool_result_bytes');
-      native.resultBytes=total;native.resultWireBytes+=bytes(JSON.stringify(b.content)).length-bytes(JSON.stringify(out.visible)).length;out.visible=b.content;out.api_error=true;
-    }else need(out.visible===b.content,'native_result_history');
-  };
   const argsOf=e=>{
     const flat=Object.fromEntries(Object.entries(e).filter(([k])=>!['tool','tool_use_id','agentId','consent','input'].includes(k)));
     if(!Object.prototype.hasOwnProperty.call(e,'input'))return flat;
@@ -200,7 +188,6 @@ export function register(on, options) {
   };
   const denyText='Native web call refused or unavailable; this request has not verified the claim.';
   async function webDeny($,e,reason,guard_reason='none'){
-    native.failed=true;
     try{await receipt($,'refused',{reason,guard_reason,native_web:proof()});}catch{}
     return {deny:denyText};
   }
@@ -214,55 +201,26 @@ export function register(on, options) {
     }).catch(()=>({description:'Unavailable',isDeferred:false}));
     on('tool.call',async($,e,next)=>{
       try{
-        // Streaming CLI can dispatch a tool before turn.step's next() reply
-        // has crossed the Mod bridge. Wait for that exact plan, never guess it.
-        if(native.pendingStep)await native.pendingStep;
         const id=e.tool_use_id,args=argsOf(e);
-        let known=native.planned.find(x=>x.tool===e.tool && canonical(x.input)===canonical(args));
-        if(!known && !native.failed && typeof id==='string' && !native.results.has(id)){
-          // Live streaming next() can omit toolUses even though the SDK has
-          // committed them. Authorize only the exact id from that same bounded
-          // session transcript, never a tool event's self-reported arguments.
-          const rows=await $.session.messages({as:'api'});
-          need(native.prefix && canonical(rows.slice(0,native.prefix.length))===canonical(native.prefix),'native_prefix');
-          const pending=[];
-          for(const row of rows.slice(native.prefix.length)){
-            need(Array.isArray(row.content),'native_blocks');
-            for(const b of row.content){
-              if(row.role==='assistant' && b.type==='tool_use' && !native.requests.has(b.id)){
-                need(web.allowed_tools.includes(b.name),'native_returned_tool');pending.push(b);
-              }else if(row.role==='assistant' && b.type==='text'){
-                if(!native.answers.includes(b.text))native.answers.push(b.text);
-              }else if(row.role==='user' && b.type==='tool_result'){
-                const out=native.results.get(b.tool_use_id);
-                verifyResult(b,out);
-              }else need(row.role==='assistant' && b.type==='tool_use' && native.requests.has(b.id),'native_history_type');
-            }
-          }
-          need(pending.length+native.calls<=web.max_calls,'native_planned_limit');
-          const matches=pending.filter(b=>b.id===id && b.name===e.tool && canonical(b.input)===canonical(args));
-          need(matches.length===1,'tool_plan_missing');
-          known={tool:matches[0].name,input:matches[0].input};
-        }
-        // Synchronous reservation, before any await, closes parallel and replay gaps.
-        const problem=native.failed?'previous_failure':e.agentId?'tool_subagent':
-          !web.allowed_tools.includes(e.tool)?'tool_wrong_name':typeof id!=='string'?'tool_id':
-          !known?'tool_plan_missing':known.tool!==e.tool || canonical(known.input)!==canonical(args)?'tool_plan_mismatch':
-          native.results.has(id)?'tool_replayed':native.calls>=web.max_calls?'tool_limit':Date.now()>q.deadline?'tool_deadline':null;
+        const problem=e.agentId?'tool_subagent':!web.allowed_tools.includes(e.tool)?'tool_wrong_name':
+          typeof id!=='string'?'tool_id':native.results.has(id)?'tool_replayed':null;
         if(problem)return await webDeny($,e,'tool_identity_replay_or_limit',problem);
+        const budgetMessage=native.calls>=web.max_calls?'Tool execution budget exhausted. Finish using the material already available.':
+          Date.now()>q.deadline?'Tool time budget exhausted. Finish using the material already available.':
+          native.resultBytes>=web.total_result_bytes-256?'Tool result budget exhausted. Finish using the material already available.':null;
+        if(budgetMessage)return {result:{content:budgetMessage,title:'Tool budget',renderer:{type:'text'}}};
         native.calls++;
-        if(native.planned.includes(known))native.planned.splice(native.planned.indexOf(known),1);
-        native.requests.set(id,known);native.results.set(id,{pending:true});
+        native.requests.set(id,{tool:e.tool,input:args});native.results.set(id,{pending:true});
         if(e.tool==='WebFetch')need(publicURL(args.url),'fetch_input');
         // Schema errors and ordinary tool failures belong to the model's task.
         // Do not turn content words, public numbers or SDK errors into refusals.
         let result;
         try{result=await next(e);}
         catch(error){result={isError:true,result:{content:String(error),title:'Tool error'}};}
-        const step=native.steps[native.steps.length-1];
+        const step=native.steps[native.steps.length-1]??{visible_bytes:q.T};
         const remaining=web.visible_limit-step.visible_bytes-(native.resultWireBytes-native.stepResultWireBytes)-bytes(JSON.stringify(Array.from(native.requests.values()))).length-1024;
         const cap=Math.min(web.result_bytes,web.total_result_bytes-native.resultBytes);
-        need(cap>=256,'tool_total_bytes');
+        if(cap<256)return {result:{content:'Tool result budget exhausted. Finish using available material.',title:'Tool budget',renderer:{type:'text'}}};
         const body=result.result;
         let text=body && typeof body.content==='string'?body.content:String(result.deny??'Tool unavailable');
         const failed=!!(result.deny || result.isError);
@@ -275,7 +233,7 @@ export function register(on, options) {
           clean.content=chars.slice(0,low).join('');
         }
         text=clean.content;
-        need(fits(),'tool_result_bytes');
+        if(!fits())return {result:{content:'Tool input capacity reached. Finish using available material.',title:'Tool budget',renderer:{type:'text'}}};
         const visible=JSON.stringify(clean);
         native.resultBytes+=bytes(visible).length;native.resultWireBytes+=bytes(JSON.stringify(visible)).length;
         const actual=failed?[]:[...(e.tool==='WebFetch'?[args.url]:[]),...urls(visible)];
@@ -291,46 +249,12 @@ export function register(on, options) {
   }
   async function nativeStep($,e,next){
     let entered=false;
-    let releasePlan;
-    let diagnostic={actual_index:e.index??null,expected_index:native.step,max_turns:web.max_turns,
-      actual_model:e.model??null,expected_model:q.model,actual_effort:e.effort??null,expected_effort:q.effort,
-      has_agent:!!e.agentId,within_deadline:Date.now()<=q.deadline};
+    const diagnostic={actual_index:e.index??null,actual_model:e.model??null,within_deadline:Date.now()<=q.deadline};
     try{
-      const prior=await readState($);
-      need(!native.failed && !prior.stages.includes('refused') && prior.stages.includes('composed'),'native_ready');
-      need(!e.agentId && native.step<web.max_turns && Number.isSafeInteger(e.index) && e.index>=0 && Date.now()<=q.deadline &&
-        e.model===q.model && (e.effort===undefined || e.effort===q.effort),'native_step_identity');
-      if(native.turn===null)native.turn=e.turnId;
-      need(e.turnId===native.turn,'native_turn');
+      need(!e.agentId && e.model===q.model && (e.effort===undefined || e.effort===q.effort),'native_step_identity');
+      if(Date.now()>q.deadline)return empty(e);
       const rows=await $.session.messages({as:'api'});
-      need(Array.isArray(rows) && rows.length>=1 && rows[0].role==='user','native_rows');
-      need(rows[0].content.length===1 && rows[0].content[0].type==='text' &&
-        [q.prompt,'<user_query>'+q.prompt+'</user_query>'].includes(rows[0].content[0].text),'native_first');
-      const seenCalls=new Set(),seenResults=new Set();
-      for(let i=1;i<rows.length;i++){
-        const row=rows[i];need(Array.isArray(row.content),'native_blocks');
-        for(const b of row.content){
-          if(row.role==='assistant' && b.type==='text')need(native.answers.includes(b.text),'native_answer_history');
-          else if(row.role==='assistant' && b.type==='tool_use'){
-            const call=native.requests.get(b.id);
-            need(call && call.tool===b.name && canonical(call.input)===canonical(b.input) && !seenCalls.has(b.id),'native_call_history');
-            seenCalls.add(b.id);
-          }else if(row.role==='user' && b.type==='tool_result'){
-            const out=native.results.get(b.tool_use_id);
-            need(seenCalls.has(b.tool_use_id) && !seenResults.has(b.tool_use_id),'native_result_history');
-            verifyResult(b,out);
-            seenResults.add(b.tool_use_id);
-          }else need(false,'native_history_type');
-        }
-      }
-      diagnostic={...diagnostic,planned:native.planned.length,seen_calls:seenCalls.size,requests:native.requests.size,
-        seen_results:seenResults.size,results:native.results.size};
-      // WebFetch's native content analyzer may request a model step while
-      // concurrent tools are still running. Their results are not missing.
-      const pending=Array.from(native.results.values()).some(out=>out.pending);
-      if(!pending)need(native.planned.length===0 && seenCalls.size===native.requests.size &&
-        seenResults.size===native.results.size && seenCalls.size===seenResults.size,'native_history_complete');
-      if(native.prefix)need(canonical(rows.slice(0,native.prefix.length))===canonical(native.prefix),'native_prefix');
+      need(Array.isArray(rows),'native_rows');
       const tools=await $.tool.list();need(tools.every(t=>!t.mcp),'native_mcp');
       // Definitions are the current dynamic descriptions plus the locked parameter-schema upper bound.
       const definitions=web.allowed_tools.map(name=>({name,description:native.descriptions.get(name)??tools.find(t=>t.name===name)?.description}));
@@ -343,25 +267,16 @@ export function register(on, options) {
       await receipt($,'context_cleared',{transcript_verified:true,native_web:proof()});
       if(q.mode==='probe'){await receipt($,'probe_short_circuit',{transcript_verified:true,native_web:proof()});return empty(e);}
       await receipt($,'next',{native_web:proof()});native.step++;entered=true;
-      native.pendingStep=new Promise(resolve=>{releasePlan=resolve;});
       const result=await next(e);
       need(!result.serverToolUses?.length,'server_tool');
-      need((result.toolUses??[]).length+native.calls<=web.max_calls,'native_planned_limit');
-      for(const call of result.toolUses??[]){
-        need(web.allowed_tools.includes(call.name),'native_returned_tool');
-        native.planned.push({tool:call.name,input:call.input});
-      }
-      if(result.answer)native.answers.push(result.answer);
-      native.prefix=JSON.parse(JSON.stringify(rows));
+      for(const call of result.toolUses??[])need(web.allowed_tools.includes(call.name),'native_returned_tool');
       await receipt($,'completed',{native_web:proof()});
       return result;
     }catch(error){
-      native.failed=true;
       const tag=/^Error: VISION_GUARD_([a-z_]{1,80})$/.exec(String(error));
       return reject($,e,entered?'native_result_validation':'native_step_validation',{
         guard_reason:tag?tag[1]:'native_io',hook_error:String(error).slice(0,160),diagnostic,native_web:proof()});
     }
-    finally{if(releasePlan){native.pendingStep=null;releasePlan();}}
   }
 
   on('turn.step', async ($, e, next) => {

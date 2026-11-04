@@ -43,14 +43,15 @@ if(variant==='budget')rows[0].content[0].text=q.prompt; // q has a deliberately 
 if(variant==='deadline')q.deadline=0;
 const first=await handlers['turn.step'](host,e(variant==='step_replay'?1:0),model);
 let output=null,second=null;
-if(variant==='chain' && first.toolUses.length){
+if((variant==='chain'||variant==='long_chain') && first.toolUses.length){
  let current=first;
- for(let index=0;index<3;index++){
+ const count=variant==='long_chain'?12:3;
+ for(let index=0;index<count;index++){
   const id='chain-'+index;
   const out=await handlers['tool.call'](host,{tool:'WebSearch',tool_use_id:id,...input},async()=>{calls++;return {result:{content:'fact https://example.com/news',title:'page'}}});
   rows.push({role:'assistant',content:[{type:'text',text:'intermediate prose'},{type:'tool_use',id,name:'WebSearch',input}]});
   rows.push({role:'user',content:[{type:'tool_result',tool_use_id:id,content:JSON.stringify(out.result)}]});
-  current=await handlers['turn.step'](host,e(index+1),index<2?model:async event=>{steps++;return {...event,answer:'final',toolUses:[]}});
+  current=await handlers['turn.step'](host,e(index+1),index<count-1?model:async event=>{steps++;return {...event,answer:'final',toolUses:[]}});
  }
  console.log(JSON.stringify({calls,steps,output:null,second:current,first}));process.exit(0);
 }
@@ -124,7 +125,7 @@ const first=await handlers['turn.step'](host,e(0),async event=>{
  if(variant.includes('race'))early=inputs.map(invoke);
  if(variant.includes('session_plan'))rows=rows.concat([{role:'assistant',content:[{type:'text',text:'model preamble'},
    ...inputs.map((input,i)=>({type:'tool_use',id:'sdk-call-'+i,name:tool,input}))]}]);
- return {...event,answer:'',toolUses:variant.includes('session_plan')?[]:inputs.map(input=>({name:variant.includes('badplan')?'Read':tool,input})),serverToolUses:[]};
+ return {...event,answer:'',toolUses:variant.includes('session_plan') || variant.includes('no_plan')?[]:inputs.map(input=>({name:variant.includes('badplan')?'Read':tool,input})),serverToolUses:[]};
 });
 await Promise.all(variant.includes('race')?early:inputs.map(invoke));
 for(const out of outputs.filter(Boolean)){
@@ -232,17 +233,17 @@ class NativeTests(unittest.TestCase):
             self.assertNotIn('ref',value['output'])
             self.assertEqual(len(proof['native_web']['steps']),2)
 
-    def test_replay_parallel_third_private_and_history_refused(self):
-        for variant in ('third','private','fetch_private','replay','parallel','injection','tamper_result','budget'):
-            value,proof=self.host(variant)
-            self.assertIn('refused',proof['stages'],variant)
-            self.assertLessEqual(value['calls'],1,variant)
-            self.assertEqual(value['steps'],0 if variant in ('step_replay','budget') else 1,variant)
+    def test_only_tools_and_capacity_refuse_not_history_or_content(self):
+        for variant in ('third','fetch_private','replay','budget'):
+            value,proof=self.host(variant);self.assertIn('refused',proof['stages'],variant)
+        for variant in ('private','parallel','injection','tamper_result','step_replay'):
+            value,proof=self.host(variant);self.assertNotIn('refused',proof['stages'],variant)
+            self.assertEqual(value['second']['answer'],'final JSON only')
 
-    def test_three_calls_four_steps(self):
-        value,proof=self.host('chain')
-        self.assertEqual((value['calls'],value['steps'],proof['next_calls']),(3,4,4))
-        self.assertEqual(proof['native_web']['calls'],3)
+    def test_execution_budget_and_more_than_ten_steps(self):
+        value,proof=self.host('long_chain')
+        self.assertEqual((value['calls'],value['steps']),(8,13))
+        self.assertEqual(proof['native_web']['calls'],8)
         self.assertNotIn('refused',proof['stages'])
 
     def test_probe_zero_next(self):
@@ -264,8 +265,8 @@ class NativeTests(unittest.TestCase):
         adapter=module[module.index('let eu=["tool"'):]
         self.assertTrue(adapter.endswith('}'))
         adapter='import * as ed from "node:util";\n'+adapter+'\nexport {dispatchModsToolCall};\n'
-        refused=('fetch_conflict','fetch_invalid_json','fetch_array_json','fetch_null_json','fetch_race_badplan','fetch_session_plan_wrong_id')
-        for variant in ('search','search_flat','search_url','search_json','fetch','fetch_json','fetch_parallel','fetch_parallel_json','fetch_race','fetch_parallel_race_json','fetch_flat','fetch_http','fetch_numeric_url','fetch_session_plan','fetch_parallel_session_plan','fetch_sdk_error','fetch_nested_session_plan','fetch_parallel_nested_session_plan','search_drive','search_backslash','search_unc','search_private_id','fetch_private_numeric_url','fetch_numeric_prompt','search_content_words',*refused):
+        refused=('fetch_conflict','fetch_invalid_json','fetch_array_json','fetch_null_json')
+        for variant in ('search','search_flat','search_url','search_json','fetch','fetch_json','fetch_parallel','fetch_parallel_json','fetch_race','fetch_parallel_race_json','fetch_flat','fetch_http','fetch_numeric_url','fetch_session_plan','fetch_parallel_session_plan','fetch_sdk_error','fetch_nested_session_plan','fetch_parallel_nested_session_plan','fetch_race_no_plan','fetch_session_plan_wrong_id','search_drive','search_backslash','search_unc','search_private_id','fetch_private_numeric_url','fetch_numeric_prompt','search_content_words',*refused):
             with self.subTest(variant=variant), tempfile.TemporaryDirectory() as folder:
                 work=Path(folder)
                 policy=native_contract(validate_web(dict(engine='codebuddy_cli',enabled=True,search_enabled=True)),('987654321',),InputBudget(limit=48000))

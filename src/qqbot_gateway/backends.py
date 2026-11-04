@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 BUDGET_DEFAULTS = dict(context_input_limit_tokens=16384,
                        context_overhead_reserve_tokens=2048, output_reserve_tokens=2048)
 CLI_DEFAULTS = dict(model='deepseek-v4.1-flash', reasoning_effort='auto',
-                    context_window_tokens=None, run_timeout_seconds=120,
+                    context_window_tokens=None, run_timeout_seconds=180,
                     input_budget=BUDGET_DEFAULTS)
 OLLAMA_DEFAULTS = dict(model='qwen3.5:9b-q4_K_M', expected_digest=None,
     access_file='secrets/home-5070-runtime.local.json', num_ctx=16384, think=False,
@@ -56,3 +56,7 @@ def create_runner(root, settings, budget):
     runner.web_private_ids=[settings['bot']['qq']]+sum((settings['access'][k] for k in ('allowed_groups','admin_users','blocked_users')),[]) if runner.native_web else []
     runner.vision_settings = deepcopy(settings)
     return runner
+
+
+def provider_timeout(settings):
+    return settings['llm']['queue_wait_seconds']+resolve_backend(settings)['run_timeout_seconds']+25

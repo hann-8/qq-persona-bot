@@ -126,7 +126,7 @@ def manifest(obj):
         value['member_refs']=sorted(set(value['member_refs'])|{c['member_ref'] for c in obj['member_candidates']})
     if obj['memory'] is not None:
         value['memory']=copy.deepcopy(obj['memory'])
-        value['fact_refs']=list(obj['memory']['records'])
+        value['fact_refs']=[]
     return value
 
 def plan(raw,output,question,request,effective,catalog=None,candidates=(),memory_out=None):
@@ -215,7 +215,7 @@ def verify(value,request,response_id,text,output,source,memory_cfg=None):
             raise ValueError('Memory auxiliary identity')
         if aux['updates'] is not None:
             from .group_memory import validate_updates
-            validate_updates(aux['updates'],(effective['memory'] or {}).get('records',{}))
+            validate_updates(aux['updates'],effective['memory'])
     if 'member_receipt' in value and not hexa(value['member_receipt'],64):raise ValueError('Member receipt')
     if m['images']:
         from .vision import NORMALIZER,MAX_BLOB,MAX_EDGE,MAX_PIXELS

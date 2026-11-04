@@ -438,14 +438,13 @@ class ConfigMenu:
                 group=self.ui.read('授权群号：').strip()
                 info=memory_action(self.path,group,'inspect',config_digest=digest)
                 self.ui.write(f"记录{info['records']}条 / {info['chars']}字符 / JSON {info['bytes']}字节 / revision {info['revision']}")
-                self.ui.write('1 只读导出（含事实与record ID）/ 2 新增 / 5 纠正 / 6 删除记录 / 7 删除成员 / 8 清空群 / 0 返回')
-                selected=self.ui.choose({'0','1','2','5','6','7','8'})
+                self.ui.write('1 整块只读导出 / 2 替换群或成员整块 / 7 清空成员 / 8 清空群 / 0 返回')
+                selected=self.ui.choose({'0','1','2','7','8'})
                 if selected=='0':return
-                action={'1':'export','2':'add','3':'confirm','4':'pin','5':'correct','6':'delete','7':'delete-member','8':'clear'}[selected]
+                action={'1':'export','2':'replace','7':'delete-member','8':'clear'}[selected]
                 fields=dict(expected=info['digest'])
-                if action in ('confirm','pin','correct','delete'):fields['record_id']=self.ui.read('record ID（从本机导出查看）：').strip()
-                if action in ('add','delete-member'):fields['user']=self.ui.read('成员QQ（新增群背景时留空）：').strip() or None
-                if action in ('add','correct'):fields['fact']=self.ui.read('自由记忆文本（受本群总字符配额限制）：').strip()
+                if action in ('replace','delete-member'):fields['user']=self.ui.read('成员QQ（群背景留空）：').strip() or None
+                if action=='replace':fields['fact']=json.loads(self.ui.read('完整文本JSON数组（[]清空）：'))
                 if self.ui.read('核对本次操作，输入“已核对”：').strip()!='已核对':return
                 result=memory_action(self.path,group,action,config_digest=digest,**fields)
                 self.ui.write('已完成：'+str(result))

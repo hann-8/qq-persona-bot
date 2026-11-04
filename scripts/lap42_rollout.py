@@ -74,14 +74,14 @@ def budget_check(root,settings):
     # Exercise the same final subset fitter with full optional quotas and long
     # old context. Only sizes/counts escape; no persona/body is ever printed.
     for i in range(8):source['member_candidates'].append(dict(member_ref='p_'+f'{i:016x}',name='synthetic-'+str(i)))
-    source['memory']=dict(generation='a'*32,base_revision=0,records={f'{i:032x}':'synthetic '+('x'*180) for i in range(8)},actors={})
+    source['memory']=dict(group=['synthetic '+('x'*180)+str(i) for i in range(8)],members={},unassigned=[],actors={})
     body=fit(source,header,system,budget)
     prompt=dialog_text([dict(role='user',content=body)])
     budget.check(system,prompt)
     effective=json.loads(body)
     return dict(persona_bytes=len(persona.encode()),persona_sha256=sha(persona.encode()),system_bytes=len(system.encode()),
         final_visible_policy_bytes=budget.usage(system,prompt),limit=budget.limit,overhead=budget.overhead,
-        output_reserve=budget.output,memory_records=len((effective['memory'] or {}).get('records',[])),
+        output_reserve=budget.output,memory_records=len(__import__('qqbot_gateway.group_memory',fromlist=['texts']).texts(effective['memory'])) if effective['memory'] else 0,
         member_candidates=len(effective['member_candidates']),passed=True)
 
 

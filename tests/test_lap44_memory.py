@@ -27,75 +27,65 @@ class MemoryTests(unittest.TestCase):
         ctx=store.prepare(group,f'{self.seq:064x}',source,{who:'40000'}, {})
         self.assertIsNotNone(ctx);return ctx,source
     def save(self,ctx,source,updates,**kw):return self.store.stage(ctx,dict(updates=updates,receipt=True,reason='valid')|kw,source)
-    def test_first_write_reset_restart_group_isolation(self):
-        ctx,source=self.turn();marker=next(iter(source['memory']['actors'].values()))
-        self.assertEqual(source['memory']['records'],{})
-        self.assertEqual(self.save(ctx,source,{'new_1':marker+' 爱手机摄影，也在学健康饮食。'})['result'],'saved')
-        self.store.close(ctx);self.store.live.clear()
-        restarted=MemoryStore(self.root,'10000',['20000','30000'],cfg=CFG)
-        _,again=self.turn(restarted);self.assertEqual(next(iter(again['memory']['actors'].values())),marker)
-        self.assertIn('手机摄影',next(iter(again['memory']['records'].values())))
-        _,other=self.turn(restarted,'30000');self.assertEqual(other['memory']['records'],{})
-    def test_full_unicode_and_expandable_configuration(self):
-        for limit,file,total,budget in ((50000,1048576,8388608,524288),(100000,2097152,33554432,786432)):
-            self.store.cfg=validate_config(CFG|dict(max_chars_per_group=limit,max_group_file_bytes=file,max_total_bytes=total))
-            ctx,source=self.turn();updates={k:None for k in source['memory']['records']};updates['new_1']=('中🙂\\\"'*((limit+3)//4))[:limit]
-            self.assertEqual(self.save(ctx,source,updates)['result'],'saved')
-            ctx,source=self.turn();self.assertEqual(chars(source['memory']['records']),limit)
-            valid_memory(source['memory'],cfg=self.store.cfg)
-            source['memory']['actors']['p_'+'b'*16]='u_'+'c'*64 # absent actor is not a filter
-            head=dict(must_reply=True,target_seq=source['target_seq'],addressing='mention')
-            body=json.loads(fit(source,head,'policy',InputBudget(limit=budget)))
-            self.assertEqual(body['memory'],source['memory'])
-            with self.assertRaises(GatewayError):fit(source,head,'policy',InputBudget(limit=10000))
-            ctx,source=self.turn();before=self.store.path('20000').read_bytes()
-            self.assertEqual(self.save(ctx,source,{'new_1':'多'})['reason'],'capacity');self.assertEqual(before,self.store.path('20000').read_bytes())
-    def test_atomic_merge_delete_and_no_semantic_gate(self):
-        ctx,s=self.turn();self.save(ctx,s,{f'new_{i}':'自由概括含手机健康与猜测背景 '+str(i) for i in range(1,12)})
-        ctx,s=self.turn();ids=list(s['memory']['records']);updates={k:None for k in ids[1:]};updates[ids[0]]='合并经历，可能是玩笑。'+'长'*300
-        self.assertEqual(self.save(ctx,s,updates)['result'],'saved');_,s=self.turn();self.assertEqual(len(s['memory']['records']),1)
-    def test_conflict_reentry_protocol_storage_and_noop(self):
-        ctx,s=self.turn();other,t=self.turn();r=self.save(ctx,s,{'new_1':'新认识'})
-        self.assertEqual(self.save(ctx,s,{'new_1':'不能重复'}) ,r)
-        self.assertEqual(self.save(other,t,{'new_1':'并发'})['reason'],'conflict')
-        for update,reason in (({},'no_action'),({'new_1':None},'protocol'),({'unknown':'x'},'protocol')):
-            ctx,s=self.turn();before=self.store.path('20000').read_bytes()
-            got=self.save(ctx,s,update);self.assertIn(got['reason'],(reason,'valid'));self.assertEqual(before,self.store.path('20000').read_bytes())
+    def test_blocks_names_duplicates_full_wire_and_isolation(self):
+        ctx,s=self.turn();self.assertEqual(s['memory']['actors'][next(iter(s['memory']['actors']))],'40000')
+        updates={'members':{'40000':[' 茶 ','茶','以前甜饮，最近清茶。'],'50000':['茶']},'group':['周六联机']}
+        self.assertEqual(self.save(ctx,s,updates)['result'],'saved')
+        ctx,s=self.turn();self.assertEqual(s['memory']['members']['40000']['memory'],['茶','以前甜饮，最近清茶。'])
+        self.assertEqual(s['memory']['members']['50000']['memory'],['茶'])
+        self.assertNotIn('_meta',s['memory']);self.assertNotIn('generation',s['memory'])
+        head=dict(must_reply=True,target_seq=1,addressing='mention')
+        self.assertEqual(json.loads(fit(s,head,'policy',InputBudget(limit=524288)))['memory'],s['memory'])
+        self.save(ctx,s,{'members':{'40000':[]}})
+        _,s=self.turn();self.assertEqual(s['memory']['members']['40000']['memory'],[])
+        self.assertEqual(s['memory']['group'],['周六联机'])
+        _,other=self.turn(group='30000');self.assertEqual(other['memory']['members'],{})
+        self.store.known_names['50000']='同名';self.store.known_names['40000']='同名'
+        _,s=self.turn();self.assertEqual(len(s['memory']['members']),2)
+        self.store.known_names['50000']='改名';_,s=self.turn();self.assertEqual(s['memory']['members']['50000']['name'],'改名')
+    def test_conflict_protocol_capacity_and_atomic_failure(self):
+        ctx,s=self.turn();other,t=self.turn()
+        result=self.save(ctx,s,{'group':['新认识']})
+        self.assertEqual(self.save(ctx,s,{'group':['重复请求']}),result)
+        self.assertEqual(self.save(other,t,{'group':['并发']})['reason'],'conflict')
+        for update in ({'new_1':'旧接口'},{'members':{'40000':None}},{'group':{'0':'下标'}}):
+            ctx,s=self.turn();self.assertEqual(self.save(ctx,s,update)['reason'],'protocol')
         ctx,s=self.turn();before=self.store.path('20000').read_bytes()
+        self.assertEqual(self.save(ctx,s,{'group':['长'*50001]})['reason'],'capacity');self.assertEqual(before,self.store.path('20000').read_bytes())
+        ctx,s=self.turn()
         with patch('qqbot_gateway.group_memory.os.replace',side_effect=OSError('synthetic')):
-            self.assertEqual(self.save(ctx,s,{'new_1':'保存失败'})['result'],'failed')
+            self.assertEqual(self.save(ctx,s,{'group':['失败']})['result'],'failed')
         self.assertEqual(before,self.store.path('20000').read_bytes())
-        self.assertEqual(auxiliary({'memory_updates':[]},s)['reason'],'protocol')
-        self.assertEqual(auxiliary({},s)['reason'],'no_action')
-    def test_schema1_migration_preserves_all_and_corrupt_file(self):
+    def test_legacy_association_and_deleted_text_never_revives(self):
         path=self.store.path('20000');path.parent.mkdir(parents=True)
-        old=dict(schema_version=1,namespace_hmac=self.store.namespace('20000'),records=[dict(id='a'*32,scope='member',subject_key='b'*64,fact='旧事实',status='candidate')],pending=[],purge=None)
+        known=self.store.actor('20000','40000');unknown=self.store.actor('20000','50000')
+        old=dict(schema_version=2,namespace_hmac=self.store.namespace('20000'),generation='a'*32,revision=4,last_request_key=None,
+            records={'a'*32:'u_'+known+' 旧事实','b'*32:'u_'+unknown+' 待关联事实','c'*32:'本群 约定'})
         path.write_text(json.dumps(old),encoding='utf-8')
-        doc=self.store._load('20000');self.assertEqual(doc['schema_version'],2);self.assertIn('尚未确认',doc['records']['a'*32]);self.assertTrue(path.with_name('schema1.before.json').exists())
-        path.write_text('{"schema_version":2,"schema_version":1}',encoding='utf-8');before=path.read_bytes()
-        with self.assertRaises(ValueError):self.store._load('20000')
-        self.assertEqual(path.read_bytes(),before)
-    def test_wire_aux_manifest_and_receipt_hash(self):
-        ctx,s=self.turn();req=dict(must_reply=True,target_seq=s['target_seq'],addressing='mention');raw=dict(qqbot_turn_reply=2,decision='speak',kind='chat',bubbles=['好，以后叫你小青。'],meme_id=None,response_to_seq=1,mention=None,memory_updates={'new_1':'合成称呼小青'},memory_receipt=True)
-        aux={};decision,p,response=plan(json.dumps(raw,ensure_ascii=False),OUTPUT,'合成',req,s,memory_out=aux)
+        ctx,s=self.turn();self.assertEqual(s['memory']['members']['40000']['memory'],['旧事实'])
+        self.assertEqual(len(s['memory']['unassigned']),1)
+        self.save(ctx,s,{'unassigned':[]});self.store.associate('20000',['50000'])
+        _,s=self.turn();self.assertNotIn('50000',s['memory']['members'])
+        self.assertEqual(s['memory']['group'],['本群 约定'])
+        self.store.identity_links[('30000','wx-user')]='40000'
+        self.assertEqual(self.store.identity('30000','wx-user'),'40000')
+        self.assertEqual(self.store.identity('30000','wx-other'),'wechat:wx-other')
+        self.store.wechat_groups.add('30000');self.assertEqual(self.store.identity('30000','12345'),'wechat:12345')
+    def test_wire_manifest_and_silent_success_preserves_parts(self):
+        ctx,s=self.turn();req=dict(must_reply=True,target_seq=1,addressing='mention')
+        raw=dict(qqbot_turn_reply=2,decision='speak',kind='chat',bubbles=['好。'],meme_id=None,response_to_seq=1,mention=None,memory_updates={'members':{'40000':['小青']}},memory_receipt=True)
+        aux={};decision,p,response=plan(json.dumps(raw),OUTPUT,'合成',req,s,memory_out=aux)
         meta=metadata(req,'r1',decision,p,s,response,memory_proposals=aux)
+        self.assertEqual(meta['manifest']['fact_refs'],[])
         self.assertEqual(verify(meta,req,'r1',p.canonical_text,OUTPUT,s,self.store.cfg),p)
-        saved=self.store.stage(ctx,aux,s);final=receipt_plan(p,saved,aux['receipt'],OUTPUT)
-        self.assertIn('已保存到本群长期记忆',final.canonical_text)
-        meta['plan']=final.metadata('r1');meta['plan_hash']=sha({k:v for k,v in meta.items() if k!='plan_hash'})
-        self.assertEqual(verify(meta,req,'r1',final.canonical_text,OUTPUT,s,self.store.cfg),final)
-        self.assertEqual(digest(final.canonical_text),meta['plan']['content_sha256'])
-        broken=deepcopy(meta);broken['manifest'].pop('memory');broken['plan_hash']=sha({k:v for k,v in broken.items() if k!='plan_hash'})
-        with self.assertRaises(ValueError):verify(broken,req,'r1',final.canonical_text,OUTPUT,s)
-    def test_typed_meme_mention_receipt_preserves_parts(self):
-        from qqbot_gateway.reply_plan import trusted_plan
-        text=PreparedPart('text',digest('好'),'好','好','p_'+'a'*16);image=PreparedPart('image','b'*64,'m_'+'b'*64,'合成表情')
-        p=ReplyPlan('chat',('好','合成表情'),'好\n合成表情',prepared_parts=(text,image))
-        for result in ('saved','unchanged','failed'):
-            final=receipt_plan(p,dict(result=result),True,OUTPUT)
-            trusted=trusted_plan(final.metadata('r'),'\n'.join(final.bubbles),'r',OUTPUT)
-            self.assertEqual(trusted.parts[-1],image);self.assertEqual(trusted.parts[0].mention_ref,text.mention_ref)
-        self.assertIsNone(receipt_plan(None,dict(result='saved'),True,OUTPUT))
+        saved=self.store.stage(ctx,aux,s)
+        self.assertIs(receipt_plan(p,saved,True,OUTPUT),p)
+        image=PreparedPart('image','b'*64,'m_'+'b'*64,'合成表情')
+        p=replace(p,prepared_parts=(*p.parts,image))
+        for result in ('saved','unchanged'):self.assertIs(receipt_plan(p,dict(result=result),True,OUTPUT),p)
+        self.assertIs(receipt_plan(p,dict(result='failed'),False,OUTPUT),p)
+        final=receipt_plan(p,dict(result='failed'),True,OUTPUT)
+        self.assertEqual(final.parts[:2],p.parts);self.assertEqual(len(final.parts),3)
 
 class WebMemoryTests(unittest.IsolatedAsyncioTestCase):
     async def test_native_web_keeps_human_updates_prepared_and_no_tools(self):
@@ -103,9 +93,9 @@ class WebMemoryTests(unittest.IsolatedAsyncioTestCase):
         from qqbot_gateway.web_retrieval import WebRunner
         from types import SimpleNamespace
         from qqbot_gateway.reply_plan import DEFAULTS
-        source=member_source('合成问题',['鱼鱼']);source['memory']=dict(generation='a'*32,base_revision=0,records={},actors={})
+        source=member_source('合成问题',['鱼鱼']);source['memory']=dict(group=[],members={},unassigned=[],actors={})
         request=dict(must_reply=True,target_seq=source['target_seq'],addressing='mention')
-        raw=dict(qqbot_turn_reply=2,decision='speak',kind='chat',bubbles=['公开消息'],meme_id=None,response_to_seq=1,mention=None,memory_updates={'new_1':'本群人类的新称呼'},memory_receipt=True)
+        raw=dict(qqbot_turn_reply=2,decision='speak',kind='chat',bubbles=['公开消息'],meme_id=None,response_to_seq=1,mention=None,memory_updates={'group':['本群人类的新称呼']},memory_receipt=True)
         for calls in (0,1):
             class Runner:
                 async def run(self,*args):return BackendResult(json.dumps(raw),parameters={'native_web':dict(calls=calls,result_bytes=100,sha256='b'*64,urls=['https://example.com/news'])})
@@ -120,9 +110,9 @@ class GatewayMemoryTests(unittest.IsolatedAsyncioTestCase):
         from qqbot_gateway.model_gateway import application,ModelQueue
         from qqbot_gateway.backends import BackendResult
         from qqbot_gateway.attention import canonical
-        source=member_source('合成目标',['鱼鱼']);source['memory']=dict(generation='a'*32,base_revision=0,records={'c'*32:'中'*60000},actors={})
+        source=member_source('合成目标',['鱼鱼']);source['memory']=dict(group=['中'*60000],members={},unassigned=[],actors={})
         req=dict(version=2,kind='group_turn',request_key='a'*64,epoch='b'*64,config_version='c'*64,source_digest=sha(source),mode='free',addressing='mention',must_reply=True,target_seq=1,resource_caps=[])
-        aux=dict(receipt=True,updates={'new_1':'本群合成称呼'},reason='valid')
+        aux=dict(receipt=True,updates={'group':['本群合成称呼']},reason='valid')
         raw=dict(qqbot_turn_reply=2,decision='speak',kind='answer',bubbles=['合成答复'],meme_id=None,response_to_seq=1,mention=None,memory_updates=aux['updates'],memory_receipt=True)
         for prepared in (False,True):
             class Runner:
@@ -157,17 +147,17 @@ class AstrBotMemoryTests(unittest.IsolatedAsyncioTestCase):
             ctx=r.memory.prepare('111','a'*64,source,{ref:'333'}, {})
             req=dict(version=2,kind='group_turn',request_key='a'*64,epoch='fixture-epoch',source_digest=sha(source),must_reply=True,target_seq=1,addressing='mention')
             for k,v in dict(qq_router_trace='trace',qq_group_request=req,qq_v2_source=source,qq_memory_context=ctx,qq_connection=r.connection(),qq_delivery_key=key,qq_snapshot_range=[1,1]).items():e.set_extra(k,v)
-            p=ReplyPlan('answer',('好。',),'好。');aux=dict(receipt=True,updates={'new_1':'合成称呼'},reason='valid')
+            p=ReplyPlan('answer',('好。',),'好。');aux=dict(receipt=True,updates={'group':['合成称呼']},reason='valid')
             meta=metadata(req,'chatcmpl-synthetic','speak',p,source,1,memory_proposals=aux)
             raw=SimpleNamespace(model='workbuddy-local',id='chatcmpl-synthetic',choices=[SimpleNamespace(message=SimpleNamespace(content=p.canonical_text))],qqbot_group_plan=meta)
             response=SimpleNamespace(raw_completion=raw);run=SimpleNamespace(messages=[])
             for _ in range(2):await r.preserve_gateway_text(e,run,response)
             self.assertFalse(e.get_extra('qq_group_invalid'))
-            final=e.get_extra('qq_delivery_plan');self.assertIn('已保存',final.canonical_text)
+            final=e.get_extra('qq_delivery_plan');self.assertEqual(final.canonical_text,'好。')
             self.assertEqual(tasks.delivery(key)['content_sha256'],digest(final.canonical_text))
             tasks.begin_part(key,0);tasks.part_result(key,0,'sent','synthetic-ack')
             self.assertEqual(tasks.parts(key),[(0,'sent','synthetic-ack')])
-            self.assertEqual(len(r.memory._load('111')['records']),1);self.assertEqual(r.memory._load('111')['revision'],1)
+            self.assertEqual(len(r.memory._load('111')['group']),1);self.assertEqual(r.memory._load('111')['_meta']['revision'],1)
             verify(e.get_extra('qq_group_metadata'),req,raw.id,final.canonical_text,OUTPUT,source,r.memory.cfg)
         finally:
             if tasks:tasks.db.close()

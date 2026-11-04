@@ -73,7 +73,6 @@ class Guard:
         phase_names={'context_cleared','composed','refused','admitted','probe_short_circuit','next','completed'}
         phases=list(self.receipt_root.glob('phase-*.json'))
         web=self.request.get('native_web') or {}
-        if len(phases)>max(128,8*(web.get('max_turns',0)+web.get('max_calls',0))+16):raise ValueError('VISION_PLUGIN_RECEIPT_COUNT')
         stages=['ready'];calls=0;last_proof=-1;refusals=[]
         for path in phases:
             if path.is_symlink() or path.stat().st_size>max(16384,2*(web.get('visible_limit',0)+web.get('total_result_bytes',0))):raise ValueError('VISION_PLUGIN_PHASE_INVALID')
@@ -115,11 +114,14 @@ class Guard:
 
     def finish(self):
         value = self.read()
-        required = {'ready', 'composed', 'context_cleared',
-                    'probe_short_circuit' if self.request['mode'] == 'probe' else 'completed'}
-        calls = 0 if self.request['mode'] == 'probe' else 1
-        if (not required.issubset(value['stages']) or 'refused' in value['stages'] or
-                (not 1<=value.get('next_calls',0)<=self.request['native_web']['max_turns'] if self.request.get('native_web') and self.request['mode']=='live' else value.get('next_calls') != calls) or value.get('transcript_verified') is not True):
+        if self.request.get('native_web'):
+            required={'ready','probe_short_circuit' if self.request['mode']=='probe' else 'completed'}
+            invalid=(self.request['mode']=='probe' and value.get('next_calls')!=0 or
+                     self.request['mode']=='live' and value.get('next_calls',0)<1)
+        else:
+            required={'ready','composed','context_cleared','probe_short_circuit' if self.request['mode']=='probe' else 'completed'}
+            invalid=value.get('next_calls')!=(0 if self.request['mode']=='probe' else 1)
+        if not required.issubset(value['stages']) or 'refused' in value['stages'] or invalid or value.get('transcript_verified') is not True:
             raise ValueError('VISION_PLUGIN_TURN_REJECTED')
         return value
 

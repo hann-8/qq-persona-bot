@@ -97,7 +97,7 @@ class ResultParser:
         self.events=self.events[-128:]
         if kind in ('control_response','control_request'):
             raise GatewayError('PROTOCOL_ERROR')
-        if kind == 'error' or event.get('is_error') or event.get('errors'):
+        if kind == 'error' or kind == 'result' and (event.get('is_error') or event.get('errors')):
             raise GatewayError(classify_error({k:event.get(k) for k in ('error','errors','message','result')}))
         if kind == 'system' and event.get('subtype') == 'init':
             tools=event.get('tools')
@@ -115,13 +115,12 @@ class ResultParser:
             if not isinstance(b,dict):raise GatewayError('PROTOCOL_ERROR')
             if b.get('type') in ('tool_use','tool_call'):
                 ident=b.get('id');name=b.get('name')
-                if (not self.initialized or name not in self.allowed_tools or not isinstance(ident,str) or
-                        ident in self.tool_calls or len(self.tool_calls)>=self.max_calls):
+                if (not self.initialized or name not in self.allowed_tools or not isinstance(ident,str)):
                     raise GatewayError('TOOL_ISOLATION_FAILED')
                 self.tool_calls[ident]=name
             elif b.get('type')=='tool_result':
                 ident=b.get('tool_use_id')
-                if ident not in self.tool_calls or ident in self.tool_results:raise GatewayError('PROTOCOL_ERROR')
+                if not isinstance(ident,str):raise GatewayError('PROTOCOL_ERROR')
                 self.tool_results.add(ident)
         if kind == 'result':
             if self.result is not None or not self.initialized:
@@ -143,7 +142,6 @@ class ResultParser:
             raise GatewayError('BACKEND_UNAVAILABLE')
         if not self.initialized or self.result is None:
             raise GatewayError('PROTOCOL_ERROR')
-        if self.tool_results!=set(self.tool_calls):raise GatewayError('PROTOCOL_ERROR')
         return self.result
 
 
@@ -236,7 +234,7 @@ class CLIRunner:
             system_file.write_text(system, encoding='utf-8')
             args = [str(self.node),str(self.entry),'-p','--output-format','stream-json',
                     '--tools',','.join('NoDefer('+t+')' for t in allowed),'--strict-mcp-config','--mcp-config',str(self.root/'config/mcp-empty.json'),
-                    '--permission-mode','dontAsk','--no-session-persistence','--max-turns',str(policy['max_turns'] if policy else 2),
+                    '--permission-mode','dontAsk','--no-session-persistence',*(['--max-turns','2'] if not policy else []),
                     '--model',self.model,'--system-prompt-file',str(system_file),
                     '--setting-sources','none','--disallowedTools',*denied]
             if allowed:args+=['--allowedTools',*allowed]
@@ -463,7 +461,7 @@ class CLIRunner:
                     await asyncio.gather(*io,process.wait())
                 if guard:
                     try:self.last_parameters['vision_guard']=guard.finish()
-                    except (OSError,ValueError):raise GatewayError('MODEL_CONFIG_UNSUPPORTED') from None
+                    except (OSError,ValueError):raise GatewayError('WEB_ADAPTER_ERROR' if policy else 'MODEL_CONFIG_UNSUPPORTED') from None
                     if policy:self.last_parameters['native_web']=self.last_parameters['vision_guard'].get('native_web',{})
                 result = BackendResult(parser.finish(process.returncode),parser.usage,self.last_parameters,'stop')
                 generation = 'success'
@@ -480,8 +478,12 @@ class CLIRunner:
                 generation = 'MODEL_TIMEOUT'
                 raise GatewayError('MODEL_TIMEOUT') from None
             except GatewayError as error:
+                if policy and guard and error.code in ('PROTOCOL_ERROR','BACKEND_UNAVAILABLE'):
+                    try:adapter_failed='refused' in guard.read().get('stages',[])
+                    except (OSError,ValueError):adapter_failed=False
+                    if adapter_failed:error=GatewayError('WEB_ADAPTER_ERROR')
                 generation = error.code
-                raise
+                raise error
             except asyncio.CancelledError:
                 generation = 'cancelled'
                 raise

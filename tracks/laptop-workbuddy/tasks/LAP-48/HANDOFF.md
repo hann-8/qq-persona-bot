@@ -1,24 +1,15 @@
-# LAP-48 最终交接：QQ整块记忆、联网薄适配与指定人设
+# LAP-48 交接：已实现、部署，待用户群测
 
 返回 [PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md)，继承 [AGENTS](../../../../AGENTS.md)。
 
-状态：planned / ready_for_medium，2026-11-04 20:25（Asia/Shanghai）。用户已明确修改并要求完成直接给medium指令，由其手动落地，不再追加review。入口：[最终评审](REVIEW.md) / [最终设计](PLAN.md) / [实施指令](MEDIUM_START.md) / [指定人设备稿](PERSONA_RESTORE.md)。规划方不自动实施、派代理或切模型。
+状态：implemented_and_deployed / ready_for_user_test，2026-11-04（Asia/Shanghai）。用户已手动提交最终实施指令，同轮实现/迁移/当前技术配对/启用部署完成；唯一执行者为本会话，无代理/切模型。完整事实见 [RESULT](RESULT.md)，批准方案见 [REVIEW](REVIEW.md) / [PLAN](PLAN.md)，原指令 [MEDIUM_START](MEDIUM_START.md)，指定人设 [PERSONA_RESTORE](PERSONA_RESTORE.md)。
 
-最终选择：
-- QQ号是QQ群友唯一键，name展示，memory无编号数组；按变化成员/group/unassigned整块替换，省略不改、空数组清空。用户明确不要rN/mN或逐条定位，不用下标/hash换皮恢复。
-- 同块完全相同文字可轻量去重，语义相近由原Planner看全文合并；无额外调用/向量库/准确率门槛。
-- 官方tool.call薄适配，删除第二计划、逐步完整历史/prefix/阶段齐全及固定10步门槛。8次真实执行和现容量作为可调预算，正常网站/预算错误给模型收尾，不毒化全任务；180秒两阶段共享、表达30/清理5、provider派生235秒。
-- 成功/无变化不改正文、不播报保存；明确记忆请求失败才反馈。实际结果内部保留。
-- 人设精确选ff2e348，删第十三节及开头指向它的说明，顺排说明序号；第1～12节其余角色文字保留。两阶段仍读同一人设，清理通用风格冲突，首稿439字候选废止。
+当前合同：QQ号唯一键，schema3无逐条ID，按变化成员/group/unassigned整块更新；全文交Planner、_meta仅宿主。同文块内轻量去重，语义整理交原Planner。官方联网薄适配删除第二计划/历史重演/prefix/阶段/固定10步；保留8次真实执行与容量预算，网站/预算错误普通收尾。180秒共享、表达30/清理5、provider实际235。成功保存/无变化静默，明确失败才说明。两阶段使用ff2e348第1～12节备稿，不加程序风格规则。
 
-证据：天气样例CLI trace 7c84eda6a5为tool_plan_missing→native_ready，本地拒绝非总超时；后续天气属另一任务，具体原始SDK顺序未留摘要。当前旧HMAC关联只读核对一群5/5、另一群2/3，有一位待关联；保留unassigned及内部legacy_links，不猜QQ不阻塞部署。QQ号/key/原文未输出或提交。运行中的自然记忆写入及用户后续名单变化不由本轮覆盖。
+实际迁移：两份有效记忆39条完整保留，5/2位成员、1条待关联；原0字节退役文件保留。精确私有备份state/lap48-deployment/before；不能旧备份覆盖部署后新事实。现有WX映射保持，未配对微信身份不冒充QQ；独立WeChatbot/旧QQbot未操作。
 
-人设备稿：源ff2e348d236613ab74990edd3386dafb06b149ed，备稿8,896字符/17,575 UTF-8字节，SHA256 82a9378d450388a8c08cb30481ee42c8666c3a4b8758293a014d243a75ced430；当前运行短稿仍1,502字节。备稿增加后续输入成本，不能声称去掉编号的节省抵消它。PERSONA_RESTORE只是交接文档，不是第二个运行配置。
+验证：36项当前组合、11项runner/配置、1项实际provider分支通过。真实锁定CLI零生成一轮通过；当前配对b2212e35cf2cf84593eea38969cc5010c201f8e73cf128f703439eeed19285b7，质量仍pending_user_test。最终running/connected/可收消息/router_ready，错误为空、无待重启/source_changed；local语义仅CLI期限改180，保护摘要及人设原字节核对通过。实际provider_sources=235；修复了已有微信保留分支未更新旧timeout的问题并必要重启。
 
-归属：当前会话唯一文档写入者，无代理。首稿交付e81c15e；本次修订起点main/e81c15e与实时origin/main一致，仅原用户未跟踪启动bat保留。此次只拥有八文档：PROGRESS、工作线HANDOFF/TASKS、本目录HANDOFF/REVIEW/PLAN/MEDIUM_START/PERSONA_RESTORE。没有改源码、local、运行persona或实际记忆，没有启停、真实模型/搜索或QQ/微信测试消息。独立WeChatbot不操作；本根已有WX-Akasha映射纳入实施兼容范围。
+Git起点625bd0c与实时origin/main一致；短期分支codex/lap48-memory-web-persona在本根实施，仅本任务改动提交，快进main并push/清分支。最终SHA见RESULT交付说明和git log；原未跟踪用户bat保留、不执行、不提交。未知用户差异未覆盖。
 
-验证：八文档295个本地链接、两处JSON示例及QQ整块结构通过；备稿与指定版本仅删第十三节/失效说明并顺排说明编号的转换逐字节相符；入口/medium链接和Git范围通过，git diff --check无空白错误。只改八份Markdown，不跑实现测试，不把只读状态当真实质量验收。
-
-Git：仅提交八份归属Markdown，说明“docs: finalize LAP-48 QQ memory and medium handoff”；最终SHA以本轮回执/git log为准，commit/push并核对main实时远端一致后释放文档归属，未跟踪用户bat不提交。
-
-下一步：用户手动把MEDIUM_START交给medium。实施同轮完成实现/必要回归/迁移/当前零生成技术配对/启用受管部署/Git，质量由用户群测；不重开规划、不补历史大矩阵、不增加审批或真实样本。
+下一步：用户自然群测记忆整理/忘记、角色表达、真实搜索/网站失败收尾及延迟；未主动真实模型生成、公共搜索或QQ/微信测试消息。不要把健康/离线/零生成晋升质量验收，不补旧大矩阵或再次等待部署许可。
