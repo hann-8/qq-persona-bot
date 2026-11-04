@@ -346,15 +346,6 @@ class WebRunner:
             notice='图片准备已超时，这次没有送入模型，请稍后再试。'
             return BackendResult(notice,prepared_plan=ReplyPlan('answer',(notice,),notice,fallback_reason='local_image_prepare_timeout'),generation_performed=False)
         source=json.loads(json.loads(prompt)[-1]['content'])
-        if getattr(self,'dialogue_mode','single')=='planner_replyer':
-            from .dialogue import run
-            from .cli_web_policy import SCOPE
-            target=next(r['text'] for r in source['messages'] if r['seq']==source['target_seq'])
-            token=SCOPE.set((bool(source['web_anchor']) and (request['must_reply'] or getattr(self,'allow_ambient_web',True)),target))
-            try:result=await run(self,system,prompt,request_id,request,source)
-            finally:SCOPE.reset(token)
-            self.runner.last_parameters=result.parameters
-            return self.finish_native_v2(result,request,source,source['web_anchor'])
         question=source['web_anchor'] if request['must_reply'] or getattr(self,'allow_ambient_web',True) else None
         from .bilibili_policy import LINK,BARE
         if question and (LINK.search(question) or BARE.search(question)):
@@ -364,6 +355,15 @@ class WebRunner:
             (not request['must_reply'] or r['seq']==source['target_seq']) for r in source['messages']):
             from .errors import GatewayError
             raise GatewayError('UNSUPPORTED_REQUEST')
+        if getattr(self,'dialogue_mode','single')=='planner_replyer':
+            from .dialogue import run
+            from .cli_web_policy import SCOPE
+            target=next(r['text'] for r in source['messages'] if r['seq']==source['target_seq'])
+            token=SCOPE.set((bool(question),target))
+            try:result=await run(self,system,prompt,request_id,request,source)
+            finally:SCOPE.reset(token)
+            self.runner.last_parameters=result.parameters
+            return self.finish_native_v2(result,request,source,question)
         if getattr(self,'native_web',False):
             return await self.run_native_v2(system,prompt,request_id,request,source,question)
         if not question:return await self.guarded(self.runner.run(system,prompt,request_id))
