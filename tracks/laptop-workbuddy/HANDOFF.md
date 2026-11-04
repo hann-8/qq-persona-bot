@@ -1,4 +1,4 @@
-当前活动任务：**LAP-47 已实现、启用并受管部署，ready_for_user_test**（2026-11-04）。Planner→Replyer/120秒共享/表达预留30秒与精简人设已加载，原能力保持；最终44项组合及另11项runner/配置通过，真实CLI两阶段零生成配对/activate通过。当前running/connected/可收消息/router_ready、无当前错误或待重启。真实自然感/延迟待用户实测。[结果](tasks/LAP-47/RESULT.md) / [交接](tasks/LAP-47/HANDOFF.md) / [方案](tasks/LAP-47/PLAN.md)。
+当前活动任务：**LAP-48 planned / awaiting_review**（2026-11-04）：成员分层记忆/短编号、联网误拒与180秒共享期限、静默保存和大肥鱼角色恢复。[评审](tasks/LAP-48/REVIEW.md) / [设计](tasks/LAP-48/PLAN.md) / [交接](tasks/LAP-48/HANDOFF.md)。本轮只读/文档，不自动实施；确认后手动交medium。运行基础仍为LAP-47，用户反馈拆分更拟人、角色变淡；其他质量边界保留。[47结果](tasks/LAP-47/RESULT.md)。
 
 2026-11-03 LAP-46已实现并受管部署main：WebSearch/read别名冲突、内部并行步骤和正文恢复已修；内容审查/来源尾巴移除，思考low开启，搜索/图片预算已扩大加载。QQ running/connected/ready、无当前错误或待重启，记忆/识图保持。实际质量待用户自然群测，无新增常驻原文日志。[结果](tasks/LAP-46/RESULT.md) / [交接](tasks/LAP-46/HANDOFF.md)。
 
@@ -52,7 +52,7 @@ LAP-41已完成新根整理：uv报告清除38,269缓存文件约626.1MiB、5份
 
 ## 当前需要读的文件
 
-- 当前：[43 HANDOFF](tasks/LAP-43/HANDOFF.md) → [详规第0/10节](tasks/LAP-43/PLAN.md) / [统一medium指令](tasks/LAP-43/MEDIUM_START.md)，用户提交新prompt后同轮实现并部署，人工群体验留给用户。42识图当前事实见[最终结果](../../reports/lap-42-vision-closure-result.md)，旧42及43分轮指令均为历史，不重跑接入、首试、六例或已加载功能。
+- 当前：[48评审](tasks/LAP-48/REVIEW.md) → [详细设计](tasks/LAP-48/PLAN.md) / [交接](tasks/LAP-48/HANDOFF.md)。本轮只规划，确认后生成统一medium指令；运行基础/验证看[47结果](tasks/LAP-47/RESULT.md)。43/44及旧42分轮指令为历史，不重跑接入、首试、六例或已加载功能。
 - 上轮：[21实际数据准备](tasks/LAP-21/SNOW_MIGRATION_RESULT.md)保留；active未激活/真实未验不阻塞42，42不动其pending。
 - 日常使用：[SnowLuma使用说明](../../SnowLuma使用说明.md)。
 - 旧NapCat用户：[实际bot使用对照](../../docs/BOT_USAGE_COMPARISON.md)。
