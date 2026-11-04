@@ -1,3 +1,5 @@
+LAP-47 文档续作，2026-11-04，session `LAP-47-maibot-dialogue-plan`：用户要求未来采用“max及以上设计 → 单份简练 Markdown review → 按反馈修改 → 用户手动连同指令交给 medium”的流程，本次47规划豁免、不补评审稿。当前会话仅拥有 AGENTS.md、本 TASKS 与47 HANDOFF；起点 main/778b2aa，用户未跟踪启动 bat 保留，不改47方案或运行态。完成文档核对与 Git 交付后释放归属。
+
 LAP-47 planned / ready_for_medium，2026-11-04 18:30（Asia/Shanghai）领取，session `LAP-47-maibot-dialogue-plan`，当前会话唯一文档写入者，无代理。归属 AGENTS.md、PROGRESS.md、工作线 HANDOFF/TASKS、tasks/LAP-47/{HANDOFF,PLAN,MEDIUM_START}.md；MaiBot 分工与当前接点已核对，完整方案及统一指令已落盘，AGENTS 已去流水账并纳入三条禁止要求。main 起点 `31e9adc`，用户未跟踪启动 bat 保留，不改代码/local/人设/运行，不调用真实模型或发消息。文档核对及 Git 交付后释放归属。[交接](tasks/LAP-47/HANDOFF.md) / [计划](tasks/LAP-47/PLAN.md) / [medium 指令](tasks/LAP-47/MEDIUM_START.md)。
 
 2026-11-03 LAP-46实施收尾：session LAP-46-implementation，源码bbe728d已快进main并完成零生成配对/activate/受管恢复，独立status确认connected/ready、无待重启/当前错误、thinking=true及新预算加载。8项业务任务已用完，别名修复后未追加真实搜索样本；质量交用户试用，无主动QQ/常驻详细日志。保护材料及验证见[结果](tasks/LAP-46/RESULT.md)；文档/Git交付核对后释放唯一执行归属。用户bat保留。
