@@ -64,8 +64,9 @@ def budget_check(root,settings):
     from qqbot_gateway.turn_v2 import fit,sha as turn_sha
     from qqbot_gateway.vision import member_source
     persona=(root/'config/persona.md').read_text(encoding='utf-8')
+    from qqbot_gateway.dialogue import planner_phase
     system=compose_persona(persona,settings['output'],settings['web'],settings['participation'],settings['memes'],
-        settings['vision'],settings['members'],settings['memory'],settings['bilibili'])
+        settings['vision'],settings['members'],settings['memory'],settings['bilibili'],phase=planner_phase(settings))
     system=system.replace('mention必须null；','')+MEMBERS_POLICY
     budget=InputBudget.from_settings(settings,validate_model_settings(settings))
     source=member_source('synthetic current target',settings['participation']['attention']['aliases'])

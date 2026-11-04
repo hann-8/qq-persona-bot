@@ -262,6 +262,13 @@ def normalize_settings(raw):
     if not isinstance(access_path,str) or not access_path.startswith('secrets/') or '..' in Path(access_path).parts or Path(access_path).is_absolute():raise ValueError('Local access_file must remain in project secrets')
     if local['input_budget']['context_input_limit_tokens']+local['input_budget']['output_reserve_tokens'] > local['num_ctx'] or local['input_budget']['output_reserve_tokens'] < local['num_predict']:raise ValueError('Local budget exceeds known model capacity / output reserve')
     for key, value in {'history_turns':8,'user_cooldown_seconds':5,'session_queue_limit':2,'session_queue_timeout_seconds':600}.items():chat.setdefault(key,value)
+    chat.setdefault('dialogue_mode','single')
+    chat.setdefault('replyer_reserve_seconds',30)
+    if chat['dialogue_mode'] not in ('single','planner_replyer'):raise ValueError('Invalid dialogue_mode')
+    reserve=chat['replyer_reserve_seconds']
+    if type(reserve) is not int or reserve<=0:raise ValueError('Invalid replyer_reserve_seconds')
+    if llm['backend']=='codebuddy_cli' and chat['dialogue_mode']=='planner_replyer' and reserve>=profiles['codebuddy_cli']['run_timeout_seconds']:
+        raise ValueError('Replyer reserve must be below run timeout')
     output.setdefault('mode', 'plain_chat')
     output.setdefault('quote_reply',False)
     if output['quote_reply'] is not False:raise ValueError('Only direct group replies are supported')

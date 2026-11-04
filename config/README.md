@@ -190,3 +190,7 @@ Snow运行准入另要求online/good、已armed且pipe/login/rx/outbound健康�
 health的memory显示实际加载配额，status的memory显示条数/字符/文件字节及最近保存状态，configuration.pending_restart须false。配置保存不等于已加载。当前固定模型容量不足时先降低额度，不改代码或能力登记伪造容量。该配对probe是CLI零生成技术检查，不调用真实模型生成或联网服务。
 
 本机停机管理用 `scripts/configure_bot.py memory-admin`，支持查看计数、只读导出、自由文本新增/纠正/删除、按稳定成员标记删除或清空群；schema2无确认/固定/到期机制。自由文本若未包含某成员稳定标记，不能保证按成员删除能找全所有间接关系；需要明确条目删除。群聊模型没有清namespace/key或改配置的权限。
+# LAP-47 对话配置
+
+在原 `config/local/chat.yaml` 的 chat 节设置 `dialogue_mode: planner_replyer`、`replyer_reserve_seconds: 30`，正常受管启动生效。缺省为 single/30；表达预留须为正整数且小于所选 CodeBuddy 整项运行期限。仅 CodeBuddy v2 使用双阶段，Ollama/旧接口保留 single；health 如实区分请求模式与实际模式。人设仍只有 `config/persona.md`。精简角色保留认真问题的完整表达，真实自然感和延迟由用户实测。
+

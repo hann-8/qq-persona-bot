@@ -25,7 +25,7 @@ def natural_expression(limit, media=False):
     return rule + '\n'
 
 
-def compose_persona(character, output=None, web=None, participation=None, memes=None, vision=None, members=None, memory=None, bilibili=None):
+def compose_persona(character, output=None, web=None, participation=None, memes=None, vision=None, members=None, memory=None, bilibili=None, *, phase=None):
     from .reply_plan import DEFAULTS
     cfg = DEFAULTS | (output or {})
     limit = cfg['max_bubbles'] if cfg['delivery_mode'] == 'adaptive' else 1
@@ -55,6 +55,12 @@ def compose_persona(character, output=None, web=None, participation=None, memes=
         policy+=MEMORY_POLICY+f"本群记忆正文容量为{memory.get('max_chars_per_group',50000)}个Unicode字符。\n"
         policy=policy.replace('不跨用户或群取记忆','可使用本群记忆全文，不跨群取记忆')
         policy+='本轮记忆学习'+('开启。\n' if memory.get('learning_enabled') else '关闭，memory_updates必须{}。\n')
+    if phase=='planner':
+        return policy+'''\n本次是Planner阶段：理解可见群聊、人物与引用关系，决定接谁的话、是否发言、chat/answer、必要事实、当前图片发现、受控表情及记忆更新。
+只输出完整内部JSON：{"qqbot_dialogue_plan":1,"decision":"speak","kind":"chat","response_to_seq":null,"reply_reference":"接住的意思、回复方向和必要事实","meme_id":null,"mention":null,"memory_updates":{},"memory_receipt":false}。
+must_reply=true必须speak且固定target；否则可silent，发言对象只选eligible_seq。silent时meme_id和mention必须null。mention必须null；记忆遵守上述开关与实际保存回执合同。
+reply_reference是给表达阶段的语义指导，不是群正文，也不输出思维过程。普通闲聊说明要接住的意思和语气即可；认真问题完整保留必要事实、代码、链接及不确定性，不先写整篇待润色正文。图片和工具只在本阶段使用，用过web后kind=answer且meme_id=null。
+以下角色材料供理解语气与关系：\n'''+character
     if (participation and participation.get('mode')=='free' and participation.get('attention',{}).get('enabled')) or vision and vision.get('enabled') or members and members.get('enabled') or memory and memory.get('enabled'):
         return policy+f'''关注协议v2：self.speaker=bot，配置别名是本bot；群友的“你/我”按speaker、at_refs、reply_seq和已ACK焦点判断。
 只依据当前target及可见行；must_reply=true必须回答冻结target，否则可silent；没有主语的承接句可续聊，结束确认/感叹可沉默。
@@ -104,6 +110,7 @@ def session_version(prompt, settings):
             'num_ctx','think','num_predict','keep_alive_seconds','temperature','top_p','top_k','input_budget')
     parameters = {key:cfg[key] for key in keys if key in cfg}
     parameters['web']=settings.get('web',{})
+    parameters['dialogue']={k:settings.get('chat',{}).get(k,v) for k,v in (('dialogue_mode','single'),('replyer_reserve_seconds',30))}
     parameters['bilibili']=settings.get('bilibili',{})
     parameters['public_network']=settings.get('public_network',{})
     from copy import deepcopy

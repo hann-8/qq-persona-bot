@@ -63,7 +63,8 @@ class QQRouter(Star):
         self.participation=settings['participation']
         from qqbot_gateway.meme_catalog import MemeCatalog
         self.memes=MemeCatalog(self.root,settings['memes'])
-        self.persona=compose_persona((self.root/'config/persona.md').read_text(encoding='utf-8'),self.output,self.web,self.participation,settings['memes'],settings.get('vision'),settings.get('members'),settings['memory'],settings.get('bilibili'))
+        from qqbot_gateway.dialogue import planner_phase
+        self.persona=compose_persona((self.root/'config/persona.md').read_text(encoding='utf-8'),self.output,self.web,self.participation,settings['memes'],settings.get('vision'),settings.get('members'),settings['memory'],settings.get('bilibili'),phase=planner_phase(settings))
         self.persona_id=session_version(self.persona+('\n'+self.memes.fingerprint() if self.memes.cfg['enabled'] else ''),settings)
         chat=settings.get('chat',{})
         self.budget=InputBudget.from_settings(settings,validate_model_settings(settings))

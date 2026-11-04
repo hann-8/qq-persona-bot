@@ -115,6 +115,8 @@ llm:  # 配置节，子字段见下方；保留既有校验约束
         context_overhead_reserve_tokens: 2048  # 输入开销预留，保守计数，非精确token
         output_reserve_tokens: 2048  # 输出预留；本地输入加输出不超过num_ctx，预留不少于num_predict
 chat:  # 配置节，子字段见下方；保留既有校验约束
+  dialogue_mode: single  # CodeBuddy v2可选planner_replyer，正常启动生效
+  replyer_reserve_seconds: 30  # 表达预留秒数；双阶段时小于整项模型期限
   history_turns: 8  # 历史轮数1..64，保留旧历史并受预算裁剪
 output:  # 配置节，子字段见下方；保留既有校验约束
   quote_reply: false  # 固定false，直接群发

@@ -2,7 +2,7 @@
 
 返回 [PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md)。继承根 [AGENTS](../../../../AGENTS.md)。
 
-状态：planned / ready_for_medium；方案与统一指令已落盘，文档核对已通过。尚未实现、启用或部署；Git 交付提交见本轮会话回执。
+状态：implemented / pairing_pending；8项阶段回归纳入最终44项原生web/owner/记忆组合通过，另11项runner/配置通过；只改local两个计划字段，源码接续并保留并发文档提交16e718f。用户已批准整体方案，本会话唯一执行，恢复材料 state/lap47-deployment/before；方案与统一指令已落盘，文档核对已通过。尚未实现、启用或部署；Git 交付提交见本轮会话回执。
 
 目标：核对 MaiBot 的 Planner / Replyer，给现有 SnowLuma bot 制定一次落地的轻量改造方案，由用户交给 medium 实施，真实群聊由用户实测。同时按用户纠正，将 AGENTS.md 清理为长期项目准则，并原文加入“严禁过度防御性编码，严禁过度测试，严禁让整个设计落地流程分太多步骤。”
 

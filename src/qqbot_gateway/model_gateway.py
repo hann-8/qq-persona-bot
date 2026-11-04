@@ -275,6 +275,9 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
                                   'native_web_tools':__import__('qqbot_gateway.cli_web_policy',fromlist=['allowed_tools']).allowed_tools(getattr(queue.runner,'web_config',{})),
                                   'native_web_limits':{k:v for k,v in getattr(queue.runner,'web_config',{}).items() if k.startswith('cli_')},
                                   'thinking_enabled':getattr(queue.runner,'thinking_enabled',False),
+                                  'dialogue_mode_requested':getattr(queue.runner,'dialogue_mode_requested','single'),
+                                  'dialogue_mode':getattr(queue.runner,'dialogue_mode','single') if v2 else 'single',
+                                  'replyer_reserve_seconds':getattr(queue.runner,'replyer_reserve_seconds',30),
                                   'memory':{k:getattr(queue.runner,'vision_settings',{}).get('memory',{}).get(k,False) for k in ('enabled','learning_enabled','max_chars_per_group','max_group_file_bytes','max_total_bytes')},
                                   'vision':vision_status or {'enabled':bool(materials),'quality_state':'unverified'},
                                   'web_search_enabled':getattr(queue.runner,'retriever',None).cfg.get('search_enabled',False) if getattr(queue.runner,'retriever',None) else False,
@@ -481,7 +484,7 @@ def application(queue,token,ready_file=None,budget=None,max_reply_chars=1200,roo
             queue.group_usage[usage_key]=queue.group_usage.get(usage_key,0)+1
             if backend_result.generation_performed:
                 generated_key=group_request.get('addressing',group_request.get('trigger'))+':generations'
-                queue.group_usage[generated_key]=queue.group_usage.get(generated_key,0)+1
+                queue.group_usage[generated_key]=queue.group_usage.get(generated_key,0)+backend_result.parameters.get('generation_stages',1)
         elif is_media and not backend_result.web_expired:
             from .media_protocol import media_plan
             plan=backend_result.prepared_plan
@@ -535,6 +538,11 @@ def main():
     ids=[settings['bot']['qq']]+sum((settings['access'][k] for k in ('allowed_groups','admin_users','blocked_users')),[])
     runner=WebRunner(runner,Retriever(settings['web'],ids,network=settings['public_network'],root=root,bilibili=settings['bilibili'],aliases=settings['participation']['attention']['aliases']),budget,settings['output'],root)
     runner.allow_ambient_web=settings['participation']['allow_ambient_web']
+    from .dialogue import effective_mode,planner_phase
+    runner.dialogue_mode_requested=settings['chat']['dialogue_mode']
+    runner.dialogue_mode=effective_mode(settings)
+    runner.replyer_reserve_seconds=settings['chat']['replyer_reserve_seconds']
+    runner.dialogue_character=(root/'config/persona.md').read_text(encoding='utf-8')
     from .meme_catalog import MemeCatalog
     memes=MemeCatalog(root,settings['memes'])
     runner.memes=memes
@@ -546,7 +554,7 @@ def main():
     if settings['participation']['mode']=='free' and settings['participation']['attention']['enabled'] or settings['vision']['enabled'] or settings['members']['enabled'] or settings['memory']['enabled'] or settings['bilibili']['enabled']:
         from .persona import compose_persona,session_version
         from .reply_plan import digest
-        persona=compose_persona((root/'config/persona.md').read_text(encoding='utf-8'),settings['output'],settings['web'],settings['participation'],settings['memes'],settings.get('vision'),settings['members'],settings['memory'],settings.get('bilibili'))
+        persona=compose_persona((root/'config/persona.md').read_text(encoding='utf-8'),settings['output'],settings['web'],settings['participation'],settings['memes'],settings.get('vision'),settings['members'],settings['memory'],settings.get('bilibili'),phase=planner_phase(settings))
         persona_id=session_version(persona+('\n'+memes.fingerprint() if memes.cfg['enabled'] else ''),settings)
         v2=dict(mode=settings['participation']['mode'],config_version=digest(persona_id),aliases=settings['participation']['attention']['aliases'],mentions_enabled=settings['members']['mentions_enabled'],memory_enabled=settings['memory']['enabled'],learning_enabled=settings['memory']['learning_enabled'],memory_config=settings['memory'])
     from .vision import MaterialClient,context_token

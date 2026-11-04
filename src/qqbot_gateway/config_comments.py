@@ -1,5 +1,7 @@
 """Fixed Chinese vocabulary; defaults describe new installs, never migration values."""
 DESCRIPTIONS = {
+    'dialogue_mode': 'single或planner_replyer；仅CodeBuddy v2双阶段，正常启动生效',
+    'replyer_reserve_seconds': '表达预留秒数；正整数且双阶段时小于模型整项期限，默认30',
     'search_enabled': '显式启用bing_rss个人试用；逐请求正文/日期校验，质量待用户实测',
     'freshness_days': '默认近7天，1..30；本轮明确时间窗优先，正常重启生效',
     'qq_transport': '可选QQ传输；缺省NapCat，不回填旧快照；停机保存后下次受管启动生效',

@@ -9,6 +9,7 @@ def decode_envelope(raw, *, group, must_reply):
     if not isinstance(raw,str) or not raw.strip():raise ValueError('empty')
     check_decoded_tools(raw)
     body=raw.strip().lstrip('\ufeff')
+    if 'qqbot_dialogue_plan' in body:raise ValueError('internal_dialogue_plan')
     fence=re.fullmatch(r'```(?:json)?\s*\n(.*?)\n```',body,re.S|re.I)
     if fence:body=fence[1].strip()
     marker='qqbot_group_reply' if group else 'qqbot_media_reply'

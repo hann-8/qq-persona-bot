@@ -8,6 +8,7 @@ import re
 from pathlib import Path
 import subprocess
 import tempfile
+import time
 
 import psutil
 
@@ -195,22 +196,29 @@ class CLIRunner:
         """Same isolated controls and cleanup, with no user or model generation."""
         return await self._execute('', '', request_id, control_only=True)
 
-    async def run(self, system, prompt, request_id):
-        return await self._execute(system, prompt, request_id)
+    async def run(self, system, prompt, request_id, *, phase=None, deadline=None):
+        return await self._execute(system, prompt, request_id,phase=phase,deadline=deadline)
 
-    async def probe_image_contract(self, system, prompt, request_id, *, fault=None):
+    async def probe_image_contract(self, system, prompt, request_id, *, fault=None, phase=None, deadline=None):
         """Local single-user turn.step short circuit; never a business answer."""
         if fault not in (None,'missing_plugin','wrong_receipt'):raise ValueError('INVALID_PROBE_FAULT')
-        return await self._execute(system,prompt,request_id,probe=True,probe_fault=fault)
+        return await self._execute(system,prompt,request_id,probe=True,probe_fault=fault,phase=phase,deadline=deadline)
 
-    async def _execute(self, system, prompt, request_id, *, control_only=False,probe=False,probe_fault=None):
+    async def _execute(self, system, prompt, request_id, *, control_only=False,probe=False,probe_fault=None,phase=None,deadline=None):
+        started=time.monotonic()
+        timeout=min(self.timeout,deadline-started-self.cleanup_seconds) if deadline is not None else self.timeout
+        if timeout<=0:raise GatewayError('MODEL_TIMEOUT')
+        thinking=self.thinking_enabled if phase!='replyer' else False
         from .vision import CURRENT,text_budget,cli_message,wire_check,production_budget
         from .cli_web_policy import native_contract, SCOPE, PRIVATE_IDS, current_question, denied_tools
         web=getattr(self,'web_config',{})
-        native=bool(getattr(self,'native_web',False) and not control_only)
+        native=bool((getattr(self,'native_web',False) or phase=='replyer') and not control_only)
         scope=SCOPE.get()
         policy=native_contract(web,list(getattr(self,'web_private_ids',()))+list(PRIVATE_IDS.get()),text_budget(self.budget),scope[1] or current_question(prompt)) if native else None
-        if policy and not scope[0]:policy['allowed_tools']=[]
+        if policy:
+            if not scope[0] or phase=='replyer':policy['allowed_tools']=[]
+            policy['thinking_enabled']=thinking
+        if phase=='replyer' and CURRENT.get() is not None:raise GatewayError('PROTOCOL_ERROR')
         allowed=policy['allowed_tools'] if policy else []
         denied=denied_tools(self.denied,allowed)
         if control_only and CURRENT.get():raise GatewayError('PROTOCOL_ERROR')
@@ -232,7 +240,7 @@ class CLIRunner:
                     '--model',self.model,'--system-prompt-file',str(system_file),
                     '--setting-sources','none','--disallowedTools',*denied]
             if allowed:args+=['--allowedTools',*allowed]
-            local_settings={'autoCompactEnabled':False,'alwaysThinkingEnabled':self.thinking_enabled}
+            local_settings={'autoCompactEnabled':False,'alwaysThinkingEnabled':thinking}
             args += ['--settings',json.dumps(local_settings)]
             guard=None
             from .hosted_cli_budget import KIND, final_budget, framework_upper, model_terms
@@ -244,7 +252,7 @@ class CLIRunner:
                     terms=final_budget(selected_record(self.vision_settings),self.budget,system,prompt,
                         image.width,image.height,known_models().get(self.model,{})) if image else dict(T=len((system+prompt).encode()),F=framework_upper(),V=0,
                             O=model_terms(known_models().get(self.model,{}),self.budget.output)[1],C=1000000)
-                    guard=Guard(work,system,prompt,image,terms,mode='probe' if probe else 'live',denied_tools=[t for t in self.denied if t not in allowed],wire_message=image_message,native_web=policy,timeout=self.timeout)
+                    guard=Guard(work,system,prompt,image,terms,mode='probe' if probe else 'live',denied_tools=[t for t in self.denied if t not in allowed],wire_message=image_message,native_web=policy,timeout=timeout)
                 except (OSError,ValueError,KeyError,TypeError):
                     raise GatewayError('MODEL_CONFIG_UNSUPPORTED') from None
                 if probe_fault!='missing_plugin':args += ['--plugin-dir',str(guard.root)]
@@ -293,8 +301,9 @@ class CLIRunner:
                 raise GatewayError('BACKEND_UNAVAILABLE') from None
             parser = ResultParser(self.model,allowed,policy['max_calls'] if policy else 3,self.budget.limit if self.budget else 16384)
             self.last_parameters = {'model':self.model,'effort_requested':self.reasoning_effort,
-                                    'effort_effective':None,'thinking_enabled':self.thinking_enabled,'allowed_tools':allowed,'auto_compact_setting':False,
+                                    'effort_effective':None,'thinking_enabled':thinking,'allowed_tools':allowed,'auto_compact_setting':False,
                                     'forced_compact_exclusion_verified':False,'native_window':'unverified'}
+            if phase:self.last_parameters.update(phase=phase,timeout_seconds=timeout,deadline=deadline)
             self.last_parameters['effort_evidence']='auto_default' if self.reasoning_effort=='auto' else 'awaiting_current_capabilities'
             exchange = ControlExchange('get_available_models') if control_only or self.reasoning_effort != 'auto' else None
             acknowledged = asyncio.Event()
@@ -408,7 +417,7 @@ class CLIRunner:
                     process.stdin.write((json.dumps(exchange.request())+'\n').encode('utf-8'))
                     await process.stdin.drain()
                     try:
-                        await asyncio.wait_for(acknowledged.wait(), min(self.control_timeout,self.timeout))
+                        await asyncio.wait_for(acknowledged.wait(), min(self.control_timeout,timeout))
                     except TimeoutError:
                         raise GatewayError('PROTOCOL_ERROR') from None
                     if control_only:return
@@ -417,7 +426,7 @@ class CLIRunner:
                         self._native_metadata_check(system,prompt)
                     if guard:
                         try:
-                            ready_proof=await guard.ready(min(self.control_timeout,self.timeout))
+                            ready_proof=await guard.ready(min(self.control_timeout,timeout))
                             if probe:self.last_parameters['vision_guard_ready']=ready_proof
                             if probe_fault=='wrong_receipt':
                                 # Deliberately invalidate the expected identity after
@@ -450,7 +459,7 @@ class CLIRunner:
             io = [asyncio.create_task(coro()) for coro in (read_stdout,read_stderr,write_stdin)]
             generation = 'pending'
             try:
-                async with asyncio.timeout(self.timeout):
+                async with asyncio.timeout(max(0,timeout-(time.monotonic()-started)) if deadline is not None else timeout):
                     await asyncio.gather(*io,process.wait())
                 if guard:
                     try:self.last_parameters['vision_guard']=guard.finish()

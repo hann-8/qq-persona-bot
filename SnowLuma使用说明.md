@@ -1,5 +1,9 @@
 # SnowLuma 日常使用
 
+LAP-47：本机 CodeBuddy v2 已选择 Planner → Replyer：先理解群聊、准备事实/工具/图片与记忆动作，再根据真实聊天写正文；可沉默时仅 Planner。发言最多两个业务阶段，共用原 120 秒期限，没有第三次修复调用；会增加一次模型调用与用量，真实自然感和延迟待用户群测。人设仍只编辑 `config/persona.md`。
+
+`config/local/chat.yaml` 的 `chat.dialogue_mode` 可选 `single`（缺省）或 `planner_replyer`；`chat.replyer_reserve_seconds` 默认 30。保存后正常启动加载，Ollama 与旧接口保持 single。只读 health 显示请求/实际模式；回退需按原机制完成当前技术配对再重启，不关闭原识图等能力。
+
 当前QQ以本工作根为主线；进度见[PROGRESS](PROGRESS.md)，从旧bot迁来的使用差异见[实际对照](docs/BOT_USAGE_COMPARISON.md)。
 
 1. 双击本文件旁的 **启动机器人.cmd**。脚本自动准备连接并启动缺少的组件、专用QQ和官方Snow，打开本机管理页。再次双击会复用已有实例。

@@ -149,10 +149,17 @@ def probe_valid(root, settings, trial=False):
         if not isinstance(name,str) or not re.fullmatch('probe-[a-f0-9]{32}\\.json',name):return False
         journal=Path(root)/(JOURNALS if trial else 'state/lap42-vision-closure')/name
         rows=read_json(journal)
-        if sha(journal.read_bytes())!=item.get('journal_sha256') or not isinstance(rows,list) or len(rows)!=3:return False
-        if ([r.get('fault') for r in rows]!=[None,'missing_plugin','wrong_receipt'] or
+        from .dialogue import effective_mode
+        dual=effective_mode(settings)=='planner_replyer'
+        if sha(journal.read_bytes())!=item.get('journal_sha256') or not isinstance(rows,list) or len(rows) not in ((4,) if dual else (3,4)):return False
+        if ([r.get('fault') for r in rows[:3]]!=[None,'missing_plugin','wrong_receipt'] or
             any(r.get('state')!='verified' for r in rows) or
-            [r.get('users') for r in rows]!=[1,0,0]):return False
+            [r.get('users') for r in rows[:3]]!=[1,0,0]):return False
+        if len(rows)==4:
+            reply=rows[3];parameters=reply['parameters'];reply_proof=reply['result']['guard']
+            if (reply.get('phase')!='replyer' or reply.get('users')!=1 or parameters.get('thinking_enabled') is not False or
+                parameters.get('allowed_tools')!=[] or reply_proof.get('next_calls')!=0 or
+                reply_proof.get('mode')!='probe' or reply_proof.get('transcript_verified') is not True):return False
         proof=rows[0]['result']['guard']
         if (proof.get('mode')!='probe' or proof.get('next_calls')!=0 or proof.get('transcript_verified') is not True or
             not {'ready','composed','context_cleared','probe_short_circuit'}.issubset(proof.get('stages',[])) or

@@ -27,8 +27,8 @@ async def probe(root,settings,journal,trial=False):
     out=io.BytesIO();Image.new('RGB',(24,16),'red').save(out,format='PNG')
     blob=normalize(out.getvalue());rows=[]
     from scripts.activate_lap42_vision import atomic
-    for fault in (None,'missing_plugin','wrong_receipt'):
-        row=dict(fault=fault,state='started',users=0)
+    for phase,fault in (('planner',None),('planner','missing_plugin'),('planner','wrong_receipt'),('replyer',None)):
+        row=dict(phase=phase,fault=fault,state='started',users=0)
         rows.append(row);atomic(journal,json.dumps(rows).encode())
         from copy import deepcopy
         runner_settings=deepcopy(settings)
@@ -37,11 +37,12 @@ async def probe(root,settings,journal,trial=False):
         # current record, final budget, wire, tools and zero-next short circuit.
         if trial:runner_settings['vision']['enabled']=False
         runner=create_runner(root,runner_settings,InputBudget.from_settings(settings))
-        token=CURRENT.set(NativeImage(blob,4096,time.monotonic()+60,time.monotonic()+15))
+        token=CURRENT.set(NativeImage(blob,4096,time.monotonic()+60,time.monotonic()+15) if phase=='planner' else None)
         try:
             try:
                 result=await runner.probe_image_contract('Project policy 中文🙂 {{literal}}\nDo not generate.',
-                    'Synthetic local image probe.', 'lap42-probe-'+str(fault),fault=fault)
+                    'Synthetic local image probe.', 'lap42-probe-'+phase+'-'+str(fault),fault=fault,
+                    phase=phase,deadline=time.monotonic()+60)
             except GatewayError as error:
                 row.update(state='failed',users=runner.user_messages_sent,error=error.code)
                 row['rejection']=runner.last_parameters.get('vision_rejection')
@@ -69,12 +70,17 @@ async def probe(root,settings,journal,trial=False):
             if fault is None and (not result.get('local_probe') or result['guard']['next_calls']!=0):
                 raise ValueError('CLI_PROBE_GENERATION_UNKNOWN')
             row.update(state='verified',users=runner.user_messages_sent,result=result)
+            row['parameters']=dict(runner.last_parameters)
+            if phase=='replyer' and (row['parameters']['thinking_enabled'] or row['parameters']['allowed_tools'] or CURRENT.get() is not None):
+                raise ValueError('REPLYER_CAPABILITY_MISMATCH')
             atomic(journal,json.dumps(rows).encode())
         finally:
             CURRENT.reset(token);await runner.cleanup_close()
     value=dict(schema_version=2,binding=binding(settings,runtime_identity(root,settings)),
         assets_signature=assets_signature(),passed=True,positive_local_users=rows[0]['users'],
-        positive_next_calls=rows[0]['result']['guard']['next_calls'],negative_users=[r['users'] for r in rows[1:]],
+        positive_next_calls=rows[0]['result']['guard']['next_calls'],negative_users=[r['users'] for r in rows[1:3]],
+        replyer_zero_generation=dict(users=rows[3]['users'],next_calls=rows[3]['result']['guard']['next_calls'],
+            thinking_enabled=rows[3]['parameters']['thinking_enabled'],allowed_tools=rows[3]['parameters']['allowed_tools'],image=False),
         real_generations=0,stages=rows[0]['result']['guard']['stages'],timestamp=time.time(),
         journal=journal.name,journal_sha256=__import__('hashlib').sha256(journal.read_bytes()).hexdigest())
     return value

@@ -2,6 +2,8 @@
 # 同目录五文件共同组成配置；其他文件见config/README.md。
 # 本机config/local不提交；保存后下次正常启动生效，不热更新。
 chat:  # 配置节，子字段见下方；保留既有校验约束
+  dialogue_mode: single  # CodeBuddy v2可选planner_replyer，正常启动生效
+  replyer_reserve_seconds: 30  # 表达预留，正整数且双阶段时小于整项模型期限
   history_turns: 8  # 历史轮数1..64，保留旧历史并受预算裁剪；新装默认 8
   user_cooldown_seconds: 5  # 同人冷却秒0..3600；新装默认 5
   session_queue_limit: 2  # 会话排队数0..100；新装默认 2

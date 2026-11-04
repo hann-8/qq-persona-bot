@@ -16,7 +16,7 @@ sys.path[:0]=[str(ROOT/'src'),str(ROOT/'tests'),str(ROOT)]
 def check(root):
     import os
     os.environ['QQBOT_TEST_ASTRBOT_SITE']=str(root/'runtime/astrbot-tool/astrbot/Lib/site-packages')
-    modules=('test_lap43','test_cli_native_web','test_lap44_memory')
+    modules=('test_lap43','test_cli_native_web','test_lap44_memory','test_dialogue')
     result=unittest.TextTestRunner(verbosity=1).run(unittest.defaultTestLoader.loadTestsFromNames(modules))
     from qqbot_gateway.vision import adapter_signature
     from qqbot_gateway.vision_capabilities import digest,selected_record
@@ -31,7 +31,8 @@ def check(root):
     from qqbot_gateway.persona import compose_persona
     budget=budget_check(root,settings)
     static=static_diagnostics(settings,runtime_identity(root,settings))
-    system=compose_persona((root/'config/persona.md').read_text(encoding='utf-8'),settings['output'],settings['web'],settings['participation'],settings['memes'],settings['vision'],settings['members'],settings['memory'])
+    from qqbot_gateway.dialogue import planner_phase
+    system=compose_persona((root/'config/persona.md').read_text(encoding='utf-8'),settings['output'],settings['web'],settings['participation'],settings['memes'],settings['vision'],settings['members'],settings['memory'],phase=planner_phase(settings))
     native=final_budget(selected_record(settings),InputBudget.from_settings(settings),system,
         json.dumps(member_source('合成当前图片问题',settings['participation']['attention']['aliases']),ensure_ascii=False)+
         'x'*6000+json.dumps(__import__('qqbot_gateway.meme_catalog',fromlist=['MemeCatalog']).MemeCatalog(root,settings['memes']).candidates(''),ensure_ascii=False),1000,1000)

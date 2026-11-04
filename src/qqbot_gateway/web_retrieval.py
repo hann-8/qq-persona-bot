@@ -346,6 +346,15 @@ class WebRunner:
             notice='图片准备已超时，这次没有送入模型，请稍后再试。'
             return BackendResult(notice,prepared_plan=ReplyPlan('answer',(notice,),notice,fallback_reason='local_image_prepare_timeout'),generation_performed=False)
         source=json.loads(json.loads(prompt)[-1]['content'])
+        if getattr(self,'dialogue_mode','single')=='planner_replyer':
+            from .dialogue import run
+            from .cli_web_policy import SCOPE
+            target=next(r['text'] for r in source['messages'] if r['seq']==source['target_seq'])
+            token=SCOPE.set((bool(source['web_anchor']) and (request['must_reply'] or getattr(self,'allow_ambient_web',True)),target))
+            try:result=await run(self,system,prompt,request_id,request,source)
+            finally:SCOPE.reset(token)
+            self.runner.last_parameters=result.parameters
+            return self.finish_native_v2(result,request,source,source['web_anchor'])
         question=source['web_anchor'] if request['must_reply'] or getattr(self,'allow_ambient_web',True) else None
         from .bilibili_policy import LINK,BARE
         if question and (LINK.search(question) or BARE.search(question)):
@@ -395,6 +404,13 @@ class WebRunner:
         token=SCOPE.set((bool(question),target))
         try:result=await self.guarded(self.runner.run(system,prompt,request_id))
         finally:SCOPE.reset(token)
+        return self.finish_native_v2(result,request,source,question)
+
+    def finish_native_v2(self,result,request,source,question):
+        from dataclasses import replace
+        from .turn_v2 import plan
+        from .cli_web_policy import source_urls
+        if result.prepared_plan is not None or result.web_expired:return result
         proof=result.parameters.get('native_web',{})
         if not proof.get('calls'):return result
         try:
@@ -408,14 +424,16 @@ class WebRunner:
             if reply and decision=='speak':
                 allowed=set(proof.get('urls',[]))
                 if any(u not in allowed for u in source_urls(reply.canonical_text)):
-                    return self.local_failure(request,'本次联网来源无法核对，没有采用这次答复。')
+                    failure=self.local_failure(request,'本次联网来源无法核对，没有采用这次答复。')
+                    return replace(failure,usage=result.usage,parameters=result.parameters,generation_performed=result.generation_performed)
                 # URLs stay internal; the user's answer does not need a source footer.
                 sources=[dict(url=u) for u in proof.get('urls',[])]
                 return replace(result,text=reply.canonical_text,prepared_plan=reply,response_to_seq=response,
                                memory_aux=aux,web_evidence=tuple(dict(url=s['url'],engine='codebuddy_cli',tool_calls=proof['calls'],result_bytes=proof['result_bytes'],sha256=proof['sha256']) for s in sources))
             return replace(result,text=json.dumps(raw,ensure_ascii=False),memory_aux=aux)
         except (ValueError,TypeError,KeyError,WebFailure):
-            return self.local_failure(request,'本次联网答复未通过格式或来源检查。')
+            failure=self.local_failure(request,'本次联网答复未通过格式或来源检查。')
+            return replace(failure,usage=result.usage,parameters=result.parameters,generation_performed=result.generation_performed)
 
     def local_failure(self,request,notice):
         from .backends import BackendResult
