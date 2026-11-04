@@ -1,3 +1,5 @@
+当前活动任务：[LAP-47 群聊理解与自然表达分离](tasks/LAP-47/HANDOFF.md)，已规划、待 medium；[详规](tasks/LAP-47/PLAN.md) / [统一实施指令](tasks/LAP-47/MEDIUM_START.md)。本轮仅七份文档与 AGENTS 准则清理，未实现或操作运行态。用户提交指令后 medium 一轮完成改造/必要检查/受管部署/Git，用户自行群测。
+
 2026-11-03 LAP-46已实现并受管部署main：WebSearch/read别名冲突、内部并行步骤和正文恢复已修；内容审查/来源尾巴移除，思考low开启，搜索/图片预算已扩大加载。QQ running/connected/ready、无当前错误或待重启，记忆/识图保持。实际质量待用户自然群测，无新增常驻原文日志。[结果](tasks/LAP-46/RESULT.md) / [交接](tasks/LAP-46/HANDOFF.md)。
 
 2026-11-01 LAP-45七天日志已实现、启用和受管加载，当前用户每小时/登录任务实际执行成功。11项日志专项10通过/1权限跳过，24桌面和34兼容通过，CLI零生成配对通过；QQ connected/ready、微信11229正常，管理页跟随官方5101。本地仍仅SnowLuma main；[结果](tasks/LAP-45/RESULT.md) / [交接](tasks/LAP-45/HANDOFF.md)。
