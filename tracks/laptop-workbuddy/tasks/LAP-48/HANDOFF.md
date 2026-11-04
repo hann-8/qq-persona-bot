@@ -1,21 +1,24 @@
-# LAP-48 记忆、联网早失败与大肥鱼角色表达
+# LAP-48 最终交接：QQ整块记忆、联网薄适配与指定人设
 
-返回 [PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md)。继承根 [AGENTS](../../../../AGENTS.md)。
+返回 [PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md)，继承 [AGENTS](../../../../AGENTS.md)。
 
-状态：planned / awaiting_review，2026-11-04 19:54（Asia/Shanghai）。[独立评审稿](REVIEW.md) / [详细设计](PLAN.md) 已完成。用户只授权本轮规划；当前会话是唯一文档写入者，无代理。用户反馈后修订，确认后提供 medium 指令；不自动实施，也未创建 MEDIUM_START。
+状态：planned / ready_for_medium，2026-11-04 20:25（Asia/Shanghai）。用户已明确修改并要求完成直接给medium指令，由其手动落地，不再追加review。入口：[最终评审](REVIEW.md) / [最终设计](PLAN.md) / [实施指令](MEDIUM_START.md) / [指定人设备稿](PERSONA_RESTORE.md)。规划方不自动实施、派代理或切模型。
 
-目标：按成员组织记忆并减少无意义模型输入；修复联网早失败并贯通三分钟运行预算；用户追加“成功保存不在聊天说出来”和“恢复大肥鱼人设，保留拆分后自然感”均已纳入。
+最终选择：
+- QQ号是QQ群友唯一键，name展示，memory无编号数组；按变化成员/group/unassigned整块替换，省略不改、空数组清空。用户明确不要rN/mN或逐条定位，不用下标/hash换皮恢复。
+- 同块完全相同文字可轻量去重，语义相近由原Planner看全文合并；无额外调用/向量库/准确率门槛。
+- 官方tool.call薄适配，删除第二计划、逐步完整历史/prefix/阶段齐全及固定10步门槛。8次真实执行和现容量作为可调预算，正常网站/预算错误给模型收尾，不毒化全任务；180秒两阶段共享、表达30/清理5、provider派生235秒。
+- 成功/无变化不改正文、不播报保存；明确记忆请求失败才反馈。实际结果内部保留。
+- 人设精确选ff2e348，删第十三节及开头指向它的说明，顺排说明序号；第1～12节其余角色文字保留。两阶段仍读同一人设，清理通用风格冲突，首稿439字候选废止。
 
-基线：main / `31945062e726b4b98a8b6717d4315063537581d0`，开始实时 origin/main 相同。仅有用户未跟踪 `启动机器人_workbuddyDeepseek.bat`，保留、不执行、不提交。旧 QQbot 是空 cwd；实际工作根为 QQbot_Snowluma，独立 WeChatbot 不在本次范围。
+证据：天气样例CLI trace 7c84eda6a5为tool_plan_missing→native_ready，本地拒绝非总超时；后续天气属另一任务，具体原始SDK顺序未留摘要。当前旧HMAC关联只读核对一群5/5、另一群2/3，有一位待关联；保留unassigned及内部legacy_links，不猜QQ不阻塞部署。QQ号/key/原文未输出或提交。运行中的自然记忆写入及用户后续名单变化不由本轮覆盖。
 
-决定：一个 schema3 memory.json 按“成员名 · mN”分层、rN 精确改删，元数据/长身份映射集中 _meta 且不入模型，全文范围不缩减；成功/无变化不追加回执。信任锁定 SDK 官方 tool.call，去掉第二份计划匹配前提；180 秒两阶段共享、表达预留30、清理5，Planner约145秒，provider由30+180+25推导为235秒。角色候选见 REVIEW，恢复具体性格/称呼/米与水池设定并明确 Replyer 表达职责，不增加固定台词/配额。
+人设备稿：源ff2e348d236613ab74990edd3386dafb06b149ed，备稿8,896字符/17,575 UTF-8字节，SHA256 82a9378d450388a8c08cb30481ee42c8666c3a4b8758293a014d243a75ced430；当前运行短稿仍1,502字节。备稿增加后续输入成本，不能声称去掉编号的节省抵消它。PERSONA_RESTORE只是交接文档，不是第二个运行配置。
 
-证据：19:27:03天气问题、19:27:12失败，CLI trace 7c84eda6a5 记录 tool_plan_missing → native_ready，不是 MODEL_TIMEOUT；首次失败投递与19:27:39天气答复属于两项任务。具体 SDK 原始顺序未留在摘要，不能确定并行/流式/内嵌哪一种；不把本例推及所有故障。两阶段人设都已接线，原 9,585 字压为514字；日志有角色口吻和重复颜文字，用户报告拆分更拟人、角色变淡。候选439字（未计标题），具体表达效果待用户 review/群测。
+归属：当前会话唯一文档写入者，无代理。首稿交付e81c15e；本次修订起点main/e81c15e与实时origin/main一致，仅原用户未跟踪启动bat保留。此次只拥有八文档：PROGRESS、工作线HANDOFF/TASKS、本目录HANDOFF/REVIEW/PLAN/MEDIUM_START/PERSONA_RESTORE。没有改源码、local、运行persona或实际记忆，没有启停、真实模型/搜索或QQ/微信测试消息。独立WeChatbot不操作；本根已有WX-Akasha映射纳入实施兼容范围。
 
-本轮归属仅 PROGRESS、工作线 HANDOFF/TASKS 和本目录 HANDOFF/REVIEW/PLAN。只读当前源码、锁定 CLI 源码/随包官方文档、必要忽略日志/只读任务台账、health和记忆结构统计；不改运行配置/人设/实际记忆，不启停，不调用真实模型/搜索或发送消息。共用 WX-Akasha actor_links/namespace_override 在实施兼容范围内，独立 WeChatbot 不操作。当前 bot 自然运行写入不归本轮改动。
+验证：八文档295个本地链接、两处JSON示例及QQ整块结构通过；备稿与指定版本仅删第十三节/失效说明并顺排说明编号的转换逐字节相符；入口/medium链接和Git范围通过，git diff --check无空白错误。只改八份Markdown，不跑实现测试，不把只读状态当真实质量验收。
 
-验证：归属六文档的281个本地链接均存在、两处JSON示例可解析、双向入口和review先行边界通过；git diff --check通过。源码/运行配置/实际人设/记忆均未由本会话修改，不跑实现测试，不把只读health当成功验收。候选角色正文439字已独立计算，未声称一定增加或减少总模型费用。
+Git：仅提交八份归属Markdown，说明“docs: finalize LAP-48 QQ memory and medium handoff”；最终SHA以本轮回执/git log为准，commit/push并核对main实时远端一致后释放文档归属，未跟踪用户bat不提交。
 
-Git交付仅六份归属Markdown，提交说明 `docs: plan LAP-48 memory, web reliability and persona improvements`；最终SHA以本轮回执/git log为准。commit/push并核对main远端一致后释放文档归属；用户未跟踪bat继续保留，不提交。
-
-下一步：用户 review REVIEW；有反馈修改两稿。确认后给与最终方案一致的一份 medium 指令，用户手动交接；实施按 PLAN 一次落地/必要检查/启用部署/Git，不追加历史大矩阵或真实测试样本。
+下一步：用户手动把MEDIUM_START交给medium。实施同轮完成实现/必要回归/迁移/当前零生成技术配对/启用受管部署/Git，质量由用户群测；不重开规划、不补历史大矩阵、不增加审批或真实样本。
