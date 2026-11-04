@@ -2,28 +2,14 @@
 
 返回 [PROGRESS](../../../../PROGRESS.md) / [工作线](../../HANDOFF.md) / [TASKS](../../TASKS.md)。继承根 [AGENTS](../../../../AGENTS.md)。
 
-状态：implemented / pairing_pending；8项阶段回归纳入最终44项原生web/owner/记忆组合通过，另11项runner/配置通过；只改local两个计划字段，源码接续并保留并发文档提交16e718f。用户已批准整体方案，本会话唯一执行，恢复材料 state/lap47-deployment/before；方案与统一指令已落盘，文档核对已通过。尚未实现、启用或部署；Git 交付提交见本轮会话回执。
+状态：implemented_and_deployed / ready_for_user_test，2026-11-04（Asia/Shanghai）。用户整体授权已执行，本会话唯一实施/配对/受管启停执行者，无代理。详见 [实际结果](RESULT.md) / [批准方案](PLAN.md)。
 
-目标：核对 MaiBot 的 Planner / Replyer，给现有 SnowLuma bot 制定一次落地的轻量改造方案，由用户交给 medium 实施，真实群聊由用户实测。同时按用户纠正，将 AGENTS.md 清理为长期项目准则，并原文加入“严禁过度防御性编码，严禁过度测试，严禁让整个设计落地流程分太多步骤。”
+CodeBuddy v2 已启用 Planner → Replyer，同队列/账号/120秒期限，表达预留30秒；silent一次、speak最多两业务阶段，Replyer无思考/工具/图片且无控制权限。最终回到原v2及记忆保存/回执、来源/身份/ACK边界，原能力保留。人设已精简，原版与精确local/配对备份在 state/lap47-deployment/before；没有新配置入口、常驻原文日志或第三次模型调用。
 
-本轮 session：LAP-47-maibot-dialogue-plan，2026-11-04 18:30（Asia/Shanghai），当前会话唯一文档写入者；不派代理。
+必要验证：8项新回归纳入最终44项组合全部通过，另11项runner/配置通过。真实锁定CLI Planner正反及Replyer零生成检查通过，远端生成0；原activate已完成，绑定0bd1ad4a33de4f2506900bbfe27df3dd38b11a6bceff53711815b3efa3d1e46a，质量仍pending_user_test。
 
-安全检查点：主线 `main`，HEAD / 实时 origin/main 均为 `31e9adc6f41ed5c01c87506400de1aa7264edd0f`。已有用户未跟踪文件 `启动机器人_workbuddyDeepseek.bat` 保留，不执行、不提交。未发现其他已跟踪差异。
+当前独立status/health：running、connected、可收群消息、router_ready=true、current_error=null、pending_restart=false、source_changed=false；实际planner_replyer/30、Planner thinking=true/low，原两web工具预算、识图、记忆读写保持。没有代用户群聊验收，也没有主动真实生成/搜索质量样本或测试消息。
 
-归属：根 AGENTS.md、PROGRESS.md、工作线 HANDOFF.md / TASKS.md、本目录 HANDOFF.md / PLAN.md / MEDIUM_START.md。不修改源码、配置、人设、状态或历史交付记录；不启停、不登录、不调用真实模型或发消息。
+Git：实现78da4ea及最终修正6879b7c已从codex/lap47-dialogue快进main，后续交付同步结果/入口并push核对；清理已合入临时分支。起点接续另一session文档提交16e718f，保留其“后续max设计先交简练review、用户手动交medium”的准则，本次批准方案未改。原未跟踪启动机器人_workbuddyDeepseek.bat保留、不执行、不提交；local仅新增两个计划字段，其余语义不变；独立WeChatbot/旧QQbot未操作。
 
-成果：[完整计划](PLAN.md) / [统一 medium 指令](MEDIUM_START.md)。本轮共七份文档，不改源码、local 或人设内容。
-
-已核对：根准则、PROGRESS、工作线入口、LAP-46 当前交接；MaiBot main 固定参考提交 `c6429547af711555e3d4d1b8d04b413572cb616c`，实际 Planner/reply_reference/真实聊天输入/Replyer 分工与过滤代码已读。当前项目的 persona、v2、WebRunner/CLIRunner/ModelQueue、记忆和技术绑定接点已核对；本机配置仅读取非秘密参数投影。
-
-决定：CodeBuddy v2 同任务内 Planner → Replyer，silent 一阶段、speak 最多两阶段；表达不重复工具/像素/记忆决策。共享现有 120 秒整项运行期限，表达默认预留 30 秒；精简 9,585 字符的人设，保留角色，删除机械配额。只新增 chat.dialogue_mode 与 chat.replyer_reserve_seconds。Ollama/旧接口保留单阶段，独立 WeChatbot 根不动。
-
-AGENTS 已去掉部署/排查流水账，保留长期准则，原文加入用户三条禁止要求；当前与历史任务进度继续由 PROGRESS、任务交接和 Git 承接。本次方案不写成 AGENTS 进度。
-
-实施授权边界：用户提交 MEDIUM_START 后一轮实现、启用两个 local 字段、精简人设、必要离线/零生成配对、受管部署和 Git。agent 不主动真实生成/搜索服务质量测试/QQ或微信测试消息；真实自然感、事实保持和延迟由用户实测。旧大矩阵/六例 IQ 不作本次前置。
-
-验证：七份归属文档的差异与合同已核对，33 个新增/本地引用均可达，git diff --check 通过；AGENTS 原文要求存在、日期流水账已移除。不运行行为测试，不探测模型，不查询当前进程健康，不把前日部署健康当本轮事实。功能与实际两阶段 CLI 延迟均未验证。
-
-下一步：用户将统一指令交给 medium。从 AGENTS/PROGRESS 进入本任务即可；无需重做 MaiBot 全库调研或再拆规划审批。本轮归属在文档提交推送交付后释放，原用户未跟踪 bat 继续保留。
-
-后续工作流修订：用户明确本次47规划保持原样，不补评审稿；以后的 max及以上设计完成后先交单份简练、易读且保留关键信息的 Markdown review，按反馈修改，确认后由用户连同实施指令手动交给 medium。该长期准则已写入 AGENTS 的“规划与实施”，本任务 PLAN/MEDIUM_START 不改。此次仅 AGENTS、TASKS、本 HANDOFF 三份文档，起点 main/778b2aa；无代码/配置/运行操作，不运行行为测试。Git 交付后释放文档归属，仍保留用户未跟踪 bat。
+下一步：用户自行群测真实自然感、事实保持和延迟；有实际问题续LAP-47，不重做历史大矩阵/六例IQ或追加质量审批。当前实现归属在Git交付核对后释放。回退见RESULT，只恢复本任务精确变化，不覆盖后续配置或清记忆。

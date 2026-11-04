@@ -1,3 +1,7 @@
+2026-11-04 LAP-47 completed / ready_for_user_test：本会话实现78da4ea已快进main并完成当前技术配对/受管启动，实际connected/ready、双阶段/原能力加载、无待重启。44项最终组合及另11项runner/配置通过；Planner正反/Replyer真实CLI零生成通过，0远端生成。结果/HANDOFF与入口已同步；Git交付后释放归属并清理短期分支，真实自然感/延迟待用户实测。保留另一session文档16e718f和用户未跟踪bat。[结果](tasks/LAP-47/RESULT.md)。
+
+2026-11-04 LAP-47 配置状态展示归属补充：scripts/manage.py 仅纠正原硬编码“CLI思考关闭”，显示health实际思考与请求/实际对话模式；不改变启停或身份判断。config/README.md同步两字段说明。
+
 2026-11-04 LAP-47 implementation：当前会话为唯一实现/配对/受管部署执行者，无代理。用户已批准整体PLAN，本根短期分支 codex/lap47-dialogue，起点main/778b2aa与实时origin/main一致；仅用户未跟踪启动bat保留、不执行、不提交。归属PLAN第6节的源码/阶段提示、persona、两字段模板与注释、tests/test_dialogue.py、既有probe/revalidate必要接点、使用说明、本任务RESULT/HANDOFF/PLAN及PROGRESS/工作线HANDOFF/TASKS；忽略归属state/lap47-deployment精确备份、本机chat两字段、当前技术配对。其他local/秘密/图库/记忆/其他根不改，不主动真实生成/搜索质量或发消息。
 
 LAP-47 文档续作，2026-11-04，session `LAP-47-maibot-dialogue-plan`：用户要求未来采用“max及以上设计 → 单份简练 Markdown review → 按反馈修改 → 用户手动连同指令交给 medium”的流程，本次47规划豁免、不补评审稿。当前会话仅拥有 AGENTS.md、本 TASKS 与47 HANDOFF；起点 main/778b2aa，用户未跟踪启动 bat 保留，不改47方案或运行态。完成文档核对与 Git 交付后释放归属。

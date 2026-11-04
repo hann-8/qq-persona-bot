@@ -1,4 +1,4 @@
-当前活动任务：[LAP-47 群聊理解与自然表达分离](tasks/LAP-47/HANDOFF.md)，已规划、待 medium；[详规](tasks/LAP-47/PLAN.md) / [统一实施指令](tasks/LAP-47/MEDIUM_START.md)。本轮仅七份文档与 AGENTS 准则清理，未实现或操作运行态。用户提交指令后 medium 一轮完成改造/必要检查/受管部署/Git，用户自行群测。
+当前活动任务：**LAP-47 已实现、启用并受管部署，ready_for_user_test**（2026-11-04）。Planner→Replyer/120秒共享/表达预留30秒与精简人设已加载，原能力保持；最终44项组合及另11项runner/配置通过，真实CLI两阶段零生成配对/activate通过。当前running/connected/可收消息/router_ready、无当前错误或待重启。真实自然感/延迟待用户实测。[结果](tasks/LAP-47/RESULT.md) / [交接](tasks/LAP-47/HANDOFF.md) / [方案](tasks/LAP-47/PLAN.md)。
 
 2026-11-03 LAP-46已实现并受管部署main：WebSearch/read别名冲突、内部并行步骤和正文恢复已修；内容审查/来源尾巴移除，思考low开启，搜索/图片预算已扩大加载。QQ running/connected/ready、无当前错误或待重启，记忆/识图保持。实际质量待用户自然群测，无新增常驻原文日志。[结果](tasks/LAP-46/RESULT.md) / [交接](tasks/LAP-46/HANDOFF.md)。
 
