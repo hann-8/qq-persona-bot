@@ -1,3 +1,5 @@
+2026-11-07 OPS-ASTRBOT-PASSWORD：AstrBot 管理密码已重置，单组件受管重启及本机登录验证通过；[交接](tracks/laptop-workbuddy/tasks/OPS-ASTRBOT-PASSWORD/HANDOFF.md)。
+
 当前活动任务：**LAP-48 implemented_and_deployed / ready_for_user_test**（2026-11-04）。QQ号schema3整块记忆、静默成功保存、官方联网薄适配/180秒共享/实际provider235及指定完整人设已启用；39条有效旧记忆保留、1条待关联，原0字节退役文件不动。36＋11＋1项定向检查与当前CLI零生成配对通过；最终running/connected/可收消息/router_ready、无错误或待重启。真实搜索/角色/群聊质量交用户自然群测。[结果](tracks/laptop-workbuddy/tasks/LAP-48/RESULT.md) / [交接](tracks/laptop-workbuddy/tasks/LAP-48/HANDOFF.md)。
 
 2026-11-03 当前交付：**LAP-46整体CLI搜索/表达与图片预算已实现部署，待用户群测**。修复WebSearch别名read被Read deny误关、工具并行步骤误拒绝及正文格式恢复；去掉内容黑名单/来源尾巴，开启思考low，放宽搜索和图片预算。实际running/connected/可收消息、router_ready，current_error=null、pending_restart=false；原能力/配置保护保持，无新增常驻详细日志。[结果](tracks/laptop-workbuddy/tasks/LAP-46/RESULT.md) / [交接](tracks/laptop-workbuddy/tasks/LAP-46/HANDOFF.md)。

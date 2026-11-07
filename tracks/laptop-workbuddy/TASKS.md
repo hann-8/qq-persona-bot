@@ -1,3 +1,5 @@
+2026-11-07 OPS-ASTRBOT-PASSWORD：AstrBot 管理密码已重置，单组件受管重启及本机登录验证通过；[交接](tasks/OPS-ASTRBOT-PASSWORD/HANDOFF.md)。
+
 2026-11-04 LAP-48 implemented_and_deployed / ready_for_user_test：本会话唯一实施/迁移/配对/受管启停者已完成；36＋11＋1定向检查、当前CLI零生成一轮、39条迁移及部署终检通过。归属PLAN第7节实现/测试/文档及scripts/deploy_lap48.py、scripts/manage.py、scripts/lap42_rollout.py、tests/test_lap48_deployment.py与当前配对。仅local CLI180/实际provider235及指定人设变化，原用户bat保留；质量待用户自然群测，Git核对后释放实施归属。
 
 2026-11-04 20:07续领、20:25 LAP-48 planned / ready_for_medium：同一session LAP-48-memory-web-plan，当前会话唯一文档写入者，无代理。用户最终选择QQ号唯一键，删除rN/mN/逐条接口、按成员整块整理，语义去重交原Planner；指定ff2e348人设删第十三节及失效说明；联网再次强调不防御，最终删除重复计划/完整历史/阶段/固定10步门槛，预算错误普通收尾。用户要求修订后直接给medium指令，无新增review。main/e81c15e与开始实时origin/main一致，保留用户未跟踪bat。归属八文档：PROGRESS、工作线HANDOFF/TASKS、本任务HANDOFF/REVIEW/PLAN/MEDIUM_START/PERSONA_RESTORE；只读/文档，不改代码/local/运行persona/记忆，不启停/真实模型/搜索/消息。[指令](tasks/LAP-48/MEDIUM_START.md) / [交接](tasks/LAP-48/HANDOFF.md)。
