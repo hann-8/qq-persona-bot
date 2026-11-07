@@ -1,17 +1,17 @@
 {
-  "adapter_signature": "214b7708af1eb3ecd90468fa36ef43ddc8592b526c509372a1a3d470780a3bc8",
-  "binding": "b2212e35cf2cf84593eea38969cc5010c201f8e73cf128f703439eeed19285b7",
+  "adapter_signature": "b9f7697411ebfca1af568ef5831f728e09f8e458170e0aed380f54012e98593b",
+  "binding": "948760766dec9127528fd6dfc7d343ae4d07406beed02133395cb1a0d80556f1",
   "budget": {
-    "final_visible_policy_bytes": 27856,
+    "final_visible_policy_bytes": 14182,
     "limit": 524288,
     "member_candidates": 8,
     "memory_records": 8,
     "output_reserve": 2048,
     "overhead": 2048,
     "passed": true,
-    "persona_bytes": 17575,
-    "persona_sha256": "82a9378d450388a8c08cb30481ee42c8666c3a4b8758293a014d243a75ced430",
-    "system_bytes": 22793
+    "persona_bytes": 3901,
+    "persona_sha256": "e8479c883c0754e0ec3d7e64add9f1215233948468b07711b184c3d3098c148f",
+    "system_bytes": 9119
   },
   "files": {
     "reports/lap-42-vision-closure-sources.json": "7c24fa759b061c28e2dfc07e0a5d4195a10eaecdec18c5c190effa8119e4e640",
@@ -26,7 +26,7 @@
     "C": 1000000,
     "F": 8985,
     "O": 128000,
-    "T": 30253,
+    "T": 16579,
     "V": 1024
   },
   "passed": true,

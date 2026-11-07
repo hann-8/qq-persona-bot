@@ -1,6 +1,6 @@
 2026-11-07 OPS-ASTRBOT-PASSWORD：AstrBot 管理密码已重置，单组件受管重启及本机登录验证通过；[交接](tracks/laptop-workbuddy/tasks/OPS-ASTRBOT-PASSWORD/HANDOFF.md)。
 
-当前活动任务：**LAP-49 planned / awaiting_user_review**（2026-11-07）。以LAP-47短稿为底，保留大肥鱼特征及原15组64条颜文字素材，去掉固定表演要求；候选3,901字节，当前运行稿17,575字节。本轮仅文档，运行人设/代码/配置/进程不动。[评审](tracks/laptop-workbuddy/tasks/LAP-49/REVIEW.md) / [候选人设](tracks/laptop-workbuddy/tasks/LAP-49/PERSONA_DRAFT.md) / [交接](tracks/laptop-workbuddy/tasks/LAP-49/HANDOFF.md)。
+当前活动任务：**LAP-49 implemented / stopped_for_user_start**（2026-11-07）。确认稿已原样替换运行人设（3,901字节、15组64条颜文字），36项定向检查及Planner/Replyer零生成配对通过；识图技术配对已更新，原配置/记忆/图库保持。按用户要求未启动bot，最终AstrBot/model/gate均0；真实加载/群聊质量待用户手动启动实测。[结果](tracks/laptop-workbuddy/tasks/LAP-49/RESULT.md) / [交接](tracks/laptop-workbuddy/tasks/LAP-49/HANDOFF.md)。
 
 LAP-48已部署基础（2026-11-04，历史加载证据）：QQ号schema3整块记忆、静默成功保存、官方联网薄适配/180秒共享/实际provider235及指定完整人设已启用；39条有效旧记忆保留、1条待关联，原0字节退役文件不动。36＋11＋1项定向检查与当前CLI零生成配对通过；当时running/connected/可收消息/router_ready、无错误或待重启。真实搜索/角色/群聊质量交用户自然群测。[结果](tracks/laptop-workbuddy/tasks/LAP-48/RESULT.md) / [交接](tracks/laptop-workbuddy/tasks/LAP-48/HANDOFF.md)。
 
@@ -68,7 +68,7 @@ LAP-41工作区整理与使用对照已完成：uv报告清除38,269个缓存文
 ## 从哪里继续
 
 1. 使用bot：[日常操作](SnowLuma使用说明.md) / [与旧NapCat bot的使用对照](docs/BOT_USAGE_COMPARISON.md)。
-2. 项目接续：本文件 → [AGENTS](AGENTS.md) → [QQ主线HANDOFF](tracks/laptop-workbuddy/HANDOFF.md)和[TASKS](tracks/laptop-workbuddy/TASKS.md) → [LAP-49交接](tracks/laptop-workbuddy/tasks/LAP-49/HANDOFF.md)、[评审](tracks/laptop-workbuddy/tasks/LAP-49/REVIEW.md)、[候选人设](tracks/laptop-workbuddy/tasks/LAP-49/PERSONA_DRAFT.md)。本轮仅规划，待用户review后提供medium指令，不自动实施；已部署基础见[48结果](tracks/laptop-workbuddy/tasks/LAP-48/RESULT.md)，不重复旧验收。
+2. 项目接续：本文件 → [AGENTS](AGENTS.md) → [QQ主线HANDOFF](tracks/laptop-workbuddy/HANDOFF.md)和[TASKS](tracks/laptop-workbuddy/TASKS.md) → [LAP-49结果](tracks/laptop-workbuddy/tasks/LAP-49/RESULT.md)。已实施、按用户要求保持停止，由用户正常手动启动；真实自然感仍待群测。
 3. 故障找文件：[目录与日志](项目目录与日志说明.md)。只按实际问题检索，不从历史清单自动展开新任务。
 
 ## 路线和边界
@@ -86,7 +86,7 @@ LAP-41工作区整理与使用对照已完成：uv报告清除38,269个缓存文
 
 | 工作线 | 状态/最新依据 | 接续入口 |
 | --- | --- | --- |
-| QQ主线：SnowLuma及共用bot业务 | LAP-49人设评审/候选就绪，待用户review；已部署基础LAP-48，质量边界保留 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [LAP-49](tracks/laptop-workbuddy/tasks/LAP-49/HANDOFF.md) |
+| QQ主线：SnowLuma及共用bot业务 | LAP-49人设已替换/技术配对通过，按用户要求保持停止，待用户启动实测 | [HANDOFF](tracks/laptop-workbuddy/HANDOFF.md) / [TASKS](tracks/laptop-workbuddy/TASKS.md) / [LAP-49](tracks/laptop-workbuddy/tasks/LAP-49/HANDOFF.md) |
 | 家庭5070备用模型路线 | 历史记录为接入已实现/离线及元数据通过、真实生成未验；本轮未重查，不自动切换后端 | [HANDOFF](tracks/local-5070/HANDOFF.md) / [既有选型](tracks/local-5070/MODEL_SELECTION.md) |
 
 `tracks/laptop-workbuddy` 是保留的历史目录名，当前承担QQ主线和共用网关交接，不表示仍以NapCat或WorkBuddy界面为主路线。所有旧任务的状态/验收差额在TASKS与各任务HANDOFF保留，不重命名整棵目录。

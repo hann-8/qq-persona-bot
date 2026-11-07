@@ -1,6 +1,6 @@
 2026-11-07 OPS-ASTRBOT-PASSWORD：AstrBot 管理密码已重置，单组件受管重启及本机登录验证通过；[交接](tasks/OPS-ASTRBOT-PASSWORD/HANDOFF.md)。
 
-当前活动任务：**LAP-49 planned / awaiting_user_review**（2026-11-07）。以LAP-47短稿为底，保留大肥鱼特征及原15组64条颜文字素材，去掉固定表演要求；候选3,901字节，当前运行稿17,575字节。本轮仅文档，运行人设/代码/配置/进程不动。[评审](tasks/LAP-49/REVIEW.md) / [候选人设](tasks/LAP-49/PERSONA_DRAFT.md) / [交接](tasks/LAP-49/HANDOFF.md)。
+当前活动任务：**LAP-49 implemented / stopped_for_user_start**（2026-11-07）。确认稿已原样替换运行人设（3,901字节、15组64条颜文字），36项定向检查及Planner/Replyer零生成配对通过；识图技术配对已更新，原配置/记忆/图库保持。按用户要求未启动bot，最终AstrBot/model/gate均0；真实加载/群聊质量待用户手动启动实测。[结果](tasks/LAP-49/RESULT.md) / [交接](tasks/LAP-49/HANDOFF.md)。
 
 LAP-48已部署基础（2026-11-04，历史加载证据）：QQ号schema3整块记忆、静默成功保存、官方联网薄适配/180秒共享/实际provider235及指定完整人设已启用；39条有效旧记忆保留、1条待关联，原0字节退役文件不动。36＋11＋1项定向检查与当前CLI零生成配对通过；当时running/connected/可收消息/router_ready、无错误或待重启。真实搜索/角色/群聊质量交用户自然群测。[结果](tasks/LAP-48/RESULT.md) / [交接](tasks/LAP-48/HANDOFF.md)。
 
@@ -56,7 +56,7 @@ LAP-41已完成新根整理：uv报告清除38,269缓存文件约626.1MiB、5份
 
 ## 当前需要读的文件
 
-- 当前：[49交接](tasks/LAP-49/HANDOFF.md) → [评审](tasks/LAP-49/REVIEW.md) / [候选人设](tasks/LAP-49/PERSONA_DRAFT.md)。先由用户review，再提供与确认稿一致的medium指令；不自动实施或派发。
+- 当前：[49结果](tasks/LAP-49/RESULT.md) / [交接](tasks/LAP-49/HANDOFF.md)。用户已确认并授权当前会话实施，已完成；按明确要求不启动，用户稍后正常手动启动。
 - 已部署基础：[48结果](tasks/LAP-48/RESULT.md) / [交接](tasks/LAP-48/HANDOFF.md)，其中真实搜索/记忆/群聊质量仍按原证据边界保留。
 - 上轮：[21实际数据准备](tasks/LAP-21/SNOW_MIGRATION_RESULT.md)保留；active未激活/真实未验不阻塞42，42不动其pending。
 - 日常使用：[SnowLuma使用说明](../../SnowLuma使用说明.md)。

@@ -1,4 +1,6 @@
-2026-11-07 20:03（Asia/Shanghai）领取 **LAP-49**，session `LAP-49-persona-naturalness-plan`，负责人当前会话Codex，无代理/切模型。起点main/0fed7c9，tracked干净；保留用户未跟踪.workbuddy/memory/2026-11-06.md、reports/vision-probe-gate-fix-plan-2026-11-06.md和启动bat，不读取私密内容、不执行、不提交。仅拥有PROGRESS、工作线HANDOFF/TASKS、tasks/LAP-49/{HANDOFF,REVIEW,PERSONA_DRAFT}.md六文档；只读核对历史/当前提示、交付评审与角色候选，不改运行persona/源码/local，不启停/登录/真实模型/搜索/消息。[交接](tasks/LAP-49/HANDOFF.md)。
+2026-11-07 20:12（Asia/Shanghai）LAP-49实施续领，session `LAP-49-persona-implementation`，当前会话唯一实现/零生成配对/受管停止执行者。用户已确认候选并指定当前会话实施，明确完事不要启动bot。起点main/07e1589，短期codex/lap49-persona；保留原三项用户未跟踪文件。归属config/persona.md、必要当前技术报告与本项文档/PROGRESS/工作线HANDOFF/TASKS；忽略归属state/lap49-deployment精确备份及本次技术配对。源码/local/记忆/图库不改，无代理/主动真实模型或消息；完成后保持停止。[交接](tasks/LAP-49/HANDOFF.md)。
+
+2026-11-07 20:03（Asia/Shanghai）LAP-49规划领取记录：session `LAP-49-persona-naturalness-plan`，仅六文档；已交付07e1589。当前授权和归属以上方实施记录为准。
 
 2026-11-07 OPS-ASTRBOT-PASSWORD：AstrBot 管理密码已重置，单组件受管重启及本机登录验证通过；[交接](tasks/OPS-ASTRBOT-PASSWORD/HANDOFF.md)。
 
@@ -228,7 +230,7 @@ LAP-15内容提交`632fdc5`已推送origin/main，2026-10-17 11:09用ls-remote�
 
 | ID | 单一任务 | 状态与已有证据 | 依赖/推荐顺序 | 执行session | 下一步/完成出口 |
 | --- | --- | --- | --- | --- | --- |
-| LAP-49 | 自然表达与大肥鱼角色提示优化 | planned / awaiting_user_review；[评审](tasks/LAP-49/REVIEW.md) / [候选](tasks/LAP-49/PERSONA_DRAFT.md) / [交接](tasks/LAP-49/HANDOFF.md) | 保留Planner→Replyer，原15组64条素材完整；3,901字节候选，运行不动 | LAP-49-persona-naturalness-plan，2026-11-07 20:03仅六文档；Git核对后释放写入归属 | 先review完整角色候选，确认后提供medium指令；不自动实施 |
+| LAP-49 | 自然表达与大肥鱼角色提示优化 | implemented / stopped_for_user_start；[结果](tasks/LAP-49/RESULT.md) / [交接](tasks/LAP-49/HANDOFF.md) | 确认稿原样替换，36项检查/当前零生成配对通过；未启动 | LAP-49-persona-implementation，2026-11-07；Git核对后释放唯一归属 | 用户手动正常启动并群测，不代用户发消息 |
 | LAP-48 | QQ号整块记忆、联网薄适配/180秒、静默保存与指定完整人设 | implemented_and_deployed / ready_for_user_test；[结果](tasks/LAP-48/RESULT.md) / [交接](tasks/LAP-48/HANDOFF.md) / [设计](tasks/LAP-48/PLAN.md) | 已实现迁移/配对/受管部署，质量待用户自然群测 | 本会话唯一实施者，2026-11-04；Git核对后释放归属 | 用户自然群测，不补历史大矩阵 |
 | LAP-43 | Snow功能落地；续仅两工具原生联网 | 基础四项已部署，用户确认表情/owner可用；旧Python联网故障保留。原生CLI两工具仅规划就绪；[HANDOFF](tasks/LAP-43/HANDOFF.md) / [CLI合同](tasks/LAP-43/CLI_WEB_PLAN.md) / [指令](tasks/LAP-43/MEDIUM_START.md) | 当前CodeBuddy改原生WebSearch/WebFetch，token/轮次有界，实际工具尚未开放；旧接受及48000保留 | LAP-43-native-web-plan，2026-10-28 23:45仅7文档；Git交付后释放 | medium按当前指令同轮实现/启用/main部署，群体验由用户实测；不重做已交付功能或开放其他工具 |
 | LAP-42 | Snow整合；识图闭环 | 视觉按用户“两张本机+一张群图”缩减验收通过，104单元/39框架及真实CLI契约通过；[HANDOFF](tasks/LAP-42/HANDOFF.md) / [结果](../../reports/lap-42-vision-closure-result.md) | 保留运行供用户使用，不续21/其他验收；GIF/旧辅助差额未测 | LAP-42-vision-closure-implementation，Git核对后释放唯一运行/验证归属 | vision=true已加载；授权输入政策48000；原事件ACK及用户客户端/内容确认通过；原六例四项豁免与历史失败保留 |
