@@ -1,6 +1,8 @@
 2026-11-07 OPS-ASTRBOT-PASSWORD：AstrBot 管理密码已重置，单组件受管重启及本机登录验证通过；[交接](tasks/OPS-ASTRBOT-PASSWORD/HANDOFF.md)。
 
-当前活动任务：**LAP-48 implemented_and_deployed / ready_for_user_test**（2026-11-04）。QQ号schema3整块记忆、静默成功保存、官方联网薄适配/180秒共享/实际provider235及指定完整人设已启用；39条有效旧记忆保留、1条待关联，原0字节退役文件不动。36＋11＋1项定向检查与当前CLI零生成配对通过；最终running/connected/可收消息/router_ready、无错误或待重启。真实搜索/角色/群聊质量交用户自然群测。[结果](tasks/LAP-48/RESULT.md) / [交接](tasks/LAP-48/HANDOFF.md)。
+当前活动任务：**LAP-49 planned / awaiting_user_review**（2026-11-07）。以LAP-47短稿为底，保留大肥鱼特征及原15组64条颜文字素材，去掉固定表演要求；候选3,901字节，当前运行稿17,575字节。本轮仅文档，运行人设/代码/配置/进程不动。[评审](tasks/LAP-49/REVIEW.md) / [候选人设](tasks/LAP-49/PERSONA_DRAFT.md) / [交接](tasks/LAP-49/HANDOFF.md)。
+
+LAP-48已部署基础（2026-11-04，历史加载证据）：QQ号schema3整块记忆、静默成功保存、官方联网薄适配/180秒共享/实际provider235及指定完整人设已启用；39条有效旧记忆保留、1条待关联，原0字节退役文件不动。36＋11＋1项定向检查与当前CLI零生成配对通过；当时running/connected/可收消息/router_ready、无错误或待重启。真实搜索/角色/群聊质量交用户自然群测。[结果](tasks/LAP-48/RESULT.md) / [交接](tasks/LAP-48/HANDOFF.md)。
 
 2026-11-03 LAP-46已实现并受管部署main：WebSearch/read别名冲突、内部并行步骤和正文恢复已修；内容审查/来源尾巴移除，思考low开启，搜索/图片预算已扩大加载。QQ running/connected/ready、无当前错误或待重启，记忆/识图保持。实际质量待用户自然群测，无新增常驻原文日志。[结果](tasks/LAP-46/RESULT.md) / [交接](tasks/LAP-46/HANDOFF.md)。
 
@@ -54,7 +56,8 @@ LAP-41已完成新根整理：uv报告清除38,269缓存文件约626.1MiB、5份
 
 ## 当前需要读的文件
 
-- 当前：[48交接](tasks/LAP-48/HANDOFF.md) → [最终评审](tasks/LAP-48/REVIEW.md) / [设计](tasks/LAP-48/PLAN.md) / [medium指令](tasks/LAP-48/MEDIUM_START.md) / [指定人设备稿](tasks/LAP-48/PERSONA_RESTORE.md)。由用户手动交medium一次实现/启用/部署，不自动派发；首稿短编号/短角色已废止，运行基础见[47结果](tasks/LAP-47/RESULT.md)。
+- 当前：[49交接](tasks/LAP-49/HANDOFF.md) → [评审](tasks/LAP-49/REVIEW.md) / [候选人设](tasks/LAP-49/PERSONA_DRAFT.md)。先由用户review，再提供与确认稿一致的medium指令；不自动实施或派发。
+- 已部署基础：[48结果](tasks/LAP-48/RESULT.md) / [交接](tasks/LAP-48/HANDOFF.md)，其中真实搜索/记忆/群聊质量仍按原证据边界保留。
 - 上轮：[21实际数据准备](tasks/LAP-21/SNOW_MIGRATION_RESULT.md)保留；active未激活/真实未验不阻塞42，42不动其pending。
 - 日常使用：[SnowLuma使用说明](../../SnowLuma使用说明.md)。
 - 旧NapCat用户：[实际bot使用对照](../../docs/BOT_USAGE_COMPARISON.md)。
