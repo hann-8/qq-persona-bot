@@ -1,6 +1,6 @@
 2026-11-07 OPS-ASTRBOT-PASSWORD：AstrBot 管理密码已重置，单组件受管重启及本机登录验证通过；[交接](tracks/laptop-workbuddy/tasks/OPS-ASTRBOT-PASSWORD/HANDOFF.md)。
 
-当前活动任务：**LAP-49 implemented / stopped_for_user_start**（2026-11-07）。确认稿已原样替换运行人设（3,901字节、15组64条颜文字），36项定向检查及Planner/Replyer零生成配对通过；识图技术配对已更新，原配置/记忆/图库保持。按用户要求未启动bot，最终AstrBot/model/gate均0；真实加载/群聊质量待用户手动启动实测。[结果](tracks/laptop-workbuddy/tasks/LAP-49/RESULT.md) / [交接](tracks/laptop-workbuddy/tasks/LAP-49/HANDOFF.md)。
+当前活动任务：**LAP-49 implemented / stopped_for_user_start**（2026-11-07）。确认稿已原样替换运行人设（3,901字节、15组64条颜文字），36项定向检查及Planner/Replyer零生成配对通过；识图技术配对已更新，原配置/记忆/图库保持。按用户要求未启动bot，最终AstrBot/model/gate均0；真实加载/群聊质量待用户手动启动实测。[结果](tracks/laptop-workbuddy/tasks/LAP-49/RESULT.md) / [交接](tracks/laptop-workbuddy/tasks/LAP-49/HANDOFF.md)。 20:22启动冲突已清理：旧gate/model未在台账中但仍监听，经精确身份恢复受管清理后，实际6185/6199/6200/8765均无监听；bot未启动，用户可重新手动启动。
 
 LAP-48已部署基础（2026-11-04，历史加载证据）：QQ号schema3整块记忆、静默成功保存、官方联网薄适配/180秒共享/实际provider235及指定完整人设已启用；39条有效旧记忆保留、1条待关联，原0字节退役文件不动。36＋11＋1项定向检查与当前CLI零生成配对通过；当时running/connected/可收消息/router_ready、无错误或待重启。真实搜索/角色/群聊质量交用户自然群测。[结果](tracks/laptop-workbuddy/tasks/LAP-48/RESULT.md) / [交接](tracks/laptop-workbuddy/tasks/LAP-48/HANDOFF.md)。
 
